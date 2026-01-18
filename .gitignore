@@ -137,3 +137,32 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# ============================================
+# DOCUMENTACIÓN PRIVADA DEL PROYECTO
+# ============================================
+# Ignorar todos los README excepto el principal de la raíz
+
+# Backend - Documentación de base de datos
+apps/backend/database/README.md
+
+# Backend - Documentación de módulos
+apps/backend/src/modules/bonda/README.md
+apps/backend/src/modules/supabase/README.md
+apps/backend/src/modules/example/README.md
+apps/backend/src/modules/*/README.md
+
+# Backend - README del backend
+apps/backend/README.md
+
+# Frontend - Documentación de flujos
+apps/frontend/docs/
+
+# Frontend - README del frontend
+apps/frontend/README.md
+
+# Documentos de integración y resúmenes en la raíz
+INTEGRACION-BONDA-RESUMEN.md
+*-RESUMEN.md
+
+# NOTA: El README.md de la raíz del proyecto SÍ se sube (no está ignorado)

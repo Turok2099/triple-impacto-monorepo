@@ -1,7 +1,8 @@
-name: Backend CI
+name: Backend CI/CD
 
 on:
   push:
+    branches: [main]
     paths:
       - "apps/backend/**"
   pull_request:
@@ -9,26 +10,30 @@ on:
       - "apps/backend/**"
 
 jobs:
-  build:
+  backend:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
       - name: Install dependencies
-        run: |
-          cd apps/backend
-          npm install
+        working-directory: apps/backend
+        run: npm install
 
       - name: Build project
-        run: |
-          cd apps/backend
-          npm run build
+        working-directory: apps/backend
+        run: npm run build
+        env:
+          NODE_ENV: test
+
+      - name: Run tests
+        working-directory: apps/backend
+        run: npm test
         env:
           NODE_ENV: test
           PORT: 3000
@@ -41,18 +46,10 @@ jobs:
           BONDA_MICROSITE_ID: test-id
           BONDA_USE_MOCKS: true
 
-      - name: Run tests
-        run: |
-          cd apps/backend
-          npm test
-        env:
-          NODE_ENV: test
-          PORT: 3000
-          JWT_SECRET: test-secret-key-for-ci
-          SUPABASE_URL: https://test.supabase.co
-          SUPABASE_ANON_KEY: test-key
-          SUPABASE_SERVICE_ROLE_KEY: test-key
-          BONDA_API_URL: https://apiv1.cuponstar.com
-          BONDA_API_KEY: test-key
-          BONDA_MICROSITE_ID: test-id
-          BONDA_USE_MOCKS: true
+      # 🚀 Deploy a Railway (solo cuando hay push a main)
+      - name: Deploy to Railway
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: bervProject/railway-deploy@main
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          service: backend

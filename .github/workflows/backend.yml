@@ -46,10 +46,4 @@ jobs:
           BONDA_MICROSITE_ID: test-id
           BONDA_USE_MOCKS: true
 
-      # 🚀 Deploy a Railway (solo cuando hay push a main)
-      - name: Deploy to Railway
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: bervProject/railway-deploy@main
-        with:
-          railway_token: ${{ secrets.RAILWAY_TOKEN }}
-          service: backend
+      # Deploy manual en Railway - GitHub Actions solo hace CI (build + test)

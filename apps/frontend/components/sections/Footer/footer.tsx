@@ -73,8 +73,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-              Transformamos tu generosidad en impacto social real y beneficios
-              exclusivos. Dona, ayuda y ahorra.
+            Transformamos tu generosidad en impacto social y ambiental real real y en beneficios exclusivos. Doná, ayudá y ahorrá.
             </p>
             {/* Redes sociales */}
             <div className="flex gap-3">

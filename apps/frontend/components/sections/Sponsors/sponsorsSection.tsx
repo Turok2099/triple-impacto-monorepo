@@ -40,7 +40,7 @@ export default function SponsorsSection() {
             Marcas Aliadas
           </h2>
           <p className="max-w-2xl mx-auto text-xl text-gray-600">
-            Empresas comprometidas con el{" "}
+            Empresas comprometidas con {" "}
             <span className="font-semibold" style={{ color: "#16a459" }}>
               Club Triple Impacto
             </span>{" "}

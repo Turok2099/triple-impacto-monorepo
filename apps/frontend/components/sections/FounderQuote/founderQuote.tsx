@@ -31,7 +31,7 @@ export default function FounderQuote() {
               <p className="text-center text-gray-700 text-base pt-6 font-normal leading-relaxed italic">
                 "Cada vez que compramos y vendemos,{" "}
                 <span className="text-[#16a459] font-semibold">
-                  elegimos el mundo en el que quiere vivir"
+                  elegimos el mundo en el que queremos vivir"
                 </span>
               </p>
 

@@ -5,10 +5,10 @@ export default function FAQCTASection() {
         {/* CTA para visitar FAQs */}
         <div className="text-center">
           <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
-            ¿Tienes alguna pregunta?
+            Tenéss alguna pregunta?
           </h2>
           <p className="text-xl text-gray-600 mb-8 max-w-xl mx-auto">
-            Encuentra respuestas a las preguntas más frecuentes sobre cómo
+            Encontrá respuestas a las preguntas más frecuentes sobre cómo
             funciona Club Triple Impacto
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

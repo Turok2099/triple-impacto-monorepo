@@ -90,10 +90,10 @@ export default function CuponesShowcase({
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
-            Descubre nuestro catálogo de descuentos
+            Descubrí nuestro catálogo de descuentos
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Al donar, obtienes acceso a descuentos exclusivos en servicios que usas todos los días.
+            Al donar, obtenés acceso a descuentos exclusivos en servicios que usas todos los días.
           </p>
         </div>
 

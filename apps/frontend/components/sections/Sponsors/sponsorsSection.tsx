@@ -92,18 +92,7 @@ export default function SponsorsSection() {
           ))}
         </div>
 
-        {/* Mensaje adicional */}
-        <div className="text-center mt-16">
-          <p className="text-gray-600 mb-4">
-            ¿Tu empresa quiere ser parte del cambio?
-          </p>
-          <button
-            className="px-8 py-3 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
-            style={{ backgroundColor: "#16a459" }}
-          >
-            Sumate como marca aliada
-          </button>
-        </div>
+
       </div>
     </section>
   );

@@ -12,18 +12,19 @@ on:
 jobs:
   backend:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: npm
+          cache-dependency-path: apps/backend/package-lock.json
 
       - name: Install dependencies
         working-directory: apps/backend
-        run: npm install
+        run: npm ci
 
       - name: Build project
         working-directory: apps/backend
@@ -44,6 +45,4 @@ jobs:
           BONDA_API_URL: https://apiv1.cuponstar.com
           BONDA_API_KEY: test-key
           BONDA_MICROSITE_ID: test-id
-          BONDA_USE_MOCKS: true
-
-      # Deploy manual en Railway - GitHub Actions solo hace CI (build + test)
+          BONDA_USE_MOCKS: "true"

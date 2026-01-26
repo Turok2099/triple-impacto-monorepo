@@ -57,39 +57,108 @@ export default function PartnersSection() {
                 animation: `fadeIn 1.2s ease-in-out ${index * 0.2}s both`,
               }}
             >
-              {/* Card con imagen/logo */}
-              <div className="block overflow-hidden group rounded-xl shadow-lg cursor-pointer">
-                <div
-                  className="w-full h-56 sm:h-64 flex items-center justify-center text-7xl transition-all duration-300 ease-out group-hover:scale-110"
-                  style={{
-                    background: `linear-gradient(135deg, ${
-                      index % 3 === 0
-                        ? "#16a459"
-                        : index % 3 === 1
-                        ? "#385da0"
-                        : "#cfc755"
-                    } 0%, ${
-                      index % 3 === 0
-                        ? "#0d8745"
-                        : index % 3 === 1
-                        ? "#2a4a80"
-                        : "#b8af42"
-                    } 100%)`,
-                  }}
-                >
-                  {partner.logo.startsWith("http") ? (
-                    <div className="w-full h-full flex items-center justify-center bg-white p-8">
-                      <img
-                        src={partner.logo}
-                        alt={partner.name}
-                        className="w-full h-full object-contain"
-                      />
+              {/* Card con imagen/logo interactivo */}
+              {partner.website ? (
+                partner.website.startsWith("/") ? (
+                  <Link href={partner.website} className="block overflow-hidden group rounded-xl shadow-lg cursor-pointer">
+                    <div
+                      className="w-full h-56 sm:h-64 flex items-center justify-center text-7xl transition-all duration-300 ease-out group-hover:scale-110"
+                      style={{
+                        background: `linear-gradient(135deg, ${index % 3 === 0
+                            ? "#16a459"
+                            : index % 3 === 1
+                              ? "#385da0"
+                              : "#cfc755"
+                          } 0%, ${index % 3 === 0
+                            ? "#0d8745"
+                            : index % 3 === 1
+                              ? "#2a4a80"
+                              : "#b8af42"
+                          } 100%)`,
+                      }}
+                    >
+                      {partner.logo.startsWith("http") ? (
+                        <div className="w-full h-full flex items-center justify-center bg-white p-8">
+                          <img
+                            src={partner.logo}
+                            alt={partner.name}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                      ) : (
+                        partner.logo
+                      )}
                     </div>
-                  ) : (
-                    partner.logo
-                  )}
+                  </Link>
+                ) : (
+                  <a
+                    href={partner.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block overflow-hidden group rounded-xl shadow-lg cursor-pointer"
+                  >
+                    <div
+                      className="w-full h-56 sm:h-64 flex items-center justify-center text-7xl transition-all duration-300 ease-out group-hover:scale-110"
+                      style={{
+                        background: `linear-gradient(135deg, ${index % 3 === 0
+                            ? "#16a459"
+                            : index % 3 === 1
+                              ? "#385da0"
+                              : "#cfc755"
+                          } 0%, ${index % 3 === 0
+                            ? "#0d8745"
+                            : index % 3 === 1
+                              ? "#2a4a80"
+                              : "#b8af42"
+                          } 100%)`,
+                      }}
+                    >
+                      {partner.logo.startsWith("http") ? (
+                        <div className="w-full h-full flex items-center justify-center bg-white p-8">
+                          <img
+                            src={partner.logo}
+                            alt={partner.name}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                      ) : (
+                        partner.logo
+                      )}
+                    </div>
+                  </a>
+                )
+              ) : (
+                <div className="block overflow-hidden group rounded-xl shadow-lg cursor-pointer">
+                  <div
+                    className="w-full h-56 sm:h-64 flex items-center justify-center text-7xl transition-all duration-300 ease-out group-hover:scale-110"
+                    style={{
+                      background: `linear-gradient(135deg, ${index % 3 === 0
+                          ? "#16a459"
+                          : index % 3 === 1
+                            ? "#385da0"
+                            : "#cfc755"
+                        } 0%, ${index % 3 === 0
+                          ? "#0d8745"
+                          : index % 3 === 1
+                            ? "#2a4a80"
+                            : "#b8af42"
+                        } 100%)`,
+                    }}
+                  >
+                    {partner.logo.startsWith("http") ? (
+                      <div className="w-full h-full flex items-center justify-center bg-white p-8">
+                        <img
+                          src={partner.logo}
+                          alt={partner.name}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    ) : (
+                      partner.logo
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Contenido de la card */}
               <div className="relative mt-5">
@@ -130,15 +199,25 @@ export default function PartnersSection() {
 
                 {/* Link */}
                 {partner.website && (
-                  <a
-                    href={partner.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#16a459] font-semibold text-sm hover:underline inline-flex items-center gap-1"
-                  >
-                    Conocer más
-                    <span aria-hidden="true">→</span>
-                  </a>
+                  partner.website.startsWith("/") ? (
+                    <Link
+                      href={partner.website}
+                      className="text-[#16a459] font-semibold text-sm hover:underline inline-flex items-center gap-1"
+                    >
+                      Conocer más
+                      <span aria-hidden="true">→</span>
+                    </Link>
+                  ) : (
+                    <a
+                      href={partner.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#16a459] font-semibold text-sm hover:underline inline-flex items-center gap-1"
+                    >
+                      Conocer más
+                      <span aria-hidden="true">→</span>
+                    </a>
+                  )
                 )}
               </div>
             </div>

@@ -9,7 +9,7 @@ export const partnersData: Partner[] = [
     description:
       "Promoción de la movilidad sustentable y educación vial en comunidades urbanas para un transporte más limpio y saludable.",
     beneficiaries: 380,
-    website: "https://www.voyenbici.org.ar",
+    website: "/ongs/ong-template",
     certified: true,
     activeProjects: 8,
   },

@@ -15,8 +15,13 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return API welcome message', () => {
+      const result = appController.getHello();
+      expect(result).toEqual({
+        message: 'Bienvenido a la API de Triple Impacto',
+        version: '1.0.0',
+        documentation: '/api',
+      });
     });
   });
 });

@@ -8,7 +8,6 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { SupabaseService } from '../supabase/supabase.service';
-import { BondaService } from '../bonda/bonda.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
@@ -19,19 +18,16 @@ export class AuthService {
 
   constructor(
     private readonly supabaseService: SupabaseService,
-    private readonly bondaService: BondaService,
     private readonly jwtService: JwtService,
   ) {}
 
   /**
-   * Registrar un nuevo usuario
+   * Registrar un nuevo usuario.
+   * El afiliado en Bonda se crea tras la confirmación del primer pago (webhook Fiserv), no aquí.
    * 1. Valida que el email no exista
-   * 2. Genera código de afiliado único
-   * 3. Hashea la contraseña
-   * 4. Crea usuario en Supabase
-   * 5. Crea afiliado en Bonda
-   * 6. Actualiza estado de sincronización
-   * 7. Genera JWT
+   * 2. Hashea la contraseña
+   * 3. Crea usuario en Supabase (sin bonda_affiliate_code)
+   * 4. Genera JWT
    */
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
     const { email, password, nombre, telefono, provincia, localidad } =
@@ -43,14 +39,11 @@ export class AuthService {
       throw new ConflictException('El email ya está registrado');
     }
 
-    // 2. Generar código de afiliado único
-    const bondaCode = this.generarCodigoAfiliado(email);
-
-    // 3. Hashear contraseña
+    // 2. Hashear contraseña
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
-    // 4. Crear usuario en Supabase
+    // 3. Crear usuario en Supabase (sin bonda_affiliate_code; se asigna tras el primer pago Fiserv)
     let usuario;
     try {
       usuario = await this.supabaseService.createUser({
@@ -60,21 +53,13 @@ export class AuthService {
         provincia,
         localidad,
         password_hash: passwordHash,
-        bonda_affiliate_code: bondaCode,
       });
     } catch (error) {
       this.logger.error('Error al crear usuario en Supabase:', error);
       throw new InternalServerErrorException('Error al crear usuario');
     }
 
-    // 5. Crear afiliado en Bonda (asíncrono, no bloquea el registro)
-    this.sincronizarConBonda(usuario.id, bondaCode, registerDto).catch(
-      (error) => {
-        this.logger.error('Error en sincronización con Bonda:', error);
-      },
-    );
-
-    // 6. Generar JWT
+    // 4. Generar JWT
     const token = this.generarToken(usuario);
 
     this.logger.log(`✅ Usuario registrado: ${email}`);
@@ -84,7 +69,7 @@ export class AuthService {
         id: usuario.id,
         nombre: usuario.nombre,
         email: usuario.email,
-        bondaCode: usuario.bonda_affiliate_code,
+        bondaCode: usuario.bonda_affiliate_code ?? null,
       },
       token,
     };
@@ -118,28 +103,10 @@ export class AuthService {
         id: usuario.id,
         nombre: usuario.nombre,
         email: usuario.email,
-        bondaCode: usuario.bonda_affiliate_code,
+        bondaCode: usuario.bonda_affiliate_code ?? null,
       },
       token,
     };
-  }
-
-  /**
-   * Generar código de afiliado único
-   * Formato: {emailPart}_{timestamp}{random}
-   * Ejemplo: juan_xy7k2p3
-   */
-  private generarCodigoAfiliado(email: string): string {
-    const emailPart = email
-      .split('@')[0]
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, '')
-      .substring(0, 5);
-
-    const timestamp = Date.now().toString(36).substring(-5);
-    const random = Math.random().toString(36).substring(2, 5);
-
-    return `${emailPart}_${timestamp}${random}`;
   }
 
   /**
@@ -149,66 +116,10 @@ export class AuthService {
     const payload = {
       sub: usuario.id,
       email: usuario.email,
-      bondaCode: usuario.bonda_affiliate_code,
+      bondaCode: usuario.bonda_affiliate_code ?? null,
     };
 
     return this.jwtService.sign(payload);
-  }
-
-  /**
-   * Sincronizar usuario con Bonda
-   * Esta función se ejecuta de forma asíncrona después del registro
-   */
-  private async sincronizarConBonda(
-    usuarioId: string,
-    bondaCode: string,
-    data: RegisterDto,
-  ): Promise<void> {
-    try {
-      // Crear afiliado en Bonda
-      const bondaResponse = await this.bondaService.crearAfiliado({
-        code: bondaCode,
-        email: data.email,
-        nombre: data.nombre,
-        telefono: data.telefono,
-        provincia: data.provincia,
-        localidad: data.localidad,
-      });
-
-      // Actualizar estado de sincronización
-      if (bondaResponse.success) {
-        await this.supabaseService.updateBondaSyncStatus(usuarioId, 'synced');
-        this.logger.log(`✅ Usuario sincronizado con Bonda: ${bondaCode}`);
-      } else {
-        await this.supabaseService.updateBondaSyncStatus(usuarioId, 'error');
-        this.logger.error('Error en respuesta de Bonda:', bondaResponse.error);
-      }
-
-      // Registrar log de la operación
-      await this.supabaseService.logBondaOperation({
-        usuario_id: usuarioId,
-        operacion: 'create',
-        endpoint: '/affiliates',
-        request_data: { code: bondaCode, email: data.email },
-        response_data: bondaResponse,
-        exitoso: bondaResponse.success || false,
-        error_message: bondaResponse.error?.code,
-      });
-    } catch (error) {
-      this.logger.error('Error al sincronizar con Bonda:', error);
-      await this.supabaseService.updateBondaSyncStatus(usuarioId, 'error');
-
-      // Registrar error en logs
-      await this.supabaseService.logBondaOperation({
-        usuario_id: usuarioId,
-        operacion: 'create',
-        endpoint: '/affiliates',
-        request_data: { code: bondaCode },
-        response_data: null,
-        exitoso: false,
-        error_message: error.message,
-      });
-    }
   }
 
   /**

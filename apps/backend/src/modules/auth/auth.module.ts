@@ -5,7 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { BondaModule } from '../bonda/bonda.module';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -22,11 +22,10 @@ import { BondaModule } from '../bonda/bonda.module';
       },
       inject: [ConfigService],
     }),
-    BondaModule,
     ConfigModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
-  exports: [AuthService, JwtStrategy, PassportModule],
+  providers: [AuthService, JwtStrategy, JwtAuthGuard],
+  exports: [AuthService, JwtStrategy, JwtAuthGuard, PassportModule],
 })
 export class AuthModule {}

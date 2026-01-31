@@ -4,12 +4,11 @@
 -- ============================================
 
 -- Tabla: usuarios
--- Almacena la información de usuarios registrados en Triple Impacto
--- Se sincroniza con Bonda a través del código de afiliado (bonda_affiliate_code)
+-- Almacena la información de usuarios registrados en Triple Impacto.
+-- Los códigos de afiliado Bonda (uno por ONG/micrositio) se guardan en usuarios_bonda_afiliados.
 CREATE TABLE IF NOT EXISTS usuarios (
   -- Identificadores
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  bonda_affiliate_code VARCHAR(255) UNIQUE NOT NULL, -- Código de afiliado en Bonda (único)
   
   -- Información personal
   nombre VARCHAR(255) NOT NULL,
@@ -28,22 +27,15 @@ CREATE TABLE IF NOT EXISTS usuarios (
   -- Metadatos
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  last_login_at TIMESTAMP WITH TIME ZONE,
-  
-  -- Sincronización con Bonda
-  bonda_synced_at TIMESTAMP WITH TIME ZONE, -- Última sincronización con Bonda
-  bonda_sync_status VARCHAR(50) DEFAULT 'pending' -- pending, synced, error
+  last_login_at TIMESTAMP WITH TIME ZONE
 );
 
 -- Índices para mejorar el rendimiento
 CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios(email);
-CREATE INDEX IF NOT EXISTS idx_usuarios_bonda_code ON usuarios(bonda_affiliate_code);
 CREATE INDEX IF NOT EXISTS idx_usuarios_estado ON usuarios(estado);
 
 -- Comentarios descriptivos
 COMMENT ON TABLE usuarios IS 'Tabla principal de usuarios registrados en Triple Impacto';
-COMMENT ON COLUMN usuarios.bonda_affiliate_code IS 'Código único del afiliado en Bonda (sincronizado)';
-COMMENT ON COLUMN usuarios.bonda_sync_status IS 'Estado de sincronización con Bonda API';
 
 -- ============================================
 -- Tabla: donaciones
@@ -141,6 +133,10 @@ CREATE TABLE IF NOT EXISTS organizaciones (
   telefono VARCHAR(50),
   direccion TEXT,
   
+  -- Montos de donación (por ONG)
+  monto_minimo DECIMAL(10, 2),   -- Mínimo aceptado para donar a esta ONG (NULL = sin mínimo)
+  monto_sugerido DECIMAL(10, 2), -- Monto sugerido que muestra el front (NULL = usar default en front)
+  
   -- Estado
   activa BOOLEAN DEFAULT true,
   verificada BOOLEAN DEFAULT false,
@@ -154,6 +150,86 @@ CREATE INDEX IF NOT EXISTS idx_organizaciones_activa ON organizaciones(activa);
 CREATE INDEX IF NOT EXISTS idx_organizaciones_nombre ON organizaciones(nombre);
 
 COMMENT ON TABLE organizaciones IS 'Organizaciones no gubernamentales beneficiarias de donaciones';
+COMMENT ON COLUMN organizaciones.monto_minimo IS 'Mínimo aceptado para donar a esta ONG; NULL = sin mínimo';
+COMMENT ON COLUMN organizaciones.monto_sugerido IS 'Monto sugerido que muestra el front; NULL = usar default en front';
+
+-- ============================================
+-- Tabla: bonda_microsites
+-- Configuración por programa/micrositio de Bonda (token + microsite_id).
+-- Un registro por cada “club” o programa de beneficios; los cupones cambian por micrositio.
+-- ============================================
+CREATE TABLE IF NOT EXISTS bonda_microsites (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  
+  -- Identificación del programa
+  nombre VARCHAR(255) NOT NULL,
+  slug VARCHAR(100) UNIQUE NOT NULL,
+  
+  -- Credenciales Bonda (sensibles; usar solo en backend)
+  api_token TEXT NOT NULL,
+  microsite_id VARCHAR(100),
+  
+  -- Vinculación opcional con nuestra tabla de organizaciones
+  organizacion_id UUID REFERENCES organizaciones(id) ON DELETE SET NULL,
+  
+  -- Estado
+  activo BOOLEAN DEFAULT true,
+  
+  -- Metadatos
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_bonda_microsites_slug ON bonda_microsites(slug);
+CREATE INDEX IF NOT EXISTS idx_bonda_microsites_organizacion ON bonda_microsites(organizacion_id);
+CREATE INDEX IF NOT EXISTS idx_bonda_microsites_activo ON bonda_microsites(activo);
+
+COMMENT ON TABLE bonda_microsites IS 'Token y microsite_id de Bonda por programa; los cupones son distintos por micrositio';
+COMMENT ON COLUMN bonda_microsites.api_token IS 'Token/API key de Bonda para este micrositio (no exponer al frontend)';
+COMMENT ON COLUMN bonda_microsites.slug IS 'Identificador único para resolver config en backend (ej: club-impacto-proyectar)';
+
+-- ============================================
+-- Tabla: usuarios_bonda_afiliados
+-- Relación N:N usuario ↔ micrositio Bonda. Un usuario puede tener un affiliate_code por ONG.
+-- Se crea/actualiza tras la confirmación del primer pago (webhook Fiserv) por esa ONG.
+-- ============================================
+CREATE TABLE IF NOT EXISTS usuarios_bonda_afiliados (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  bonda_microsite_id UUID NOT NULL REFERENCES bonda_microsites(id) ON DELETE CASCADE,
+  affiliate_code VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, bonda_microsite_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_usuarios_bonda_afiliados_user ON usuarios_bonda_afiliados(user_id);
+CREATE INDEX IF NOT EXISTS idx_usuarios_bonda_afiliados_microsite ON usuarios_bonda_afiliados(bonda_microsite_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_usuarios_bonda_afiliados_code ON usuarios_bonda_afiliados(affiliate_code);
+
+COMMENT ON TABLE usuarios_bonda_afiliados IS 'Afiliados Bonda por usuario y micrositio; un código por (usuario, ONG)';
+COMMENT ON COLUMN usuarios_bonda_afiliados.affiliate_code IS 'Código de afiliado en Bonda para este usuario en este micrositio';
+
+-- ============================================
+-- Tabla: public_coupons
+-- Catálogo público de cupones (Estado 1 – Visitantes). Se muestra sin códigos.
+-- ============================================
+CREATE TABLE IF NOT EXISTS public_coupons (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  titulo TEXT NOT NULL,
+  descripcion TEXT,
+  descuento TEXT,
+  imagen_url TEXT,
+  empresa TEXT,
+  categoria TEXT,
+  orden INT DEFAULT 0,
+  activo BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_public_coupons_activo ON public_coupons(activo);
+CREATE INDEX IF NOT EXISTS idx_public_coupons_orden ON public_coupons(orden);
+
+COMMENT ON TABLE public_coupons IS 'Catálogo público de cupones para visitantes (sin códigos)';
 
 -- ============================================
 -- Tabla: logs_sync_bonda
@@ -220,6 +296,11 @@ CREATE TRIGGER update_organizaciones_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
+CREATE TRIGGER update_bonda_microsites_updated_at
+  BEFORE UPDATE ON bonda_microsites
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
 -- ============================================
 -- ROW LEVEL SECURITY (RLS) para Supabase
 -- ============================================
@@ -229,6 +310,9 @@ ALTER TABLE usuarios ENABLE ROW LEVEL SECURITY;
 ALTER TABLE donaciones ENABLE ROW LEVEL SECURITY;
 ALTER TABLE cupones_bonda ENABLE ROW LEVEL SECURITY;
 ALTER TABLE organizaciones ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bonda_microsites ENABLE ROW LEVEL SECURITY;
+ALTER TABLE usuarios_bonda_afiliados ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public_coupons ENABLE ROW LEVEL SECURITY;
 
 -- Políticas de seguridad para usuarios
 -- Los usuarios solo pueden ver/editar su propia información
@@ -265,6 +349,53 @@ CREATE POLICY "Las organizaciones activas son visibles para todos"
   ON organizaciones
   FOR SELECT
   USING (activa = true);
+
+-- Políticas de seguridad para bonda_microsites
+-- Contiene tokens; solo el backend (service_role) debe acceder.
+-- Sin políticas para anon/authenticated → solo service_role puede leer/escribir.
+-- (El service_role de Supabase ignora RLS por defecto.)
+
+-- Políticas de seguridad para usuarios_bonda_afiliados
+-- Usuarios solo ven sus propias filas (user_id = auth.uid()).
+-- INSERT/UPDATE/DELETE vía backend (service_role) en webhook.
+CREATE POLICY "Usuarios ven sus afiliados Bonda"
+  ON usuarios_bonda_afiliados
+  FOR SELECT
+  USING (auth.uid() = user_id);
+
+-- Políticas de seguridad para public_coupons
+-- Lectura pública para cupones activos (visitantes sin login).
+CREATE POLICY "Cupones públicos activos visibles para todos"
+  ON public_coupons
+  FOR SELECT
+  USING (activo = true);
+
+-- ============================================
+-- DATOS INICIALES: bonda_microsites (programas conocidos)
+-- Ejecutar tras crear la tabla y reemplazar {TOKEN} por el valor real de Bonda.
+-- ============================================
+-- INSERT INTO bonda_microsites (nombre, slug, api_token, activo) VALUES
+--   ('Club de Impacto Proyectar', 'club-impacto-proyectar', '{TOKEN}', true),
+--   ('Beneficios Biblioteca Rurales Argentinas', 'beneficios-biblioteca-rurales', '{TOKEN}', true),
+--   ('Beneficios Haciendo Camino', 'beneficios-haciendo-camino', '{TOKEN}', true),
+--   ('Comunidad Mamis Solidarias', 'comunidad-mamis-solidarias', '{TOKEN}', true),
+--   ('Club Plato Lleno', 'club-plato-lleno', '{TOKEN}', true),
+--   ('Beneficios Monte Adentro', 'beneficios-monte-adentro', '{TOKEN}', true),
+--   ('Beneficios Fundación Padres', 'beneficios-fundacion-padres', '{TOKEN}', true),
+--   ('Club Proactiva', 'club-proactiva', '{TOKEN}', true),
+--   ('Beneficios La Guarida', 'beneficios-la-guarida', '{TOKEN}', true),
+--   ('Comunidad Techo', 'comunidad-techo', '{TOKEN}', true),
+--   ('Regenerar Club', 'regenerar-club', '{TOKEN}', true),
+--   ('Beneficios Loros Parlantes', 'beneficios-loros-parlantes', '{TOKEN}', true);
+
+-- ============================================
+-- DATOS INICIALES: public_coupons (catálogo público – mock)
+-- Ejecutar para tener cupones de ejemplo en la landing.
+-- ============================================
+-- INSERT INTO public_coupons (titulo, descripcion, descuento, empresa, categoria, orden, activo) VALUES
+--   ('2x1 en entradas de cine', 'Válido en cines participantes', '2x1', 'Cinemark', 'entretenimiento', 1, true),
+--   ('10% en compras online', 'Código al donar', '10%', 'Netshoes', 'moda', 2, true),
+--   ('Combo 2x1 en restaurantes', 'Presentando beneficio', '2x1', 'Wendy''s', 'gastronomia', 3, true);
 
 -- ============================================
 -- DATOS DE EJEMPLO (OPCIONAL - Solo para desarrollo)

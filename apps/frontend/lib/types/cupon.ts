@@ -46,3 +46,17 @@ export interface CuponesResponseDto {
   count: number;
   cupones: CuponDto[];
 }
+
+/** Cupón público (catálogo visitantes – sin códigos). Respuesta de GET /api/public/cupones */
+export interface PublicCouponDto {
+  id: string;
+  titulo: string;
+  descripcion: string | null;
+  descuento: string | null;
+  imagen_url: string | null;
+  empresa: string | null;
+  categoria: string | null;
+  orden: number;
+  activo: boolean;
+  created_at: string;
+}

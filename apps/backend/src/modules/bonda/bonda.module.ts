@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { BondaController } from './bonda.controller';
 import { BondaService } from './bonda.service';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
@@ -9,6 +10,7 @@ import { BondaService } from './bonda.service';
       timeout: 5000,
       maxRedirects: 5,
     }),
+    forwardRef(() => AuthModule),
   ],
   controllers: [BondaController],
   providers: [BondaService],

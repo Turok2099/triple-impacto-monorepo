@@ -23,11 +23,11 @@ export class SyncCuponesService {
   ) {}
 
   /**
-   * Cron que se ejecuta cada 6 horas para sincronizar cupones.
+   * Cron que se ejecuta diariamente a las 3 AM (hora Argentina) para sincronizar cupones.
    * Usa round-robin para rotar entre micrositios activos.
    * También se puede ejecutar manualmente llamando a este método.
    */
-  @Cron(CronExpression.EVERY_6_HOURS, {
+  @Cron('0 3 * * *', {
     name: 'sync-cupones-bonda',
     timeZone: 'America/Argentina/Buenos_Aires',
   })

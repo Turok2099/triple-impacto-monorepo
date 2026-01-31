@@ -22,7 +22,11 @@ async function bootstrap() {
       if (!origin) return callback(null, true);
       
       // Verificar si el origin está permitido
-      if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      if (
+        allowedOrigins.includes(origin) || 
+        origin.endsWith('.vercel.app') ||
+        origin.endsWith('.tripleimpacto.site')
+      ) {
         callback(null, true);
       } else {
         console.warn(`CORS blocked origin: ${origin}`);

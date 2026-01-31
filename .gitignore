@@ -138,10 +138,17 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+# Turbo cache and logs
+.turbo/
+
 # ============================================
 # DOCUMENTACIÓN PRIVADA DEL PROYECTO
 # ============================================
 # Ignorar todos los README excepto el principal de la raíz
+
+# Backend - Documentación sensible de Bonda (contiene información confidencial de la API)
+apps/backend/BONDA\ API.txt
+apps/backend/BONDA\ API.md
 
 # Backend - Documentación de base de datos
 apps/backend/database/README.md
@@ -164,5 +171,20 @@ apps/frontend/README.md
 # Documentos de integración y resúmenes en la raíz
 INTEGRACION-BONDA-RESUMEN.md
 *-RESUMEN.md
+
+# Documentación de deployment y configuración (generada automáticamente)
+GUIA-DEPLOYMENT-PRODUCCION.md
+RESUMEN-DEPLOYMENT.md
+INSTRUCCIONES-SYNC-CUPONES.md
+PRE-PUSH-CHECKLIST.md
+VALORES-PARA-COPIAR.txt
+CAMBIOS-ROUND-ROBIN.md
+LISTO-PARA-PUSH.md
+
+# Documentación técnica del backend (database)
+apps/backend/database/SYNC-CUPONES-AUTOMATICO.md
+apps/backend/database/ROUND-ROBIN-MICROSITIOS.md
+apps/backend/database/VALIDACION-CUPONES-LANDING.md
+apps/backend/database/PLAN-PRUEBAS-BONDA.md
 
 # NOTA: El README.md de la raíz del proyecto SÍ se sube (no está ignorado)

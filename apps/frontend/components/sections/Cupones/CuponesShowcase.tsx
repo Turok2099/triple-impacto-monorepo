@@ -1,17 +1,36 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CuponesResponseDto, CuponDto } from "@/lib/types/cupon";
-import { obtenerCupones } from "@/lib/bonda";
+import { CuponesResponseDto, CuponDto, PublicCouponDto } from "@/lib/types/cupon";
+import { obtenerCuponesPorUsuario, obtenerCuponesPublicos } from "@/lib/bonda";
+import { useAuth } from "@/contexts/AuthContext";
 import CuponCard from "./CuponCard";
 
-interface CuponesShowcaseProps {
-  codigoAfiliado?: string;
+/** Convierte cupón público al formato que usa CuponCard (sin códigos). */
+function publicToCuponDto(p: PublicCouponDto): CuponDto {
+  return {
+    id: p.id,
+    nombre: p.titulo,
+    descuento: p.descuento ?? "",
+    codigoAfiliado: "",
+    micrositioId: "",
+    incluirCodigo: "0",
+    empresa: { id: "", nombre: p.empresa ?? p.titulo },
+    imagenes: {
+      principal: p.imagen_url ? { "280x190": p.imagen_url } : undefined,
+      thumbnail: p.imagen_url ? { "90x90": p.imagen_url } : undefined,
+    },
+    envio: undefined,
+  };
 }
 
-export default function CuponesShowcase({ 
-  codigoAfiliado 
-}: CuponesShowcaseProps) {
+interface CuponesShowcaseProps {
+  /** Slug del micrositio Bonda para cupones (ej. club-impacto-proyectar). */
+  microsite?: string;
+}
+
+export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
+  const { isAuthenticated } = useAuth();
   const [cupones, setCupones] = useState<CuponDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,20 +41,29 @@ export default function CuponesShowcase({
       try {
         setLoading(true);
         setError(null);
-        const data: CuponesResponseDto = await obtenerCupones(codigoAfiliado);
-        setCupones(data.cupones || []);
-        setCount(data.count || 0);
+        if (!isAuthenticated) {
+          const publicos = await obtenerCuponesPublicos();
+          setCupones(publicos.map(publicToCuponDto));
+          setCount(publicos.length);
+        } else {
+          const data: CuponesResponseDto = await obtenerCuponesPorUsuario(
+            microsite
+          );
+          setCupones(data.cupones ?? []);
+          setCount(data.count ?? 0);
+        }
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Error al cargar cupones';
+        const errorMessage =
+          err instanceof Error ? err.message : "Error al cargar cupones";
         setError(errorMessage);
-        console.error('Error al cargar cupones:', err);
+        console.error("Error al cargar cupones:", err);
       } finally {
         setLoading(false);
       }
     }
 
     cargarCupones();
-  }, [codigoAfiliado]);
+  }, [isAuthenticated, microsite]);
 
   if (loading) {
     return (

@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { SupabaseService } from '../supabase/supabase.service';
 import { CuponesResponseDto } from './dto/cupones-response.dto';
 import { CuponDto } from './dto/cupon.dto';
 import { CreateAffiliateDto } from './dto/create-affiliate.dto';
@@ -10,6 +11,18 @@ import {
   BondaDeleteResponse,
 } from './dto/affiliate-response.dto';
 
+/** Config usada para llamar a la API de Bonda (token + microsite_id). */
+export interface BondaMicrositeConfig {
+  api_token: string;
+  microsite_id: string;
+}
+
+/** Opciones para resolver el micrositio: por slug o por organizacion_id. */
+export interface BondaMicrositeOptions {
+  slug?: string;
+  organizacionId?: string;
+}
+
 @Injectable()
 export class BondaService {
   private readonly logger = new Logger(BondaService.name);
@@ -18,30 +31,85 @@ export class BondaService {
   private readonly micrositeId: string;
   private readonly useMocks: boolean;
 
-  constructor(private readonly httpService: HttpService) {
-    // Configuración desde variables de entorno
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly supabase: SupabaseService,
+  ) {
     this.apiUrl = process.env.BONDA_API_URL || 'https://apiv1.cuponstar.com';
     this.apiKey = process.env.BONDA_API_KEY || '';
     this.micrositeId = process.env.BONDA_MICROSITE_ID || '';
-    
-    // Usar mocks si no hay credenciales configuradas
-    this.useMocks = !this.apiKey || !this.micrositeId || process.env.BONDA_USE_MOCKS === 'true';
+    this.useMocks =
+      !this.apiKey ||
+      !this.micrositeId ||
+      process.env.BONDA_USE_MOCKS === 'true';
 
     if (this.useMocks) {
-      this.logger.warn('⚠️ BondaService está usando MOCKS - No hay credenciales configuradas');
+      this.logger.warn(
+        '⚠️ BondaService: MOCKS habilitados cuando no se pasa config desde DB',
+      );
     }
   }
 
-  async obtenerCupones(codigoAfiliado: string): Promise<CuponesResponseDto> {
-    if (this.useMocks) {
+  /**
+   * Resuelve config de Bonda desde bonda_microsites (por slug u organizacion_id)
+   * o desde env si no se pasa ninguna opción (retrocompat).
+   */
+  private async resolveConfig(
+    options?: BondaMicrositeOptions,
+  ): Promise<BondaMicrositeConfig | null> {
+    if (options?.slug) {
+      const row = await this.supabase.getBondaMicrositeBySlug(options.slug);
+      if (!row) {
+        throw new Error(`Micrositio no encontrado: slug="${options.slug}"`);
+      }
+      return {
+        api_token: row.api_token,
+        microsite_id: row.microsite_id ?? '',
+      };
+    }
+    if (options?.organizacionId) {
+      const row =
+        await this.supabase.getBondaMicrositeByOrganizacionId(
+          options.organizacionId,
+        );
+      if (!row) {
+        throw new Error(
+          `Micrositio no encontrado: organizacion_id="${options.organizacionId}"`,
+        );
+      }
+      return {
+        api_token: row.api_token,
+        microsite_id: row.microsite_id ?? '',
+      };
+    }
+    if (this.apiKey && this.micrositeId) {
+      return {
+        api_token: this.apiKey,
+        microsite_id: this.micrositeId,
+      };
+    }
+    return null;
+  }
+
+  async obtenerCupones(
+    codigoAfiliado: string,
+    options?: BondaMicrositeOptions,
+  ): Promise<CuponesResponseDto> {
+    const config = await this.resolveConfig(options);
+    if (!config && this.useMocks) {
       return this.getCuponesMock(codigoAfiliado);
+    }
+    if (!config) {
+      throw new Error(
+        'Se requiere microsite (slug) u organizacion_id, o configurar BONDA_API_KEY y BONDA_MICROSITE_ID en env',
+      );
     }
 
     try {
       const url = `${this.apiUrl}/api/cupones_recibidos`;
       const params = {
-        key: this.apiKey,
-        micrositio_id: this.micrositeId,
+        key: config.api_token,
+        micrositio_id: config.microsite_id,
         codigo_afiliado: codigoAfiliado,
       };
 
@@ -191,23 +259,30 @@ export class BondaService {
   /**
    * Crear un nuevo afiliado en Bonda
    * POST /api/v2/microsite/{microsite_id}/affiliates
-   * 
+   *
    * Si el usuario fue eliminado hace menos de 30 días, será restaurado.
    */
   async crearAfiliado(
     affiliateData: CreateAffiliateDto,
+    options?: BondaMicrositeOptions,
   ): Promise<BondaAffiliateResponse> {
-    if (this.useMocks) {
+    const config = await this.resolveConfig(options);
+    if (!config && this.useMocks) {
       return this.crearAfiliadoMock(affiliateData);
+    }
+    if (!config) {
+      throw new Error(
+        'Se requiere microsite (slug) u organizacion_id, o configurar BONDA_API_KEY y BONDA_MICROSITE_ID en env',
+      );
     }
 
     try {
-      const url = `${this.apiUrl}/api/v2/microsite/${this.micrositeId}/affiliates`;
+      const url = `${this.apiUrl}/api/v2/microsite/${config.microsite_id}/affiliates`;
 
       const response = await firstValueFrom(
         this.httpService.post(url, affiliateData, {
           headers: {
-            token: this.apiKey,
+            token: config.api_token,
             'Content-Type': 'application/json',
           },
         }),
@@ -217,7 +292,6 @@ export class BondaService {
     } catch (error) {
       this.logger.error('Error al crear afiliado en Bonda:', error.message);
 
-      // Si es un error HTTP, retornar el error de Bonda
       if (error.response?.data) {
         return error.response.data;
       }
@@ -229,24 +303,31 @@ export class BondaService {
   /**
    * Actualizar un afiliado existente en Bonda
    * PATCH /api/v2/microsite/{microsite_id}/affiliates/{affiliate_code}
-   * 
+   *
    * SOLO se envían los campos que se desean actualizar.
    */
   async actualizarAfiliado(
     affiliateCode: string,
     updateData: UpdateAffiliateDto,
+    options?: BondaMicrositeOptions,
   ): Promise<BondaAffiliateResponse> {
-    if (this.useMocks) {
+    const config = await this.resolveConfig(options);
+    if (!config && this.useMocks) {
       return this.actualizarAfiliadoMock(affiliateCode, updateData);
+    }
+    if (!config) {
+      throw new Error(
+        'Se requiere microsite (slug) u organizacion_id, o configurar BONDA_API_KEY y BONDA_MICROSITE_ID en env',
+      );
     }
 
     try {
-      const url = `${this.apiUrl}/api/v2/microsite/${this.micrositeId}/affiliates/${affiliateCode}`;
+      const url = `${this.apiUrl}/api/v2/microsite/${config.microsite_id}/affiliates/${affiliateCode}`;
 
       const response = await firstValueFrom(
         this.httpService.patch(url, updateData, {
           headers: {
-            token: this.apiKey,
+            token: config.api_token,
             'Content-Type': 'application/json',
           },
         }),
@@ -267,23 +348,30 @@ export class BondaService {
   /**
    * Eliminar un afiliado de Bonda
    * DELETE /api/v2/microsite/{microsite_id}/affiliates/{affiliate_code}
-   * 
+   *
    * Soft delete por 30 días. Después de ese período, la eliminación es permanente.
    */
   async eliminarAfiliado(
     affiliateCode: string,
+    options?: BondaMicrositeOptions,
   ): Promise<BondaDeleteResponse> {
-    if (this.useMocks) {
+    const config = await this.resolveConfig(options);
+    if (!config && this.useMocks) {
       return this.eliminarAfiliadoMock(affiliateCode);
+    }
+    if (!config) {
+      throw new Error(
+        'Se requiere microsite (slug) u organizacion_id, o configurar BONDA_API_KEY y BONDA_MICROSITE_ID en env',
+      );
     }
 
     try {
-      const url = `${this.apiUrl}/api/v2/microsite/${this.micrositeId}/affiliates/${affiliateCode}`;
+      const url = `${this.apiUrl}/api/v2/microsite/${config.microsite_id}/affiliates/${affiliateCode}`;
 
       const response = await firstValueFrom(
         this.httpService.delete(url, {
           headers: {
-            token: this.apiKey,
+            token: config.api_token,
           },
         }),
       );

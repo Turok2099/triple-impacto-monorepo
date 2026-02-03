@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 
-export default function PagoExitosoPage() {
+function PagoExitosoContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user } = useAuth();
@@ -227,5 +227,29 @@ export default function PagoExitosoPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PagoExitosoPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+            <div className="mb-6">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-600 mx-auto"></div>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Cargando...
+            </h2>
+            <p className="text-gray-600">
+              Por favor, espera un momento.
+            </p>
+          </div>
+        </div>
+      }
+    >
+      <PagoExitosoContent />
+    </Suspense>
   );
 }

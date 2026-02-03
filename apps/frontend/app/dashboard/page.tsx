@@ -10,7 +10,7 @@ import Link from 'next/link';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [dashboard, setDashboard] = useState<DashboardUsuario | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,6 +25,7 @@ export default function DashboardPage() {
   }, [user, router]);
 
   const cargarDashboard = async () => {
+    const token = localStorage.getItem('auth_token');
     if (!token) return;
 
     try {
@@ -135,7 +136,7 @@ export default function DashboardPage() {
                 <CuponCard
                   key={cupon.id}
                   cupon={cupon}
-                  token={token!}
+                  token={localStorage.getItem('auth_token') || ''}
                   onMarcarUsado={cargarDashboard}
                 />
               ))}

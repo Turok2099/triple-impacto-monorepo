@@ -9,7 +9,7 @@ import CuponCard from '@/components/dashboard/CuponCard';
 
 export default function MisCuponesPage() {
   const router = useRouter();
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [cupones, setCupones] = useState<CuponSolicitado[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,6 +24,7 @@ export default function MisCuponesPage() {
   }, [user, router]);
 
   const cargarCupones = async () => {
+    const token = localStorage.getItem('auth_token');
     if (!token) return;
 
     try {
@@ -133,7 +134,7 @@ export default function MisCuponesPage() {
                 <CuponCard
                   key={cupon.id}
                   cupon={cupon}
-                  token={token!}
+                  token={localStorage.getItem('auth_token') || ''}
                   onMarcarUsado={cargarCupones}
                 />
               ))}

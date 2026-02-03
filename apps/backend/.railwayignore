@@ -1,5 +1,5 @@
 node_modules/
-dist/
+# dist/ - NECESARIO para Railway (contiene el build compilado)
 .env
 .env.local
 .env.*.local

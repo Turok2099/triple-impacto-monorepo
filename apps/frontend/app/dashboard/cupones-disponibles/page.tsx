@@ -23,7 +23,7 @@ interface CuponBonda {
 
 export default function CuponesDisponiblesPage() {
   const router = useRouter();
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [cupones, setCupones] = useState<CuponBonda[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,6 +42,7 @@ export default function CuponesDisponiblesPage() {
   }, [user, router]);
 
   const cargarCuponesDisponibles = async () => {
+    const token = localStorage.getItem('auth_token');
     if (!token) return;
 
     try {
@@ -185,7 +186,7 @@ export default function CuponesDisponiblesPage() {
                   cupon={cupon}
                   codigoAfiliado={CODIGO_AFILIADO}
                   micrositioSlug={MICROSITIO_SLUG}
-                  token={token!}
+                  token={localStorage.getItem('auth_token') || ''}
                   onSolicitar={cargarCuponesDisponibles}
                 />
               ))}

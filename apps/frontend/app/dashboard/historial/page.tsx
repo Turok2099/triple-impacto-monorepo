@@ -14,7 +14,7 @@ import {
 
 export default function HistorialPage() {
   const router = useRouter();
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [historial, setHistorial] = useState<HistorialCupones | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +33,7 @@ export default function HistorialPage() {
   }, [user, router, filtroEstado, paginaActual]);
 
   const cargarHistorial = async () => {
+    const token = localStorage.getItem('auth_token');
     if (!token) return;
 
     try {

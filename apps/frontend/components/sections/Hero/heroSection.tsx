@@ -36,7 +36,10 @@ export default function HeroSection() {
 
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <button className="group px-8 py-4 bg-linear-to-r from-emerald-600 to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 flex items-center justify-center gap-2">
+              <a
+                href="/donar"
+                className="group px-8 py-4 bg-linear-to-r from-emerald-600 to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 flex items-center justify-center gap-2"
+              >
                 <span>Quiero donar y obtener descuentos</span>
                 <svg
                   className="w-5 h-5 group-hover:translate-x-1 transition-transform"
@@ -51,10 +54,13 @@ export default function HeroSection() {
                     d="M13 7l5 5m0 0l-5 5m5-5H6"
                   />
                 </svg>
-              </button>
-              <button className="px-8 py-4 bg-white text-gray-800 font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 border-2 border-gray-200 hover:border-emerald-300">
+              </a>
+              <a
+                href="#cupones"
+                className="px-8 py-4 bg-white text-gray-800 font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 border-2 border-gray-200 hover:border-emerald-300"
+              >
                 Ver beneficios disponibles
-              </button>
+              </a>
             </div>
 
             {/* Trust indicators */}

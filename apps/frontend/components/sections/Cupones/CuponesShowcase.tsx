@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CuponesResponseDto, CuponDto, PublicCouponDto } from "@/lib/types/cupon";
-import { obtenerCuponesPorUsuario, obtenerCuponesPublicos } from "@/lib/bonda";
-import { useAuth } from "@/contexts/AuthContext";
+import { CuponDto, PublicCouponDto } from "@/lib/types/cupon";
+import { obtenerCuponesPublicos } from "@/lib/bonda";
 import CuponCard from "./CuponCard";
 
 /** Convierte cupón público al formato que usa CuponCard (sin códigos). */
@@ -30,7 +29,6 @@ interface CuponesShowcaseProps {
 }
 
 export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
-  const { isAuthenticated } = useAuth();
   const [cupones, setCupones] = useState<CuponDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,17 +39,12 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
       try {
         setLoading(true);
         setError(null);
-        if (!isAuthenticated) {
-          const publicos = await obtenerCuponesPublicos();
-          setCupones(publicos.map(publicToCuponDto));
-          setCount(publicos.length);
-        } else {
-          const data: CuponesResponseDto = await obtenerCuponesPorUsuario(
-            microsite
-          );
-          setCupones(data.cupones ?? []);
-          setCount(data.count ?? 0);
-        }
+
+        // SIEMPRE mostrar cupones públicos en el home (independiente del login)
+        // Los cupones para "usar" (con código) solo están en el dashboard
+        const publicos = await obtenerCuponesPublicos();
+        setCupones(publicos.map(publicToCuponDto));
+        setCount(publicos.length);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Error al cargar cupones";
@@ -63,7 +56,7 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
     }
 
     cargarCupones();
-  }, [isAuthenticated, microsite]);
+  }, []); // Ya no depende de isAuthenticated ni microsite
 
   if (loading) {
     return (
@@ -71,7 +64,7 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mb-4"></div>
-            <p className="text-gray-600">Cargando tus cupones...</p>
+            <p className="text-gray-600">Cargando cupones...</p>
           </div>
         </div>
       </section>
@@ -121,7 +114,8 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
             Descubrí nuestro catálogo de descuentos
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Al donar, obtenés acceso a descuentos exclusivos en servicios que usas todos los días.
+            Al donar, obtenés acceso a descuentos exclusivos en servicios que
+            usas todos los días.
           </p>
         </div>
 

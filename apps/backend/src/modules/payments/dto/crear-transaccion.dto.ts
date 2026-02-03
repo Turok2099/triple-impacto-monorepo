@@ -4,7 +4,7 @@ import {
   IsOptional,
   IsUUID,
   Min,
-  IsUrl,
+  Matches,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -23,11 +23,16 @@ export class CrearTransaccionDto {
   organizacion_id?: string;
 
   @IsString()
-  @IsUrl({}, { message: 'responseSuccessURL debe ser una URL válida' })
+  @Matches(/^https?:\/\/.+/, {
+    message:
+      'responseSuccessURL debe ser una URL válida con http:// o https://',
+  })
   responseSuccessURL: string;
 
   @IsString()
-  @IsUrl({}, { message: 'responseFailURL debe ser una URL válida' })
+  @Matches(/^https?:\/\/.+/, {
+    message: 'responseFailURL debe ser una URL válida con http:// o https://',
+  })
   responseFailURL: string;
 
   /**
@@ -35,7 +40,10 @@ export class CrearTransaccionDto {
    * Si no se envía, el backend puede armarla con API_BASE_URL + /api/payments/fiserv/notification.
    */
   @IsString()
-  @IsUrl({}, { message: 'transactionNotificationURL debe ser una URL válida' })
+  @Matches(/^https?:\/\/.+/, {
+    message:
+      'transactionNotificationURL debe ser una URL válida con http:// o https://',
+  })
   @IsOptional()
   transactionNotificationURL?: string;
 }

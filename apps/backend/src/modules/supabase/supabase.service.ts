@@ -409,17 +409,65 @@ export class SupabaseService implements OnModuleInit {
    * Obtener organizaciones activas (incluye monto_minimo, monto_sugerido).
    */
   async getOrganizacionesActivas() {
-    const { data, error } = await this.from('organizaciones')
-      .select('*')
-      .eq('activa', true)
+    // Obtener organizaciones con micrositios de Bonda activos
+    // Esto muestra las ONGs que tienen APIs de Bonda configuradas
+    const { data, error } = await this.from('bonda_microsites')
+      .select(
+        `
+        id,
+        nombre,
+        slug,
+        organizacion_id,
+        organizaciones (
+          id,
+          nombre,
+          descripcion,
+          logo_url,
+          website_url,
+          email,
+          telefono,
+          direccion,
+          monto_minimo,
+          monto_sugerido,
+          verificada,
+          created_at,
+          updated_at
+        )
+      `,
+      )
+      .eq('activo', true)
       .order('nombre', { ascending: true });
 
     if (error) {
-      this.logger.error('Error al obtener organizaciones:', error);
+      this.logger.error('Error al obtener organizaciones con Bonda:', error);
       throw error;
     }
 
-    return data;
+    // Mapear los datos para retornar en el formato esperado
+    return data.map((microsite: any) => {
+      // Type assertion para el JOIN (Supabase retorna objeto, no array)
+      const org = microsite.organizaciones;
+
+      return {
+        id: microsite.organizacion_id || microsite.id,
+        bonda_microsite_id: microsite.id,
+        nombre: org?.nombre || microsite.nombre,
+        descripcion:
+          org?.descripcion || `Micrositio Bonda: ${microsite.nombre}`,
+        logo_url: org?.logo_url || null,
+        website_url: org?.website_url || null,
+        email: org?.email || null,
+        telefono: org?.telefono || null,
+        direccion: org?.direccion || null,
+        monto_minimo: org?.monto_minimo || 5000,
+        monto_sugerido: org?.monto_sugerido || 10000,
+        slug: microsite.slug,
+        activa: true,
+        verificada: org?.verificada || false,
+        created_at: org?.created_at || new Date().toISOString(),
+        updated_at: org?.updated_at || new Date().toISOString(),
+      };
+    });
   }
 
   // ========================================
@@ -538,5 +586,217 @@ export class SupabaseService implements OnModuleInit {
     }
 
     this.logger.log(`✅ Micrositio ${micrositeId} marcado como sincronizado`);
+  }
+
+  // ========================================
+  // CUPONES SOLICITADOS POR USUARIO (Dashboard)
+  // ========================================
+
+  /**
+   * Guardar un cupón solicitado por el usuario (con código visible)
+   */
+  async guardarCuponSolicitado(cuponData: {
+    usuario_id: string;
+    bonda_cupon_id: string;
+    nombre: string;
+    descuento: string;
+    empresa_nombre: string;
+    empresa_id?: string;
+    codigo?: string;
+    codigo_id?: string;
+    codigo_afiliado: string;
+    micrositio_slug?: string;
+    bonda_microsite_id?: string;
+    mensaje?: string;
+    operadora?: string;
+    celular?: string;
+    imagen_thumbnail?: string;
+    imagen_principal?: string;
+    imagen_apaisada?: string;
+    expires_at?: string;
+    bonda_raw_data?: any;
+  }) {
+    const { data, error } = await this.from('usuario_cupones_solicitados')
+      .insert({
+        usuario_id: cuponData.usuario_id,
+        bonda_cupon_id: cuponData.bonda_cupon_id,
+        nombre: cuponData.nombre,
+        descuento: cuponData.descuento,
+        empresa_nombre: cuponData.empresa_nombre,
+        empresa_id: cuponData.empresa_id,
+        codigo: cuponData.codigo,
+        codigo_id: cuponData.codigo_id,
+        codigo_afiliado: cuponData.codigo_afiliado,
+        micrositio_slug: cuponData.micrositio_slug,
+        bonda_microsite_id: cuponData.bonda_microsite_id,
+        estado: 'activo',
+        mensaje: cuponData.mensaje,
+        operadora: cuponData.operadora,
+        celular: cuponData.celular,
+        imagen_thumbnail: cuponData.imagen_thumbnail,
+        imagen_principal: cuponData.imagen_principal,
+        imagen_apaisada: cuponData.imagen_apaisada,
+        expires_at: cuponData.expires_at,
+        bonda_raw_data: cuponData.bonda_raw_data,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      this.logger.error('Error al guardar cupón solicitado:', error);
+      throw error;
+    }
+
+    this.logger.log(
+      `✅ Cupón solicitado guardado: ${cuponData.nombre} para usuario ${cuponData.usuario_id}`,
+    );
+    return data;
+  }
+
+  /**
+   * Verificar si el usuario puede solicitar un cupón (sin duplicados activos)
+   */
+  async puedeSolicitarCupon(
+    usuarioId: string,
+    bondaCuponId: string,
+  ): Promise<boolean> {
+    const { data } = await this.getClient().rpc('puede_solicitar_cupon', {
+      p_usuario_id: usuarioId,
+      p_bonda_cupon_id: bondaCuponId,
+    });
+
+    return data === true;
+  }
+
+  /**
+   * Obtener cupones activos del usuario
+   */
+  async getCuponesActivosUsuario(usuarioId: string) {
+    const { data, error } = await this.from('usuario_cupones_solicitados')
+      .select('*')
+      .eq('usuario_id', usuarioId)
+      .eq('estado', 'activo')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      this.logger.error('Error al obtener cupones activos del usuario:', error);
+      throw error;
+    }
+
+    return data || [];
+  }
+
+  /**
+   * Obtener historial completo de cupones del usuario con paginación
+   */
+  async getHistorialCuponesUsuario(
+    usuarioId: string,
+    opciones: {
+      pagina?: number;
+      limite?: number;
+      estado?: 'activo' | 'usado' | 'vencido' | 'cancelado' | 'todos';
+    } = {},
+  ) {
+    const pagina = opciones.pagina || 1;
+    const limite = opciones.limite || 20;
+    const offset = (pagina - 1) * limite;
+
+    let query = this.from('usuario_cupones_solicitados')
+      .select('*', { count: 'exact' })
+      .eq('usuario_id', usuarioId);
+
+    // Filtrar por estado si no es 'todos'
+    if (opciones.estado && opciones.estado !== 'todos') {
+      query = query.eq('estado', opciones.estado);
+    }
+
+    const { data, error, count } = await query
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limite - 1);
+
+    if (error) {
+      this.logger.error(
+        'Error al obtener historial de cupones del usuario:',
+        error,
+      );
+      throw error;
+    }
+
+    return {
+      cupones: data || [],
+      total: count || 0,
+      pagina,
+      limite,
+      totalPaginas: Math.ceil((count || 0) / limite),
+    };
+  }
+
+  /**
+   * Obtener estadísticas de cupones del usuario
+   */
+  async getEstadisticasCuponesUsuario(usuarioId: string) {
+    const { data, error } = await this.from('usuario_estadisticas_cupones')
+      .select('*')
+      .eq('usuario_id', usuarioId)
+      .maybeSingle();
+
+    if (error) {
+      this.logger.error(
+        'Error al obtener estadísticas de cupones del usuario:',
+        error,
+      );
+      // Si no existe, devolver estadísticas vacías
+      return {
+        cupones_activos: 0,
+        cupones_usados: 0,
+        total_cupones_solicitados: 0,
+        ultimo_cupon_solicitado: null,
+      };
+    }
+
+    return (
+      data || {
+        cupones_activos: 0,
+        cupones_usados: 0,
+        total_cupones_solicitados: 0,
+        ultimo_cupon_solicitado: null,
+      }
+    );
+  }
+
+  /**
+   * Marcar un cupón como usado
+   */
+  async marcarCuponComoUsado(cuponId: string, usuarioId: string) {
+    const { data } = await this.getClient().rpc('marcar_cupon_como_usado', {
+      p_cupon_id: cuponId,
+      p_usuario_id: usuarioId,
+    });
+
+    if (!data) {
+      throw new Error('No se pudo marcar el cupón como usado');
+    }
+
+    this.logger.log(`✅ Cupón ${cuponId} marcado como usado`);
+    return true;
+  }
+
+  /**
+   * Obtener total donado por el usuario
+   */
+  async getTotalDonadoUsuario(usuarioId: string): Promise<number> {
+    const { data, error } = await this.from('donaciones')
+      .select('monto')
+      .eq('usuario_id', usuarioId)
+      .eq('estado', 'completada');
+
+    if (error) {
+      this.logger.error('Error al obtener total donado:', error);
+      return 0;
+    }
+
+    if (!data || data.length === 0) return 0;
+
+    return data.reduce((sum, d) => sum + Number(d.monto), 0);
   }
 }

@@ -68,10 +68,9 @@ export class BondaService {
       };
     }
     if (options?.organizacionId) {
-      const row =
-        await this.supabase.getBondaMicrositeByOrganizacionId(
-          options.organizacionId,
-        );
+      const row = await this.supabase.getBondaMicrositeByOrganizacionId(
+        options.organizacionId,
+      );
       if (!row) {
         throw new Error(
           `Micrositio no encontrado: organizacion_id="${options.organizacionId}"`,
@@ -335,7 +334,10 @@ export class BondaService {
 
       return response.data;
     } catch (error) {
-      this.logger.error('Error al actualizar afiliado en Bonda:', error.message);
+      this.logger.error(
+        'Error al actualizar afiliado en Bonda:',
+        error.message,
+      );
 
       if (error.response?.data) {
         return error.response.data;
@@ -432,9 +434,7 @@ export class BondaService {
     };
   }
 
-  private eliminarAfiliadoMock(
-    affiliateCode: string,
-  ): BondaDeleteResponse {
+  private eliminarAfiliadoMock(affiliateCode: string): BondaDeleteResponse {
     this.logger.log(`[MOCK] Eliminando afiliado: ${affiliateCode}`);
 
     return {
@@ -443,5 +443,100 @@ export class BondaService {
         deleted: 1,
       },
     };
+  }
+
+  // ========================================
+  // SOLICITAR CUPÓN ESPECÍFICO (Dashboard)
+  // ========================================
+
+  /**
+   * Solicitar un cupón específico de Bonda para el usuario
+   *
+   * NOTA IMPORTANTE sobre cómo funciona Bonda:
+   * El endpoint /api/cupones_recibidos devuelve los cupones que el usuario ya "recibió".
+   * No hay un endpoint separado para "solicitar" un cupón individual.
+   *
+   * Por lo tanto, este método:
+   * 1. Obtiene TODOS los cupones recibidos del usuario
+   * 2. Busca el cupón específico por ID
+   * 3. Lo guarda en nuestra BD con el código visible
+   * 4. Retorna el cupón con su código
+   *
+   * Si el cupón no está en la lista de "recibidos", significa que el usuario
+   * aún no lo ha solicitado en el sitio de Bonda. En ese caso, deberías
+   * implementar lógica adicional según tu flujo de negocio.
+   */
+  async solicitarCuponEspecifico(
+    usuarioId: string,
+    bondaCuponId: string,
+    codigoAfiliado: string,
+    micrositioSlug: string,
+    celular?: string,
+  ) {
+    // 1. Verificar si el usuario puede solicitar este cupón (sin duplicados activos)
+    const puedeSolicitar = await this.supabase.puedeSolicitarCupon(
+      usuarioId,
+      bondaCuponId,
+    );
+
+    if (!puedeSolicitar) {
+      throw new Error('Ya tienes este cupón activo en tu dashboard');
+    }
+
+    // 2. Obtener TODOS los cupones recibidos del usuario desde Bonda
+    const cuponesResponse = await this.obtenerCupones(codigoAfiliado, {
+      slug: micrositioSlug,
+    });
+
+    // 3. Buscar el cupón específico por ID
+    const cuponEncontrado = cuponesResponse.cupones.find(
+      (c) => c.id === bondaCuponId,
+    );
+
+    if (!cuponEncontrado) {
+      throw new Error(
+        'Cupón no encontrado en tu lista de cupones recibidos de Bonda. ' +
+          'Asegúrate de que ya lo hayas solicitado en el sistema de Bonda.',
+      );
+    }
+
+    // 4. Obtener el microsite_id desde la BD
+    const microsite =
+      await this.supabase.getBondaMicrositeBySlug(micrositioSlug);
+
+    if (!microsite) {
+      throw new Error(`Micrositio no encontrado: ${micrositioSlug}`);
+    }
+
+    // 5. Guardar el cupón en nuestra BD
+    const cuponGuardado = await this.supabase.guardarCuponSolicitado({
+      usuario_id: usuarioId,
+      bonda_cupon_id: cuponEncontrado.id,
+      nombre: cuponEncontrado.nombre,
+      descuento: cuponEncontrado.descuento,
+      empresa_nombre: cuponEncontrado.empresa?.nombre || '',
+      empresa_id: cuponEncontrado.empresa?.id || '',
+      codigo: cuponEncontrado.envio?.codigo || undefined,
+      codigo_id: cuponEncontrado.envio?.codigoId || undefined,
+      codigo_afiliado: codigoAfiliado,
+      micrositio_slug: micrositioSlug,
+      bonda_microsite_id: microsite.id,
+      mensaje: cuponEncontrado.envio?.mensaje || undefined,
+      operadora: cuponEncontrado.envio?.operadora || undefined,
+      celular: celular || cuponEncontrado.envio?.celular || undefined,
+      imagen_thumbnail:
+        cuponEncontrado.imagenes?.thumbnail?.['90x90'] || undefined,
+      imagen_principal:
+        cuponEncontrado.imagenes?.principal?.['280x190'] || undefined,
+      imagen_apaisada:
+        cuponEncontrado.imagenes?.apaisada?.['240x80'] || undefined,
+      bonda_raw_data: cuponEncontrado,
+    });
+
+    this.logger.log(
+      `✅ Cupón solicitado: ${cuponEncontrado.nombre} (código: ${cuponEncontrado.envio?.codigo || 'N/A'})`,
+    );
+
+    return cuponGuardado;
   }
 }

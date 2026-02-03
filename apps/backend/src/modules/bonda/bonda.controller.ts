@@ -26,6 +26,16 @@ import {
   BondaAffiliateResponse,
   BondaDeleteResponse,
 } from './dto/affiliate-response.dto';
+import { SolicitarCuponDto } from './dto/solicitar-cupon.dto';
+import {
+  CuponSolicitadoDto,
+  DashboardUsuarioDto,
+  EstadisticasUsuarioDto,
+} from './dto/cupon-solicitado.dto';
+import {
+  HistorialCuponesDto,
+  HistorialCuponesQueryDto,
+} from './dto/historial-cupones.dto';
 
 /** Query params opcionales para resolver micrositio Bonda por slug u organizacion_id */
 export interface BondaMicrositeQuery {
@@ -221,5 +231,210 @@ export class BondaController {
       slug: microsite,
       organizacionId,
     });
+  }
+
+  // ========================================
+  // ENDPOINTS PARA DASHBOARD DE USUARIO
+  // ========================================
+
+  /**
+   * Solicitar un cupón específico de Bonda
+   * POST /api/bonda/solicitar-cupon
+   * 
+   * El usuario solicita un cupón y se guarda en su dashboard con el código visible
+   */
+  @Post('solicitar-cupon')
+  @UseGuards(JwtAuthGuard)
+  async solicitarCupon(
+    @Req() req: Request & { user?: { userId: string } },
+    @Body() solicitarDto: SolicitarCuponDto,
+  ): Promise<CuponSolicitadoDto> {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new BadRequestException('Se requiere autenticación');
+    }
+
+    // Solicitar el cupón a través del servicio
+    const cuponGuardado = await this.bondaService.solicitarCuponEspecifico(
+      userId,
+      solicitarDto.bondaCuponId,
+      solicitarDto.codigoAfiliado,
+      solicitarDto.micrositioSlug,
+      solicitarDto.celular,
+    );
+
+    // Transformar a DTO de respuesta
+    return this.transformarACuponSolicitadoDto(cuponGuardado);
+  }
+
+  /**
+   * Obtener cupones activos del usuario (dashboard)
+   * GET /api/bonda/mis-cupones
+   * 
+   * Retorna los cupones que el usuario ha solicitado y están activos
+   */
+  @Get('mis-cupones')
+  @UseGuards(JwtAuthGuard)
+  async obtenerMisCupones(
+    @Req() req: Request & { user?: { userId: string } },
+  ): Promise<CuponSolicitadoDto[]> {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new BadRequestException('Se requiere autenticación');
+    }
+
+    const cupones = await this.supabase.getCuponesActivosUsuario(userId);
+
+    return cupones.map(this.transformarACuponSolicitadoDto);
+  }
+
+  /**
+   * Obtener historial completo de cupones del usuario
+   * GET /api/bonda/historial-cupones
+   * 
+   * Retorna el historial paginado de todos los cupones solicitados
+   */
+  @Get('historial-cupones')
+  @UseGuards(JwtAuthGuard)
+  async obtenerHistorialCupones(
+    @Req() req: Request & { user?: { userId: string } },
+    @Query('pagina') pagina?: number,
+    @Query('limite') limite?: number,
+    @Query('estado') estado?: 'activo' | 'usado' | 'vencido' | 'cancelado' | 'todos',
+  ): Promise<HistorialCuponesDto> {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new BadRequestException('Se requiere autenticación');
+    }
+
+    const resultado = await this.supabase.getHistorialCuponesUsuario(userId, {
+      pagina: pagina ? Number(pagina) : 1,
+      limite: limite ? Number(limite) : 20,
+      estado: estado || 'todos',
+    });
+
+    return {
+      cupones: resultado.cupones.map(this.transformarACuponSolicitadoDto),
+      total: resultado.total,
+      pagina: resultado.pagina,
+      limite: resultado.limite,
+      totalPaginas: resultado.totalPaginas,
+    };
+  }
+
+  /**
+   * Obtener dashboard completo del usuario
+   * GET /api/bonda/dashboard
+   * 
+   * Retorna estadísticas, cupones activos y recientes
+   */
+  @Get('dashboard')
+  @UseGuards(JwtAuthGuard)
+  async obtenerDashboard(
+    @Req() req: Request & { user?: { userId: string } },
+  ): Promise<DashboardUsuarioDto> {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new BadRequestException('Se requiere autenticación');
+    }
+
+    // Obtener información del usuario
+    const usuario = await this.supabase.findUserById(userId);
+    if (!usuario) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    // Obtener estadísticas
+    const stats = await this.supabase.getEstadisticasCuponesUsuario(userId);
+    const totalDonado = await this.supabase.getTotalDonadoUsuario(userId);
+
+    // Obtener cupones activos
+    const cuponesActivos = await this.supabase.getCuponesActivosUsuario(userId);
+
+    // Obtener últimos 5 cupones
+    const historialReciente = await this.supabase.getHistorialCuponesUsuario(
+      userId,
+      { pagina: 1, limite: 5 },
+    );
+
+    return {
+      usuario: {
+        id: usuario.id,
+        nombre: usuario.nombre,
+        email: usuario.email,
+      },
+      estadisticas: {
+        cuponesActivos: stats.cupones_activos || 0,
+        cuponesUsados: stats.cupones_usados || 0,
+        totalCuponesSolicitados: stats.total_cupones_solicitados || 0,
+        ultimoCuponSolicitado: stats.ultimo_cupon_solicitado,
+        totalDonado,
+      },
+      cuponesActivos: cuponesActivos.map(this.transformarACuponSolicitadoDto),
+      cuponesRecientes: historialReciente.cupones.map(
+        this.transformarACuponSolicitadoDto,
+      ),
+    };
+  }
+
+  /**
+   * Marcar un cupón como usado
+   * PATCH /api/bonda/cupones/:id/usar
+   */
+  @Patch('cupones/:id/usar')
+  @UseGuards(JwtAuthGuard)
+  async marcarCuponComoUsado(
+    @Req() req: Request & { user?: { userId: string } },
+    @Param('id') cuponId: string,
+  ): Promise<{ success: boolean; message: string }> {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new BadRequestException('Se requiere autenticación');
+    }
+
+    const resultado = await this.supabase.marcarCuponComoUsado(cuponId, userId);
+
+    if (!resultado) {
+      throw new BadRequestException(
+        'No se pudo marcar el cupón como usado. Verifica que sea tuyo y esté activo.',
+      );
+    }
+
+    return {
+      success: true,
+      message: 'Cupón marcado como usado exitosamente',
+    };
+  }
+
+  // ========================================
+  // MÉTODO AUXILIAR PARA TRANSFORMACIÓN
+  // ========================================
+
+  /**
+   * Transforma el objeto de BD a DTO de respuesta
+   */
+  private transformarACuponSolicitadoDto(cupon: any): CuponSolicitadoDto {
+    return {
+      id: cupon.id,
+      bondaCuponId: cupon.bonda_cupon_id,
+      nombre: cupon.nombre,
+      descuento: cupon.descuento,
+      empresaNombre: cupon.empresa_nombre,
+      empresaId: cupon.empresa_id,
+      codigo: cupon.codigo,
+      codigoId: cupon.codigo_id,
+      estado: cupon.estado,
+      usadoAt: cupon.usado_at,
+      mensaje: cupon.mensaje,
+      operadora: cupon.operadora,
+      celular: cupon.celular,
+      imagenThumbnail: cupon.imagen_thumbnail,
+      imagenPrincipal: cupon.imagen_principal,
+      imagenApaisada: cupon.imagen_apaisada,
+      createdAt: cupon.created_at,
+      updatedAt: cupon.updated_at,
+      expiresAt: cupon.expires_at,
+      micrositioSlug: cupon.micrositio_slug,
+    };
   }
 }

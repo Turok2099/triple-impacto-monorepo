@@ -60,3 +60,6 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # Seed con tokens Bonda (no subir al repo)
 database/seed-bonda-microsites.sql
+
+# Scripts output (archivos generados por análisis)
+scripts/output/

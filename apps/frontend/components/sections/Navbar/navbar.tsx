@@ -74,7 +74,8 @@ export default function Navbar() {
                   {isAuthenticated && user ? (
                     <div className="flex items-center gap-3">
                       <span className="text-sm text-gray-700 font-medium">
-                        Hola, <span className="text-emerald-600">{user.nombre}</span>
+                        Hola,{" "}
+                        <span className="text-emerald-600">{user.nombre}</span>
                       </span>
                       <button
                         onClick={handleLogout}
@@ -94,10 +95,13 @@ export default function Navbar() {
                   )}
 
                   {/* CTA Principal */}
-                  <button className="px-6 py-2.5 bg-linear-to-r from-emerald-600 to-emerald-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2">
+                  <a
+                    href="/donar"
+                    className="px-6 py-2.5 bg-linear-to-r from-emerald-600 to-emerald-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2"
+                  >
                     <span>💚</span>
                     <span>Donar ahora</span>
-                  </button>
+                  </a>
                 </>
               )}
             </div>
@@ -105,9 +109,12 @@ export default function Navbar() {
             {/* Botones Mobile */}
             <div className="flex lg:hidden items-center gap-2">
               {/* CTA Mobile (solo icono) */}
-              <button className="px-4 py-2 bg-linear-to-r from-emerald-600 to-emerald-700 text-white font-semibold rounded-lg shadow-md">
+              <a
+                href="/donar"
+                className="px-4 py-2 bg-linear-to-r from-emerald-600 to-emerald-700 text-white font-semibold rounded-lg shadow-md"
+              >
                 Donar
-              </button>
+              </a>
 
               {/* Hamburger Menu */}
               <button
@@ -266,10 +273,14 @@ export default function Navbar() {
 
           {/* CTA Fixed Bottom en Mobile */}
           <div className="absolute bottom-0 left-0 right-0 p-6 bg-linear-to-t from-white via-white to-transparent">
-            <button className="w-full py-4 bg-linear-to-r from-emerald-600 to-emerald-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 text-lg">
+            <a
+              href="/donar"
+              onClick={handleNavClick}
+              className="w-full py-4 bg-linear-to-r from-emerald-600 to-emerald-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 text-lg"
+            >
               <span>💚</span>
               <span>Donar ahora</span>
-            </button>
+            </a>
             <p className="text-center text-gray-500 text-xs mt-3">
               Tu donación genera impacto real y te da beneficios
             </p>

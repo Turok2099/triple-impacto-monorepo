@@ -74,55 +74,7 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
   const handleFiltroChange = (categoria: number | null, orden: string) => {
     setCategoriaActual(categoria);
     setOrdenActual(orden);
-    // El useEffect se encargará de recargar los cupones
   };
-
-  if (loading) {
-    return (
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mb-4"></div>
-            <p className="text-gray-600">Cargando cupones...</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (error) {
-    return (
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center bg-red-50 border-2 border-red-200 rounded-lg p-8">
-            <div className="text-4xl mb-4">⚠️</div>
-            <h3 className="text-2xl font-bold text-red-900 mb-2">
-              Error al cargar cupones
-            </h3>
-            <p className="text-red-700">{error}</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (cupones.length === 0) {
-    return (
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center">
-            <div className="text-6xl mb-4">🎟️</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">
-              No hay cupones disponibles
-            </h3>
-            <p className="text-gray-600">
-              Próximamente tendremos más descuentos disponibles.
-            </p>
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
@@ -138,25 +90,56 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
           </p>
         </div>
 
-        {/* Filtros */}
+        {/* Bloque de filtros: siempre visible e independiente de las cards */}
         <FiltrosCupones onFiltroChange={handleFiltroChange} />
 
-        {/* Grid de Cupones (más columnas = cards más angostas) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-          {cupones.map((cupon) => (
-            <CuponCard key={cupon.id} cupon={cupon} />
-          ))}
-        </div>
+        {/* Bloque de cards: loading, error, vacío o grid */}
+        <div className="min-h-[200px]">
+          {loading && (
+            <div className="flex flex-col items-center justify-center py-16">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mb-4" />
+              <p className="text-gray-600">Cargando cupones...</p>
+            </div>
+          )}
 
-        {/* Contador de resultados */}
-        {!loading && (
-          <div className="text-center mt-8 text-gray-600">
-            Mostrando{" "}
-            <span className="font-semibold text-emerald-600">{count}</span>{" "}
-            cupones
-            {categoriaActual && " filtrados"}
-          </div>
-        )}
+          {!loading && error && (
+            <div className="text-center bg-red-50 border-2 border-red-200 rounded-lg p-8">
+              <div className="text-4xl mb-4">⚠️</div>
+              <h3 className="text-2xl font-bold text-red-900 mb-2">
+                Error al cargar cupones
+              </h3>
+              <p className="text-red-700">{error}</p>
+            </div>
+          )}
+
+          {!loading && !error && cupones.length === 0 && (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-4">🎟️</div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                No hay cupones en esta categoría
+              </h3>
+              <p className="text-gray-600">
+                Probá con otra categoría o volvé a &quot;Todo&quot; para ver todo el catálogo.
+              </p>
+            </div>
+          )}
+
+          {!loading && !error && cupones.length > 0 && (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {cupones.map((cupon) => (
+                  <CuponCard key={cupon.id} cupon={cupon} />
+                ))}
+              </div>
+              <div className="text-center mt-8 text-gray-600">
+                Mostrando{" "}
+                <span className="font-semibold text-emerald-600">{count}</span>{" "}
+                cupones
+                {categoriaActual && " filtrados"}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </section>
   );

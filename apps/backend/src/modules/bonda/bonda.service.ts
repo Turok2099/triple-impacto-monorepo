@@ -92,7 +92,11 @@ export class BondaService {
 
   async obtenerCupones(
     codigoAfiliado: string,
-    options?: BondaMicrositeOptions,
+    options?: BondaMicrositeOptions & {
+      categoria?: number;
+      orderBy?: 'latest' | 'relevant' | 'ownRelevant';
+      subcategories?: boolean;
+    },
   ): Promise<CuponesResponseDto> {
     const config = await this.resolveConfig(options);
     if (!config && this.useMocks) {
@@ -108,11 +112,20 @@ export class BondaService {
       // Endpoint corregido: /api/cupones retorna catálogo DISPONIBLE (no usados)
       // Retorna 1600+ cupones del micrositio vs 25 cupones usados de /api/cupones_recibidos
       const url = `${this.apiUrl}/api/cupones`;
-      const params = {
+      const params: any = {
         key: config.api_token,
         micrositio_id: config.microsite_id,
         codigo_afiliado: codigoAfiliado,
+        subcategories: options?.subcategories ?? true, // Retornar subcategorías por defecto
       };
+
+      // Agregar filtros opcionales
+      if (options?.categoria) {
+        params.categoria = options.categoria;
+      }
+      if (options?.orderBy) {
+        params.orderBy = options.orderBy;
+      }
 
       const response = await firstValueFrom(
         this.httpService.get(url, { params }),
@@ -122,6 +135,40 @@ export class BondaService {
     } catch (error) {
       this.logger.error('Error al obtener cupones de Bonda:', error.message);
       throw new Error('Error al obtener cupones de Bonda');
+    }
+  }
+
+  /**
+   * Obtiene las categorías disponibles del micrositio de Bonda.
+   */
+  async obtenerCategorias(
+    options?: BondaMicrositeOptions,
+  ): Promise<{ id: number; nombre: string; parent_id?: number | null }[]> {
+    const config = await this.resolveConfig(options);
+    if (!config) {
+      throw new Error(
+        'Se requiere microsite (slug) u organizacion_id para obtener categorías',
+      );
+    }
+
+    try {
+      const url = `${this.apiUrl}/api/categorias`;
+      const params = {
+        key: config.api_token,
+        micrositio_id: config.microsite_id,
+      };
+
+      const response = await firstValueFrom(
+        this.httpService.get(url, { params }),
+      );
+
+      return response.data.results || [];
+    } catch (error) {
+      this.logger.error(
+        'Error al obtener categorías de Bonda:',
+        error.message,
+      );
+      throw new Error('Error al obtener categorías de Bonda');
     }
   }
 

@@ -30,7 +30,7 @@ Este documento describe el flujo completo desde que un usuario se registra hasta
    └─ Puede ver el catálogo general pero no obtener códigos
 
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                     FASE 2: PRIMER PAGO (FISERV)                        │
+│                     FASE 2: PRIMER PAGO                                 │
 └─────────────────────────────────────────────────────────────────────────┘
 
 6. Usuario autenticado accede a página de donación
@@ -41,21 +41,21 @@ Este documento describe el flujo completo desde que un usuario se registra hasta
 7. Frontend → Backend: POST /api/donaciones/create
    └─ Crea registro en tabla 'donaciones' con estado 'pendiente'
 
-8. Backend → Frontend: Retorna payment_id y URL de Fiserv
+8. Backend → Frontend: Retorna payment_id y URL del gateway de pago (por implementar)
 
-9. Frontend redirige a Fiserv (gateway de pago)
-   ├─ Usuario ingresa datos de tarjeta
-   └─ Fiserv procesa el pago
+9. Frontend redirige al gateway de pago
+   ├─ Usuario ingresa datos de tarjeta / método de pago
+   └─ El gateway procesa el pago
 
-10. Fiserv → Backend: Webhook de confirmación
-    └─ POST /api/webhooks/fiserv
+10. Gateway → Backend: Webhook de confirmación
+    └─ POST /api/webhooks/pago
     └─ Body: { payment_id, status, amount, ... }
 
 ┌─────────────────────────────────────────────────────────────────────────┐
 │              FASE 3: ACTIVACIÓN EN BONDA (POST-PAGO)                    │
 └─────────────────────────────────────────────────────────────────────────┘
 
-11. Backend recibe confirmación de Fiserv
+11. Backend recibe confirmación del pago (webhook)
     ├─ Valida webhook signature (seguridad)
     └─ Verifica que payment_id existe y está pendiente
 
@@ -83,9 +83,9 @@ Este documento describe el flujo completo desde que un usuario se registra hasta
     └─ Backend registra log
        └─ logs_sync_bonda: { operacion: 'create', exitoso: true, ... }
 
-15. Backend envía respuesta a Fiserv (200 OK)
+15. Backend envía respuesta al webhook (200 OK)
 
-16. Frontend recibe redirect de Fiserv con resultado
+16. Frontend recibe redirect del gateway con resultado
     └─ Redirige a /donacion/success
 
 17. Usuario AHORA tiene acceso completo a cupones Bonda
@@ -141,7 +141,7 @@ async register(registerDto: RegisterDto) {
 }
 ```
 
-**Y agregar la lógica en el webhook de Fiserv:**
+**Y agregar la lógica en el webhook de pago:**
 
 ```typescript
 // ✅ NUEVO (en webhooks.service.ts o donaciones.service.ts)
@@ -236,7 +236,7 @@ CREATE TABLE donaciones (
   -- Información de la donación
   monto DECIMAL(10, 2) NOT NULL,
   moneda VARCHAR(3) DEFAULT 'ARS',
-  metodo_pago VARCHAR(50) DEFAULT 'fiserv',
+  metodo_pago VARCHAR(50),
   
   -- Organización beneficiaria
   organizacion_id UUID,
@@ -245,10 +245,10 @@ CREATE TABLE donaciones (
   -- Estado de la donación
   estado VARCHAR(50) DEFAULT 'pendiente',  -- pendiente, completada, fallida, reembolsada
   
-  -- Información de pago externo (Fiserv)
+  -- Información de pago externo (gateway por definir)
   payment_id VARCHAR(255) UNIQUE,
   payment_status VARCHAR(100),
-  fiserv_transaction_id VARCHAR(255),
+  transaction_id VARCHAR(255),
   
   -- Certificado de donación
   certificado_url TEXT,
@@ -272,9 +272,9 @@ CREATE TABLE donaciones (
 - [ ] Agregar campo `estado` en usuarios
 - [ ] Actualizar estados iniciales
 
-### Fase 2: Integración con Fiserv (POR HACER)
+### Fase 2: Donaciones y gateway de pago (POR HACER)
 - [ ] Crear módulo de donaciones
-- [ ] Integrar SDK de Fiserv
+- [ ] Definir e integrar gateway de pago
 - [ ] Crear endpoint para iniciar pago
 - [ ] Crear webhook para recibir confirmaciones
 - [ ] Validar signatures de webhook
@@ -294,13 +294,13 @@ CREATE TABLE donaciones (
 
 ## 📝 Validaciones Importantes
 
-### Seguridad del Webhook de Fiserv
+### Seguridad del Webhook de pago
 
 ```typescript
-async validarWebhookFiserv(signature: string, body: string): Promise<boolean> {
-  // Fiserv firma el webhook con HMAC-SHA256
+async validarWebhookPago(signature: string, body: string): Promise<boolean> {
+  // El gateway firma el webhook (ej. HMAC-SHA256)
   const expectedSignature = crypto
-    .createHmac('sha256', process.env.FISERV_WEBHOOK_SECRET)
+    .createHmac('sha256', process.env.PAGO_WEBHOOK_SECRET)
     .update(body)
     .digest('hex');
   
@@ -385,10 +385,10 @@ async procesarWebhook(paymentId: string, data: any) {
 
 ## 🔄 Flujos Alternativos
 
-### Usuario cancela el pago en Fiserv
+### Usuario cancela el pago
 
 ```
-1. Fiserv envía webhook con status: 'cancelled'
+1. El gateway envía webhook con status: 'cancelled'
 2. Backend actualiza donaciones.estado = 'fallida'
 3. Backend NO crea afiliado en Bonda
 4. Usuario puede reintentar el pago
@@ -397,7 +397,7 @@ async procesarWebhook(paymentId: string, data: any) {
 ### Error al crear afiliado en Bonda
 
 ```
-1. Pago exitoso en Fiserv
+1. Pago exitoso
 2. Error al crear en Bonda (ej: código duplicado)
 3. Backend:
    - Marca donaciones.estado = 'completada' (el pago fue exitoso)
@@ -411,7 +411,7 @@ async procesarWebhook(paymentId: string, data: any) {
 
 1. **Ajustar módulo de autenticación** (remover sincronización de Bonda)
 2. **Crear módulo de donaciones**
-3. **Integrar con Fiserv**
+3. **Definir e integrar gateway de pago**
 4. **Implementar webhooks**
 5. **Crear lógica de activación post-pago**
 6. **Actualizar frontend con estados**

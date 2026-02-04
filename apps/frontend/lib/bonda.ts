@@ -10,12 +10,27 @@ const DEFAULT_MICROSITE =
   process.env.NEXT_PUBLIC_BONDA_DEFAULT_MICROSITE || 'club-impacto-proyectar';
 
 /**
- * Catálogo público de cupones (Estado 1 – Visitantes). Sin códigos.
- * GET /api/public/cupones
+ * Catálogo público de cupones desde Bonda API (Estado 1 – Visitantes). Sin códigos.
+ * GET /api/public/cupones-bonda
+ * 
+ * Este endpoint llama directamente a Bonda API con filtros en tiempo real,
+ * mostrando los 1600+ cupones disponibles de Fundación Padres.
+ * 
+ * @param categoria - ID de categoría para filtrar (opcional)
+ * @param orderBy - Ordenamiento: 'relevant' | 'latest' (default: relevant)
  */
-export async function obtenerCuponesPublicos(): Promise<PublicCouponDto[]> {
+export async function obtenerCuponesPublicos(
+  categoria?: number,
+  orderBy?: 'relevant' | 'latest'
+): Promise<PublicCouponDto[]> {
   try {
-    const response = await fetch(`${API_URL}/public/cupones`, {
+    const params = new URLSearchParams();
+    if (categoria) params.append('categoria', categoria.toString());
+    if (orderBy) params.append('orderBy', orderBy);
+
+    const url = `${API_URL}/public/cupones-bonda${params.toString() ? `?${params.toString()}` : ''}`;
+    
+    const response = await fetch(url, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     });
@@ -24,7 +39,21 @@ export async function obtenerCuponesPublicos(): Promise<PublicCouponDto[]> {
       throw new Error(`Error al obtener cupones públicos: ${response.statusText}`);
     }
 
-    return response.json();
+    const data = await response.json();
+    
+    // Transformar respuesta de Bonda al formato PublicCouponDto
+    return data.cupones.map((cupon: any) => ({
+      id: cupon.id,
+      titulo: cupon.nombre,
+      descripcion: `${cupon.descuento} de descuento en ${cupon.empresa}`,
+      descuento: cupon.descuento,
+      imagen_url: cupon.imagen_url,
+      empresa: cupon.empresa,
+      categoria: null, // TODO: Mapear categoría desde respuesta de Bonda
+      orden: 0,
+      activo: true,
+      created_at: new Date().toISOString(),
+    }));
   } catch (error) {
     console.error('Error en obtenerCuponesPublicos:', error);
     throw error;

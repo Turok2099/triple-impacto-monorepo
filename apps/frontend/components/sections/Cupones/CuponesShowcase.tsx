@@ -31,7 +31,6 @@ interface CuponesShowcaseProps {
 
 export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
   const [cupones, setCupones] = useState<CuponDto[]>([]);
-  const [cuponesCompletos, setCuponesCompletos] = useState<CuponDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [count, setCount] = useState(0);
@@ -39,52 +38,38 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
   const [ordenActual, setOrdenActual] = useState<string>("relevant");
 
   useEffect(() => {
-    async function cargarCupones() {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // SIEMPRE mostrar cupones públicos en el home (independiente del login)
-        // Los cupones para "usar" (con código) solo están en el dashboard
-        const publicos = await obtenerCuponesPublicos();
-        const cuponesDto = publicos.map(publicToCuponDto);
-        setCuponesCompletos(cuponesDto);
-        setCupones(cuponesDto);
-        setCount(cuponesDto.length);
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Error al cargar cupones";
-        setError(errorMessage);
-        console.error("Error al cargar cupones:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
     cargarCupones();
-  }, []); // Ya no depende de isAuthenticated ni microsite
+  }, [categoriaActual, ordenActual]); // Recargar cuando cambian filtros
+
+  async function cargarCupones() {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Llamar directamente a Bonda API con filtros
+      // Micrositio: Fundación Padres
+      const publicos = await obtenerCuponesPublicos(
+        categoriaActual ?? undefined,
+        (ordenActual as 'relevant' | 'latest') ?? 'relevant'
+      );
+      
+      const cuponesDto = publicos.map(publicToCuponDto);
+      setCupones(cuponesDto);
+      setCount(cuponesDto.length);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Error al cargar cupones";
+      setError(errorMessage);
+      console.error("Error al cargar cupones:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const handleFiltroChange = (categoria: number | null, orden: string) => {
     setCategoriaActual(categoria);
     setOrdenActual(orden);
-
-    // Filtrar cupones localmente (filtrado básico por ahora)
-    let cuponesFiltrados = [...cuponesCompletos];
-
-    // TODO: Implementar filtrado real por categoría cuando tengamos esa data en los cupones
-    // Por ahora, mostramos todos
-
-    // Ordenar
-    if (orden === "latest") {
-      // Ordenar por ID descendente (más recientes primero)
-      cuponesFiltrados.sort((a, b) => Number(b.id) - Number(a.id));
-    } else {
-      // Orden por defecto (relevant) - mantener orden original de la API
-      cuponesFiltrados = [...cuponesCompletos];
-    }
-
-    setCupones(cuponesFiltrados);
-    setCount(cuponesFiltrados.length);
+    // El useEffect se encargará de recargar los cupones
   };
 
   if (loading) {

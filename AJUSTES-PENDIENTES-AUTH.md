@@ -235,7 +235,7 @@ Después de estos ajustes:
 1. **Registro**: Usuario se crea localmente, sin tocar Bonda
 2. **Estado**: `registrado` (sin acceso a cupones)
 3. **Bonda**: Pendiente de activación
-4. **Próximo paso**: Implementar módulo de donaciones y webhook de Fiserv
+4. **Próximo paso**: Implementar módulo de donaciones (gateway de pago por definir)
 5. **Activación**: Solo después del primer pago exitoso
 
 ## 📝 Notas Adicionales
@@ -247,4 +247,4 @@ Después de estos ajustes:
 
 ---
 
-**Próximo paso**: Después de hacer estos ajustes, crear el módulo de donaciones e integración con Fiserv.
+**Próximo paso**: Después de hacer estos ajustes, crear el módulo de donaciones (gateway de pago por definir).

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { CuponDto, PublicCouponDto } from "@/lib/types/cupon";
 import { obtenerCuponesPublicos } from "@/lib/bonda";
 import CuponCard from "./CuponCard";
+import FiltrosCupones from "./FiltrosCupones";
 
 /** Convierte cupón público al formato que usa CuponCard (sin códigos). */
 function publicToCuponDto(p: PublicCouponDto): CuponDto {
@@ -30,9 +31,12 @@ interface CuponesShowcaseProps {
 
 export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
   const [cupones, setCupones] = useState<CuponDto[]>([]);
+  const [cuponesCompletos, setCuponesCompletos] = useState<CuponDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [count, setCount] = useState(0);
+  const [categoriaActual, setCategoriaActual] = useState<number | null>(null);
+  const [ordenActual, setOrdenActual] = useState<string>("relevant");
 
   useEffect(() => {
     async function cargarCupones() {
@@ -43,8 +47,10 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
         // SIEMPRE mostrar cupones públicos en el home (independiente del login)
         // Los cupones para "usar" (con código) solo están en el dashboard
         const publicos = await obtenerCuponesPublicos();
-        setCupones(publicos.map(publicToCuponDto));
-        setCount(publicos.length);
+        const cuponesDto = publicos.map(publicToCuponDto);
+        setCuponesCompletos(cuponesDto);
+        setCupones(cuponesDto);
+        setCount(cuponesDto.length);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Error al cargar cupones";
@@ -57,6 +63,29 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
 
     cargarCupones();
   }, []); // Ya no depende de isAuthenticated ni microsite
+
+  const handleFiltroChange = (categoria: number | null, orden: string) => {
+    setCategoriaActual(categoria);
+    setOrdenActual(orden);
+
+    // Filtrar cupones localmente (filtrado básico por ahora)
+    let cuponesFiltrados = [...cuponesCompletos];
+
+    // TODO: Implementar filtrado real por categoría cuando tengamos esa data en los cupones
+    // Por ahora, mostramos todos
+
+    // Ordenar
+    if (orden === "latest") {
+      // Ordenar por ID descendente (más recientes primero)
+      cuponesFiltrados.sort((a, b) => Number(b.id) - Number(a.id));
+    } else {
+      // Orden por defecto (relevant) - mantener orden original de la API
+      cuponesFiltrados = [...cuponesCompletos];
+    }
+
+    setCupones(cuponesFiltrados);
+    setCount(cuponesFiltrados.length);
+  };
 
   if (loading) {
     return (
@@ -119,12 +148,23 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
           </p>
         </div>
 
+        {/* Filtros */}
+        <FiltrosCupones onFiltroChange={handleFiltroChange} />
+
         {/* Grid de Cupones */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {cupones.map((cupon) => (
             <CuponCard key={cupon.id} cupon={cupon} />
           ))}
         </div>
+
+        {/* Contador de resultados */}
+        {!loading && (
+          <div className="text-center mt-8 text-gray-600">
+            Mostrando <span className="font-semibold text-emerald-600">{count}</span> cupones
+            {categoriaActual && " filtrados"}
+          </div>
+        )}
       </div>
     </section>
   );

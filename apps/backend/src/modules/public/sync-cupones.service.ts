@@ -23,19 +23,25 @@ export class SyncCuponesService {
   ) {}
 
   /**
-   * Cron que se ejecuta diariamente a las 3 AM (hora Argentina) para sincronizar cupones.
-   * Usa round-robin para rotar entre micrositios activos.
-   * También se puede ejecutar manualmente llamando a este método.
+   * ⚠️ DESHABILITADO TEMPORALMENTE:
+   * El endpoint /api/cupones_recibidos de Bonda retorna cupones YA SOLICITADOS (usados),
+   * no cupones disponibles. Esto causa duplicados y muestra historial en lugar de catálogo.
+   *
+   * PENDIENTE: Contactar a Bonda para obtener endpoint de "cupones disponibles" o "catálogo público".
+   *
+   * Para habilitar, descomentar el decorador @Cron.
    */
-  @Cron('0 3 * * *', {
-    name: 'sync-cupones-bonda',
-    timeZone: 'America/Argentina/Buenos_Aires',
-  })
+  // @Cron('0 3 * * *', {
+  //   name: 'sync-cupones-bonda',
+  //   timeZone: 'America/Argentina/Buenos_Aires',
+  // })
   async syncCuponesFromBonda() {
     let micrositeId: string | null = null;
 
     try {
-      this.logger.log('🔄 Iniciando sync de cupones desde Bonda (round-robin)...');
+      this.logger.log(
+        '🔄 Iniciando sync de cupones desde Bonda (round-robin)...',
+      );
 
       // Obtener el siguiente micrositio en la rotación round-robin
       const microsite = await this.supabase.getNextMicrositeForSync();

@@ -46,10 +46,38 @@ export class PublicController {
   /**
    * Catálogo público de cupones (Estado 1 – Visitantes).
    * No requiere autenticación. Se muestran en la landing sin códigos.
+   * Soporta filtros opcionales: categoria, orderBy
    */
   @Get('cupones')
-  async getCupones(): Promise<PublicCouponDto[]> {
+  async getCupones(
+    @Query('categoria') categoria?: string,
+    @Query('orderBy') orderBy?: string,
+  ): Promise<PublicCouponDto[]> {
+    // Si hay filtros, llamar directamente a Bonda (futuro)
+    // Por ahora, retornamos de la tabla local public_coupons
+    // TODO: Implementar filtrado desde Bonda en tiempo real si se requiere
     return this.supabase.getPublicCoupons();
+  }
+
+  /**
+   * Obtiene las categorías disponibles de cupones.
+   * GET /api/public/categorias
+   */
+  @Get('categorias')
+  async getCategorias(): Promise<
+    { id: number; nombre: string; parent_id?: number | null }[]
+  > {
+    // Retornar categorías hardcodeadas o desde Supabase
+    // Por ahora, retornamos las categorías más comunes
+    return [
+      { id: 0, nombre: 'Todos' },
+      { id: 12, nombre: 'Gastronomía' },
+      { id: 11, nombre: 'Turismo' },
+      { id: 13, nombre: 'Compras' },
+      { id: 7, nombre: 'Belleza y Salud' },
+      { id: 6, nombre: 'Indumentaria y Moda' },
+      { id: 8, nombre: 'Servicios' },
+    ];
   }
 
   /**

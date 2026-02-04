@@ -4,19 +4,19 @@ export interface EmpresaDto {
   id: string;
   nombre: string;
   logoThumbnail?: {
-    '90x90': string;
+    "90x90": string;
   };
 }
 
 export interface ImagenesDto {
   thumbnail?: {
-    '90x90': string;
+    "90x90": string;
   };
   principal?: {
-    '280x190': string;
+    "280x190": string;
   };
   apaisada?: {
-    '240x80': string;
+    "240x80": string;
   };
 }
 
@@ -34,6 +34,8 @@ export interface CuponDto {
   id: string;
   nombre: string;
   descuento: string;
+  /** Descripción breve del beneficio para mostrar en la card */
+  descripcion?: string | null;
   codigoAfiliado: string;
   micrositioId: string;
   incluirCodigo: string;
@@ -47,13 +49,14 @@ export interface CuponesResponseDto {
   cupones: CuponDto[];
 }
 
-/** Cupón público (catálogo visitantes – sin códigos). Respuesta de GET /api/public/cupones */
+/** Cupón público (catálogo visitantes – sin códigos). Respuesta de GET /api/public/cupones-bonda */
 export interface PublicCouponDto {
   id: string;
   titulo: string;
   descripcion: string | null;
   descuento: string | null;
   imagen_url: string | null;
+  logo_empresa: string | null;
   empresa: string | null;
   categoria: string | null;
   orden: number;

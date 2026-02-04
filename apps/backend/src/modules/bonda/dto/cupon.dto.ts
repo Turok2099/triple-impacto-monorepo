@@ -32,6 +32,8 @@ export class CuponDto {
   id: string;
   nombre: string;
   descuento: string;
+  /** Descripción breve del beneficio (ej. "10% de descuento en toda la tienda") */
+  descripcionBreve?: string;
   codigoAfiliado: string;
   micrositioId: string;
   incluirCodigo: string;

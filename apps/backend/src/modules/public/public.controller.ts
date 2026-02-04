@@ -2,6 +2,7 @@ import { Controller, Get, Post, Query, UnauthorizedException } from '@nestjs/com
 import { SupabaseService } from '../supabase/supabase.service';
 import { SyncCuponesService } from './sync-cupones.service';
 import { ConfigService } from '@nestjs/config';
+import { BondaService } from '../bonda/bonda.service';
 
 /** Cupón público para el catálogo de visitantes (sin códigos). */
 export interface PublicCouponDto {
@@ -37,10 +38,19 @@ export interface OrganizacionPublicDto {
 
 @Controller('public')
 export class PublicController {
+  // Hardcodear configuración de Fundación Padres para cupones públicos
+  private readonly FUNDACION_PADRES_CONFIG = {
+    slug: 'beneficios-fundacion-padres',
+    micrositeId: '911299',
+    apiToken: 'DG7xN1fp5wmr60YnPizhhEbYCT4ivTOiVDYoLXdKEn9Zhb1nipHIJEDHuyn69bWq',
+    codigoAfiliado: '22380612', // Código demo para consultas públicas
+  };
+
   constructor(
     private readonly supabase: SupabaseService,
     private readonly syncCuponesService: SyncCuponesService,
     private readonly configService: ConfigService,
+    private readonly bondaService: BondaService,
   ) {}
 
   /**
@@ -78,6 +88,55 @@ export class PublicController {
       { id: 6, nombre: 'Indumentaria y Moda' },
       { id: 8, nombre: 'Servicios' },
     ];
+  }
+
+  /**
+   * Obtiene cupones directamente desde Bonda API con filtros.
+   * GET /api/public/cupones-bonda
+   * 
+   * Query params:
+   * - categoria: ID de categoría (opcional)
+   * - orderBy: relevant | latest (opcional, default: relevant)
+   * 
+   * Este endpoint llama directamente a Bonda (micrositio Fundación Padres)
+   * sin pasar por la tabla public_coupons de Supabase.
+   * Retorna todos los cupones disponibles (1600+) con filtros aplicados.
+   */
+  @Get('cupones-bonda')
+  async getCuponesDesdeBonda(
+    @Query('categoria') categoria?: string,
+    @Query('orderBy') orderBy?: string,
+  ): Promise<any> {
+    try {
+      const response = await this.bondaService.obtenerCupones(
+        this.FUNDACION_PADRES_CONFIG.codigoAfiliado,
+        {
+          slug: this.FUNDACION_PADRES_CONFIG.slug,
+          categoria: categoria ? Number(categoria) : undefined,
+          orderBy: orderBy as 'latest' | 'relevant' | 'ownRelevant',
+          subcategories: true,
+        },
+      );
+
+      // Transformar a formato público (sin códigos sensibles)
+      return {
+        count: response.count,
+        cupones: response.cupones.map((cupon) => ({
+          id: cupon.id,
+          nombre: cupon.nombre,
+          descuento: cupon.descuento,
+          empresa: cupon.empresa.nombre,
+          imagen_url:
+            cupon.imagenes.principal?.['280x190'] ||
+            cupon.imagenes.thumbnail?.['90x90'] ||
+            null,
+          logo_empresa:
+            cupon.empresa.logoThumbnail?.['90x90'] || null,
+        })),
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 
   /**

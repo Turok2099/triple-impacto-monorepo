@@ -39,6 +39,10 @@ export default function CuponCard({ cupon }: CuponCardProps) {
             target.src = defaultImage;
           }}
         />
+        {/* Nombre de la marca: esquina superior derecha, blanco con texto negro */}
+        <div className="absolute top-3 right-3 z-10 px-3 py-1.5 rounded-full bg-white text-black text-sm font-medium shadow-md">
+          {cupon.empresa.nombre}
+        </div>
       </div>
 
       {/* Logo: bloque cuadrado (alto = ancho), imagen ajustada solo al ancho del bloque */}
@@ -56,10 +60,6 @@ export default function CuponCard({ cupon }: CuponCardProps) {
 
       {/* Contenido debajo de la imagen (padding para no quedar bajo el logo) */}
       <div className="relative z-0 pt-16 sm:pt-20 pb-5 px-5 text-center">
-        {/* Pill con nombre de la marca */}
-        <div className="inline-block px-4 py-1.5 rounded-full bg-gray-100 text-gray-700 text-sm font-medium mb-3">
-          {cupon.empresa.nombre}
-        </div>
         {/* Descuento destacado */}
         <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
           {cupon.descuento}

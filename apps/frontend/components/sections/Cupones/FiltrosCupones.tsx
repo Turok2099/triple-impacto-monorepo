@@ -1,6 +1,25 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  LayoutGrid,
+  ShoppingBag,
+  UtensilsCrossed,
+  Shirt,
+  GraduationCap,
+  Wrench,
+  Plane,
+  Dumbbell,
+  Sparkles,
+  Gamepad2,
+  Bike,
+  Theater,
+  Car,
+  Film,
+  Building2,
+  Home,
+  type LucideIcon,
+} from "lucide-react";
 
 interface Categoria {
   id: number;
@@ -11,25 +30,25 @@ interface FiltrosCuponesProps {
   onFiltroChange: (categoria: number | null, orden: string) => void;
 }
 
-const ICONOS_CATEGORIAS: Record<string, string> = {
-  Todo: "🎟️",
-  Todos: "🎟️",
-  Compras: "🛍️",
-  Gastronomía: "🍔",
-  "Indumentaria, Calzado y Moda": "👕",
-  "Indumentaria y Moda": "👕",
-  Educación: "📚",
-  Servicios: "🔧",
-  Turismo: "✈️",
-  "Gimnasios y Deportes": "🏋️",
-  "Belleza y Salud": "💄",
-  Entretenimientos: "🎭",
-  Motos: "🏍️",
-  Teatros: "🎪",
-  Autos: "🚗",
-  Cines: "🎬",
-  Inmobiliarias: "🏢",
-  Inmuebles: "🏠",
+const ICONOS_CATEGORIAS: Record<string, LucideIcon> = {
+  Todo: LayoutGrid,
+  Todos: LayoutGrid,
+  Compras: ShoppingBag,
+  Gastronomía: UtensilsCrossed,
+  "Indumentaria, Calzado y Moda": Shirt,
+  "Indumentaria y Moda": Shirt,
+  Educación: GraduationCap,
+  Servicios: Wrench,
+  Turismo: Plane,
+  "Gimnasios y Deportes": Dumbbell,
+  "Belleza y Salud": Sparkles,
+  Entretenimientos: Gamepad2,
+  Motos: Bike,
+  Teatros: Theater,
+  Autos: Car,
+  Cines: Film,
+  Inmobiliarias: Building2,
+  Inmuebles: Home,
 };
 
 /** Lista de subcategorías por si el API devuelve vacío o solo "Todo" (misma que backend). */
@@ -116,7 +135,8 @@ export default function FiltrosCupones({
                 ? categoriaSeleccionada === null
                 : categoriaSeleccionada === categoria.id;
 
-            const icono = ICONOS_CATEGORIAS[categoria.nombre] || "🎯";
+            const IconComponent =
+              ICONOS_CATEGORIAS[categoria.nombre] || LayoutGrid;
 
             return (
               <button
@@ -132,7 +152,7 @@ export default function FiltrosCupones({
                   }
                 `}
               >
-                <span>{icono}</span>
+                <IconComponent className="w-4 h-4 shrink-0" />
                 <span>{categoria.nombre}</span>
               </button>
             );

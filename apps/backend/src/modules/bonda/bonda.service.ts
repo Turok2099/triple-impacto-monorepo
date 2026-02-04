@@ -105,7 +105,9 @@ export class BondaService {
     }
 
     try {
-      const url = `${this.apiUrl}/api/cupones_recibidos`;
+      // Endpoint corregido: /api/cupones retorna catálogo DISPONIBLE (no usados)
+      // Retorna 1600+ cupones del micrositio vs 25 cupones usados de /api/cupones_recibidos
+      const url = `${this.apiUrl}/api/cupones`;
       const params = {
         key: config.api_token,
         micrositio_id: config.microsite_id,

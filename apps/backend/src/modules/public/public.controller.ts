@@ -1,4 +1,10 @@
-import { Controller, Get, Post, Query, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Query,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { SyncCuponesService } from './sync-cupones.service';
 import { ConfigService } from '@nestjs/config';
@@ -42,7 +48,8 @@ export class PublicController {
   private readonly FUNDACION_PADRES_CONFIG = {
     slug: 'beneficios-fundacion-padres',
     micrositeId: '911299',
-    apiToken: 'DG7xN1fp5wmr60YnPizhhEbYCT4ivTOiVDYoLXdKEn9Zhb1nipHIJEDHuyn69bWq',
+    apiToken:
+      'DG7xN1fp5wmr60YnPizhhEbYCT4ivTOiVDYoLXdKEn9Zhb1nipHIJEDHuyn69bWq',
     codigoAfiliado: '22380612', // Código demo para consultas públicas
   };
 
@@ -70,15 +77,13 @@ export class PublicController {
   }
 
   /**
-   * Obtiene las categorías disponibles de cupones.
+   * Obtiene las categorías disponibles de cupones (hardcodeadas, compatibles con UI).
    * GET /api/public/categorias
    */
   @Get('categorias')
   async getCategorias(): Promise<
     { id: number; nombre: string; parent_id?: number | null }[]
   > {
-    // Retornar categorías hardcodeadas o desde Supabase
-    // Por ahora, retornamos las categorías más comunes
     return [
       { id: 0, nombre: 'Todos' },
       { id: 12, nombre: 'Gastronomía' },
@@ -90,14 +95,110 @@ export class PublicController {
     ];
   }
 
+  /** Lista exacta de filtros a mostrar (mismo orden que web Bonda). Se mapean a IDs de la API. */
+  private readonly FILTROS_LABELS = [
+    'Compras',
+    'Gastronomía',
+    'Indumentaria, Calzado y Moda',
+    'Educación',
+    'Servicios',
+    'Turismo',
+    'Gimnasios y Deportes',
+    'Belleza y Salud',
+    'Entretenimientos',
+    'Motos',
+    'Teatros',
+    'Autos',
+    'Cines',
+    'Inmobiliarias',
+    'Inmuebles',
+  ] as const;
+
+  /** Aliases para matchear nombres que Bonda puede devolver con otro texto. */
+  private readonly FILTROS_ALIASES: Record<string, string[]> = {
+    'Indumentaria, Calzado y Moda': ['Indumentaria y Moda', 'Indumentaria'],
+  };
+
+  /** Normaliza nombre para comparar con respuestas de Bonda (minúsculas, sin acentos, trim). */
+  private normalizarNombre(n: string): string {
+    return (n || '')
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/\u0300-\u036f/g, '');
+  }
+
+  /**
+   * Categorías para el filtro: misma lista que web Bonda, con IDs del endpoint Categorias.
+   * GET /api/public/categorias-bonda
+   * Se obtienen categorías/subcategorías de Bonda y se mapean a estos labels; el filtro
+   * de cupones usa el param "categoria" (Integer) según la API "Listado de cupones filtrados".
+   */
+  /** Lista completa de subcategorías para el filtro (IDs compatibles con Bonda). */
+  private readonly CATEGORIAS_FALLBACK = [
+    { id: 0, nombre: 'Todo' },
+    { id: 13, nombre: 'Compras' },
+    { id: 12, nombre: 'Gastronomía' },
+    { id: 6, nombre: 'Indumentaria, Calzado y Moda' },
+    { id: 14, nombre: 'Educación' },
+    { id: 8, nombre: 'Servicios' },
+    { id: 11, nombre: 'Turismo' },
+    { id: 16, nombre: 'Gimnasios y Deportes' },
+    { id: 7, nombre: 'Belleza y Salud' },
+    { id: 17, nombre: 'Entretenimientos' },
+    { id: 18, nombre: 'Motos' },
+    { id: 19, nombre: 'Teatros' },
+    { id: 20, nombre: 'Autos' },
+    { id: 21, nombre: 'Cines' },
+    { id: 22, nombre: 'Inmobiliarias' },
+    { id: 23, nombre: 'Inmuebles' },
+  ];
+
+  @Get('categorias-bonda')
+  async getCategoriasBonda(): Promise<
+    { id: number; nombre: string; parent_id?: number | null }[]
+  > {
+    const todo = { id: 0, nombre: 'Todo' };
+    try {
+      const bondaCategorias = await this.bondaService.obtenerCategorias({
+        slug: this.FUNDACION_PADRES_CONFIG.slug,
+      });
+      const normalizedBonda = new Map<string, number>();
+      for (const c of bondaCategorias) {
+        const key = this.normalizarNombre(c.nombre);
+        if (!normalizedBonda.has(key)) normalizedBonda.set(key, c.id);
+      }
+      const result: { id: number; nombre: string }[] = [todo];
+      for (const label of this.FILTROS_LABELS) {
+        const keys = [
+          this.normalizarNombre(label),
+          ...(this.FILTROS_ALIASES[label] || []).map((a) =>
+            this.normalizarNombre(a),
+          ),
+        ];
+        let id: number | undefined;
+        for (const key of keys) {
+          id = normalizedBonda.get(key);
+          if (id != null) break;
+        }
+        if (id != null) result.push({ id, nombre: label });
+      }
+      // Si Bonda no devolvió coincidencias, devolver siempre la lista completa para que el filtro sea usable
+      if (result.length <= 1) return this.CATEGORIAS_FALLBACK;
+      return result;
+    } catch (error) {
+      return this.CATEGORIAS_FALLBACK;
+    }
+  }
+
   /**
    * Obtiene cupones directamente desde Bonda API con filtros.
    * GET /api/public/cupones-bonda
-   * 
+   *
    * Query params:
    * - categoria: ID de categoría (opcional)
    * - orderBy: relevant | latest (opcional, default: relevant)
-   * 
+   *
    * Este endpoint llama directamente a Bonda (micrositio Fundación Padres)
    * sin pasar por la tabla public_coupons de Supabase.
    * Retorna todos los cupones disponibles (1600+) con filtros aplicados.
@@ -125,13 +226,13 @@ export class PublicController {
           id: cupon.id,
           nombre: cupon.nombre,
           descuento: cupon.descuento,
+          descripcion: cupon.descripcionBreve ?? null,
           empresa: cupon.empresa.nombre,
           imagen_url:
             cupon.imagenes.principal?.['280x190'] ||
             cupon.imagenes.thumbnail?.['90x90'] ||
             null,
-          logo_empresa:
-            cupon.empresa.logoThumbnail?.['90x90'] || null,
+          logo_empresa: cupon.empresa.logoThumbnail?.['90x90'] || null,
         })),
       };
     } catch (error) {
@@ -152,7 +253,7 @@ export class PublicController {
    * Trigger manual para sincronizar cupones de Bonda a public_coupons.
    * Requiere un secret para evitar abusos.
    * POST /api/public/sync-cupones?secret=TU_SECRET
-   * 
+   *
    * Ejemplo:
    * curl -X POST "http://localhost:3000/api/public/sync-cupones?secret=dev-secret-change-in-production"
    */

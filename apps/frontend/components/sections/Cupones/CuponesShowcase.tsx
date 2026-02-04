@@ -12,10 +12,15 @@ function publicToCuponDto(p: PublicCouponDto): CuponDto {
     id: p.id,
     nombre: p.titulo,
     descuento: p.descuento ?? "",
+    descripcion: p.descripcion ?? undefined,
     codigoAfiliado: "",
     micrositioId: "",
     incluirCodigo: "0",
-    empresa: { id: "", nombre: p.empresa ?? p.titulo },
+    empresa: {
+      id: "",
+      nombre: p.empresa ?? p.titulo,
+      logoThumbnail: p.logo_empresa ? { "90x90": p.logo_empresa } : undefined,
+    },
     imagenes: {
       principal: p.imagen_url ? { "280x190": p.imagen_url } : undefined,
       thumbnail: p.imagen_url ? { "90x90": p.imagen_url } : undefined,
@@ -50,9 +55,9 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
       // Micrositio: Fundación Padres
       const publicos = await obtenerCuponesPublicos(
         categoriaActual ?? undefined,
-        (ordenActual as 'relevant' | 'latest') ?? 'relevant'
+        (ordenActual as "relevant" | "latest") ?? "relevant"
       );
-      
+
       const cuponesDto = publicos.map(publicToCuponDto);
       setCupones(cuponesDto);
       setCount(cuponesDto.length);
@@ -136,8 +141,8 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
         {/* Filtros */}
         <FiltrosCupones onFiltroChange={handleFiltroChange} />
 
-        {/* Grid de Cupones */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Grid de Cupones (más columnas = cards más angostas) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {cupones.map((cupon) => (
             <CuponCard key={cupon.id} cupon={cupon} />
           ))}
@@ -146,7 +151,9 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
         {/* Contador de resultados */}
         {!loading && (
           <div className="text-center mt-8 text-gray-600">
-            Mostrando <span className="font-semibold text-emerald-600">{count}</span> cupones
+            Mostrando{" "}
+            <span className="font-semibold text-emerald-600">{count}</span>{" "}
+            cupones
             {categoriaActual && " filtrados"}
           </div>
         )}

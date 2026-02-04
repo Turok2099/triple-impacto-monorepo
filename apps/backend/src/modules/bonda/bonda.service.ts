@@ -164,10 +164,7 @@ export class BondaService {
 
       return response.data.results || [];
     } catch (error) {
-      this.logger.error(
-        'Error al obtener categorías de Bonda:',
-        error.message,
-      );
+      this.logger.error('Error al obtener categorías de Bonda:', error.message);
       throw new Error('Error al obtener categorías de Bonda');
     }
   }
@@ -177,6 +174,7 @@ export class BondaService {
       id: item.id?.toString() || '',
       nombre: item.nombre || '',
       descuento: item.descuento || '',
+      descripcionBreve: item.descripcion_breve || undefined,
       codigoAfiliado: item.codigo_afiliado?.toString() || '',
       micrositioId: item.micrositio_id?.toString() || '',
       incluirCodigo: item.incluir_codigo?.toString() || '',

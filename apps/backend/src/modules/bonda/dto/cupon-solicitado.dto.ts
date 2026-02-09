@@ -49,6 +49,16 @@ export class EstadisticasUsuarioDto {
 }
 
 /**
+ * DTO para fundaciones/micrositios del usuario
+ */
+export class FundacionUsuarioDto {
+  id: string; // ID del micrositio
+  nombre: string; // Nombre de la fundación/micrositio
+  codigoAfiliado: string; // Código de afiliado del usuario
+  fechaAfiliacion: string; // Fecha de creación del affiliate
+}
+
+/**
  * DTO para el dashboard completo del usuario
  */
 export class DashboardUsuarioDto {
@@ -58,6 +68,7 @@ export class DashboardUsuarioDto {
     email: string;
   };
   estadisticas: EstadisticasUsuarioDto;
+  fundaciones: FundacionUsuarioDto[]; // Fundaciones a las que ha donado
   cuponesActivos: CuponSolicitadoDto[];
   cuponesRecientes: CuponSolicitadoDto[]; // Últimos 5
 }

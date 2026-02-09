@@ -39,7 +39,7 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [count, setCount] = useState(0);
-  const [categoriaActual, setCategoriaActual] = useState<number | null>(null);
+  const [categoriaActual, setCategoriaActual] = useState<string | null>(null);
   const [ordenActual, setOrdenActual] = useState<string>("relevant");
 
   useEffect(() => {
@@ -51,16 +51,32 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
       setLoading(true);
       setError(null);
 
-      // Llamar directamente a Bonda API con filtros
-      // Micrositio: Fundación Padres
+      // Llamar al backend con filtros por categoría (nombre, no ID)
       const publicos = await obtenerCuponesPublicos(
         categoriaActual ?? undefined,
         (ordenActual as "relevant" | "latest") ?? "relevant"
       );
 
       const cuponesDto = publicos.map(publicToCuponDto);
-      setCupones(cuponesDto);
-      setCount(cuponesDto.length);
+      
+      // Eliminar duplicados por MARCA (backend ya lo hace, pero por seguridad)
+      const cuponesUnicosPorMarca = Array.from(
+        new Map(cuponesDto.map((c) => [c.empresa.nombre, c])).values()
+      );
+      
+      // Limitar a 10 cupones máximo
+      let cuponesFiltrados = cuponesUnicosPorMarca;
+      
+      if (ordenActual === "relevant") {
+        // "Más relevantes" = 10 cupones aleatorios
+        cuponesFiltrados = shuffleArray([...cuponesUnicosPorMarca]).slice(0, 10);
+      } else {
+        // "Más recientes" = primeros 10 cupones (ya vienen ordenados del backend)
+        cuponesFiltrados = cuponesUnicosPorMarca.slice(0, 10);
+      }
+      
+      setCupones(cuponesFiltrados);
+      setCount(cuponesFiltrados.length);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Error al cargar cupones";
@@ -71,7 +87,17 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
     }
   }
 
-  const handleFiltroChange = (categoria: number | null, orden: string) => {
+  // Función para mezclar array aleatoriamente (Fisher-Yates shuffle)
+  function shuffleArray<T>(array: T[]): T[] {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }
+
+  const handleFiltroChange = (categoria: string | null, orden: string) => {
     setCategoriaActual(categoria);
     setOrdenActual(orden);
   };

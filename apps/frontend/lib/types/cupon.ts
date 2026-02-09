@@ -49,6 +49,13 @@ export interface CuponesResponseDto {
   cupones: CuponDto[];
 }
 
+/** Categoría de cupones */
+export interface CategoriaDto {
+  id: number;
+  nombre: string;
+  parent_id?: number | null;
+}
+
 /** Cupón público (catálogo visitantes – sin códigos). Respuesta de GET /api/public/cupones-bonda */
 export interface PublicCouponDto {
   id: string;

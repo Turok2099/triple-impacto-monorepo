@@ -28,6 +28,12 @@ export class EnvioDto {
   fecha?: string;
 }
 
+export class CategoriaDto {
+  id: number;
+  nombre: string;
+  parent_id?: number | null;
+}
+
 export class CuponDto {
   id: string;
   nombre: string;
@@ -40,4 +46,5 @@ export class CuponDto {
   empresa: EmpresaDto;
   imagenes: ImagenesDto;
   envio?: EnvioDto;
+  categorias?: CategoriaDto[];
 }

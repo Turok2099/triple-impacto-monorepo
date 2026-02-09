@@ -59,7 +59,7 @@ export default function CuponCard({ cupon }: CuponCardProps) {
       </div>
 
       {/* Contenido debajo de la imagen (padding para no quedar bajo el logo) */}
-      <div className="relative z-0 pt-16 sm:pt-20 pb-5 px-5 text-center">
+      <div className="relative z-0 pt-24 sm:pt-32 pb-5 px-5 text-center">
         {/* Descuento destacado */}
         <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
           {cupon.descuento}

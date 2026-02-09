@@ -96,6 +96,7 @@ export class BondaService {
       categoria?: number;
       orderBy?: 'latest' | 'relevant' | 'ownRelevant';
       subcategories?: boolean;
+      page?: number;
     },
   ): Promise<CuponesResponseDto> {
     const config = await this.resolveConfig(options);
@@ -125,6 +126,9 @@ export class BondaService {
       }
       if (options?.orderBy) {
         params.orderBy = options.orderBy;
+      }
+      if (options?.page) {
+        params.page = options.page;
       }
 
       const response = await firstValueFrom(
@@ -169,6 +173,39 @@ export class BondaService {
     }
   }
 
+  /**
+   * Obtiene los cupones recibidos/solicitados por un afiliado (últimos 25).
+   * Llama al endpoint /api/cupones_recibidos de Bonda.
+   */
+  async obtenerCuponesRecibidos(
+    codigoAfiliado: string,
+    options?: BondaMicrositeOptions,
+  ): Promise<CuponesResponseDto> {
+    const config = await this.resolveConfig(options);
+    if (!config || this.useMocks) {
+      this.logger.warn('obtenerCuponesRecibidos: usando respuesta vacía');
+      return { count: 0, cupones: [], next: null, previous: null };
+    }
+
+    const params = new URLSearchParams({
+      key: config.api_token,
+      micrositio_id: config.microsite_id,
+      codigo_afiliado: codigoAfiliado,
+    });
+
+    const url = `${this.apiUrl}/api/cupones_recibidos?${params.toString()}`;
+    this.logger.log(
+      `Llamando a Bonda cupones_recibidos (afiliado=${codigoAfiliado})`,
+    );
+
+    const response = await firstValueFrom(
+      this.httpService.get(url, { timeout: 10000 }),
+    );
+
+    // La respuesta de cupones_recibidos usa "results" en lugar de "cupones"
+    return this.transformBondaResponse(response.data);
+  }
+
   private transformBondaResponse(data: any): CuponesResponseDto {
     const cupones: CuponDto[] = (data.results || []).map((item: any) => ({
       id: item.id?.toString() || '',
@@ -199,11 +236,17 @@ export class BondaService {
             fecha: item.envio.fecha,
           }
         : undefined,
+      categorias: item.categorias || undefined,
     }));
+
+    // NO deduplicar aquí - retornar todos los cupones tal como vienen de Bonda
+    // La deduplicación por marca se hace solo en los endpoints públicos del frontend
 
     return {
       count: data.count || cupones.length,
-      cupones,
+      cupones: cupones,
+      next: data.next || null,
+      previous: data.previous || null,
     };
   }
 

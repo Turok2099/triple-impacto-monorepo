@@ -40,6 +40,13 @@ export interface EstadisticasUsuario {
   totalDonado?: number;
 }
 
+export interface FundacionUsuario {
+  id: string;
+  nombre: string;
+  codigoAfiliado: string;
+  fechaAfiliacion: string;
+}
+
 export interface DashboardUsuario {
   usuario: {
     id: string;
@@ -47,6 +54,7 @@ export interface DashboardUsuario {
     email: string;
   };
   estadisticas: EstadisticasUsuario;
+  fundaciones: FundacionUsuario[];
   cuponesActivos: CuponSolicitado[];
   cuponesRecientes: CuponSolicitado[];
 }
@@ -126,12 +134,29 @@ export async function obtenerDashboard(
   const response = await fetch(`${API_URL}/bonda/dashboard`, {
     method: 'GET',
     headers: {
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
   });
 
   if (!response.ok) {
-    throw new Error('Error al obtener dashboard');
+    const errorText = await response.text();
+    let errorMessage = `Error ${response.status}: ${response.statusText}`;
+    
+    try {
+      const errorJson = JSON.parse(errorText);
+      errorMessage = errorJson.message || errorMessage;
+    } catch {
+      if (errorText) errorMessage = errorText;
+    }
+    
+    console.error('Error en obtenerDashboard:', {
+      status: response.status,
+      statusText: response.statusText,
+      error: errorMessage,
+    });
+    
+    throw new Error(errorMessage);
   }
 
   return response.json();

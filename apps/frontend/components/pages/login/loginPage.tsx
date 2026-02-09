@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
@@ -13,6 +13,16 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sessionExpiredMsg, setSessionExpiredMsg] = useState(false);
+
+  // Verificar si la sesión expiró
+  useEffect(() => {
+    const expired = sessionStorage.getItem("session_expired");
+    if (expired === "true") {
+      setSessionExpiredMsg(true);
+      sessionStorage.removeItem("session_expired");
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,6 +83,23 @@ export default function LoginPage() {
 
         {/* Formulario */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
+          {/* Mensaje de sesión expirada */}
+          {sessionExpiredMsg && (
+            <div className="mb-6 bg-amber-50 border border-amber-300 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <span className="text-amber-600 text-xl shrink-0">⏱️</span>
+                <div>
+                  <p className="text-sm font-medium text-amber-900 mb-1">
+                    Tu sesión expiró
+                  </p>
+                  <p className="text-sm text-amber-800">
+                    Por seguridad, las sesiones expiran después de 24 horas. Por favor, iniciá sesión nuevamente.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Mensaje de error */}
           {error && (
             <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">

@@ -5,7 +5,39 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { obtenerMisCupones, CuponSolicitado } from '@/lib/dashboard';
-import CuponCard from '@/components/dashboard/CuponCard';
+
+// Componente simple para mostrar cupones solicitados
+function CuponCard({ cupon, token, onMarcarUsado }: { cupon: CuponSolicitado; token: string; onMarcarUsado: () => void }) {
+  return (
+    <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 relative">
+      {/* Bloque superior: imagen de fondo */}
+      <div className="relative h-44 overflow-hidden bg-gray-100">
+        <div className="w-full h-full flex items-center justify-center bg-emerald-100">
+          <span className="text-5xl">🎟️</span>
+        </div>
+        {/* Estado del cupón */}
+        <div className="absolute top-3 right-3 z-10 px-3 py-1.5 rounded-full bg-emerald-600 text-white text-sm font-medium shadow-md">
+          Activo
+        </div>
+      </div>
+
+      {/* Contenido */}
+      <div className="relative z-0 p-5 text-center">
+        <h3 className="text-xl font-bold text-gray-900 mb-2">
+          Cupón #{cupon.id}
+        </h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Código de cupón disponible
+        </p>
+        <button
+          className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-colors text-sm"
+        >
+          Ver detalles
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function MisCuponesPage() {
   const router = useRouter();

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "@/components/sections/Navbar/navbar";
 import Footer from "@/components/sections/Footer/footer";
 import WhatsAppButton from "@/components/shared/WhatsAppButton";
+import FloatingDonateButton from "@/components/shared/FloatingDonateButton";
 import { AuthProvider } from "@/contexts/AuthContext";
 import "./globals.css";
 
@@ -37,6 +38,7 @@ export default function RootLayout({
           {children}
           <Footer />
           <WhatsAppButton />
+          <FloatingDonateButton />
         </AuthProvider>
       </body>
     </html>

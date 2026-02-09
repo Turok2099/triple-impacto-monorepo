@@ -8,7 +8,7 @@ import FormularioPagoFiserv from "@/components/donar/FormularioPagoFiserv";
 import Link from "next/link";
 
 export default function DonarPage() {
-  const { user } = useAuth();
+  const { user, handleSessionExpired } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [transaccionCreada, setTransaccionCreada] = useState<{
@@ -58,6 +58,13 @@ export default function DonarPage() {
       });
     } catch (err: any) {
       console.error("Error al crear transacción:", err);
+      
+      // Si es un error 401 (token expirado), redirigir al login
+      if (err.message === "Unauthorized" || err.message.includes("401")) {
+        handleSessionExpired();
+        return;
+      }
+      
       setError(
         err.message ||
           "Error al procesar la donación. Por favor, intenta nuevamente."

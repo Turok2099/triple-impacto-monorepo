@@ -161,6 +161,58 @@ export class BondaController {
     return response;
   }
 
+  /**
+   * Obtiene los cupones recibidos/solicitados por el usuario (últimos 25).
+   * Llama al endpoint /api/cupones_recibidos de Bonda.
+   * GET /api/bonda/cupones-recibidos?microsite=slug
+   */
+  @Get('cupones-recibidos')
+  @UseGuards(JwtAuthGuard)
+  async obtenerCuponesRecibidos(
+    @Req() req: Request & { user?: { userId: string } },
+    @Query('microsite') microsite?: string,
+    @Query('organizacion_id') organizacionId?: string,
+  ): Promise<CuponesResponseDto> {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new BadRequestException('Se requiere autenticación');
+    }
+
+    if (!microsite && !organizacionId) {
+      throw new BadRequestException(
+        'Se requiere microsite (slug) u organizacion_id',
+      );
+    }
+
+    const micrositeRow = microsite
+      ? await this.supabase.getBondaMicrositeBySlug(microsite)
+      : await this.supabase.getBondaMicrositeByOrganizacionId(
+          organizacionId!,
+        );
+
+    if (!micrositeRow) {
+      throw new NotFoundException(
+        `Micrositio no encontrado: ${microsite || organizacionId}`,
+      );
+    }
+
+    const affiliateRow = await this.supabase.getAffiliateBondaByUser(
+      userId,
+      micrositeRow.id,
+    );
+
+    if (!affiliateRow) {
+      throw new NotFoundException(
+        `No se encontró código de afiliado para este usuario en el micrositio: ${micrositeRow.nombre}`,
+      );
+    }
+
+    return this.bondaService.obtenerCuponesRecibidos(
+      affiliateRow.affiliate_code,
+      { slug: microsite, organizacionId },
+    );
+  }
+
   // ========================================
   // ENDPOINTS PARA GESTIÓN DE AFILIADOS
   // ========================================
@@ -326,7 +378,7 @@ export class BondaController {
    * Obtener dashboard completo del usuario
    * GET /api/bonda/dashboard
    * 
-   * Retorna estadísticas, cupones activos y recientes
+   * Retorna estadísticas, cupones activos, recientes y fundaciones
    */
   @Get('dashboard')
   @UseGuards(JwtAuthGuard)
@@ -338,43 +390,90 @@ export class BondaController {
       throw new BadRequestException('Se requiere autenticación');
     }
 
-    // Obtener información del usuario
-    const usuario = await this.supabase.findUserById(userId);
-    if (!usuario) {
-      throw new NotFoundException('Usuario no encontrado');
+    try {
+      // Obtener información del usuario
+      const usuario = await this.supabase.findUserById(userId);
+      if (!usuario) {
+        throw new NotFoundException('Usuario no encontrado');
+      }
+
+      // Obtener estadísticas (con manejo de errores)
+      let stats;
+      try {
+        stats = await this.supabase.getEstadisticasCuponesUsuario(userId);
+      } catch (error) {
+        console.warn('Error al obtener estadísticas, usando valores por defecto:', error);
+        stats = {
+          cupones_activos: 0,
+          cupones_usados: 0,
+          total_cupones_solicitados: 0,
+          ultimo_cupon_solicitado: null,
+        };
+      }
+
+      // Obtener total donado (con manejo de errores)
+      let totalDonado = 0;
+      try {
+        totalDonado = await this.supabase.getTotalDonadoUsuario(userId);
+      } catch (error) {
+        console.warn('Error al obtener total donado, usando 0:', error);
+      }
+
+      // Obtener fundaciones a las que ha donado (micrositios activos del usuario)
+      let fundaciones: any[] = [];
+      try {
+        fundaciones = await this.supabase.getFundacionesUsuario(userId);
+      } catch (error) {
+        console.warn('Error al obtener fundaciones, usando array vacío:', error);
+      }
+
+      // Obtener cupones activos (con manejo de errores)
+      let cuponesActivos: any[] = [];
+      try {
+        cuponesActivos = await this.supabase.getCuponesActivosUsuario(userId);
+      } catch (error) {
+        console.warn('Error al obtener cupones activos, usando array vacío:', error);
+      }
+
+      // Obtener últimos 5 cupones (con manejo de errores)
+      let historialReciente: any = { cupones: [], total: 0, pagina: 1, limite: 5, totalPaginas: 0 };
+      try {
+        historialReciente = await this.supabase.getHistorialCuponesUsuario(
+          userId,
+          { pagina: 1, limite: 5 },
+        );
+      } catch (error) {
+        console.warn('Error al obtener historial reciente, usando array vacío:', error);
+      }
+
+      return {
+        usuario: {
+          id: usuario.id,
+          nombre: usuario.nombre,
+          email: usuario.email,
+        },
+        estadisticas: {
+          cuponesActivos: stats.cupones_activos || 0,
+          cuponesUsados: stats.cupones_usados || 0,
+          totalCuponesSolicitados: stats.total_cupones_solicitados || 0,
+          ultimoCuponSolicitado: stats.ultimo_cupon_solicitado,
+          totalDonado,
+        },
+        fundaciones: fundaciones.map((f) => ({
+          id: f.bonda_microsite_id,
+          nombre: f.micrositio_nombre,
+          codigoAfiliado: f.affiliate_code,
+          fechaAfiliacion: f.created_at,
+        })),
+        cuponesActivos: cuponesActivos.map(this.transformarACuponSolicitadoDto),
+        cuponesRecientes: historialReciente.cupones.map(
+          this.transformarACuponSolicitadoDto,
+        ),
+      };
+    } catch (error) {
+      console.error('Error crítico en obtenerDashboard:', error);
+      throw error;
     }
-
-    // Obtener estadísticas
-    const stats = await this.supabase.getEstadisticasCuponesUsuario(userId);
-    const totalDonado = await this.supabase.getTotalDonadoUsuario(userId);
-
-    // Obtener cupones activos
-    const cuponesActivos = await this.supabase.getCuponesActivosUsuario(userId);
-
-    // Obtener últimos 5 cupones
-    const historialReciente = await this.supabase.getHistorialCuponesUsuario(
-      userId,
-      { pagina: 1, limite: 5 },
-    );
-
-    return {
-      usuario: {
-        id: usuario.id,
-        nombre: usuario.nombre,
-        email: usuario.email,
-      },
-      estadisticas: {
-        cuponesActivos: stats.cupones_activos || 0,
-        cuponesUsados: stats.cupones_usados || 0,
-        totalCuponesSolicitados: stats.total_cupones_solicitados || 0,
-        ultimoCuponSolicitado: stats.ultimo_cupon_solicitado,
-        totalDonado,
-      },
-      cuponesActivos: cuponesActivos.map(this.transformarACuponSolicitadoDto),
-      cuponesRecientes: historialReciente.cupones.map(
-        this.transformarACuponSolicitadoDto,
-      ),
-    };
   }
 
   /**

@@ -15,6 +15,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (token: string, userData: User) => void;
   logout: () => void;
+  handleSessionExpired: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -56,6 +57,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.location.href = "/";
   };
 
+  const handleSessionExpired = () => {
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("user");
+    setUser(null);
+    // Guardar mensaje de sesión expirada
+    sessionStorage.setItem("session_expired", "true");
+    // Redirigir al login
+    window.location.href = "/login";
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -64,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         login,
         logout,
+        handleSessionExpired,
       }}
     >
       {children}

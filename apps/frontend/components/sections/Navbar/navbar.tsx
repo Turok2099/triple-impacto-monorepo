@@ -73,6 +73,12 @@ export default function Navbar() {
                   {/* Auth - Usuario logueado */}
                   {isAuthenticated && user ? (
                     <div className="flex items-center gap-3">
+                      <a
+                        href="/dashboard"
+                        className="px-4 py-2 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-all duration-200 font-medium text-sm"
+                      >
+                        Dashboard
+                      </a>
                       <span className="text-sm text-gray-700 font-medium">
                         Hola,{" "}
                         <span className="text-emerald-600">{user.nombre}</span>
@@ -94,28 +100,12 @@ export default function Navbar() {
                     </a>
                   )}
 
-                  {/* CTA Principal */}
-                  <a
-                    href="/donar"
-                    className="px-6 py-2.5 bg-linear-to-r from-emerald-600 to-emerald-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2"
-                  >
-                    <span>💚</span>
-                    <span>Donar ahora</span>
-                  </a>
                 </>
               )}
             </div>
 
             {/* Botones Mobile */}
             <div className="flex lg:hidden items-center gap-2">
-              {/* CTA Mobile (solo icono) */}
-              <a
-                href="/donar"
-                className="px-4 py-2 bg-linear-to-r from-emerald-600 to-emerald-700 text-white font-semibold rounded-lg shadow-md"
-              >
-                Donar
-              </a>
-
               {/* Hamburger Menu */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -238,6 +228,14 @@ export default function Navbar() {
                         {user.nombre}
                       </div>
                     </div>
+                    <a
+                      href="/dashboard"
+                      onClick={handleNavClick}
+                      className="flex items-center gap-3 px-4 py-3 text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors font-medium"
+                    >
+                      <span className="text-2xl">📊</span>
+                      <span>Dashboard</span>
+                    </a>
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors font-medium"
@@ -271,20 +269,6 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* CTA Fixed Bottom en Mobile */}
-          <div className="absolute bottom-0 left-0 right-0 p-6 bg-linear-to-t from-white via-white to-transparent">
-            <a
-              href="/donar"
-              onClick={handleNavClick}
-              className="w-full py-4 bg-linear-to-r from-emerald-600 to-emerald-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 text-lg"
-            >
-              <span>💚</span>
-              <span>Donar ahora</span>
-            </a>
-            <p className="text-center text-gray-500 text-xs mt-3">
-              Tu donación genera impacto real y te da beneficios
-            </p>
-          </div>
         </div>
       </div>
 

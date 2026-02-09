@@ -44,13 +44,12 @@ export interface OrganizacionPublicDto {
 
 @Controller('public')
 export class PublicController {
-  // Hardcodear configuración de Fundación Padres para cupones públicos
-  private readonly FUNDACION_PADRES_CONFIG = {
-    slug: 'beneficios-fundacion-padres',
-    micrositeId: '911299',
-    apiToken:
-      'DG7xN1fp5wmr60YnPizhhEbYCT4ivTOiVDYoLXdKEn9Zhb1nipHIJEDHuyn69bWq',
-    codigoAfiliado: '22380612', // Código demo para consultas públicas
+  // Configuración de Fundación Padres desde variables de entorno (seguro)
+  private readonly FUNDACION_PADRES_CONFIG: {
+    slug: string;
+    micrositeId: string;
+    apiToken: string;
+    codigoAfiliado: string;
   };
 
   constructor(
@@ -58,27 +57,24 @@ export class PublicController {
     private readonly syncCuponesService: SyncCuponesService,
     private readonly configService: ConfigService,
     private readonly bondaService: BondaService,
-  ) {}
+  ) {
+    // Inicializar configuración de Fundación Padres desde variables de entorno
+    this.FUNDACION_PADRES_CONFIG = {
+      slug: this.configService.get<string>('BONDA_MICROSITE_SLUG') || 'beneficios-fundacion-padres',
+      micrositeId: this.configService.get<string>('BONDA_MICROSITE_ID') || '',
+      apiToken: this.configService.get<string>('BONDA_API_KEY') || '',
+      codigoAfiliado: this.configService.get<string>('BONDA_CODIGO_AFILIADO') || '',
+    };
 
-  /**
-   * Catálogo público de cupones (Estado 1 – Visitantes).
-   * No requiere autenticación. Se muestran en la landing sin códigos.
-   * Soporta filtros opcionales: categoria, orderBy
-   */
-  @Get('cupones')
-  async getCupones(
-    @Query('categoria') categoria?: string,
-    @Query('orderBy') orderBy?: string,
-  ): Promise<PublicCouponDto[]> {
-    // Si hay filtros, llamar directamente a Bonda (futuro)
-    // Por ahora, retornamos de la tabla local public_coupons
-    // TODO: Implementar filtrado desde Bonda en tiempo real si se requiere
-    return this.supabase.getPublicCoupons();
+    // Validar que las credenciales de Bonda estén configuradas
+    if (!this.FUNDACION_PADRES_CONFIG.apiToken || !this.FUNDACION_PADRES_CONFIG.micrositeId) {
+      console.warn('⚠️ ADVERTENCIA: Credenciales de Bonda no configuradas en variables de entorno');
+    }
   }
 
   /**
-   * Obtiene las categorías disponibles de cupones (hardcodeadas, compatibles con UI).
-   * GET /api/public/categorias
+   * [DEPRECADO] Endpoint legacy que retornaba de tabla local.
+   * Usar /public/cupones-bonda en su lugar para datos en tiempo real de Bonda.
    */
   @Get('categorias')
   async getCategorias(): Promise<
@@ -192,48 +188,61 @@ export class PublicController {
   }
 
   /**
-   * Obtiene cupones directamente desde Bonda API con filtros.
+   * Obtiene cupones desde Supabase (public_coupons_v2) con filtros.
    * GET /api/public/cupones-bonda
    *
    * Query params:
-   * - categoria: ID de categoría (opcional)
-   * - orderBy: relevant | latest (opcional, default: relevant)
+   * - categoria: Nombre de categoría (opcional, ej: "Gastronomía")
+   * - busqueda: Término de búsqueda (opcional)
+   * - limite: Número de cupones a retornar (opcional, default: todos)
+   * - offset: Offset para paginación (opcional, default: 0)
    *
-   * Este endpoint llama directamente a Bonda (micrositio Fundación Padres)
-   * sin pasar por la tabla public_coupons de Supabase.
-   * Retorna todos los cupones disponibles (1600+) con filtros aplicados.
+   * Este endpoint lee desde la tabla public_coupons_v2 de Supabase,
+   * que se sincroniza automáticamente desde Bonda a las 3 AM Argentina.
+   * Muestra solo 1 cupón por marca/empresa.
    */
   @Get('cupones-bonda')
   async getCuponesDesdeBonda(
     @Query('categoria') categoria?: string,
-    @Query('orderBy') orderBy?: string,
+    @Query('busqueda') busqueda?: string,
+    @Query('limite') limite?: string,
+    @Query('offset') offset?: string,
   ): Promise<any> {
     try {
-      const response = await this.bondaService.obtenerCupones(
-        this.FUNDACION_PADRES_CONFIG.codigoAfiliado,
-        {
-          slug: this.FUNDACION_PADRES_CONFIG.slug,
-          categoria: categoria ? Number(categoria) : undefined,
-          orderBy: orderBy as 'latest' | 'relevant' | 'ownRelevant',
-          subcategories: true,
+      // Obtener cupones desde Supabase
+      const resultado = await this.supabase.getPublicCouponsV2({
+        categoria: categoria && categoria !== 'Todo' ? categoria : undefined,
+        busqueda,
+        limite: limite ? parseInt(limite, 10) : undefined,
+        offset: offset ? parseInt(offset, 10) : undefined,
+        soloActivos: true,
+      });
+
+      // Transformar a formato compatible con el frontend actual
+      const cuponesTransformados = resultado.cupones.map((cupon: any) => ({
+        id: cupon.bonda_cupon_id,
+        nombre: cupon.nombre,
+        descuento: cupon.descuento,
+        descripcion: cupon.descripcion_breve ?? null,
+        empresa: {
+          nombre: cupon.empresa_nombre,
         },
+        imagen_url: cupon.imagen_principal_url || cupon.imagen_thumbnail_url || null,
+        logo_empresa: cupon.empresa_logo_url || null,
+        categoria_principal: cupon.categoria_principal || null,
+        fecha_vencimiento: cupon.fecha_vencimiento || null,
+      }));
+
+      // Eliminar duplicados por MARCA (mostrar solo 1 cupón por empresa)
+      const cuponesUnicosPorMarca = Array.from(
+        new Map(cuponesTransformados.map((c) => [c.empresa.nombre, c])).values(),
       );
 
-      // Transformar a formato público (sin códigos sensibles)
       return {
-        count: response.count,
-        cupones: response.cupones.map((cupon) => ({
-          id: cupon.id,
-          nombre: cupon.nombre,
-          descuento: cupon.descuento,
-          descripcion: cupon.descripcionBreve ?? null,
-          empresa: cupon.empresa.nombre,
-          imagen_url:
-            cupon.imagenes.principal?.['280x190'] ||
-            cupon.imagenes.thumbnail?.['90x90'] ||
-            null,
-          logo_empresa: cupon.empresa.logoThumbnail?.['90x90'] || null,
-        })),
+        count: cuponesUnicosPorMarca.length,
+        cupones: cuponesUnicosPorMarca,
+        total_disponible: resultado.total,
+        sincronizado_desde: 'supabase',
       };
     } catch (error) {
       throw error;

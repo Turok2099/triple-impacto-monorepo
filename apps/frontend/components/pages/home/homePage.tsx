@@ -1,4 +1,5 @@
 import CuponesShowcase from "@/components/sections/Cupones/CuponesShowcase";
+import CouponCounter from "@/components/sections/CouponCounter/couponCounter";
 import CTASection from "@/components/sections/CTA/ctaSection";
 import FAQCTASection from "@/components/sections/FAQ/faqCTA";
 import FounderQuote from "@/components/sections/FounderQuote/founderQuote";
@@ -15,6 +16,7 @@ export default function HomePage() {
       <FounderQuote />
       <HowItWorksSection />
       <CuponesShowcase />
+      <CouponCounter />
       <SponsorsSection />
       <PartnersSection />
       <WhyDonateSection />

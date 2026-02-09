@@ -1,25 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  LayoutGrid,
-  ShoppingBag,
-  UtensilsCrossed,
-  Shirt,
-  GraduationCap,
-  Wrench,
-  Plane,
-  Dumbbell,
-  Sparkles,
-  Gamepad2,
-  Bike,
-  Theater,
-  Car,
-  Film,
-  Building2,
-  Home,
-  type LucideIcon,
-} from "lucide-react";
 
 interface Categoria {
   id: number;
@@ -27,29 +8,8 @@ interface Categoria {
 }
 
 interface FiltrosCuponesProps {
-  onFiltroChange: (categoria: number | null, orden: string) => void;
+  onFiltroChange: (categoria: string | null, orden: string) => void;
 }
-
-const ICONOS_CATEGORIAS: Record<string, LucideIcon> = {
-  Todo: LayoutGrid,
-  Todos: LayoutGrid,
-  Compras: ShoppingBag,
-  Gastronomía: UtensilsCrossed,
-  "Indumentaria, Calzado y Moda": Shirt,
-  "Indumentaria y Moda": Shirt,
-  Educación: GraduationCap,
-  Servicios: Wrench,
-  Turismo: Plane,
-  "Gimnasios y Deportes": Dumbbell,
-  "Belleza y Salud": Sparkles,
-  Entretenimientos: Gamepad2,
-  Motos: Bike,
-  Teatros: Theater,
-  Autos: Car,
-  Cines: Film,
-  Inmobiliarias: Building2,
-  Inmuebles: Home,
-};
 
 /** Lista de subcategorías por si el API devuelve vacío o solo "Todo" (misma que backend). */
 const CATEGORIAS_POR_DEFECTO: Categoria[] = [
@@ -76,10 +36,8 @@ export default function FiltrosCupones({
 }: FiltrosCuponesProps) {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<
-    number | null
+    string | null
   >(null);
-  const [ordenSeleccionado, setOrdenSeleccionado] =
-    useState<string>("relevant");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -103,16 +61,10 @@ export default function FiltrosCupones({
     }
   }
 
-  const handleCategoriaClick = (categoriaId: number) => {
-    const nuevaCategoria = categoriaId === 0 ? null : categoriaId;
+  const handleCategoriaClick = (categoriaId: number, categoriaNombre: string) => {
+    const nuevaCategoria = categoriaId === 0 ? null : categoriaNombre;
     setCategoriaSeleccionada(nuevaCategoria);
-    onFiltroChange(nuevaCategoria, ordenSeleccionado);
-  };
-
-  const handleOrdenChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const nuevoOrden = e.target.value;
-    setOrdenSeleccionado(nuevoOrden);
-    onFiltroChange(categoriaSeleccionada, nuevoOrden);
+    onFiltroChange(nuevaCategoria, "relevant");
   };
 
   if (loading) {
@@ -125,57 +77,29 @@ export default function FiltrosCupones({
 
   return (
     <div className="mb-8">
-      {/* Contenedor de filtros */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white rounded-2xl shadow-md p-4">
-        {/* Botones de categorías */}
-        <div className="flex flex-wrap gap-2 flex-1">
+      {/* Barra horizontal con scroll (estilo dashboard) */}
+      <div className="relative mb-4">
+        <div className="flex gap-2 overflow-x-auto scrollbar-thin py-2 pb-4">
           {categorias.map((categoria) => {
             const isSelected =
               categoria.id === 0
                 ? categoriaSeleccionada === null
-                : categoriaSeleccionada === categoria.id;
-
-            const IconComponent =
-              ICONOS_CATEGORIAS[categoria.nombre] || LayoutGrid;
+                : categoriaSeleccionada === categoria.nombre;
 
             return (
               <button
                 key={categoria.id}
-                onClick={() => handleCategoriaClick(categoria.id)}
-                className={`
-                  px-4 py-2 rounded-full font-semibold transition-all duration-200
-                  flex items-center gap-2 text-sm sm:text-base
-                  ${
-                    isSelected
-                      ? "bg-emerald-600 text-white shadow-lg scale-105"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-md"
-                  }
-                `}
+                onClick={() => handleCategoriaClick(categoria.id, categoria.nombre)}
+                className={`shrink-0 whitespace-nowrap px-5 py-2 rounded-full font-bold text-sm transition-all ${
+                  isSelected
+                    ? "bg-emerald-600 text-white shadow-sm"
+                    : "bg-white text-slate-600 border border-emerald-100 hover:border-emerald-400"
+                }`}
               >
-                <IconComponent className="w-4 h-4 shrink-0" />
-                <span>{categoria.nombre}</span>
+                {categoria.nombre}
               </button>
             );
           })}
-        </div>
-
-        {/* Dropdown de ordenamiento */}
-        <div className="flex items-center gap-2">
-          <label
-            htmlFor="orden"
-            className="text-sm font-medium text-gray-700 whitespace-nowrap"
-          >
-            Ordenar por:
-          </label>
-          <select
-            id="orden"
-            value={ordenSeleccionado}
-            onChange={handleOrdenChange}
-            className="px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900 bg-white cursor-pointer"
-          >
-            <option value="relevant">Más relevantes</option>
-            <option value="latest">Más recientes</option>
-          </select>
         </div>
       </div>
     </div>

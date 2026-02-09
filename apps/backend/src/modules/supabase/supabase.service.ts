@@ -362,12 +362,13 @@ export class SupabaseService implements OnModuleInit {
   }
 
   /**
-   * Obtener cupones públicos (catálogo Estado 1 – Visitantes).
-   * Usar para la landing sin login.
-   * Query equivalente: supabase.from('public_coupons').select('*').eq('activo', true).
-   * La tabla public_coupons tiene RLS + política "Cupones públicos activos visibles para todos"
-   * (SELECT solo donde activo = true). Este backend usa service_role, así que RLS no aplica aquí;
-   * el .eq('activo', true) es por consistencia. Ver database/README.md, sección "Verificar RLS en public_coupons".
+   * [DEPRECADO] Obtener cupones desde tabla local public_coupons.
+   * 
+   * ⚠️ Este método ya no se usa. Los cupones ahora se obtienen directamente
+   * de Bonda API en tiempo real a través de /public/cupones-bonda
+   * 
+   * La tabla public_coupons se mantiene para sincronizaciones programadas
+   * pero NO se usa en el flujo principal del frontend.
    */
   async getPublicCoupons() {
     const { data, error } = await this.from('public_coupons')
@@ -798,5 +799,217 @@ export class SupabaseService implements OnModuleInit {
     if (!data || data.length === 0) return 0;
 
     return data.reduce((sum, d) => sum + Number(d.monto), 0);
+  }
+
+  /**
+   * Obtener fundaciones/micrositios a los que el usuario ha donado
+   */
+  async getFundacionesUsuario(usuarioId: string) {
+    const { data, error } = await this.from('usuarios_bonda_afiliados')
+      .select(`
+        affiliate_code,
+        created_at,
+        bonda_microsite_id,
+        bonda_microsites (
+          id,
+          nombre,
+          slug
+        )
+      `)
+      .eq('user_id', usuarioId);
+
+    if (error) {
+      this.logger.error('Error al obtener fundaciones del usuario:', error);
+      throw error;
+    }
+
+    return (data || []).map((row: any) => ({
+      affiliate_code: row.affiliate_code,
+      created_at: row.created_at,
+      bonda_microsite_id: row.bonda_microsites.id,
+      micrositio_nombre: row.bonda_microsites.nombre,
+      micrositio_slug: row.bonda_microsites.slug,
+    }));
+  }
+
+  /**
+   * Obtener código de afiliado de un usuario para un micrositio específico
+   */
+  async getAffiliateBondaByUser(usuarioId: string, bondaMicrositeId: string) {
+    const { data, error } = await this.from('usuarios_bonda_afiliados')
+      .select('*')
+      .eq('user_id', usuarioId)
+      .eq('bonda_microsite_id', bondaMicrositeId)
+      .maybeSingle();
+
+    if (error) {
+      this.logger.error('Error al obtener código de afiliado:', error);
+      throw error;
+    }
+
+    return data;
+  }
+
+  // ========================================
+  // PUBLIC_COUPONS_V2 (Sincronización desde Bonda)
+  // ========================================
+
+  /**
+   * Obtener cupones públicos desde public_coupons_v2 con filtros
+   */
+  async getPublicCouponsV2(opciones: {
+    categoria?: string;
+    busqueda?: string;
+    limite?: number;
+    offset?: number;
+    soloActivos?: boolean;
+  } = {}) {
+    let query = this.from('public_coupons_v2').select('*', { count: 'exact' });
+
+    // Filtrar solo activos por defecto
+    if (opciones.soloActivos !== false) {
+      query = query.eq('activo', true);
+    }
+
+    // Filtrar por categoría principal
+    if (opciones.categoria && opciones.categoria !== 'Todo') {
+      query = query.eq('categoria_principal', opciones.categoria);
+    }
+
+    // Búsqueda por texto en nombre o empresa
+    if (opciones.busqueda) {
+      query = query.or(
+        `nombre.ilike.%${opciones.busqueda}%,empresa_nombre.ilike.%${opciones.busqueda}%`,
+      );
+    }
+
+    // Filtrar cupones no vencidos
+    query = query.or(`fecha_vencimiento.is.null,fecha_vencimiento.gte.${new Date().toISOString()}`);
+
+    // Ordenar por fecha de sincronización (más recientes primero)
+    query = query.order('synced_at', { ascending: false });
+
+    // Paginación
+    if (opciones.limite) {
+      const offset = opciones.offset || 0;
+      query = query.range(offset, offset + opciones.limite - 1);
+    }
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      this.logger.error('Error al obtener cupones públicos v2:', error);
+      throw error;
+    }
+
+    return {
+      cupones: data || [],
+      total: count || 0,
+    };
+  }
+
+  /**
+   * Insertar o actualizar cupones en public_coupons_v2 (upsert por bonda_cupon_id)
+   */
+  async upsertPublicCouponsV2(cupones: Array<{
+    bonda_cupon_id: string;
+    bonda_microsite_id?: string;
+    nombre: string;
+    descuento?: string;
+    descripcion_breve?: string;
+    empresa_nombre?: string;
+    empresa_id?: string;
+    empresa_logo_url?: string;
+    empresa_data?: object;
+    imagen_principal_url?: string;
+    imagen_thumbnail_url?: string;
+    imagenes?: object;
+    descripcion_micrositio?: string;
+    usage_instructions?: string;
+    legales?: string;
+    categorias?: object;
+    categoria_principal?: string;
+    fecha_vencimiento?: string;
+    activo?: boolean;
+    usar_en?: object;
+    permitir_sms?: boolean;
+    orden?: number;
+  }>) {
+    if (!cupones || cupones.length === 0) {
+      this.logger.warn('No hay cupones para insertar en public_coupons_v2');
+      return { count: 0 };
+    }
+
+    // Agregar timestamp de sincronización
+    const cuponesConTimestamp = cupones.map((cupon) => ({
+      ...cupon,
+      synced_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      activo: cupon.activo !== false, // Por defecto true
+    }));
+
+    const { data, error } = await this.from('public_coupons_v2')
+      .upsert(cuponesConTimestamp, {
+        onConflict: 'bonda_cupon_id',
+        ignoreDuplicates: false, // Actualizar si ya existe
+      })
+      .select();
+
+    if (error) {
+      this.logger.error('Error al insertar cupones en public_coupons_v2:', error);
+      throw error;
+    }
+
+    this.logger.log(`✅ ${data?.length || 0} cupones sincronizados en public_coupons_v2`);
+    return { count: data?.length || 0 };
+  }
+
+  /**
+   * Eliminar cupones antiguos/vencidos de public_coupons_v2
+   */
+  async limpiarCuponesVencidosV2(): Promise<number> {
+    const fechaLimite = new Date();
+    fechaLimite.setDate(fechaLimite.getDate() - 7); // Eliminar vencidos hace más de 7 días
+
+    const { data, error } = await this.from('public_coupons_v2')
+      .delete()
+      .lt('fecha_vencimiento', fechaLimite.toISOString())
+      .select();
+
+    if (error) {
+      this.logger.error('Error al limpiar cupones vencidos:', error);
+      throw error;
+    }
+
+    const count = data?.length || 0;
+    if (count > 0) {
+      this.logger.log(`✅ ${count} cupones vencidos eliminados de public_coupons_v2`);
+    }
+    return count;
+  }
+
+  /**
+   * Obtener estadísticas de public_coupons_v2
+   */
+  async getEstadisticasCuponesV2() {
+    const { count: totalActivos } = await this.from('public_coupons_v2')
+      .select('*', { count: 'exact', head: true })
+      .eq('activo', true);
+
+    const { count: totalVencidos } = await this.from('public_coupons_v2')
+      .select('*', { count: 'exact', head: true })
+      .lt('fecha_vencimiento', new Date().toISOString());
+
+    const { data: ultimoSync } = await this.from('public_coupons_v2')
+      .select('synced_at')
+      .order('synced_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    return {
+      total_activos: totalActivos || 0,
+      total_vencidos: totalVencidos || 0,
+      ultima_sincronizacion: ultimoSync?.synced_at || null,
+    };
   }
 }

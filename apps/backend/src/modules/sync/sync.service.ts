@@ -1,0 +1,352 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { BondaService } from '../bonda/bonda.service';
+import { SupabaseService } from '../supabase/supabase.service';
+
+@Injectable()
+export class SyncService {
+  private readonly logger = new Logger(SyncService.name);
+
+  constructor(
+    private readonly bondaService: BondaService,
+    private readonly supabaseService: SupabaseService,
+    private readonly configService: ConfigService,
+  ) {}
+
+  /**
+   * Sincronizar todos los cupones desde Bonda API a Supabase
+   * Hace llamadas paginadas hasta obtener todos los cupones disponibles
+   */
+  async sincronizarCuponesDesdeBonda(micrositeId?: string): Promise<{
+    total_cupones: number;
+    total_paginas: number;
+    tiempo_total_ms: number;
+    errores: string[];
+  }> {
+    const startTime = Date.now();
+    const errores: string[] = [];
+    let totalCupones = 0;
+    let totalPaginas = 0;
+
+    try {
+      this.logger.log('🔄 Iniciando sincronización de cupones desde Bonda...');
+
+      // Obtener micrositio para sincronizar
+      let microsite: any;
+      
+      if (micrositeId) {
+        const { data, error } = await this.supabaseService
+          .from('bonda_microsites')
+          .select('*')
+          .eq('microsite_id', micrositeId)
+          .eq('activo', true)
+          .single();
+        
+        if (error || !data) {
+          throw new Error(`No se encontró el micrositio con microsite_id: ${micrositeId}`);
+        }
+        microsite = data;
+      } else {
+        microsite = await this.supabaseService.getNextMicrositeForSync();
+      }
+
+      if (!microsite) {
+        throw new Error('No hay micrositios activos para sincronizar');
+      }
+
+      this.logger.log(
+        `📡 Sincronizando micrositio: ${microsite.nombre} (${microsite.slug})`,
+      );
+
+      // Configuración de Bonda para este micrositio
+      const codigoAfiliado =
+        this.configService.get<string>('BONDA_CODIGO_AFILIADO') || '';
+
+      // Primera llamada para saber cuántos cupones hay en total
+      this.logger.log('📥 Obteniendo primera página...');
+      let paginaActual = 1;
+      let hayMasPaginas = true;
+      const todosCupones: any[] = [];
+
+      while (hayMasPaginas) {
+        try {
+          // Llamar a Bonda API con paginación
+          const response = await this.bondaService.obtenerCupones(
+            codigoAfiliado,
+            {
+              slug: microsite.slug,
+              subcategories: true,
+              orderBy: 'relevant',
+              page: paginaActual, // IMPORTANTE: Pasar número de página
+            },
+          );
+
+          this.logger.log(
+            `📄 Página ${paginaActual}: ${response.cupones.length} cupones`,
+          );
+
+          // Agregar cupones de esta página
+          todosCupones.push(...response.cupones);
+          totalPaginas++;
+
+          // Verificar si hay más páginas usando el campo "next" de la respuesta
+          // Si next existe y no es null, hay más páginas
+          hayMasPaginas = !!response.next;
+          
+          if (hayMasPaginas) {
+            paginaActual++;
+          }
+
+          // Delay entre requests para no saturar el API
+          if (hayMasPaginas) {
+            await this.delay(500); // 500ms entre llamadas
+          }
+        } catch (error) {
+          this.logger.error(
+            `❌ Error en página ${paginaActual}: ${error.message}`,
+          );
+          errores.push(`Página ${paginaActual}: ${error.message}`);
+          break; // Salir del loop si hay un error
+        }
+      }
+
+      totalCupones = todosCupones.length;
+      this.logger.log(`✅ Total de cupones obtenidos: ${totalCupones}`);
+
+      // Mapeo de IDs de categorías padre a nombres de categorías principales
+      const CATEGORIAS_PRINCIPALES_MAP: Record<string, string> = {
+        '13': 'Compras',
+        '12': 'Gastronomía',
+        '6': 'Indumentaria, Calzado y Moda',
+        '14': 'Educación',
+        '8': 'Servicios',
+        '11': 'Turismo',
+        '16': 'Gimnasios y Deportes',
+        '7': 'Belleza y Salud',
+        '17': 'Entretenimientos',
+        '18': 'Motos',
+        '19': 'Teatros',
+        '20': 'Autos',
+        '21': 'Cines',
+        '22': 'Inmobiliarias',
+        '23': 'Inmuebles',
+      };
+
+      // Transformar cupones a formato de Supabase
+      const cuponesParaSupabase = todosCupones.map((cupon) => {
+        // Determinar la categoría principal desde parent_id o el nombre de la categoría
+        let categoriaPrincipal: string | null = null;
+        if (cupon.categorias && cupon.categorias.length > 0) {
+          const primeraCategoria = cupon.categorias[0];
+          if (primeraCategoria.parent_id) {
+            // Es una subcategoría, buscar el nombre de la categoría padre
+            categoriaPrincipal =
+              CATEGORIAS_PRINCIPALES_MAP[primeraCategoria.parent_id.toString()] || null;
+          } else {
+            // Es una categoría principal
+            categoriaPrincipal = primeraCategoria.nombre;
+          }
+        }
+
+        return {
+          bonda_cupon_id: cupon.id.toString(),
+          bonda_microsite_id: microsite.id,
+          nombre: cupon.nombre || '',
+          descuento: cupon.descuento || null,
+          descripcion_breve: cupon.descripcionBreve || null,
+          empresa_nombre: cupon.empresa?.nombre || null,
+          empresa_id: cupon.empresa?.id?.toString() || null,
+          empresa_logo_url: cupon.empresa?.logoThumbnail?.['90x90'] || null,
+          empresa_data: cupon.empresa || null,
+          imagen_principal_url:
+            cupon.imagenes?.principal?.['280x190'] ||
+            cupon.imagenes?.principal?.original ||
+            null,
+          imagen_thumbnail_url:
+            cupon.imagenes?.thumbnail?.['90x90'] ||
+            cupon.imagenes?.thumbnail?.original ||
+            null,
+          imagenes: cupon.imagenes || null,
+          descripcion_micrositio: cupon.descripcionMicrositio || null,
+          usage_instructions: cupon.usageInstructions || null,
+          legales: cupon.legales || null,
+          categorias: cupon.categorias || null,
+          categoria_principal: categoriaPrincipal || undefined,
+          fecha_vencimiento: cupon.fechaVencimiento || null,
+          activo: true,
+          usar_en: cupon.usarEn || null,
+          permitir_sms: cupon.permitirSms || false,
+          orden: 0,
+        };
+      });
+
+      // Insertar cupones en Supabase (upsert)
+      this.logger.log('💾 Guardando cupones en Supabase...');
+      const { count } = await this.supabaseService.upsertPublicCouponsV2(
+        cuponesParaSupabase,
+      );
+
+      // Actualizar timestamp de última sincronización del micrositio
+      await this.supabaseService.updateMicrositeLastSynced(microsite.id);
+
+      // Limpiar cupones vencidos antiguos
+      await this.supabaseService.limpiarCuponesVencidosV2();
+
+      const tiempoTotal = Date.now() - startTime;
+      this.logger.log(
+        `✅ Sincronización completada en ${tiempoTotal}ms (${totalPaginas} páginas, ${totalCupones} cupones)`,
+      );
+
+      // Registrar log de sincronización
+      await this.supabaseService.logBondaOperation({
+        operacion: 'sincronizar_cupones_completo',
+        endpoint: '/api/cupones',
+        exitoso: true,
+        request_data: {
+          microsite_id: microsite.id,
+          total_paginas: totalPaginas,
+        },
+        response_data: {
+          total_cupones: totalCupones,
+          cupones_guardados: count,
+        },
+      });
+
+      return {
+        total_cupones: totalCupones,
+        total_paginas: totalPaginas,
+        tiempo_total_ms: tiempoTotal,
+        errores,
+      };
+    } catch (error) {
+      const tiempoTotal = Date.now() - startTime;
+      this.logger.error(`❌ Error en sincronización: ${error.message}`);
+
+      // Registrar log de error
+      await this.supabaseService.logBondaOperation({
+        operacion: 'sincronizar_cupones_completo',
+        endpoint: '/api/cupones',
+        exitoso: false,
+        error_message: error.message,
+        request_data: { microsite_id: micrositeId },
+      });
+
+      throw error;
+    }
+  }
+
+  /**
+   * Helper para delay entre requests
+   */
+  private delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Sincronizar todos los micrositios activos
+   */
+  async sincronizarTodosMicrositios(): Promise<{
+    total_micrositios: number;
+    resultados: Array<{
+      microsite_nombre: string;
+      exito: boolean;
+      total_cupones?: number;
+      error?: string;
+    }>;
+  }> {
+    this.logger.log('🔄 Sincronizando todos los micrositios activos...');
+
+    const { data: micrositios } = await this.supabaseService
+      .from('bonda_microsites')
+      .select('*')
+      .eq('activo', true);
+
+    if (!micrositios || micrositios.length === 0) {
+      this.logger.warn('⚠️ No hay micrositios activos para sincronizar');
+      return {
+        total_micrositios: 0,
+        resultados: [],
+      };
+    }
+
+    const resultados: Array<{
+      microsite_nombre: string;
+      exito: boolean;
+      total_cupones?: number;
+      error?: string;
+    }> = [];
+
+    for (const microsite of micrositios) {
+      try {
+        this.logger.log(`\n📡 Sincronizando: ${microsite.nombre}...`);
+        const resultado = await this.sincronizarCuponesDesdeBonda(
+          microsite.id,
+        );
+
+        resultados.push({
+          microsite_nombre: microsite.nombre,
+          exito: true,
+          total_cupones: resultado.total_cupones,
+        });
+
+        // Delay entre micrositios
+        await this.delay(2000);
+      } catch (error: any) {
+        this.logger.error(
+          `❌ Error sincronizando ${microsite.nombre}: ${error.message}`,
+        );
+        resultados.push({
+          microsite_nombre: microsite.nombre,
+          exito: false,
+          error: error.message,
+        });
+      }
+    }
+
+    return {
+      total_micrositios: micrositios.length,
+      resultados,
+    };
+  }
+
+  /**
+   * Cron job: Sincronizar cupones diariamente a las 3 AM Argentina (UTC-3)
+   * 
+   * Horario Argentina (ART): 3:00 AM
+   * Horario UTC: 6:00 AM
+   * 
+   * Cron expression: '0 6 * * *' (A las 6:00 AM UTC todos los días)
+   */
+  @Cron('0 6 * * *', {
+    name: 'sincronizar_cupones_diario',
+    timeZone: 'UTC',
+  })
+  async sincronizacionAutomaticaDiaria() {
+    this.logger.log('⏰ Cron job iniciado: Sincronización diaria de cupones (3 AM Argentina)');
+
+    try {
+      const resultado = await this.sincronizarTodosMicrositios();
+
+      this.logger.log(
+        `✅ Cron job completado: ${resultado.total_micrositios} micrositios sincronizados`,
+      );
+
+      // Log en base de datos
+      await this.supabaseService.logBondaOperation({
+        operacion: 'cron_sincronizacion_diaria',
+        exitoso: true,
+        response_data: resultado,
+      });
+    } catch (error) {
+      this.logger.error(`❌ Error en cron job de sincronización: ${error.message}`);
+
+      // Log de error en base de datos
+      await this.supabaseService.logBondaOperation({
+        operacion: 'cron_sincronizacion_diaria',
+        exitoso: false,
+        error_message: error.message,
+      });
+    }
+  }
+}

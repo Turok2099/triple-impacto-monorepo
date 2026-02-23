@@ -213,31 +213,40 @@ Authorization: Bearer <token>
 
 ### Cómo Funciona la Solicitud de Cupones
 
-**IMPORTANTE:** La API de Bonda funciona de la siguiente manera:
+**IMPORTANTE:** La API de Bonda tiene dos formas de trabajar con cupones:
 
-1. El endpoint `/api/cupones_recibidos` devuelve cupones que el usuario **ya recibió/solicitó** en Bonda
-2. **No hay un endpoint separado** para "solicitar" un cupón individual
-3. Bonda envía los códigos automáticamente por email/SMS cuando el usuario los solicita **en su sitio**
+### Método 1: Solicitar Cupón Directamente (✅ RECOMENDADO)
 
-Por lo tanto, nuestro flujo es:
+**Endpoint:** `POST /api/cupones/{coupon_id}/codigo`
+
+El usuario puede solicitar cualquier cupón del catálogo y recibir el código inmediatamente:
+
 ```
 Usuario ve catálogo → Usuario hace clic en "Solicitar" 
-→ Backend busca el cupón en los "cupones recibidos" de Bonda
+→ Backend llama POST /api/cupones/{id}/codigo (form-data)
+→ Bonda retorna el código en la respuesta
 → Backend guarda el cupón en nuestra BD
 → Frontend muestra el CÓDIGO en pantalla
 ```
 
-### ¿Qué pasa si el cupón no está "recibido"?
+**Ventajas:**
+- ✅ Solicitud instantánea
+- ✅ No requiere que el cupón esté "recibido" previamente
+- ✅ No envía SMS (el código se obtiene directo en response)
 
-Si el usuario intenta solicitar un cupón que aún no está en su lista de "cupones recibidos" en Bonda, el sistema retornará un error:
+### Método 2: Leer Cupones Recibidos
 
-```json
-{
-  "message": "Cupón no encontrado en tu lista de cupones recibidos de Bonda"
-}
+**Endpoint:** `GET /api/cupones_recibidos`
+
+Retorna los últimos 25 cupones que el usuario **ya solicitó previamente** (útil para historial):
+
+```
+Backend llama GET /api/cupones_recibidos
+→ Retorna cupones con sus códigos
+→ Útil para dashboard/historial
 ```
 
-**Solución:** El usuario debe primero solicitar el cupón en el sitio de Bonda, o implementar integración con el endpoint de Bonda que permite "reclamar" cupones (si existe).
+**Uso:** Ideal para mostrar historial de cupones solicitados.
 
 ### Sin Límites de Cupones
 

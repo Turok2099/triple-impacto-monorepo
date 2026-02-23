@@ -480,6 +480,55 @@ export class BondaService {
     }
   }
 
+  /**
+   * Obtener un afiliado por código desde Bonda API
+   * GET /api/v2/microsite/{microsite_id}/affiliates/{affiliate_code}
+   * 
+   * Retorna el usuario completo con member, segmentation y company.
+   * Si el usuario se encuentra soft-deleteado, NO será visible (retorna null).
+   */
+  async obtenerAfiliado(
+    affiliateCode: string,
+    options?: BondaMicrositeOptions,
+  ): Promise<any> {
+    const config = await this.resolveConfig(options);
+    if (!config && this.useMocks) {
+      return this.obtenerAfiliadoMock(affiliateCode);
+    }
+    if (!config) {
+      throw new Error(
+        'Se requiere microsite (slug) u organizacion_id, o configurar BONDA_API_KEY y BONDA_MICROSITE_ID en env',
+      );
+    }
+
+    try {
+      const url = `${this.apiUrl}/api/v2/microsite/${config.microsite_id}/affiliates/${affiliateCode}`;
+
+      const response = await firstValueFrom(
+        this.httpService.get(url, {
+          headers: {
+            token: config.api_token,
+          },
+        }),
+      );
+
+      return response.data;
+    } catch (error) {
+      this.logger.error('Error al obtener afiliado desde Bonda:', error.message);
+
+      // Si el usuario no existe (404), retornar null en lugar de lanzar error
+      if (error.response?.status === 404) {
+        return null;
+      }
+
+      if (error.response?.data) {
+        return error.response.data;
+      }
+
+      throw new Error('Error al obtener afiliado desde Bonda');
+    }
+  }
+
   // ========================================
   // MOCKS PARA AFILIADOS
   // ========================================
@@ -535,6 +584,34 @@ export class BondaService {
     };
   }
 
+  private obtenerAfiliadoMock(affiliateCode: string): any {
+    this.logger.log(`[MOCK] Obteniendo afiliado: ${affiliateCode}`);
+
+    return {
+      success: true,
+      data: {
+        member: {
+          id: '12345',
+          code: affiliateCode,
+          company_id: '909092',
+          email: 'mock@example.com',
+          nombre: 'Usuario Mock',
+        },
+        segmentation: {
+          id: 331,
+          name: 'Segmentación general',
+          default: true,
+        },
+        company: {
+          id: '909092',
+          name: 'Micrositio Mock',
+          accesstype: 'Código',
+          open_site: true,
+        },
+      },
+    };
+  }
+
   // ========================================
   // SOLICITAR CUPÓN ESPECÍFICO (Dashboard)
   // ========================================
@@ -556,6 +633,75 @@ export class BondaService {
    * aún no lo ha solicitado en el sitio de Bonda. En ese caso, deberías
    * implementar lógica adicional según tu flujo de negocio.
    */
+  /**
+   * Solicita un cupón a Bonda usando POST /api/cupones/{id}/codigo
+   * Este endpoint devuelve el código directamente sin enviar SMS
+   */
+  async solicitarCodigoCupon(
+    bondaCuponId: string,
+    codigoAfiliado: string,
+    options?: BondaMicrositeOptions,
+  ): Promise<{
+    codigo: string;
+    instrucciones: string;
+    textoSms: string;
+    codigoId: string;
+  }> {
+    const config = await this.resolveConfig(options);
+    if (!config || this.useMocks) {
+      this.logger.warn('solicitarCodigoCupon: usando mock');
+      return {
+        codigo: 'MOCK-' + bondaCuponId,
+        instrucciones: '<p>Instrucciones mock</p>',
+        textoSms: 'Texto SMS mock',
+        codigoId: 'mock-id-' + Date.now(),
+      };
+    }
+
+    // Crear form-data según especificación de Bonda
+    const FormData = require('form-data');
+    const formData = new FormData();
+    formData.append('key', config.api_token);
+    formData.append('micrositio_id', config.microsite_id);
+    formData.append('codigo_afiliado', codigoAfiliado);
+    formData.append('split', '1');
+
+    const url = `${this.apiUrl}/api/cupones/${bondaCuponId}/codigo`;
+    this.logger.log(
+      `Solicitando código de cupón ${bondaCuponId} para afiliado ${codigoAfiliado}`,
+    );
+
+    try {
+      const response = await firstValueFrom(
+        this.httpService.post(url, formData, {
+          headers: formData.getHeaders(),
+          timeout: 15000,
+        }),
+      );
+
+      if (response.data?.success) {
+        return {
+          codigo: response.data.success.codigo || '',
+          instrucciones: response.data.success.instrucciones || '',
+          textoSms: response.data.success.texto_sms || '',
+          codigoId: response.data.success.id?.toString() || '',
+        };
+      }
+
+      throw new Error(
+        'Respuesta inválida de Bonda al solicitar código de cupón',
+      );
+    } catch (error: any) {
+      this.logger.error(
+        `Error al solicitar código de cupón: ${error.message}`,
+        error.response?.data,
+      );
+      throw new Error(
+        `No se pudo obtener el código del cupón: ${error.message}`,
+      );
+    }
+  }
+
   async solicitarCuponEspecifico(
     usuarioId: string,
     bondaCuponId: string,
@@ -573,20 +719,25 @@ export class BondaService {
       throw new Error('Ya tienes este cupón activo en tu dashboard');
     }
 
-    // 2. Obtener TODOS los cupones recibidos del usuario desde Bonda
+    // 2. Solicitar el código del cupón directamente a Bonda (NUEVO MÉTODO)
+    const codigoResponse = await this.solicitarCodigoCupon(
+      bondaCuponId,
+      codigoAfiliado,
+      { slug: micrositioSlug },
+    );
+
+    // 3. Obtener información del cupón desde el catálogo
     const cuponesResponse = await this.obtenerCupones(codigoAfiliado, {
       slug: micrositioSlug,
     });
 
-    // 3. Buscar el cupón específico por ID
-    const cuponEncontrado = cuponesResponse.cupones.find(
+    const cuponInfo = cuponesResponse.cupones.find(
       (c) => c.id === bondaCuponId,
     );
 
-    if (!cuponEncontrado) {
-      throw new Error(
-        'Cupón no encontrado en tu lista de cupones recibidos de Bonda. ' +
-          'Asegúrate de que ya lo hayas solicitado en el sistema de Bonda.',
+    if (!cuponInfo) {
+      this.logger.warn(
+        `Cupón ${bondaCuponId} no encontrado en catálogo, usando datos mínimos`,
       );
     }
 
@@ -598,33 +749,31 @@ export class BondaService {
       throw new Error(`Micrositio no encontrado: ${micrositioSlug}`);
     }
 
-    // 5. Guardar el cupón en nuestra BD
+    // 5. Guardar el cupón en nuestra BD con el código obtenido
     const cuponGuardado = await this.supabase.guardarCuponSolicitado({
       usuario_id: usuarioId,
-      bonda_cupon_id: cuponEncontrado.id,
-      nombre: cuponEncontrado.nombre,
-      descuento: cuponEncontrado.descuento,
-      empresa_nombre: cuponEncontrado.empresa?.nombre || '',
-      empresa_id: cuponEncontrado.empresa?.id || '',
-      codigo: cuponEncontrado.envio?.codigo || undefined,
-      codigo_id: cuponEncontrado.envio?.codigoId || undefined,
+      bonda_cupon_id: bondaCuponId,
+      nombre: cuponInfo?.nombre || `Cupón ${bondaCuponId}`,
+      descuento: cuponInfo?.descuento || '',
+      empresa_nombre: cuponInfo?.empresa?.nombre || '',
+      empresa_id: cuponInfo?.empresa?.id || '',
+      codigo: codigoResponse.codigo, // Código obtenido del endpoint POST
+      codigo_id: codigoResponse.codigoId,
       codigo_afiliado: codigoAfiliado,
       micrositio_slug: micrositioSlug,
       bonda_microsite_id: microsite.id,
-      mensaje: cuponEncontrado.envio?.mensaje || undefined,
-      operadora: cuponEncontrado.envio?.operadora || undefined,
-      celular: celular || cuponEncontrado.envio?.celular || undefined,
-      imagen_thumbnail:
-        cuponEncontrado.imagenes?.thumbnail?.['90x90'] || undefined,
+      mensaje: codigoResponse.textoSms,
+      operadora: undefined, // El endpoint POST no envía SMS
+      celular: celular,
+      imagen_thumbnail: cuponInfo?.imagenes?.thumbnail?.['90x90'] || undefined,
       imagen_principal:
-        cuponEncontrado.imagenes?.principal?.['280x190'] || undefined,
-      imagen_apaisada:
-        cuponEncontrado.imagenes?.apaisada?.['240x80'] || undefined,
-      bonda_raw_data: cuponEncontrado,
+        cuponInfo?.imagenes?.principal?.['280x190'] || undefined,
+      imagen_apaisada: cuponInfo?.imagenes?.apaisada?.['240x80'] || undefined,
+      bonda_raw_data: cuponInfo || { bondaCuponId, codigoResponse },
     });
 
     this.logger.log(
-      `✅ Cupón solicitado: ${cuponEncontrado.nombre} (código: ${cuponEncontrado.envio?.codigo || 'N/A'})`,
+      `✅ Cupón solicitado: ${cuponInfo?.nombre || bondaCuponId} (código: ${codigoResponse.codigo})`,
     );
 
     return cuponGuardado;

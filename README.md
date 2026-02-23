@@ -35,15 +35,25 @@ triple-impacto-monorepo/
 │   │   ├── tsconfig.json
 │   │   ├── tsconfig.build.json
 │   │   └── package.json
-│   └── frontend/         # Aplicación frontend con Next.js
-│       ├── app/          # App Router de Next.js
-│       │   ├── layout.tsx
-│       │   ├── page.tsx
-│       │   └── globals.css
-│       ├── public/       # Archivos estáticos
-│       ├── eslint.config.mjs
-│       ├── next.config.ts
-│       ├── postcss.config.mjs
+│   ├── frontend/         # Aplicación frontend con Next.js
+│   │   ├── app/          # App Router de Next.js
+│   │   │   ├── layout.tsx
+│   │   │   ├── page.tsx
+│   │   │   └── globals.css
+│   │   ├── public/       # Archivos estáticos
+│   │   ├── eslint.config.mjs
+│   │   ├── next.config.ts
+│   │   ├── postcss.config.mjs
+│   │   ├── tsconfig.json
+│   │   └── package.json
+│   └── cms/              # CMS para gestión de ONGs con Payload
+│       ├── src/          # Código fuente
+│       │   ├── collections/  # Colecciones de Payload
+│       │   ├── server.ts     # Servidor Express + Payload
+│       │   └── payload.config.ts
+│       ├── public/       # Archivos estáticos y medios
+│       ├── QUICKSTART.md # Guía de inicio rápido
+│       ├── INTEGRACION-NEXTJS.md  # Guía de integración
 │       ├── tsconfig.json
 │       └── package.json
 ├── packages/             # Paquetes compartidos (futuro)
@@ -73,6 +83,23 @@ triple-impacto-monorepo/
 - **Lenguaje**: TypeScript v5
 - **Estilos**: Tailwind CSS v4
 - **Linting**: ESLint v9 con `eslint-config-next`
+
+### CMS (`apps/cms`) 🆕
+
+- **Plataforma**: [Sanity.io](https://www.sanity.io/)
+- **SDK**: Sanity v5.9.0
+- **Plugins**: Vision Tool, Color Input
+- **Lenguaje**: TypeScript
+- **Características**:
+  - Headless CMS moderno y escalable
+  - Studio web integrado
+  - Sistema de gestión de contenido para ONGs
+  - Templates personalizables con colores y fuentes
+  - Personalización de imágenes y galerías
+  - API REST y GraphQL automática
+  - Editor de contenido rico (Portable Text)
+  - Optimización de imágenes con CDN global
+  - Plan gratuito generoso
 
 ### Monorepo
 
@@ -158,6 +185,7 @@ Esto iniciará:
 
 - **Backend**: Por defecto en `http://localhost:3000` (configurable con variable de entorno `PORT`)
 - **Frontend**: Por defecto en `http://localhost:3001` (Next.js usa el siguiente puerto disponible si 3000 está ocupado)
+- **CMS**: Por defecto en `http://localhost:3002` (ver [Guía de inicio del CMS](#cms))
 
 ### Desarrollo individual
 
@@ -176,6 +204,26 @@ npm run dev
 cd apps/frontend
 npm run dev
 ```
+
+**CMS:**
+
+```bash
+cd apps/cms
+npm run dev
+```
+
+### Configuración del CMS 🆕
+
+El CMS (Sanity) requiere configuración inicial:
+
+1. **Lee la guía de inicio rápido**: `apps/cms/QUICKSTART.md`
+2. **Crea un proyecto en Sanity.io** (gratuito): https://www.sanity.io
+3. **Configura tu Project ID**: Edita `apps/cms/sanity.config.ts`
+4. **Autentícate**: `cd apps/cms && npx sanity login`
+5. **Inicia el Studio**: `npm run dev`
+6. **Accede al Studio**: http://localhost:3333
+
+Para integración con Next.js, ver: `apps/cms/INTEGRACION-NEXTJS.md`
 
 ## 👥 Información para Desarrolladores
 

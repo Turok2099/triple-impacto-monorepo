@@ -376,12 +376,12 @@ export default function DashboardPage() {
           {/* Horizontal Chip Filter Bar - Deshabilitado durante búsqueda */}
           {!busquedaActiva && (
             <div className="relative mb-4">
-              <div className="flex gap-2 overflow-x-auto scrollbar-thin py-2 pb-4">
+              <div className="flex flex-wrap gap-2 py-2">
                 {categorias.map((categoria) => (
                   <button
                     key={categoria.id}
                     onClick={() => setCategoriaSeleccionada(categoria.nombre)}
-                    className={`shrink-0 whitespace-nowrap px-5 py-2 rounded-full font-bold text-sm transition-all ${
+                    className={`whitespace-nowrap px-5 py-2 rounded-full font-bold text-sm transition-all ${
                       categoriaSeleccionada === categoria.nombre
                         ? "bg-emerald-600 text-white shadow-sm"
                         : "bg-white text-slate-600 border border-emerald-100 hover:border-emerald-400"
@@ -455,16 +455,19 @@ export default function DashboardPage() {
                     <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
                       {cupon.descuento || "Descuento especial"}
                     </p>
-                    {/* Descripción en gris */}
-                    <p className="text-sm text-gray-500 line-clamp-2">
+                    {/* Descripción en gris - Siempre 3 líneas */}
+                    <p className="text-sm text-gray-500 line-clamp-3 min-h-[3.6rem]">
                       {cupon.descripcion || cupon.titulo}
                     </p>
                     {/* CTA */}
                     <button 
-                      onClick={() => router.push("/dashboard/cupones-disponibles")}
+                      onClick={() => {
+                        // TODO: Abrir modal de solicitud de cupón o implementar lógica de solicitud
+                        alert(`Solicitar cupón: ${cupon.titulo}`);
+                      }}
                       className="mt-4 w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-colors text-sm"
                     >
-                      Ver detalles
+                      Solicitar cupón
                     </button>
                   </div>
                 </div>

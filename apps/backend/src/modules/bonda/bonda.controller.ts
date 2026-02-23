@@ -285,6 +285,27 @@ export class BondaController {
     });
   }
 
+  /**
+   * GET /api/bonda/affiliates/:code
+   * Query: microsite (slug) u organizacion_id para usar config desde bonda_microsites.
+   * 
+   * Obtiene un afiliado por su código desde Bonda API.
+   * Retorna el usuario completo incluyendo member, segmentation y company.
+   * 
+   * Si el usuario se encuentra soft-deleteado, retorna 404 (null).
+   */
+  @Get('affiliates/:code')
+  async obtenerAfiliado(
+    @Param('code') code: string,
+    @Query('microsite') microsite?: string,
+    @Query('organizacion_id') organizacionId?: string,
+  ): Promise<any> {
+    return this.bondaService.obtenerAfiliado(code, {
+      slug: microsite,
+      organizacionId,
+    });
+  }
+
   // ========================================
   // ENDPOINTS PARA DASHBOARD DE USUARIO
   // ========================================

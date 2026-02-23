@@ -1,0 +1,28 @@
+{
+  "name": "cms",
+  "version": "1.0.0",
+  "description": "CMS para gestión de ONGs con Sanity - Triple Impacto",
+  "main": "index.js",
+  "scripts": {
+    "dev": "sanity dev",
+    "start": "sanity start",
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "sanity",
+    "cms",
+    "ongs"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@sanity/color-input": "^6.0.4",
+    "@sanity/vision": "^5.9.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "sanity": "^5.9.0",
+    "styled-components": "^6.3.9"
+  }
+}

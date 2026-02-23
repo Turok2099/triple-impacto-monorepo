@@ -131,7 +131,7 @@ export default function MisCuponesPage() {
             </p>
             <div className="flex gap-4 justify-center">
               <Link
-                href="/dashboard/cupones-disponibles"
+                href="/dashboard"
                 className="px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700"
               >
                 Ver Catálogo de Cupones

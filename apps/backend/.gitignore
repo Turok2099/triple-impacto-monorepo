@@ -59,8 +59,18 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # Documentación privada (no subir al repo)
 /docs/
 
-# Seed con tokens Bonda (no subir al repo)
+# Seeds con información sensible (API keys, códigos de afiliado, datos de prueba)
 database/seed-bonda-microsites.sql
+database/seed-usuarios-prueba-bonda.sql
+database/setup-test-user-affiliate.sql
+database/seed-test-user-bonda.sql
+database/seed-*.sql
 
 # Scripts output (archivos generados por análisis)
 scripts/output/
+
+# Reportes de prueba con datos sensibles
+RESULTADO-*.md
+USUARIOS-PRUEBA-*.md
+RESUMEN-*.md
+INTEGRACION-*.md

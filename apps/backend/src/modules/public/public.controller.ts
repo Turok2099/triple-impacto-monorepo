@@ -4,7 +4,11 @@ import {
   Post,
   Query,
   UnauthorizedException,
+  Req,
+  Headers,
 } from '@nestjs/common';
+import { Request } from 'express';
+import { JwtService } from '@nestjs/jwt';
 import { SupabaseService } from '../supabase/supabase.service';
 import { SyncCuponesService } from './sync-cupones.service';
 import { ConfigService } from '@nestjs/config';
@@ -57,6 +61,7 @@ export class PublicController {
     private readonly syncCuponesService: SyncCuponesService,
     private readonly configService: ConfigService,
     private readonly bondaService: BondaService,
+    private readonly jwtService: JwtService,
   ) {
     // Inicializar configuración de Fundación Padres desde variables de entorno
     this.FUNDACION_PADRES_CONFIG = {
@@ -196,10 +201,12 @@ export class PublicController {
    * - busqueda: Término de búsqueda (opcional)
    * - limite: Número de cupones a retornar (opcional, default: todos)
    * - offset: Offset para paginación (opcional, default: 0)
+   * - deduplicate: Si es 'false', muestra TODOS los cupones. Por defecto muestra solo 1 por marca.
    *
    * Este endpoint lee desde la tabla public_coupons_v2 de Supabase,
    * que se sincroniza automáticamente desde Bonda a las 3 AM Argentina.
-   * Muestra solo 1 cupón por marca/empresa.
+   * Por defecto muestra solo 1 cupón por marca/empresa (útil para home).
+   * Para dashboard, usar deduplicate=false para ver todos los cupones.
    */
   @Get('cupones-bonda')
   async getCuponesDesdeBonda(
@@ -207,8 +214,29 @@ export class PublicController {
     @Query('busqueda') busqueda?: string,
     @Query('limite') limite?: string,
     @Query('offset') offset?: string,
+    @Query('deduplicate') deduplicate?: string,
+    @Headers('authorization') authorization?: string,
   ): Promise<any> {
     try {
+      // Intentar extraer userId del token (opcional)
+      let micrositeIds: string[] | undefined = undefined;
+      
+      if (authorization?.startsWith('Bearer ')) {
+        try {
+          const token = authorization.substring(7);
+          const payload = this.jwtService.verify(token);
+          const userId = payload.userId;
+          
+          if (userId) {
+            // Obtener micrositios del usuario basado en sus donaciones
+            micrositeIds = await this.supabase.getMicrositiosUsuario(userId);
+          }
+        } catch (error) {
+          // Token inválido o expirado, continuar sin filtrar por micrositios
+          console.warn('Token JWT inválido o expirado, mostrando todos los cupones');
+        }
+      }
+
       // Obtener cupones desde Supabase
       const resultado = await this.supabase.getPublicCouponsV2({
         categoria: categoria && categoria !== 'Todo' ? categoria : undefined,
@@ -216,6 +244,7 @@ export class PublicController {
         limite: limite ? parseInt(limite, 10) : undefined,
         offset: offset ? parseInt(offset, 10) : undefined,
         soloActivos: true,
+        micrositeIds, // Filtrar por micrositios del usuario si está autenticado
       });
 
       // Transformar a formato compatible con el frontend actual
@@ -233,16 +262,20 @@ export class PublicController {
         fecha_vencimiento: cupon.fecha_vencimiento || null,
       }));
 
-      // Eliminar duplicados por MARCA (mostrar solo 1 cupón por empresa)
-      const cuponesUnicosPorMarca = Array.from(
-        new Map(cuponesTransformados.map((c) => [c.empresa.nombre, c])).values(),
-      );
+      // Deduplicación opcional por MARCA (por defecto true para home)
+      const shouldDeduplicate = deduplicate !== 'false'; // Por defecto true
+      const cuponesFinal = shouldDeduplicate
+        ? Array.from(
+            new Map(cuponesTransformados.map((c) => [c.empresa.nombre, c])).values(),
+          )
+        : cuponesTransformados;
 
       return {
-        count: cuponesUnicosPorMarca.length,
-        cupones: cuponesUnicosPorMarca,
+        count: cuponesFinal.length,
+        cupones: cuponesFinal,
         total_disponible: resultado.total,
         sincronizado_desde: 'supabase',
+        deduplicated: shouldDeduplicate,
       };
     } catch (error) {
       throw error;

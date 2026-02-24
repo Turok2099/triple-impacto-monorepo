@@ -64,11 +64,11 @@ export default function CuponCard({ cupon }: CuponCardProps) {
         <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
           {cupon.descuento}
         </p>
-        {/* Descripción en gris */}
-        <p className="text-sm text-gray-500 line-clamp-2">{descripcion}</p>
+        {/* Descripción en gris - Siempre 3 líneas */}
+        <p className="text-sm text-gray-500 line-clamp-3 min-h-[3.6rem]">{descripcion}</p>
         {/* CTA */}
         <button className="mt-4 w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-colors text-sm">
-          Ver detalles
+          Obtener descuento
         </button>
       </div>
     </div>

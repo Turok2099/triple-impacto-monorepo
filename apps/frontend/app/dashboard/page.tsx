@@ -11,6 +11,28 @@ import {
   PublicCouponDto,
   CategoriaDto,
 } from "@/lib/bonda";
+import {
+  Ticket,
+  CheckCircle2,
+  Heart,
+  Wallet,
+  LayoutGrid,
+  UserCircle,
+  Gift,
+  LogOut,
+  Grid3x3,
+  UtensilsCrossed,
+  Sparkles,
+  Laptop,
+  Film,
+  Dumbbell,
+  Home,
+  GraduationCap,
+  ShoppingBag,
+  Plane,
+  Shirt,
+  Car,
+} from "lucide-react";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -27,7 +49,7 @@ export default function DashboardPage() {
   const [hayMasCupones, setHayMasCupones] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [cuponesRecibidos, setCuponesRecibidos] = useState<number>(0);
-  const [todosLosCupones, setTodosLosCupones] = useState<PublicCouponDto[]>([]);
+  const [totalCuponesDisponibles, setTotalCuponesDisponibles] = useState<number>(0);
   const [dashboardCargado, setDashboardCargado] = useState(false);
   const [busquedaActiva, setBusquedaActiva] = useState(false);
   const CUPONES_POR_PAGINA = 10;
@@ -58,7 +80,7 @@ export default function DashboardPage() {
         console.warn("Error al cargar categorías:", err);
       });
 
-      cargarCupones(true).catch((err) => {
+      cargarCupones(1).catch((err) => {
         console.warn("Error al cargar cupones:", err);
       });
 
@@ -94,7 +116,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (user && !busquedaActiva) {
-      cargarCupones(true);
+      cargarCupones(1);
     }
   }, [categoriaSeleccionada]);
 
@@ -109,7 +131,7 @@ export default function DashboardPage() {
       } else {
         // Volver a cargar cupones por categoría
         setBusquedaActiva(false);
-        cargarCupones(true);
+        cargarCupones(1);
       }
     }, 500); // Esperar 500ms después de que el usuario deje de escribir
 
@@ -118,7 +140,7 @@ export default function DashboardPage() {
 
   const realizarBusqueda = async () => {
     setBusquedaActiva(true);
-    await cargarCupones(true, busqueda);
+    await cargarCupones(1, busqueda);
   };
 
   const cargarDashboard = async () => {
@@ -148,35 +170,28 @@ export default function DashboardPage() {
     setCategorias(cats);
   };
 
-  const cargarCupones = async (reset = true, terminoBusqueda?: string) => {
-    if (reset) {
+  const cargarCupones = async (pagina: number = 1, terminoBusqueda?: string) => {
+    if (pagina === 1) {
       setPaginaActual(1);
     } else {
       setLoadingMore(true);
     }
 
     try {
-      const data = await obtenerCuponesPublicos(
+      const offset = (pagina - 1) * CUPONES_POR_PAGINA;
+      const { cupones: data, total } = await obtenerCuponesPublicos(
         categoriaSeleccionada === "Todo" ? undefined : categoriaSeleccionada,
         "relevant",
-        terminoBusqueda
+        terminoBusqueda,
+        false, // NO deduplicar en dashboard - mostrar TODOS los cupones
+        CUPONES_POR_PAGINA, // Límite: 10 cupones por página
+        offset // Offset según la página actual
       );
 
-      if (reset) {
-        // Primera carga: guardar todos y mostrar primeros 8
-        setTodosLosCupones(data);
-        setCupones(data.slice(0, CUPONES_POR_PAGINA));
-        setHayMasCupones(data.length > CUPONES_POR_PAGINA);
-      } else {
-        // Carrusel: reemplazar con los siguientes 8
-        const inicio = paginaActual * CUPONES_POR_PAGINA;
-        const fin = inicio + CUPONES_POR_PAGINA;
-        const nuevosCupones = todosLosCupones.slice(inicio, fin);
-
-        setCupones(nuevosCupones);
-        setPaginaActual((prev) => prev + 1);
-        setHayMasCupones(fin < todosLosCupones.length);
-      }
+      setCupones(data);
+      setTotalCuponesDisponibles(total);
+      setPaginaActual(pagina);
+      setHayMasCupones((pagina * CUPONES_POR_PAGINA) < total);
     } catch (error) {
       console.error("Error al cargar cupones:", error);
       // No bloquear el dashboard por error en cupones
@@ -185,20 +200,36 @@ export default function DashboardPage() {
     }
   };
 
-  const cargarMasCupones = () => {
-    cargarCupones(false, busquedaActiva ? busqueda : undefined);
-  };
-
   // Cupones a mostrar (ya vienen paginados del backend)
   const cuponesMostrados = cupones;
   const hayMasCuponesBusqueda = busquedaActiva && hayMasCupones;
-  
-  // Calcular total de páginas
-  const totalPaginas = Math.ceil(todosLosCupones.length / CUPONES_POR_PAGINA);
+
+  // Calcular total de páginas usando el total real del backend
+  const totalPaginas = Math.ceil(totalCuponesDisponibles / CUPONES_POR_PAGINA);
+
+  // Función para obtener el icono según la categoría
+  const getCategoryIcon = (categoryName: string) => {
+    const iconMap: { [key: string]: any } = {
+      Todo: Grid3x3,
+      "Alimentos y Bebidas": UtensilsCrossed,
+      "Belleza y Salud": Sparkles,
+      Tecnología: Laptop,
+      Entretenimiento: Film,
+      Deportes: Dumbbell,
+      Hogar: Home,
+      Educación: GraduationCap,
+      Moda: Shirt,
+      Viajes: Plane,
+      Compras: ShoppingBag,
+      Automotriz: Car,
+    };
+
+    return iconMap[categoryName] || ShoppingBag;
+  };
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-emerald-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Cargando tu dashboard...</p>
@@ -209,7 +240,7 @@ export default function DashboardPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-emerald-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
         <div className="bg-white rounded-lg shadow-lg p-8 max-w-md">
           <div className="text-center">
             <div className="text-4xl mb-4">⚠️</div>
@@ -235,118 +266,201 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="bg-emerald-50 min-h-screen pb-20">
-      {/* Top Navigation */}
-      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-emerald-100 px-4 py-3">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center gap-3">
-            <div className="size-10 rounded-full bg-emerald-600 flex items-center justify-center">
-              <span className="text-white text-2xl">💚</span>
-            </div>
-            <div>
-              <h1 className="text-lg font-bold leading-tight">
-                Impact Dashboard
-              </h1>
-              <p className="text-xs text-emerald-600 font-medium uppercase tracking-wider">
-                Miembro Activo
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={logout}
-            className="size-10 flex items-center justify-center rounded-full bg-emerald-100/50 hover:bg-red-100 transition-colors"
-            title="Cerrar sesión"
-          >
-            <span className="text-slate-900">🚪</span>
-          </button>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto p-4 space-y-6">
-        {/* Top Section: Header & Summary */}
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 bg-white rounded-xl p-5 shadow-sm border border-emerald-100 flex items-center gap-4">
-            <div className="size-16 rounded-full bg-linear-to-br from-emerald-400 to-emerald-600 flex items-center justify-center border-2 border-emerald-600">
-              <span className="text-3xl">👤</span>
-            </div>
-            <div>
-              <h2 className="text-xl font-bold">
+    <div className="bg-[#F8FAFC] min-h-screen pb-8">
+      {/* Header */}
+      <header className="bg-white px-6 py-6 border-b border-slate-100">
+        <div className="max-w-7xl mx-auto">
+          {/* Top row: Avatar + Nombre centrados */}
+          <div className="flex flex-col items-center gap-3 mb-6">
+            <div
+              className="size-16 rounded-full bg-cover bg-center ring-2 ring-slate-50 shadow-md"
+              style={{
+                backgroundImage: `url(https://ui-avatars.com/api/?name=${encodeURIComponent(dashboard.usuario.nombre)}&background=16a459&color=fff&size=192)`,
+              }}
+            ></div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-xl text-[#1A202C]">
                 ¡Hola, {dashboard.usuario.nombre.split(" ")[0]}!
-              </h2>
-              <p className="text-slate-500 text-sm">
-                Generando impacto desde {new Date().getFullYear()}
-              </p>
+              </span>
+              <span className="bg-[#16a459]/10 text-[#16a459] text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                Miembro Activo
+              </span>
             </div>
           </div>
 
-          <div className="flex-none bg-white rounded-xl p-5 shadow-sm border border-emerald-100 flex flex-col justify-center min-w-[200px]">
-            <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-1">
-              Mi Impacto
-            </p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-extrabold text-slate-900">
-                {cuponesRecibidos}
-              </span>
-              <span className="text-slate-500 font-medium">
-                Cupones Recibidos
-              </span>
-            </div>
-            <button
-              onClick={() => router.push("/dashboard/historial")}
-              className="mt-2 text-sm font-semibold text-emerald-600 flex items-center gap-1 hover:underline"
+          {/* Navigation Links */}
+          <div className="flex items-center justify-center gap-8">
+            <a
+              className="flex flex-col items-center gap-1 text-[#16a459] transition-colors"
+              href="/dashboard"
             >
-              Ver reporte completo →
+              <LayoutGrid className="w-6 h-6" strokeWidth={2} />
+              <span className="text-xs font-semibold">Inicio</span>
+            </a>
+            <a
+              className="flex flex-col items-center gap-1 text-slate-400 hover:text-[#16a459] transition-colors"
+              href="/dashboard/perfil"
+            >
+              <UserCircle className="w-6 h-6" strokeWidth={2} />
+              <span className="text-xs font-medium">Perfil</span>
+            </a>
+            <a
+              className="flex flex-col items-center gap-1 text-slate-400 hover:text-[#16a459] transition-colors"
+              href="/dashboard/mis-cupones"
+            >
+              <Gift className="w-6 h-6" strokeWidth={2} />
+              <span className="text-xs font-medium">Mis Cupones</span>
+            </a>
+            <button
+              onClick={logout}
+              className="flex flex-col items-center gap-1 text-slate-400 hover:text-red-500 transition-colors"
+              title="Cerrar sesión"
+            >
+              <LogOut className="w-6 h-6" strokeWidth={2} />
+              <span className="text-xs font-medium">Salir</span>
             </button>
           </div>
         </div>
+      </header>
 
-        {/* Active Donations Section */}
+      <main className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+        {/* Impact Summary */}
         <section>
-          <div className="flex items-center justify-between mb-3 px-1">
-            <h3 className="text-lg font-bold">Donaciones Activas</h3>
-            <a className="text-sm font-semibold text-emerald-600" href="/donar">
-              Donar más
+          <h2 className="text-[#1A202C] font-bold text-xl mb-4">
+            Resumen de Impacto
+          </h2>
+          <div className="grid grid-cols-4 gap-3">
+            <div className="bg-white p-4 rounded-2xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-slate-50 flex flex-col items-center gap-2">
+              <Ticket className="w-8 h-8 text-[#16a459]" strokeWidth={1.5} />
+              <p className="text-[10px] font-semibold text-[#718096] uppercase tracking-tight text-center">
+                Cupones Activos
+              </p>
+              <p className="text-2xl font-bold text-[#16a459]">
+                {dashboard.estadisticas?.cuponesActivos || 0}
+              </p>
+            </div>
+            <div className="bg-white p-4 rounded-2xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-slate-50 flex flex-col items-center gap-2">
+              <CheckCircle2
+                className="w-8 h-8 text-[#16a459]"
+                strokeWidth={1.5}
+              />
+              <p className="text-[10px] font-semibold text-[#718096] uppercase tracking-tight text-center">
+                Cupones Usados
+              </p>
+              <p className="text-2xl font-bold text-[#16a459]">
+                {dashboard.estadisticas?.cuponesUsados || 0}
+              </p>
+            </div>
+            <div className="bg-white p-4 rounded-2xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-slate-50 flex flex-col items-center gap-2">
+              <Heart className="w-8 h-8 text-[#16a459]" strokeWidth={1.5} />
+              <p className="text-[10px] font-semibold text-[#718096] uppercase tracking-tight text-center">
+                Total Donado
+              </p>
+              <p className="text-2xl font-bold text-[#16a459]">
+                $
+                {dashboard.estadisticas?.totalDonado?.toLocaleString("es-AR") ||
+                  "0"}
+              </p>
+            </div>
+            <div className="bg-white p-4 rounded-2xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-slate-50 flex flex-col items-center gap-2">
+              <Wallet className="w-8 h-8 text-[#16a459]" strokeWidth={1.5} />
+              <p className="text-[10px] font-semibold text-[#718096] uppercase tracking-tight text-center">
+                Total Ahorrado
+              </p>
+              <p className="text-2xl font-bold text-[#16a459]">
+                ${(dashboard.estadisticas?.cuponesUsados || 0) * 50}
+              </p>
+            </div>
+          </div>
+          <p className="mt-4 text-[12px] text-slate-400 font-medium">
+            Último cupón solicitado:{" "}
+            <span className="text-slate-600">
+              {dashboard.estadisticas?.ultimoCuponSolicitado
+                ? new Date(
+                    dashboard.estadisticas.ultimoCuponSolicitado,
+                  ).toLocaleDateString("es-AR", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })
+                : "Nunca"}
+            </span>
+          </p>
+        </section>
+
+        {/* My Foundations */}
+        <section className="py-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-[#1A202C]">
+              Mis Fundaciones
+            </h3>
+            <a
+              href="/donar"
+              className="bg-[#16a459] text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md shadow-[#16a459]/20 active:scale-95 transition-transform"
+            >
+              <span className="text-sm">+</span>
+              Donar Más
             </a>
           </div>
-          <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-2">
-            {dashboard.fundaciones &&
-            dashboard.fundaciones.filter((f) =>
-              f.nombre.includes("Fundación Padres"),
-            ).length > 0 ? (
-              dashboard.fundaciones
-                .filter((f) => f.nombre.includes("Fundación Padres"))
-                .map((fundacion) => (
-                  <div
-                    key={fundacion.id}
-                    className="flex-none w-44 bg-white rounded-xl p-4 shadow-sm border border-emerald-100"
-                  >
-                    <div className="size-12 rounded-lg bg-emerald-50 mb-3 flex items-center justify-center">
-                      <span className="text-2xl">💝</span>
+          <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4">
+            {dashboard.fundaciones && dashboard.fundaciones.length > 0 ? (
+              dashboard.fundaciones.map((fundacion) => (
+                <div
+                  key={fundacion.id}
+                  className="min-w-[280px] bg-white border border-slate-100 rounded-3xl p-5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)]"
+                >
+                  <div className="flex items-center gap-4 mb-5">
+                    <div
+                      className="size-14 rounded-2xl bg-cover bg-center shrink-0 shadow-sm"
+                      style={{
+                        backgroundImage: `url(https://ui-avatars.com/api/?name=${encodeURIComponent(fundacion.nombre)}&background=16a459&color=fff&size=128)`,
+                      }}
+                    ></div>
+                    <div>
+                      <h4 className="font-bold text-[#1A202C] text-base">
+                        {fundacion.nombre}
+                      </h4>
+                      <p className="text-[11px] text-[#718096]">
+                        Desde{" "}
+                        {new Date(fundacion.fechaAfiliacion).toLocaleDateString(
+                          "es-AR",
+                          {
+                            month: "short",
+                            year: "numeric",
+                          },
+                        )}
+                      </p>
                     </div>
-                    <p className="font-bold text-slate-900 truncate">
-                      {fundacion.nombre}
-                    </p>
-                    <p className="text-xs text-slate-500 mt-1">
-                      Desde:{" "}
-                      {new Date(fundacion.fechaAfiliacion).toLocaleDateString(
-                        "es-AR",
-                        {
-                          month: "short",
-                          year: "numeric",
-                        },
-                      )}
-                    </p>
                   </div>
-                ))
+                  <div className="flex justify-between items-end border-t border-slate-50 pt-4">
+                    <div>
+                      <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">
+                        Impacto
+                      </p>
+                      <p className="text-lg font-bold text-[#16a459]">
+                        $0.00{" "}
+                        <span className="text-[10px] text-slate-400 font-normal">
+                          donado
+                        </span>
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <span className="inline-block px-2 py-1 bg-slate-50 rounded text-[10px] font-bold text-slate-500 uppercase">
+                        Único
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))
             ) : (
-              <div className="flex-none w-full bg-white rounded-xl p-6 shadow-sm border border-emerald-100 text-center">
+              <div className="min-w-full bg-white border border-slate-100 rounded-3xl p-8 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] text-center">
                 <span className="text-4xl mb-2 block">💝</span>
-                <p className="text-slate-600 text-sm">
+                <p className="text-slate-600 text-sm mb-4">
                   Aún no has realizado donaciones. ¡Comienza hoy!
                 </p>
                 <a
                   href="/donar"
-                  className="inline-block mt-3 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-bold hover:bg-emerald-700"
+                  className="inline-block px-6 py-3 bg-[#16a459] text-white rounded-full text-sm font-bold hover:bg-[#12854a] transition-colors"
                 >
                   Donar Ahora
                 </a>
@@ -356,8 +470,15 @@ export default function DashboardPage() {
         </section>
 
         {/* Exclusive Benefits Section */}
-        <section className="space-y-4">
-          <h3 className="text-lg font-bold">Beneficios Exclusivos</h3>
+        <section className="space-y-6">
+          <div className="flex items-center justify-center gap-3">
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-slate-900 tracking-tight">
+              TUS DESCUENTOS EXCLUSIVOS
+            </h2>
+            <span className="inline-flex items-center justify-center px-4 py-2 bg-[#16a459] text-white text-lg font-bold rounded-full shadow-lg">
+              {totalCuponesDisponibles}
+            </span>
+          </div>
 
           {/* Search Bar */}
           <div className="relative group">
@@ -376,20 +497,24 @@ export default function DashboardPage() {
           {/* Horizontal Chip Filter Bar - Deshabilitado durante búsqueda */}
           {!busquedaActiva && (
             <div className="relative mb-4">
-              <div className="flex flex-wrap gap-2 py-2">
-                {categorias.map((categoria) => (
-                  <button
-                    key={categoria.id}
-                    onClick={() => setCategoriaSeleccionada(categoria.nombre)}
-                    className={`whitespace-nowrap px-5 py-2 rounded-full font-bold text-sm transition-all ${
-                      categoriaSeleccionada === categoria.nombre
-                        ? "bg-emerald-600 text-white shadow-sm"
-                        : "bg-white text-slate-600 border border-emerald-100 hover:border-emerald-400"
-                    }`}
-                  >
-                    {categoria.nombre}
-                  </button>
-                ))}
+              <div className="flex flex-wrap gap-3 py-2 justify-center">
+                {categorias.map((categoria) => {
+                  const IconComponent = getCategoryIcon(categoria.nombre);
+                  return (
+                    <button
+                      key={categoria.id}
+                      onClick={() => setCategoriaSeleccionada(categoria.nombre)}
+                      className={`flex items-center gap-2 whitespace-nowrap px-5 py-2.5 rounded-full font-bold text-sm transition-all hover:scale-110 ${
+                        categoriaSeleccionada === categoria.nombre
+                          ? "bg-emerald-600 text-white shadow-md"
+                          : "bg-white text-slate-600 border border-emerald-100 hover:border-emerald-400 hover:shadow-md"
+                      }`}
+                    >
+                      <IconComponent className="w-4 h-4" strokeWidth={2.5} />
+                      {categoria.nombre}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -400,10 +525,12 @@ export default function DashboardPage() {
               <div className="flex items-center gap-2">
                 <span className="text-emerald-700 font-bold">🔍 Buscando:</span>
                 <span className="text-gray-700">"{busqueda}"</span>
-                <span className="text-gray-500 text-sm">({todosLosCupones.length} resultados)</span>
+                <span className="text-gray-500 text-sm">
+                  ({totalCuponesDisponibles} resultados)
+                </span>
               </div>
               <button
-                onClick={() => setBusqueda('')}
+                onClick={() => setBusqueda("")}
                 className="text-emerald-600 hover:text-emerald-800 font-bold text-sm"
               >
                 Limpiar ✕
@@ -422,12 +549,16 @@ export default function DashboardPage() {
                   {/* Bloque superior: imagen de fondo */}
                   <div className="relative h-44 overflow-hidden bg-gray-100">
                     <img
-                      src={cupon.imagen_url || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='190' viewBox='0 0 280 190'%3E%3Crect fill='%2310b981' width='280' height='190'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-size='16' fill='%23fff' text-anchor='middle' dy='.3em'%3ECupón%3C/text%3E%3C/svg%3E"}
+                      src={
+                        cupon.imagen_url ||
+                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='190' viewBox='0 0 280 190'%3E%3Crect fill='%2310b981' width='280' height='190'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-size='16' fill='%23fff' text-anchor='middle' dy='.3em'%3ECupón%3C/text%3E%3C/svg%3E"
+                      }
                       alt={cupon.titulo}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='190' viewBox='0 0 280 190'%3E%3Crect fill='%2310b981' width='280' height='190'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-size='16' fill='%23fff' text-anchor='middle' dy='.3em'%3ECupón%3C/text%3E%3C/svg%3E";
+                        target.src =
+                          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='190' viewBox='0 0 280 190'%3E%3Crect fill='%2310b981' width='280' height='190'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-size='16' fill='%23fff' text-anchor='middle' dy='.3em'%3ECupón%3C/text%3E%3C/svg%3E";
                       }}
                     />
                     {/* Nombre de la marca: esquina superior derecha, blanco con texto negro */}
@@ -439,12 +570,16 @@ export default function DashboardPage() {
                   {/* Logo: bloque cuadrado (alto = ancho), imagen ajustada solo al ancho del bloque */}
                   <div className="absolute left-1/2 top-32 sm:top-28 -translate-x-1/2 z-10 w-36 h-36 sm:w-42 sm:h-42 rounded-xl bg-white shadow-lg flex items-center justify-center p-1 ring-2 ring-white overflow-hidden">
                     <img
-                      src={cupon.logo_empresa || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'%3E%3Crect fill='%23f3f4f6' rx='12' width='90' height='90'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-size='24' fill='%236b7280' text-anchor='middle' dy='.3em'%3E🎁%3C/text%3E%3C/svg%3E"}
+                      src={
+                        cupon.logo_empresa ||
+                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'%3E%3Crect fill='%23f3f4f6' rx='12' width='90' height='90'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-size='24' fill='%236b7280' text-anchor='middle' dy='.3em'%3E🎁%3C/text%3E%3C/svg%3E"
+                      }
                       alt={cupon.empresa || "Logo"}
                       className="w-full h-full object-contain"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'%3E%3Crect fill='%23f3f4f6' rx='12' width='90' height='90'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-size='24' fill='%236b7280' text-anchor='middle' dy='.3em'%3E🎁%3C/text%3E%3C/svg%3E";
+                        target.src =
+                          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'%3E%3Crect fill='%23f3f4f6' rx='12' width='90' height='90'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-size='24' fill='%236b7280' text-anchor='middle' dy='.3em'%3E🎁%3C/text%3E%3C/svg%3E";
                       }}
                     />
                   </div>
@@ -460,14 +595,14 @@ export default function DashboardPage() {
                       {cupon.descripcion || cupon.titulo}
                     </p>
                     {/* CTA */}
-                    <button 
+                    <button
                       onClick={() => {
                         // TODO: Abrir modal de solicitud de cupón o implementar lógica de solicitud
                         alert(`Solicitar cupón: ${cupon.titulo}`);
                       }}
                       className="mt-4 w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-colors text-sm"
                     >
-                      Solicitar cupón
+                      Obtener descuento
                     </button>
                   </div>
                 </div>
@@ -498,20 +633,7 @@ export default function DashboardPage() {
                 {paginaActual > 1 && (
                   <button
                     onClick={() => {
-                      if (busqueda) {
-                        setPaginaActual((prev) => prev - 1);
-                      } else {
-                        // Para categorías, no tiene sentido ir atrás en carrusel
-                        // pero lo dejamos por si acaso
-                        setPaginaActual((prev) => {
-                          const nuevaPagina = prev - 1;
-                          const inicio = (nuevaPagina - 1) * CUPONES_POR_PAGINA;
-                          const fin = inicio + CUPONES_POR_PAGINA;
-                          setCupones(todosLosCupones.slice(inicio, fin));
-                          setHayMasCupones(fin < todosLosCupones.length);
-                          return nuevaPagina;
-                        });
-                      }
+                      cargarCupones(paginaActual - 1, busquedaActiva ? busqueda : undefined);
                     }}
                     className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-xl transition-colors flex items-center gap-2"
                   >
@@ -526,15 +648,10 @@ export default function DashboardPage() {
                 </span>
 
                 {/* Botón Siguiente */}
-                {((hayMasCupones && !busqueda) ||
-                  (busqueda && hayMasCuponesBusqueda)) && (
+                {hayMasCupones && (
                   <button
                     onClick={() => {
-                      if (busqueda) {
-                        setPaginaActual((prev) => prev + 1);
-                      } else {
-                        cargarMasCupones();
-                      }
+                      cargarCupones(paginaActual + 1, busquedaActiva ? busqueda : undefined);
                     }}
                     disabled={loadingMore}
                     className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white font-bold rounded-xl transition-colors flex items-center gap-2"

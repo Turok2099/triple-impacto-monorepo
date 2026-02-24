@@ -12,26 +12,6 @@ import {
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
-  // ONGs aliadas (16 ONGs en orden alfabético)
-  const ongs = [
-    { name: "Aldea de Luces", url: "#" },
-    { name: "Asociación Altas Capacidades Argentina", url: "#" },
-    { name: "Bibliotecas Rurales Argentinas", url: "#" },
-    { name: "Fundación Padres", url: "#" },
-    { name: "Fundación Regenerar", url: "#" },
-    { name: "Haciendo Camino", url: "#" },
-    { name: "La Guardia ONG", url: "#" },
-    { name: "Loros Parlantes", url: "#" },
-    { name: "Mamis Solidarias", url: "#" },
-    { name: "Monte Adentro", url: "#" },
-    { name: "Plato Lleno", url: "#" },
-    { name: "Proactiva", url: "#" },
-    { name: "Proyectar ONG", url: "#" },
-    { name: "Sustentabilidad sin Fronteras", url: "#" },
-    { name: "Techo", url: "#" },
-    { name: "Voy en Bici", url: "#" },
-  ];
-
   // Links rápidos
   const quickLinks = [
     { name: "Cómo funciona", url: "#como-funciona" },
@@ -101,21 +81,16 @@ export default function Footer() {
             <h4 className="text-white font-semibold text-lg mb-4">
               ONGs Aliadas
             </h4>
-            <ul className="space-y-3">
-              {ongs.map((ong) => (
-                <li key={ong.name}>
-                  <a
-                    href={ong.url}
-                    className="text-gray-400 hover:text-emerald-400 transition-colors duration-200 flex items-center gap-2 group"
-                  >
-                    <span className="text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                      →
-                    </span>
-                    <span>{ong.name}</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <p className="text-sm text-gray-400 mb-4 leading-relaxed">
+              Conocé todas las organizaciones que forman parte de nuestra comunidad.
+            </p>
+            <a
+              href="/ongs"
+              className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors duration-200 font-medium"
+            >
+              Ver todas las ONGs
+              <span>→</span>
+            </a>
           </div>
 
           {/* Columna 4: Contacto */}

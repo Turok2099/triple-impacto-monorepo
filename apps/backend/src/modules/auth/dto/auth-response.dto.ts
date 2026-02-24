@@ -3,7 +3,11 @@ export class AuthResponseDto {
     id: string;
     nombre: string;
     email: string;
-    bondaCode: string;
+    bondaCode: string | null;
+    telefono?: string | null;
+    dni?: string | null;
+    provincia?: string | null;
+    localidad?: string | null;
   };
   token: string;
 }

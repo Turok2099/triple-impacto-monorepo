@@ -109,6 +109,7 @@ export class SupabaseService implements OnModuleInit {
     nombre: string;
     email: string;
     telefono?: string;
+    dni?: string;
     provincia?: string;
     localidad?: string;
     password_hash?: string;
@@ -850,6 +851,45 @@ export class SupabaseService implements OnModuleInit {
     return data;
   }
 
+  /**
+   * Obtener IDs de micrositios (ONGs) a los que el usuario tiene acceso
+   * Basado en las donaciones completadas del usuario
+   */
+  async getMicrositiosUsuario(usuarioId: string): Promise<string[]> {
+    // Obtener organizaciones a las que el usuario ha donado
+    const { data: donaciones, error: donacionesError } = await this.from('donaciones')
+      .select('organizacion_id')
+      .eq('usuario_id', usuarioId)
+      .eq('estado', 'completada')
+      .not('organizacion_id', 'is', null);
+
+    if (donacionesError) {
+      this.logger.error('Error al obtener donaciones del usuario:', donacionesError);
+      throw donacionesError;
+    }
+
+    // Si no tiene donaciones, devolver array vacío
+    if (!donaciones || donaciones.length === 0) {
+      return [];
+    }
+
+    // Extraer IDs únicos de organizaciones
+    const organizacionIds = [...new Set(donaciones.map(d => d.organizacion_id))];
+
+    // Obtener micrositios de esas organizaciones
+    const { data: micrositios, error: micrositiosError } = await this.from('bonda_microsites')
+      .select('id')
+      .in('organizacion_id', organizacionIds)
+      .eq('activo', true);
+
+    if (micrositiosError) {
+      this.logger.error('Error al obtener micrositios:', micrositiosError);
+      throw micrositiosError;
+    }
+
+    return (micrositios || []).map(m => m.id);
+  }
+
   // ========================================
   // PUBLIC_COUPONS_V2 (Sincronización desde Bonda)
   // ========================================
@@ -863,12 +903,18 @@ export class SupabaseService implements OnModuleInit {
     limite?: number;
     offset?: number;
     soloActivos?: boolean;
+    micrositeIds?: string[];
   } = {}) {
     let query = this.from('public_coupons_v2').select('*', { count: 'exact' });
 
     // Filtrar solo activos por defecto
     if (opciones.soloActivos !== false) {
       query = query.eq('activo', true);
+    }
+
+    // Filtrar por micrositios específicos (ONGs del usuario)
+    if (opciones.micrositeIds && opciones.micrositeIds.length > 0) {
+      query = query.in('bonda_microsite_id', opciones.micrositeIds);
     }
 
     // Filtrar por categoría principal

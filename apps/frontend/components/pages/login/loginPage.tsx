@@ -58,8 +58,8 @@ export default function LoginPage() {
         localStorage.removeItem("remembered_email");
       }
 
-      // Redirigir al home o dashboard
-      window.location.href = "/";
+      // Redirigir al dashboard
+      window.location.href = "/dashboard";
     } catch (err: any) {
       setError(err.message || "Error al iniciar sesión. Verifica tus credenciales.");
       console.error("Error en login:", err);

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { CuponDto, PublicCouponDto } from "@/lib/types/cupon";
 import { obtenerCuponesPublicos } from "@/lib/bonda";
 import CuponCard from "./CuponCard";
-import FiltrosCupones from "./FiltrosCupones";
 
 /** Convierte cupón público al formato que usa CuponCard (sin códigos). */
 function publicToCuponDto(p: PublicCouponDto): CuponDto {
@@ -35,48 +35,41 @@ interface CuponesShowcaseProps {
 }
 
 export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
+  const router = useRouter();
   const [cupones, setCupones] = useState<CuponDto[]>([]);
+  const [todosLosCupones, setTodosLosCupones] = useState<CuponDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [count, setCount] = useState(0);
-  const [categoriaActual, setCategoriaActual] = useState<string | null>(null);
-  const [ordenActual, setOrdenActual] = useState<string>("relevant");
+  const [clicsRestantes, setClicsRestantes] = useState(3);
 
   useEffect(() => {
     cargarCupones();
-  }, [categoriaActual, ordenActual]); // Recargar cuando cambian filtros
+  }, []);
 
   async function cargarCupones() {
     try {
       setLoading(true);
       setError(null);
 
-      // Llamar al backend con filtros por categoría (nombre, no ID)
-      const publicos = await obtenerCuponesPublicos(
-        categoriaActual ?? undefined,
-        (ordenActual as "relevant" | "latest") ?? "relevant"
+      // Llamar al backend con orderBy "relevant" (sin autenticación)
+      const { cupones: publicos } = await obtenerCuponesPublicos(
+        undefined, // Sin filtro de categoría
+        "relevant" // Ordenar por relevancia
       );
 
       const cuponesDto = publicos.map(publicToCuponDto);
       
-      // Eliminar duplicados por MARCA (backend ya lo hace, pero por seguridad)
+      // Eliminar duplicados por MARCA
       const cuponesUnicosPorMarca = Array.from(
         new Map(cuponesDto.map((c) => [c.empresa.nombre, c])).values()
       );
       
-      // Limitar a 10 cupones máximo
-      let cuponesFiltrados = cuponesUnicosPorMarca;
+      // Guardar todos los cupones para rotación
+      setTodosLosCupones(cuponesUnicosPorMarca);
       
-      if (ordenActual === "relevant") {
-        // "Más relevantes" = 10 cupones aleatorios
-        cuponesFiltrados = shuffleArray([...cuponesUnicosPorMarca]).slice(0, 10);
-      } else {
-        // "Más recientes" = primeros 10 cupones (ya vienen ordenados del backend)
-        cuponesFiltrados = cuponesUnicosPorMarca.slice(0, 10);
-      }
-      
-      setCupones(cuponesFiltrados);
-      setCount(cuponesFiltrados.length);
+      // Mostrar 10 cupones aleatorios iniciales
+      const cuponesIniciales = shuffleArray([...cuponesUnicosPorMarca]).slice(0, 10);
+      setCupones(cuponesIniciales);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Error al cargar cupones";
@@ -97,9 +90,25 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
     return shuffled;
   }
 
-  const handleFiltroChange = (categoria: string | null, orden: string) => {
-    setCategoriaActual(categoria);
-    setOrdenActual(orden);
+  // Manejar click en "Ver más descuentos"
+  const handleVerMas = () => {
+    if (clicsRestantes > 0) {
+      // Aún tiene clics disponibles → mostrar 10 cupones aleatorios diferentes
+      const nuevoCupones = shuffleArray([...todosLosCupones]).slice(0, 10);
+      setCupones(nuevoCupones);
+      setClicsRestantes(clicsRestantes - 1);
+    } else {
+      // Sin clics restantes → verificar autenticación
+      const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+      
+      if (!token) {
+        // No autenticado → redirigir a login
+        router.push("/login");
+      } else {
+        // Autenticado → redirigir a dashboard
+        router.push("/dashboard");
+      }
+    }
   };
 
   return (
@@ -115,9 +124,6 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
             usas todos los días.
           </p>
         </div>
-
-        {/* Bloque de filtros: siempre visible e independiente de las cards */}
-        <FiltrosCupones onFiltroChange={handleFiltroChange} />
 
         {/* Bloque de cards: loading, error, vacío o grid */}
         <div className="min-h-[200px]">
@@ -142,20 +148,40 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
             <div className="text-center py-16">
               <div className="text-6xl mb-4">🎟️</div>
               <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                No hay cupones en esta categoría
+                No hay cupones disponibles
               </h3>
               <p className="text-gray-600">
-                Probá con otra categoría o volvé a &quot;Todo&quot; para ver todo el catálogo.
+                Intentá nuevamente más tarde.
               </p>
             </div>
           )}
 
           {!loading && !error && cupones.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-              {cupones.map((cupon) => (
-                <CuponCard key={cupon.id} cupon={cupon} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-8">
+                {cupones.map((cupon) => (
+                  <CuponCard key={cupon.id} cupon={cupon} />
+                ))}
+              </div>
+
+              {/* Botón "Ver más descuentos" */}
+              <div className="flex justify-center mt-12">
+                <button
+                  onClick={handleVerMas}
+                  className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#16a459] to-emerald-600 text-white font-bold text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                >
+                  <span>Ver más descuentos</span>
+                  <svg 
+                    className="w-5 h-5 group-hover:translate-x-1 transition-transform" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </button>
+              </div>
+            </>
           )}
         </div>
       </div>

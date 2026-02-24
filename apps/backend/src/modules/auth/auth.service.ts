@@ -30,7 +30,7 @@ export class AuthService {
    * 4. Genera JWT
    */
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
-    const { email, password, nombre, telefono, provincia, localidad } =
+    const { email, password, nombre, telefono, dni, provincia, localidad } =
       registerDto;
 
     // 1. Verificar si el usuario ya existe
@@ -50,6 +50,7 @@ export class AuthService {
         nombre,
         email,
         telefono,
+        dni,
         provincia,
         localidad,
         password_hash: passwordHash,
@@ -70,6 +71,10 @@ export class AuthService {
         nombre: usuario.nombre,
         email: usuario.email,
         bondaCode: usuario.bonda_affiliate_code ?? null,
+        telefono: usuario.telefono ?? null,
+        dni: usuario.dni ?? null,
+        provincia: usuario.provincia ?? null,
+        localidad: usuario.localidad ?? null,
       },
       token,
     };
@@ -104,6 +109,10 @@ export class AuthService {
         nombre: usuario.nombre,
         email: usuario.email,
         bondaCode: usuario.bonda_affiliate_code ?? null,
+        telefono: usuario.telefono ?? null,
+        dni: usuario.dni ?? null,
+        provincia: usuario.provincia ?? null,
+        localidad: usuario.localidad ?? null,
       },
       token,
     };

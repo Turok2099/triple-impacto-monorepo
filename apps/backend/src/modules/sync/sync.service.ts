@@ -39,12 +39,12 @@ export class SyncService {
         const { data, error } = await this.supabaseService
           .from('bonda_microsites')
           .select('*')
-          .eq('microsite_id', micrositeId)
+          .eq('id', micrositeId)
           .eq('activo', true)
           .single();
         
         if (error || !data) {
-          throw new Error(`No se encontró el micrositio con microsite_id: ${micrositeId}`);
+          throw new Error(`No se encontró el micrositio con id: ${micrositeId}`);
         }
         microsite = data;
       } else {
@@ -146,6 +146,43 @@ export class SyncService {
           } else {
             // Es una categoría principal
             categoriaPrincipal = primeraCategoria.nombre;
+          }
+        }
+
+        // Si no se pudo determinar la categoría, intentar inferir por nombre/empresa
+        if (!categoriaPrincipal) {
+          const nombreLower = (cupon.nombre || '').toLowerCase();
+          const empresaLower = (cupon.empresa?.nombre || '').toLowerCase();
+          const descripcionLower = (cupon.descripcion || '').toLowerCase();
+          const texto = `${nombreLower} ${empresaLower} ${descripcionLower}`;
+          
+          // Inferencias por palabras clave (ordenadas por especificidad)
+          if (texto.includes('cine')) {
+            categoriaPrincipal = 'Cines';
+          } else if (texto.includes('teatro')) {
+            categoriaPrincipal = 'Teatros';
+          } else if (texto.includes('moto') || texto.includes('motocicleta')) {
+            categoriaPrincipal = 'Motos';
+          } else if (texto.includes('auto') || texto.includes('automóvil') || texto.includes('taller mecánico') || texto.includes('lubricentro') || texto.includes('lavadero')) {
+            categoriaPrincipal = 'Autos';
+          } else if (texto.includes('inmobiliaria')) {
+            categoriaPrincipal = 'Inmobiliarias';
+          } else if (texto.includes('inmueble') || texto.includes('departamento') || texto.includes('alquiler') || texto.includes('propiedad')) {
+            categoriaPrincipal = 'Inmuebles';
+          } else if (texto.includes('restaurant') || texto.includes('restaurante') || texto.includes('comida') || texto.includes('café') || texto.includes('cafetería') || texto.includes('parrilla') || texto.includes('pizza') || texto.includes('bar') || texto.includes('gastronomía')) {
+            categoriaPrincipal = 'Gastronomía';
+          } else if (texto.includes('gym') || texto.includes('gimnasio') || texto.includes('deporte') || texto.includes('fitness') || texto.includes('entrenamiento') || texto.includes('crossfit')) {
+            categoriaPrincipal = 'Gimnasios y Deportes';
+          } else if (texto.includes('viaje') || texto.includes('hotel') || texto.includes('turismo') || texto.includes('hostel') || texto.includes('hospedaje') || texto.includes('alojamiento')) {
+            categoriaPrincipal = 'Turismo';
+          } else if (texto.includes('spa') || texto.includes('peluquería') || texto.includes('salón') || texto.includes('belleza') || texto.includes('masaje') || texto.includes('estética') || texto.includes('salud') || texto.includes('clínica')) {
+            categoriaPrincipal = 'Belleza y Salud';
+          } else if (texto.includes('ropa') || texto.includes('calzado') || texto.includes('zapatilla') || texto.includes('moda') || texto.includes('fashion') || texto.includes('jean') || texto.includes('remera') || texto.includes('indumentaria')) {
+            categoriaPrincipal = 'Indumentaria, Calzado y Moda';
+          } else if (texto.includes('curso') || texto.includes('escuela') || texto.includes('instituto') || texto.includes('capacitación') || texto.includes('formación') || texto.includes('educación') || texto.includes('academia')) {
+            categoriaPrincipal = 'Educación';
+          } else if (texto.includes('tienda') || texto.includes('shop') || texto.includes('comercio') || texto.includes('compra')) {
+            categoriaPrincipal = 'Compras';
           }
         }
 

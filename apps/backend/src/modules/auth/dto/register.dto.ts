@@ -20,6 +20,10 @@ export class RegisterDto {
 
   @IsString()
   @IsOptional()
+  dni?: string;
+
+  @IsString()
+  @IsOptional()
   provincia?: string;
 
   @IsString()

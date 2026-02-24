@@ -55,21 +55,34 @@ export async function obtenerCategorias(): Promise<CategoriaDto[]> {
 export async function obtenerCuponesPublicos(
   categoria?: string,
   orderBy?: "relevant" | "latest",
-  busqueda?: string
-): Promise<PublicCouponDto[]> {
+  busqueda?: string,
+  deduplicate: boolean = true,
+  limite?: number,
+  offset?: number
+): Promise<{ cupones: PublicCouponDto[]; total: number }> {
   try {
     const params = new URLSearchParams();
     if (categoria) params.append("categoria", categoria);
     if (orderBy) params.append("orderBy", orderBy);
     if (busqueda) params.append("busqueda", busqueda);
+    if (!deduplicate) params.append("deduplicate", "false");
+    if (limite) params.append("limite", limite.toString());
+    if (offset) params.append("offset", offset.toString());
 
     const url = `${API_URL}/public/cupones-bonda${
       params.toString() ? `?${params.toString()}` : ""
     }`;
 
+    // Obtener token si existe (para filtrar por ONGs del usuario)
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+
     const response = await fetch(url, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
     });
 
     if (!response.ok) {
@@ -81,7 +94,7 @@ export async function obtenerCuponesPublicos(
     const data = await response.json();
 
     // Transformar respuesta del backend al formato PublicCouponDto
-    return data.cupones.map((cupon: any) => ({
+    const cupones = data.cupones.map((cupon: any) => ({
       id: cupon.id,
       titulo: cupon.nombre,
       descripcion:
@@ -98,6 +111,11 @@ export async function obtenerCuponesPublicos(
       activo: true,
       created_at: new Date().toISOString(),
     }));
+
+    return {
+      cupones,
+      total: data.total_disponible || data.count || cupones.length, // Usar total disponible ANTES de deduplicación
+    };
   } catch (error) {
     console.error("Error en obtenerCuponesPublicos:", error);
     throw error;

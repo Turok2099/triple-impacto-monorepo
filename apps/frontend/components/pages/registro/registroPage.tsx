@@ -13,6 +13,7 @@ export default function RegisterPage() {
     password: "",
     confirmPassword: "",
     telefono: "",
+    dni: "",
     provincia: "",
     localidad: "",
     aceptaTerminos: false,
@@ -93,6 +94,7 @@ export default function RegisterPage() {
           email: formData.email,
           password: formData.password,
           telefono: formData.telefono,
+          dni: formData.dni,
           provincia: formData.provincia,
           localidad: formData.localidad,
         }),
@@ -110,9 +112,9 @@ export default function RegisterPage() {
       // Mostrar éxito
       setSuccess(true);
 
-      // Redirigir al dashboard o home después de 2 segundos
+      // Redirigir al dashboard después de 2 segundos
       setTimeout(() => {
-        window.location.href = "/";
+        window.location.href = "/dashboard";
       }, 2000);
     } catch (err: any) {
       setError(err.message || "Error al crear la cuenta. Por favor, intenta nuevamente.");
@@ -197,29 +199,54 @@ export default function RegisterPage() {
               />
             </div>
 
-            {/* Teléfono */}
-            <div>
-              <label
-                htmlFor="telefono"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Teléfono *
-              </label>
-              <input
-                id="telefono"
-                name="telefono"
-                type="tel"
-                required
-                value={formData.telefono}
-                onChange={handleChange}
-                className="block w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-                placeholder="+54 9 11 1234-5678"
-                disabled={loading}
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                Incluí código de área sin 0 (Ej: 11 para CABA)
-              </p>
+            {/* Teléfono y DNI */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Teléfono */}
+              <div>
+                <label
+                  htmlFor="telefono"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Teléfono *
+                </label>
+                <input
+                  id="telefono"
+                  name="telefono"
+                  type="tel"
+                  required
+                  value={formData.telefono}
+                  onChange={handleChange}
+                  className="block w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  placeholder="+54 9 11 1234-5678"
+                  disabled={loading}
+                />
+              </div>
+
+              {/* DNI */}
+              <div>
+                <label
+                  htmlFor="dni"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  DNI *
+                </label>
+                <input
+                  id="dni"
+                  name="dni"
+                  type="text"
+                  required
+                  value={formData.dni}
+                  onChange={handleChange}
+                  className="block w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  placeholder="12345678"
+                  maxLength={8}
+                  disabled={loading}
+                />
+              </div>
             </div>
+            <p className="mt-1 text-xs text-gray-500">
+              Tu DNI es necesario para crear tu cuenta en Bonda y acceder a descuentos
+            </p>
 
             {/* Provincia y Localidad */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

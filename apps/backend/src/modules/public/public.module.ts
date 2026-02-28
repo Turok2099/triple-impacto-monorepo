@@ -6,12 +6,14 @@ import { PublicController } from './public.controller';
 import { SyncCuponesService } from './sync-cupones.service';
 import { BondaModule } from '../bonda/bonda.module';
 import { SupabaseModule } from '../supabase/supabase.module';
+import { SyncModule } from '../sync/sync.module';
 
 @Module({
   imports: [
-    ScheduleModule.forRoot(), // Habilita el sistema de cron jobs
-    BondaModule, // Para obtener cupones de Bonda
-    SupabaseModule, // Para leer/escribir en Supabase
+    ScheduleModule.forRoot(),
+    BondaModule,
+    SupabaseModule,
+    SyncModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -22,6 +24,6 @@ import { SupabaseModule } from '../supabase/supabase.module';
     }),
   ],
   controllers: [PublicController],
-  providers: [SyncCuponesService], // Registra el servicio de sync
+  providers: [SyncCuponesService],
 })
 export class PublicModule {}

@@ -188,3 +188,8 @@ apps/backend/database/VALIDACION-CUPONES-LANDING.md
 apps/backend/database/PLAN-PRUEBAS-BONDA.md
 
 # NOTA: El README.md de la raíz del proyecto SÍ se sube (no está ignorado)
+.vercel
+
+# Documentos sensibles (backend)
+apps/backend/docs/
+apps/backend/scripts/

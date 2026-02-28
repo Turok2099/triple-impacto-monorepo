@@ -1,6 +1,12 @@
 "use client";
 
+import { usePathname } from "next/navigation";
+
 export default function FloatingDonateButton() {
+  const pathname = usePathname();
+
+  if (pathname?.startsWith("/dashboard")) return null;
+
   return (
     <>
       <a

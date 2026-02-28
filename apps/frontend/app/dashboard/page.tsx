@@ -11,11 +11,14 @@ import {
   PublicCouponDto,
   CategoriaDto,
 } from "@/lib/bonda";
+import { obtenerMisCupones, CuponSolicitado } from "@/lib/dashboard";
+import CuponDetalleModal from "@/components/dashboard/CuponDetalleModal";
+import SeccionPerfil from "@/components/dashboard/SeccionPerfil";
+import SeccionMisCupones from "@/components/dashboard/SeccionMisCupones";
 import {
   Ticket,
   CheckCircle2,
   Heart,
-  Wallet,
   LayoutGrid,
   UserCircle,
   Gift,
@@ -34,9 +37,12 @@ import {
   Car,
 } from "lucide-react";
 
+type ActiveTab = "inicio" | "perfil" | "cupones";
+
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isLoading: authLoading, logout } = useAuth();
+  const [activeTab, setActiveTab] = useState<ActiveTab>("inicio");
   const [dashboard, setDashboard] = useState<DashboardUsuario | null>(null);
   const [cupones, setCupones] = useState<PublicCouponDto[]>([]);
   const [categorias, setCategorias] = useState<CategoriaDto[]>([]);
@@ -52,6 +58,8 @@ export default function DashboardPage() {
   const [totalCuponesDisponibles, setTotalCuponesDisponibles] = useState<number>(0);
   const [dashboardCargado, setDashboardCargado] = useState(false);
   const [busquedaActiva, setBusquedaActiva] = useState(false);
+  const [cuponSeleccionado, setCuponSeleccionado] = useState<PublicCouponDto | null>(null);
+  const [misCupones, setMisCupones] = useState<CuponSolicitado[]>([]);
   const CUPONES_POR_PAGINA = 10;
 
   useEffect(() => {
@@ -64,7 +72,7 @@ export default function DashboardPage() {
 
     // Cargar datos de forma secuencial: primero dashboard, luego el resto
     cargarTodoElDashboard();
-  }, [user, authLoading, router]);
+  }, [user, authLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const cargarTodoElDashboard = async () => {
     setLoading(true);
@@ -86,6 +94,10 @@ export default function DashboardPage() {
 
       cargarCuponesRecibidos().catch((err) => {
         console.warn("Error al cargar cupones recibidos:", err);
+      });
+
+      cargarMisCupones().catch((err) => {
+        console.warn("Error al cargar mis cupones:", err);
       });
     } catch (err: any) {
       console.error("Error crítico al cargar dashboard:", err);
@@ -109,8 +121,18 @@ export default function DashboardPage() {
       setCuponesRecibidos(data.count || 0);
     } catch (error) {
       console.error("Error al cargar cupones recibidos:", error);
-      // No mostrar error, solo dejar en 0
       setCuponesRecibidos(0);
+    }
+  };
+
+  const cargarMisCupones = async () => {
+    const token = localStorage.getItem("auth_token");
+    if (!token) return;
+    try {
+      const data = await obtenerMisCupones(token);
+      setMisCupones(data);
+    } catch (error) {
+      console.warn("Error al cargar mis cupones:", error);
     }
   };
 
@@ -290,27 +312,27 @@ export default function DashboardPage() {
 
           {/* Navigation Links */}
           <div className="flex items-center justify-center gap-8">
-            <a
-              className="flex flex-col items-center gap-1 text-[#16a459] transition-colors"
-              href="/dashboard"
+            <button
+              onClick={() => setActiveTab("inicio")}
+              className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "inicio" ? "text-[#16a459]" : "text-slate-400 hover:text-[#16a459]"}`}
             >
               <LayoutGrid className="w-6 h-6" strokeWidth={2} />
-              <span className="text-xs font-semibold">Inicio</span>
-            </a>
-            <a
-              className="flex flex-col items-center gap-1 text-slate-400 hover:text-[#16a459] transition-colors"
-              href="/dashboard/perfil"
+              <span className={`text-xs ${activeTab === "inicio" ? "font-semibold" : "font-medium"}`}>Inicio</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("perfil")}
+              className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "perfil" ? "text-[#16a459]" : "text-slate-400 hover:text-[#16a459]"}`}
             >
               <UserCircle className="w-6 h-6" strokeWidth={2} />
-              <span className="text-xs font-medium">Perfil</span>
-            </a>
-            <a
-              className="flex flex-col items-center gap-1 text-slate-400 hover:text-[#16a459] transition-colors"
-              href="/dashboard/mis-cupones"
+              <span className={`text-xs ${activeTab === "perfil" ? "font-semibold" : "font-medium"}`}>Perfil</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("cupones")}
+              className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "cupones" ? "text-[#16a459]" : "text-slate-400 hover:text-[#16a459]"}`}
             >
               <Gift className="w-6 h-6" strokeWidth={2} />
-              <span className="text-xs font-medium">Mis Cupones</span>
-            </a>
+              <span className={`text-xs ${activeTab === "cupones" ? "font-semibold" : "font-medium"}`}>Mis Cupones</span>
+            </button>
             <button
               onClick={logout}
               className="flex flex-col items-center gap-1 text-slate-400 hover:text-red-500 transition-colors"
@@ -323,13 +345,17 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+      {/* Secciones Perfil y Mis Cupones */}
+      {activeTab === "perfil" && <SeccionPerfil />}
+      {activeTab === "cupones" && <SeccionMisCupones />}
+
+      <main className={`max-w-7xl mx-auto px-6 py-6 space-y-6 ${activeTab !== "inicio" ? "hidden" : ""}`}>
         {/* Impact Summary */}
         <section>
           <h2 className="text-[#1A202C] font-bold text-xl mb-4">
             Resumen de Impacto
           </h2>
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div className="bg-white p-4 rounded-2xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-slate-50 flex flex-col items-center gap-2">
               <Ticket className="w-8 h-8 text-[#16a459]" strokeWidth={1.5} />
               <p className="text-[10px] font-semibold text-[#718096] uppercase tracking-tight text-center">
@@ -360,15 +386,6 @@ export default function DashboardPage() {
                 $
                 {dashboard.estadisticas?.totalDonado?.toLocaleString("es-AR") ||
                   "0"}
-              </p>
-            </div>
-            <div className="bg-white p-4 rounded-2xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-slate-50 flex flex-col items-center gap-2">
-              <Wallet className="w-8 h-8 text-[#16a459]" strokeWidth={1.5} />
-              <p className="text-[10px] font-semibold text-[#718096] uppercase tracking-tight text-center">
-                Total Ahorrado
-              </p>
-              <p className="text-2xl font-bold text-[#16a459]">
-                ${(dashboard.estadisticas?.cuponesUsados || 0) * 50}
               </p>
             </div>
           </div>
@@ -595,15 +612,26 @@ export default function DashboardPage() {
                       {cupon.descripcion || cupon.titulo}
                     </p>
                     {/* CTA */}
-                    <button
-                      onClick={() => {
-                        // TODO: Abrir modal de solicitud de cupón o implementar lógica de solicitud
-                        alert(`Solicitar cupón: ${cupon.titulo}`);
-                      }}
-                      className="mt-4 w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-colors text-sm"
-                    >
-                      Obtener descuento
-                    </button>
+                    {(() => {
+                      const yaSolicitado = misCupones.find(
+                        (mc) => mc.bondaCuponId === cupon.id && mc.estado === "activo"
+                      );
+                      return yaSolicitado ? (
+                        <button
+                          onClick={() => setCuponSeleccionado(cupon)}
+                          className="mt-4 w-full py-2.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-semibold rounded-xl transition-colors text-sm flex items-center justify-center gap-1.5"
+                        >
+                          ✓ Ver mi código
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => setCuponSeleccionado(cupon)}
+                          className="mt-4 w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-colors text-sm"
+                        >
+                          Obtener descuento
+                        </button>
+                      );
+                    })()}
                   </div>
                 </div>
               ))
@@ -683,6 +711,32 @@ export default function DashboardPage() {
           scrollbar-width: none;
         }
       `}</style>
+
+      {/* Modal de detalle del cupón */}
+      {cuponSeleccionado && (() => {
+        const fundacionActiva = dashboard?.fundaciones?.find(
+          (f) => f.codigoAfiliado && f.slug
+        );
+        if (!fundacionActiva) return null;
+        return (
+          <CuponDetalleModal
+            cupon={cuponSeleccionado}
+            codigoAfiliado={fundacionActiva.codigoAfiliado}
+            micrositioSlug={fundacionActiva.slug}
+            fundacionNombre={fundacionActiva.nombre}
+            token={localStorage.getItem("auth_token") || ""}
+            cuponYaSolicitado={
+              misCupones.find(
+                (mc) => mc.bondaCuponId === cuponSeleccionado.id && mc.estado === "activo"
+              ) ?? null
+            }
+            onClose={() => setCuponSeleccionado(null)}
+            onCuponSolicitado={(nuevoCupon) => {
+              setMisCupones((prev) => [...prev, nuevoCupon]);
+            }}
+          />
+        );
+      })()}
     </div>
   );
 }

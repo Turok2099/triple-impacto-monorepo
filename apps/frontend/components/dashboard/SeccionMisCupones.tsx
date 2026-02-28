@@ -1,14 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
 import { obtenerHistorialCupones, marcarCuponComoUsado, CuponSolicitado } from '@/lib/dashboard';
-import { ChevronLeft, Copy, CheckCircle, Ticket } from 'lucide-react';
+import { Copy, CheckCircle, Ticket } from 'lucide-react';
 
-export default function MisCuponesPage() {
-  const router = useRouter();
-  const { user, isLoading: authLoading } = useAuth();
+export default function SeccionMisCupones() {
   const [cupones, setCupones] = useState<CuponSolicitado[]>([]);
   const [loading, setLoading] = useState(true);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
@@ -16,10 +12,8 @@ export default function MisCuponesPage() {
   const [tab, setTab] = useState<'activos' | 'usados'>('activos');
 
   useEffect(() => {
-    if (authLoading) return;
-    if (!user) { router.push('/login'); return; }
     cargarCupones();
-  }, [user, authLoading, router]);
+  }, []);
 
   const cargarCupones = async () => {
     const token = localStorage.getItem('auth_token');
@@ -67,39 +61,27 @@ export default function MisCuponesPage() {
   const cuponesUsados = cupones.filter((c) => c.estado === 'usado');
   const lista = tab === 'activos' ? cuponesActivos : cuponesUsados;
 
-  if (authLoading || loading) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#16a459] mx-auto mb-4" />
-          <p className="text-[#2D3748]">Cargando tus cupones...</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#16a459] mx-auto mb-3" />
+          <p className="text-slate-500 text-sm">Cargando tus cupones...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden max-w-[430px] mx-auto bg-white">
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md px-4 pt-8 pb-4">
-        <div className="flex items-center gap-3 mb-5">
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50 text-[#2D3748] hover:bg-slate-100 transition-colors"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <h1 className="text-xl font-bold tracking-tight text-[#2D3748]">Mis Cupones</h1>
-        </div>
-
-        {/* Tabs */}
+    <div className="max-w-2xl mx-auto pb-12">
+      {/* Header + Tabs */}
+      <div className="px-6 pt-8 pb-4">
+        <h1 className="text-2xl font-bold text-[#1A202C] mb-5">Mis Cupones</h1>
         <div className="flex bg-slate-100 rounded-2xl p-1 gap-1">
           <button
             onClick={() => setTab('activos')}
             className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${
-              tab === 'activos'
-                ? 'bg-white text-[#16a459] shadow-sm'
-                : 'text-slate-500 hover:text-slate-700'
+              tab === 'activos' ? 'bg-white text-[#16a459] shadow-sm' : 'text-slate-500 hover:text-slate-700'
             }`}
           >
             Activos
@@ -112,9 +94,7 @@ export default function MisCuponesPage() {
           <button
             onClick={() => setTab('usados')}
             className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${
-              tab === 'usados'
-                ? 'bg-white text-slate-700 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700'
+              tab === 'usados' ? 'bg-white text-slate-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
             }`}
           >
             Usados
@@ -125,12 +105,12 @@ export default function MisCuponesPage() {
             </span>
           </button>
         </div>
-      </header>
+      </div>
 
-      {/* Contenido */}
-      <section className="px-4 py-4 pb-12">
+      {/* Lista */}
+      <section className="px-6">
         {lista.length === 0 ? (
-          <div className="rounded-2xl bg-[#E8F5EE] border border-[#16a459]/20 p-10 text-center mt-4">
+          <div className="rounded-2xl bg-[#E8F5EE] border border-[#16a459]/20 p-10 text-center mt-2">
             <div className="flex justify-center mb-4">
               <Ticket className="w-16 h-16 text-[#16a459]" strokeWidth={1.5} />
             </div>
@@ -142,14 +122,6 @@ export default function MisCuponesPage() {
                 ? 'Solicitá cupones del catálogo para empezar a disfrutar'
                 : 'Los cupones que uses aparecerán acá'}
             </p>
-            {tab === 'activos' && (
-              <button
-                onClick={() => router.push('/dashboard')}
-                className="bg-[#16a459] text-white text-sm font-bold py-3 px-6 rounded-xl shadow-sm hover:bg-[#12854a] transition-colors"
-              >
-                Ver Catálogo
-              </button>
-            )}
           </div>
         ) : (
           <div className="space-y-4 mt-2">
@@ -157,12 +129,9 @@ export default function MisCuponesPage() {
               <div
                 key={cupon.id}
                 className={`rounded-2xl border p-5 shadow-sm ${
-                  tab === 'activos'
-                    ? 'bg-[#E8F5EE] border-[#16a459]/20'
-                    : 'bg-slate-50 border-slate-200'
+                  tab === 'activos' ? 'bg-[#E8F5EE] border-[#16a459]/20' : 'bg-slate-50 border-slate-200'
                 }`}
               >
-                {/* Header */}
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <h3 className="font-bold text-sm text-[#2D3748]">
@@ -184,24 +153,17 @@ export default function MisCuponesPage() {
                     <p className="text-[11px] font-bold text-slate-600">
                       {new Date(
                         tab === 'activos' ? cupon.createdAt : (cupon.usadoAt || cupon.createdAt),
-                      ).toLocaleDateString('es-AR', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                      })}
+                      ).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' })}
                     </p>
                   </div>
                 </div>
 
-                {/* Código */}
                 {cupon.codigo && (
                   <div className={`bg-white rounded-xl p-3 border border-dashed mb-3 flex justify-between items-center ${
                     tab === 'activos' ? 'border-[#16a459]/30' : 'border-slate-200'
                   }`}>
                     <div>
-                      <p className="text-[8px] uppercase font-bold text-slate-400 mb-0.5">
-                        Código de descuento
-                      </p>
+                      <p className="text-[8px] uppercase font-bold text-slate-400 mb-0.5">Código de descuento</p>
                       <p className={`text-base font-mono font-black tracking-widest uppercase ${
                         tab === 'activos' ? 'text-[#16a459]' : 'text-slate-400 line-through'
                       }`}>
@@ -217,22 +179,16 @@ export default function MisCuponesPage() {
                             : 'bg-[#16a459]/10 text-[#16a459] hover:bg-[#16a459]/20'
                         }`}
                       >
-                        {copiedCode === cupon.id ? (
-                          <CheckCircle className="w-4 h-4" />
-                        ) : (
-                          <Copy className="w-4 h-4" />
-                        )}
+                        {copiedCode === cupon.id ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                       </button>
                     )}
                   </div>
                 )}
 
-                {/* Instrucciones */}
                 {cupon.mensaje && tab === 'activos' && (
                   <p className="text-xs text-slate-500 leading-relaxed mb-3">{cupon.mensaje}</p>
                 )}
 
-                {/* Botón marcar usado (solo en activos) */}
                 {tab === 'activos' && (
                   <button
                     onClick={() => handleMarcarUsado(cupon.id)}

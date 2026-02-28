@@ -483,6 +483,7 @@ export class BondaController {
         fundaciones: fundaciones.map((f) => ({
           id: f.bonda_microsite_id,
           nombre: f.micrositio_nombre,
+          slug: f.micrositio_slug,
           codigoAfiliado: f.affiliate_code,
           fechaAfiliacion: f.created_at,
         })),

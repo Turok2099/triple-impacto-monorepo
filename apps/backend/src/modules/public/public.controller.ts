@@ -220,13 +220,13 @@ export class PublicController {
     try {
       // Intentar extraer userId del token (opcional)
       let micrositeIds: string[] | undefined = undefined;
-
+      
       if (authorization?.startsWith('Bearer ')) {
         try {
           const token = authorization.substring(7);
           const payload = this.jwtService.verify(token);
           const userId = payload.userId;
-
+          
           if (userId) {
             // Obtener micrositios del usuario basado en sus donaciones
             micrositeIds = await this.supabase.getMicrositiosUsuario(userId);
@@ -237,13 +237,14 @@ export class PublicController {
         }
       }
 
-      // Obtener cupones desde Supabase (sin filtro de ONG, catálogo global)
+      // Obtener cupones desde Supabase
       const resultado = await this.supabase.getPublicCouponsV2({
         categoria: categoria && categoria !== 'Todo' ? categoria : undefined,
         busqueda,
         limite: limite ? parseInt(limite, 10) : undefined,
         offset: offset ? parseInt(offset, 10) : undefined,
         soloActivos: true,
+        micrositeIds, // Filtrar por micrositios del usuario si está autenticado
       });
 
       // Transformar a formato compatible con el frontend actual
@@ -265,8 +266,8 @@ export class PublicController {
       const shouldDeduplicate = deduplicate !== 'false'; // Por defecto true
       const cuponesFinal = shouldDeduplicate
         ? Array.from(
-          new Map(cuponesTransformados.map((c) => [c.empresa.nombre, c])).values(),
-        )
+            new Map(cuponesTransformados.map((c) => [c.empresa.nombre, c])).values(),
+          )
         : cuponesTransformados;
 
       return {

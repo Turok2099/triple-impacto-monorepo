@@ -12,7 +12,7 @@ export class SyncService {
     private readonly bondaService: BondaService,
     private readonly supabaseService: SupabaseService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   /**
    * Sincronizar todos los cupones desde Bonda API a Supabase
@@ -34,7 +34,7 @@ export class SyncService {
 
       // Obtener micrositio para sincronizar
       let microsite: any;
-      
+
       if (micrositeId) {
         const { data, error } = await this.supabaseService
           .from('bonda_microsites')
@@ -42,7 +42,7 @@ export class SyncService {
           .eq('id', micrositeId)
           .eq('activo', true)
           .single();
-        
+
         if (error || !data) {
           throw new Error(`No se encontró el micrositio con id: ${micrositeId}`);
         }
@@ -93,7 +93,7 @@ export class SyncService {
           // Verificar si hay más páginas usando el campo "next" de la respuesta
           // Si next existe y no es null, hay más páginas
           hayMasPaginas = !!response.next;
-          
+
           if (hayMasPaginas) {
             paginaActual++;
           }
@@ -155,7 +155,7 @@ export class SyncService {
           const empresaLower = (cupon.empresa?.nombre || '').toLowerCase();
           const descripcionLower = (cupon.descripcion || '').toLowerCase();
           const texto = `${nombreLower} ${empresaLower} ${descripcionLower}`;
-          
+
           // Inferencias por palabras clave (ordenadas por especificidad)
           if (texto.includes('cine')) {
             categoriaPrincipal = 'Cines';
@@ -281,7 +281,8 @@ export class SyncService {
   }
 
   /**
-   * Sincronizar todos los micrositios activos
+   * Sincronizar el catálogo maestro usando un único micrositio
+   * para evitar duplicar más de 20,000 cupones innecesariamente.
    */
   async sincronizarTodosMicrositios(): Promise<{
     total_micrositios: number;
@@ -292,20 +293,26 @@ export class SyncService {
       error?: string;
     }>;
   }> {
-    this.logger.log('🔄 Sincronizando todos los micrositios activos...');
+    this.logger.log('🔄 Sincronizando catálogo global de Bonda usando micrositio maestro...');
 
-    const { data: micrositios } = await this.supabaseService
+    // Trataremos de usar "Beneficios La Guarida" porque en las pruebas nos devolvió 1672 cupones
+    // (el máximo de catálogo disponible) o caer en el primero activo
+    const { data: masterMicrosites } = await this.supabaseService
       .from('bonda_microsites')
-      .select('*')
-      .eq('activo', true);
+      .select('id, nombre, slug')
+      .eq('activo', true)
+      .limit(10);
 
-    if (!micrositios || micrositios.length === 0) {
-      this.logger.warn('⚠️ No hay micrositios activos para sincronizar');
-      return {
-        total_micrositios: 0,
-        resultados: [],
-      };
+    if (!masterMicrosites || masterMicrosites.length === 0) {
+      this.logger.warn('⚠️ No hay micrositios activos para utilizar como maestro');
+      return { total_micrositios: 0, resultados: [] };
     }
+
+    // Priorizar Beneficios La Guarida (o Fundación Padres)
+    let masterMicrosite =
+      masterMicrosites.find(m => m.slug === 'beneficios-la-guarida') ||
+      masterMicrosites.find(m => m.slug === 'beneficios-fundacion-padres') ||
+      masterMicrosites[0];
 
     const resultados: Array<{
       microsite_nombre: string;
@@ -314,35 +321,30 @@ export class SyncService {
       error?: string;
     }> = [];
 
-    for (const microsite of micrositios) {
-      try {
-        this.logger.log(`\n📡 Sincronizando: ${microsite.nombre}...`);
-        const resultado = await this.sincronizarCuponesDesdeBonda(
-          microsite.id,
-        );
+    try {
+      this.logger.log(`\n📡 Sincronizando catálogo usando maestro: ${masterMicrosite.nombre}...`);
 
-        resultados.push({
-          microsite_nombre: microsite.nombre,
-          exito: true,
-          total_cupones: resultado.total_cupones,
-        });
+      const resultado = await this.sincronizarCuponesDesdeBonda(masterMicrosite.id);
 
-        // Delay entre micrositios
-        await this.delay(2000);
-      } catch (error: any) {
-        this.logger.error(
-          `❌ Error sincronizando ${microsite.nombre}: ${error.message}`,
-        );
-        resultados.push({
-          microsite_nombre: microsite.nombre,
-          exito: false,
-          error: error.message,
-        });
-      }
+      resultados.push({
+        microsite_nombre: masterMicrosite.nombre,
+        exito: true,
+        total_cupones: resultado.total_cupones,
+      });
+
+    } catch (error: any) {
+      this.logger.error(
+        `❌ Error sincronizando catálogo maestro (${masterMicrosite.nombre}): ${error.message}`,
+      );
+      resultados.push({
+        microsite_nombre: masterMicrosite.nombre,
+        exito: false,
+        error: error.message,
+      });
     }
 
     return {
-      total_micrositios: micrositios.length,
+      total_micrositios: 1, // Se reporta como 1 porque se sincronizó un catálogo global
       resultados,
     };
   }

@@ -11,6 +11,7 @@ import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { SupabaseService } from '../supabase/supabase.service';
 import { SyncCuponesService } from './sync-cupones.service';
+import { SyncService } from '../sync/sync.service';
 import { ConfigService } from '@nestjs/config';
 import { BondaService } from '../bonda/bonda.service';
 
@@ -59,6 +60,7 @@ export class PublicController {
   constructor(
     private readonly supabase: SupabaseService,
     private readonly syncCuponesService: SyncCuponesService,
+    private readonly syncService: SyncService,
     private readonly configService: ConfigService,
     private readonly bondaService: BondaService,
     private readonly jwtService: JwtService,
@@ -309,12 +311,13 @@ export class PublicController {
       throw new UnauthorizedException('Invalid secret for sync operation');
     }
 
-    await this.syncCuponesService.syncManual();
+    const resultado = await this.syncService.sincronizarTodosMicrositios();
 
     return {
       success: true,
       message: 'Sync de cupones ejecutado exitosamente',
       timestamp: new Date().toISOString(),
+      data: resultado,
     };
   }
 }

@@ -43,6 +43,7 @@ export interface EstadisticasUsuario {
 export interface FundacionUsuario {
   id: string;
   nombre: string;
+  slug: string;
   codigoAfiliado: string;
   fechaAfiliacion: string;
 }
@@ -211,6 +212,78 @@ export async function marcarCuponComoUsado(
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Error al marcar cupón como usado');
+  }
+
+  return response.json();
+}
+
+// ============================================
+// PERFIL DE USUARIO
+// ============================================
+
+export interface UpdateProfileRequest {
+  nombre?: string;
+  email?: string;
+  telefono?: string;
+  provincia?: string;
+  localidad?: string;
+}
+
+export interface UpdateProfileResponse {
+  id: string;
+  nombre: string;
+  email: string;
+  telefono: string | null;
+  dni: string | null;
+  provincia: string | null;
+  localidad: string | null;
+}
+
+/**
+ * Actualizar datos de perfil del usuario
+ * El DNI no se puede modificar
+ */
+export async function actualizarPerfil(
+  data: UpdateProfileRequest,
+  token: string,
+): Promise<UpdateProfileResponse> {
+  const response = await fetch(`${API_URL}/auth/profile`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Error al actualizar perfil');
+  }
+
+  return response.json();
+}
+
+/**
+ * Cambiar contraseña del usuario
+ */
+export async function cambiarContrasena(
+  passwordActual: string,
+  passwordNueva: string,
+  token: string,
+): Promise<{ success: boolean; message: string }> {
+  const response = await fetch(`${API_URL}/auth/change-password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ passwordActual, passwordNueva }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Error al cambiar contraseña');
   }
 
   return response.json();

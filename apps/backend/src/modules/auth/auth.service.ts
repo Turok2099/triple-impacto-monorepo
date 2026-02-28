@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
   Logger,
   InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -11,6 +12,8 @@ import { SupabaseService } from '../supabase/supabase.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -129,6 +132,62 @@ export class AuthService {
     };
 
     return this.jwtService.sign(payload);
+  }
+
+  /**
+   * Actualizar perfil del usuario (nombre, email, telefono, provincia, localidad)
+   * El DNI no se puede modificar una vez registrado
+   */
+  async updateProfile(userId: string, dto: UpdateProfileDto) {
+    // Si quiere cambiar email, verificar que no esté en uso por otro usuario
+    if (dto.email) {
+      const existing = await this.supabaseService.findUserByEmail(dto.email);
+      if (existing && existing.id !== userId) {
+        throw new ConflictException('El email ya está en uso por otra cuenta');
+      }
+    }
+
+    const updated = await this.supabaseService.updateUserProfile(userId, dto);
+
+    this.logger.log(`✅ Perfil actualizado: ${updated.email}`);
+
+    return {
+      id: updated.id,
+      nombre: updated.nombre,
+      email: updated.email,
+      telefono: updated.telefono ?? null,
+      dni: updated.dni ?? null,
+      provincia: updated.provincia ?? null,
+      localidad: updated.localidad ?? null,
+    };
+  }
+
+  /**
+   * Cambiar contraseña del usuario
+   * Verifica la contraseña actual antes de actualizar
+   */
+  async changePassword(userId: string, dto: ChangePasswordDto) {
+    const usuario = await this.supabaseService.findUserById(userId);
+    if (!usuario) {
+      throw new UnauthorizedException('Usuario no encontrado');
+    }
+
+    const passwordMatch = await bcrypt.compare(dto.passwordActual, usuario.password_hash);
+    if (!passwordMatch) {
+      throw new BadRequestException('La contraseña actual es incorrecta');
+    }
+
+    if (dto.passwordActual === dto.passwordNueva) {
+      throw new BadRequestException('La nueva contraseña debe ser diferente a la actual');
+    }
+
+    const saltRounds = 10;
+    const newHash = await bcrypt.hash(dto.passwordNueva, saltRounds);
+    await this.supabaseService.updateUserPassword(userId, newHash);
+
+    this.logger.log(`✅ Contraseña actualizada para usuario: ${usuario.email}`);
+
+    return { success: true, message: 'Contraseña actualizada exitosamente' };
   }
 
   /**

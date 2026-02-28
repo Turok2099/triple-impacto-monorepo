@@ -103,6 +103,47 @@ export class SupabaseService implements OnModuleInit {
   }
 
   /**
+   * Actualizar datos de perfil del usuario (sin DNI ni password_hash)
+   */
+  async updateUserProfile(
+    userId: string,
+    data: {
+      nombre?: string;
+      email?: string;
+      telefono?: string;
+      provincia?: string;
+      localidad?: string;
+    },
+  ) {
+    const { data: updated, error } = await this.from('usuarios')
+      .update({ ...data, updated_at: new Date().toISOString() })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) {
+      this.logger.error('Error al actualizar perfil:', error);
+      throw error;
+    }
+
+    return updated;
+  }
+
+  /**
+   * Actualizar el hash de contraseña del usuario
+   */
+  async updateUserPassword(userId: string, passwordHash: string) {
+    const { error } = await this.from('usuarios')
+      .update({ password_hash: passwordHash, updated_at: new Date().toISOString() })
+      .eq('id', userId);
+
+    if (error) {
+      this.logger.error('Error al actualizar contraseña:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Crear un nuevo usuario (sin códigos Bonda; se asignan por ONG tras el pago)
    */
   async createUser(userData: {

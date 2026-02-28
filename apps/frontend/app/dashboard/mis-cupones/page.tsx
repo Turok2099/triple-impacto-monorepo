@@ -114,19 +114,17 @@ export default function MisCuponesPage() {
             {cuponesActivos.map((cupon, index) => (
               <div
                 key={cupon.id}
-                className={`rounded-2xl ${
-                  index === 0
-                    ? 'bg-[#E8F5EE] border-[#16a459]/20'
-                    : 'bg-slate-50 border-slate-200'
-                } border p-5 shadow-sm relative overflow-hidden`}
+                className={`rounded-2xl ${index === 0
+                  ? 'bg-[#E8F5EE] border-[#16a459]/20'
+                  : 'bg-slate-50 border-slate-200'
+                  } border p-5 shadow-sm relative overflow-hidden`}
               >
                 {/* Header del cupón */}
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
                     <div
-                      className={`size-12 rounded-xl bg-white flex items-center justify-center shadow-sm border ${
-                        index === 0 ? 'border-[#16a459]/10' : 'border-slate-100'
-                      } overflow-hidden`}
+                      className={`size-12 rounded-xl bg-white flex items-center justify-center shadow-sm border ${index === 0 ? 'border-[#16a459]/10' : 'border-slate-100'
+                        } overflow-hidden`}
                     >
                       <span className="text-2xl">🎟️</span>
                     </div>
@@ -142,7 +140,7 @@ export default function MisCuponesPage() {
                       Solicitado
                     </p>
                     <p className="text-[11px] font-bold">
-                      {new Date(cupon.fecha_solicitud).toLocaleDateString('es-AR', {
+                      {new Date(cupon.createdAt).toLocaleDateString('es-AR', {
                         day: '2-digit',
                         month: 'short',
                         year: 'numeric',
@@ -154,31 +152,28 @@ export default function MisCuponesPage() {
                 {/* Código del cupón */}
                 {cupon.codigo && (
                   <div
-                    className={`bg-white rounded-lg p-3 border border-dashed ${
-                      index === 0 ? 'border-[#16a459]/30' : 'border-slate-200'
-                    } flex justify-between items-center mb-4`}
+                    className={`bg-white rounded-lg p-3 border border-dashed ${index === 0 ? 'border-[#16a459]/30' : 'border-slate-200'
+                      } flex justify-between items-center mb-4`}
                   >
                     <div className="flex flex-col">
                       <span className="text-[8px] uppercase font-bold text-slate-400">
                         Código del Cupón
                       </span>
                       <span
-                        className={`text-lg font-mono font-black ${
-                          index === 0 ? 'text-[#16a459]' : 'text-slate-500'
-                        } tracking-widest uppercase`}
+                        className={`text-lg font-mono font-black ${index === 0 ? 'text-[#16a459]' : 'text-slate-500'
+                          } tracking-widest uppercase`}
                       >
                         {cupon.codigo}
                       </span>
                     </div>
                     <button
                       onClick={() => copiarCodigo(cupon.codigo!, cupon.id)}
-                      className={`size-8 rounded-full ${
-                        copiedCode === cupon.id
-                          ? 'bg-green-100 text-green-600'
-                          : index === 0
+                      className={`size-8 rounded-full ${copiedCode === cupon.id
+                        ? 'bg-green-100 text-green-600'
+                        : index === 0
                           ? 'bg-[#16a459]/10 text-[#16a459]'
                           : 'bg-slate-100 text-slate-400'
-                      } flex items-center justify-center transition-colors`}
+                        } flex items-center justify-center transition-colors`}
                     >
                       {copiedCode === cupon.id ? (
                         <span className="text-xs">✓</span>
@@ -190,9 +185,9 @@ export default function MisCuponesPage() {
                 )}
 
                 {/* Instrucciones */}
-                {cupon.instrucciones && (
+                {cupon.mensaje && (
                   <p className="text-xs text-slate-600 mb-4 leading-relaxed">
-                    {cupon.instrucciones}
+                    {cupon.mensaje}
                   </p>
                 )}
 
@@ -220,31 +215,28 @@ export default function MisCuponesPage() {
         <div className="flex gap-2 mb-6">
           <button
             onClick={() => setFiltroHistorial('all')}
-            className={`px-4 py-1.5 rounded-full text-[11px] font-bold transition-colors ${
-              filtroHistorial === 'all'
-                ? 'bg-[#16a459] text-white'
-                : 'bg-slate-100 text-slate-500 border border-slate-200'
-            }`}
+            className={`px-4 py-1.5 rounded-full text-[11px] font-bold transition-colors ${filtroHistorial === 'all'
+              ? 'bg-[#16a459] text-white'
+              : 'bg-slate-100 text-slate-500 border border-slate-200'
+              }`}
           >
             Todos
           </button>
           <button
             onClick={() => setFiltroHistorial('used')}
-            className={`px-4 py-1.5 rounded-full text-[11px] font-bold transition-colors ${
-              filtroHistorial === 'used'
-                ? 'bg-[#16a459] text-white'
-                : 'bg-slate-100 text-slate-500 border border-slate-200'
-            }`}
+            className={`px-4 py-1.5 rounded-full text-[11px] font-bold transition-colors ${filtroHistorial === 'used'
+              ? 'bg-[#16a459] text-white'
+              : 'bg-slate-100 text-slate-500 border border-slate-200'
+              }`}
           >
             Usados
           </button>
           <button
             onClick={() => setFiltroHistorial('expired')}
-            className={`px-4 py-1.5 rounded-full text-[11px] font-bold transition-colors ${
-              filtroHistorial === 'expired'
-                ? 'bg-[#16a459] text-white'
-                : 'bg-slate-100 text-slate-500 border border-slate-200'
-            }`}
+            className={`px-4 py-1.5 rounded-full text-[11px] font-bold transition-colors ${filtroHistorial === 'expired'
+              ? 'bg-[#16a459] text-white'
+              : 'bg-slate-100 text-slate-500 border border-slate-200'
+              }`}
           >
             Vencidos
           </button>
@@ -280,7 +272,7 @@ export default function MisCuponesPage() {
                   <p className="text-xs font-bold text-[#2D3748]">Cupón #{cupon.id}</p>
                   <p className="text-[9px] text-slate-400">
                     Req:{' '}
-                    {new Date(cupon.fecha_solicitud).toLocaleDateString('es-AR', {
+                    {new Date(cupon.createdAt).toLocaleDateString('es-AR', {
                       day: '2-digit',
                       month: 'short',
                       year: 'numeric',
@@ -289,24 +281,23 @@ export default function MisCuponesPage() {
                 </div>
                 <div className="col-span-4">
                   <p className="text-[10px] text-slate-600 font-medium">
-                    {cupon.fecha_uso
-                      ? new Date(cupon.fecha_uso).toLocaleDateString('es-AR', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric',
-                        })
+                    {cupon.usadoAt
+                      ? new Date(cupon.usadoAt).toLocaleDateString('es-AR', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                      })
                       : '—'}
                   </p>
                 </div>
                 <div className="col-span-3 text-right">
                   <span
-                    className={`text-[9px] font-bold px-2 py-0.5 rounded uppercase ${
-                      cupon.estado === 'usado'
-                        ? 'text-slate-400 bg-slate-100'
-                        : cupon.estado === 'vencido'
+                    className={`text-[9px] font-bold px-2 py-0.5 rounded uppercase ${cupon.estado === 'usado'
+                      ? 'text-slate-400 bg-slate-100'
+                      : cupon.estado === 'vencido'
                         ? 'text-red-400 bg-red-50'
                         : 'text-yellow-600 bg-yellow-50'
-                    }`}
+                      }`}
                   >
                     {cupon.estado}
                   </span>

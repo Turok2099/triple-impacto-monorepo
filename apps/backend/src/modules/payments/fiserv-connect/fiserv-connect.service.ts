@@ -147,6 +147,8 @@ export class FiservConnectService implements OnModuleInit {
       currency: params.currency,
       currencyOriginal: input.currency,
       txntype: params.txntype,
+      timezone: params.timezone,
+      hash_algorithm: params.hash_algorithm,
       mode: params.mode,
       oid: params.oid,
       txndatetime: params.txndatetime,

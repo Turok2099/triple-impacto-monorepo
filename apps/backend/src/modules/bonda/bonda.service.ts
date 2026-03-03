@@ -11,9 +11,9 @@ import {
   BondaDeleteResponse,
 } from './dto/affiliate-response.dto';
 
-/** Config usada para llamar a la API de Bonda (token + microsite_id). */
 export interface BondaMicrositeConfig {
   api_token: string;
+  api_token_nominas: string | null;
   microsite_id: string;
 }
 
@@ -64,6 +64,7 @@ export class BondaService {
       }
       return {
         api_token: row.api_token,
+        api_token_nominas: row.api_token_nominas,
         microsite_id: row.microsite_id ?? '',
       };
     }
@@ -78,12 +79,14 @@ export class BondaService {
       }
       return {
         api_token: row.api_token,
+        api_token_nominas: row.api_token_nominas,
         microsite_id: row.microsite_id ?? '',
       };
     }
     if (this.apiKey && this.micrositeId) {
       return {
         api_token: this.apiKey,
+        api_token_nominas: process.env.BONDA_API_KEY_NOMINAS || this.apiKey,
         microsite_id: this.micrositeId,
       };
     }
@@ -227,14 +230,14 @@ export class BondaService {
       },
       envio: item.envio
         ? {
-            codigoId: item.envio.codigo_id || '',
-            smsId: item.envio.sms_id,
-            codigo: item.envio.codigo,
-            operadora: item.envio.operadora,
-            celular: item.envio.celular,
-            mensaje: item.envio.mensaje,
-            fecha: item.envio.fecha,
-          }
+          codigoId: item.envio.codigo_id || '',
+          smsId: item.envio.sms_id,
+          codigo: item.envio.codigo,
+          operadora: item.envio.operadora,
+          celular: item.envio.celular,
+          mensaje: item.envio.mensaje,
+          fecha: item.envio.fecha,
+        }
         : undefined,
       categorias: item.categorias || undefined,
     }));
@@ -371,7 +374,7 @@ export class BondaService {
       const response = await firstValueFrom(
         this.httpService.post(url, affiliateData, {
           headers: {
-            token: config.api_token,
+            token: config.api_token_nominas || config.api_token,
             'Content-Type': 'application/json',
           },
         }),
@@ -379,9 +382,10 @@ export class BondaService {
 
       return response.data;
     } catch (error) {
-      this.logger.error('Error al crear afiliado en Bonda:', error.message);
+      this.logger.error(`Error al crear afiliado en Bonda: ${error.message}`);
 
       if (error.response?.data) {
+        this.logger.error('Respuesta de Bonda (detalles del error):', error.response.data);
         return error.response.data;
       }
 
@@ -416,7 +420,7 @@ export class BondaService {
       const response = await firstValueFrom(
         this.httpService.patch(url, updateData, {
           headers: {
-            token: config.api_token,
+            token: config.api_token_nominas || config.api_token,
             'Content-Type': 'application/json',
           },
         }),
@@ -463,7 +467,7 @@ export class BondaService {
       const response = await firstValueFrom(
         this.httpService.delete(url, {
           headers: {
-            token: config.api_token,
+            token: config.api_token_nominas || config.api_token,
           },
         }),
       );
@@ -507,7 +511,7 @@ export class BondaService {
       const response = await firstValueFrom(
         this.httpService.get(url, {
           headers: {
-            token: config.api_token,
+            token: config.api_token_nominas || config.api_token,
           },
         }),
       );

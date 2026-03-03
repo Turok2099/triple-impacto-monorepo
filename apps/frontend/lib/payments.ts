@@ -153,7 +153,8 @@ export function obtenerURLsRetorno(): { successURL: string; errorURL: string } {
       : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001';
 
   return {
-    successURL: `${baseUrl}/donar/success`,
-    errorURL: `${baseUrl}/donar/error`,
+    successURL: `${baseUrl}/api/payments/fiserv/success`,
+    // Apuntamos al endpoint API intermedio para capturar el POST body de Fiserv
+    errorURL: `${baseUrl}/api/payments/fiserv/error`,
   };
 }

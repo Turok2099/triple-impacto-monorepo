@@ -3,210 +3,108 @@
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { XCircle, Loader2, Mail, ShieldAlert, ArrowRight, Home } from 'lucide-react';
 
 function PagoErrorContent() {
   const searchParams = useSearchParams();
 
-  // Intentar obtener información del error de los parámetros
   const failReason = searchParams.get('failReason') || searchParams.get('fail_reason');
   const responseCode = searchParams.get('response_code');
   const oid = searchParams.get('oid');
 
-  // Mapeo de códigos de error comunes
   const getMensajeError = (reason?: string | null, code?: string | null) => {
     if (reason?.toLowerCase().includes('cancel')) {
       return {
-        titulo: 'Pago Cancelado',
-        descripcion:
-          'Cancelaste el proceso de pago. No se realizó ningún cargo a tu tarjeta.',
-        icono: '🚫',
+        titulo: 'Operación Cancelada',
+        descripcion: 'Cancelaste el proceso de pago seguro. No se realizó ningún cargo a tu tarjeta.',
       };
     }
 
     if (code === '202' || reason?.toLowerCase().includes('declined')) {
       return {
         titulo: 'Pago Rechazado',
-        descripcion:
-          'Tu banco rechazó la transacción. Por favor, verifica los datos de tu tarjeta o intenta con otro método de pago.',
-        icono: '❌',
+        descripcion: 'Tu banco rechazó la transacción. Por favor, verifica tus datos o intenta con otro medio.',
       };
     }
 
     if (code === '203' || reason?.toLowerCase().includes('insufficient')) {
       return {
         titulo: 'Fondos Insuficientes',
-        descripcion:
-          'Tu tarjeta no tiene fondos suficientes para completar la transacción.',
-        icono: '💳',
+        descripcion: 'La tarjeta no tiene fondos o límite suficiente para completar esta operación.',
       };
     }
 
-    // Error genérico
     return {
-      titulo: 'Error en el Pago',
-      descripcion:
-        'Hubo un problema al procesar tu pago. No te preocupes, no se realizó ningún cargo.',
-      icono: '⚠️',
+      titulo: 'Falla en la plataforma',
+      descripcion: 'El procesador Fiserv declinó temporalmente la interacción. No te preocupes, no se ha debitado nada.',
     };
   };
 
   const errorInfo = getMensajeError(failReason, responseCode);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
-        {/* Mensaje de error */}
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-          {/* Header con icono de error */}
-          <div className="bg-gradient-to-r from-red-500 to-orange-500 p-8 text-center text-white">
-            <div className="text-6xl mb-4">{errorInfo.icono}</div>
-            <h1 className="text-3xl font-bold mb-2">{errorInfo.titulo}</h1>
-            <p className="text-red-100 text-lg">{errorInfo.descripcion}</p>
+    <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center">
+      <div className="max-w-xl w-full">
+        {/* Mensaje de error principal */}
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+          {/* Header */}
+          <div className="bg-[#e11d48] p-8 text-center text-white flex flex-col items-center">
+            <XCircle className="w-16 h-16 mb-4 text-white" strokeWidth={1.5} />
+            <h1 className="text-2xl font-bold mb-1">{errorInfo.titulo}</h1>
+            <p className="text-rose-100 text-sm font-medium">{errorInfo.descripcion}</p>
           </div>
 
           {/* Contenido */}
           <div className="p-8">
             {/* Información técnica (si disponible) */}
             {(failReason || responseCode || oid) && (
-              <div className="bg-gray-50 rounded-lg p-6 mb-6">
-                <h2 className="font-bold text-gray-900 mb-4">
-                  Detalles técnicos
+              <div className="mb-8 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+                <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                  Registro Técnico
                 </h2>
-                <div className="space-y-2 text-sm">
+                <div className="space-y-2 text-sm text-slate-700">
                   {oid && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Número de orden:</span>
-                      <span className="font-mono text-xs text-gray-700">{oid}</span>
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium text-slate-500">Ref. Fiserv (OID)</span>
+                      <span className="font-mono text-xs max-w-[150px] truncate">{oid}</span>
                     </div>
                   )}
                   {responseCode && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Código de respuesta:</span>
-                      <span className="font-mono text-gray-900">{responseCode}</span>
-                    </div>
-                  )}
-                  {failReason && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Razón:</span>
-                      <span className="text-gray-900">{failReason}</span>
+                    <div className="flex justify-between items-center mt-1">
+                      <span className="font-medium text-slate-500">Código interno</span>
+                      <span className="font-mono">{responseCode}</span>
                     </div>
                   )}
                 </div>
               </div>
             )}
 
-            {/* Posibles soluciones */}
-            <div className="bg-blue-50 rounded-lg p-6 mb-6">
-              <h2 className="font-bold text-blue-900 mb-3">
-                💡 ¿Qué puedo hacer?
-              </h2>
-              <ul className="space-y-2 text-sm text-blue-900">
-                <li className="flex items-start gap-2">
-                  <span>•</span>
-                  <span>
-                    Verifica que los datos de tu tarjeta sean correctos (número,
-                    fecha de vencimiento, CVV)
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span>•</span>
-                  <span>
-                    Asegúrate de tener fondos suficientes en tu cuenta
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span>•</span>
-                  <span>
-                    Intenta con otra tarjeta o método de pago
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span>•</span>
-                  <span>
-                    Contacta a tu banco para verificar que no haya bloqueos
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span>•</span>
-                  <span>
-                    Si el problema persiste, contactanos a{' '}
-                    <a
-                      href="mailto:soporte@tripleimpacto.site"
-                      className="text-blue-700 hover:text-blue-800 underline"
-                    >
-                      soporte@tripleimpacto.site
-                    </a>
-                  </span>
-                </li>
-              </ul>
+            {/* Aviso central de seguridad */}
+            <div className="bg-rose-50/50 border border-rose-100 rounded-xl p-5 mb-8 flex gap-3 text-sm text-rose-800">
+              <ShieldAlert className="w-5 h-5 flex-shrink-0 text-rose-500" />
+              <p className="font-medium">Ningún débito ha sido aplicado. Al tratarse de Fiserv Connect, tus credenciales ni siquiera transitaron por tu perfil en Triple Impacto.</p>
             </div>
 
             {/* Botones de acción */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col gap-3">
               <Link
                 href="/donar"
-                className="flex-1 py-4 px-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all text-center shadow-lg"
+                className="w-full flex items-center justify-center gap-2 py-3.5 px-6 bg-[#1A202C] text-white font-semibold rounded-xl hover:bg-black transition-colors"
               >
-                🔄 Intentar Nuevamente
+                Intentar Nuevamente <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 href="/"
-                className="flex-1 py-4 px-6 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-all text-center"
+                className="w-full flex items-center justify-center gap-2 py-3.5 px-6 bg-slate-50 text-slate-600 font-medium rounded-xl hover:bg-slate-100 transition-colors"
               >
-                Volver al inicio
+                <Home className="w-4 h-4 text-slate-400" /> Volver al inicio
               </Link>
             </div>
 
-            {/* Nota de seguridad */}
-            <div className="mt-6 p-4 border border-gray-200 rounded-lg">
-              <p className="text-sm text-gray-600 text-center">
-                <strong>No se realizó ningún cargo.</strong> Tu información está
-                protegida y el pago no fue procesado.
-              </p>
+            <div className="mt-6 flex flex-col items-center justify-center gap-1.5 text-xs text-slate-400">
+              <Mail className="w-4 h-4 text-slate-400" />
+              <p>Si la falla persiste, reportala a <a href="mailto:soporte@tripleimpacto.site" className="font-semibold text-slate-500 hover:text-slate-700">soporte@tripleimpacto.site</a></p>
             </div>
-          </div>
-        </div>
-
-        {/* Ayuda adicional */}
-        <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-          <h3 className="font-bold text-gray-900 mb-4 text-center">
-            ¿Necesitás ayuda?
-          </h3>
-          <div className="grid md:grid-cols-2 gap-4 text-sm">
-            <div className="text-center p-4">
-              <div className="text-3xl mb-2">📧</div>
-              <h4 className="font-medium text-gray-900 mb-1">Email</h4>
-              <a
-                href="mailto:soporte@tripleimpacto.site"
-                className="text-purple-600 hover:text-purple-700"
-              >
-                soporte@tripleimpacto.site
-              </a>
-            </div>
-            <div className="text-center p-4">
-              <div className="text-3xl mb-2">❓</div>
-              <h4 className="font-medium text-gray-900 mb-1">Preguntas</h4>
-              <Link
-                href="/faqs"
-                className="text-purple-600 hover:text-purple-700"
-              >
-                Ver preguntas frecuentes
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Métodos de pago aceptados */}
-        <div className="mt-6 text-center">
-          <p className="text-xs text-gray-500 mb-2">Aceptamos:</p>
-          <div className="flex justify-center gap-4 items-center">
-            <div className="text-gray-400 text-sm">Visa</div>
-            <div className="text-gray-400">•</div>
-            <div className="text-gray-400 text-sm">Mastercard</div>
-            <div className="text-gray-400">•</div>
-            <div className="text-gray-400 text-sm">American Express</div>
-            <div className="text-gray-400">•</div>
-            <div className="text-gray-400 text-sm">Cabal</div>
           </div>
         </div>
       </div>
@@ -218,10 +116,10 @@ export default function PagoErrorPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Cargando...</p>
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+          <div className="flex flex-col items-center">
+            <Loader2 className="w-12 h-12 text-rose-500 animate-spin mb-4" />
+            <p className="text-slate-600 font-medium">Leyendo respuesta técnica...</p>
           </div>
         </div>
       }

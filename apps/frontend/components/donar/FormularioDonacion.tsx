@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
+import { Gift, Lock, CreditCard } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   obtenerOrganizaciones,
@@ -9,13 +11,30 @@ import {
   type Organizacion,
 } from "@/lib/payments";
 
+const LOGO_MAP: Record<string, string> = {
+  "Biblioteca Popular Rurales Argentinas": "BIBLIOTECAS ARGENTINAS ARGENTINA.jpg",
+  "Fundacion Padres": "FUNDACION PADRES.jpg",
+  "Fundación Padres": "FUNDACION PADRES.jpg",
+  "Haciendo Camino": "HACIENDO CAMINO.jpg",
+  "La Guarida": "LA GUARIDA.jpg",
+  "Loros Parlantes": "LOROS PARLANTES.jpg",
+  "Mamis Solidarias": "MAMIS SOLIDARIAS.jpg",
+  "Monte Adentro": "MONTE ADENTRO.jpg",
+  "Plato Lleno": "PLATO LLENO.jpg",
+  "Fundación Plato Lleno": "PLATO LLENO.jpg",
+  "Proactiva": "PROACTIVA.jpg",
+  "Proyectarr": "PROYECTARR.jpg",
+  "Regenerar": "REGENERAR.jpg",
+  "TECHO Argentina": "TECHO ARGENTINA.jpg"
+};
+
 interface FormularioDonacionProps {
   onSubmit: (monto: number, organizacionId?: string) => void;
   loading?: boolean;
 }
 
 // Montos sugeridos predefinidos (mínimo: $5000 ARS)
-const MONTOS_SUGERIDOS = [5000, 10000, 15000, 20000, 30000];
+const MONTOS_SUGERIDOS = [5000, 10000, 15000];
 const MONTO_MINIMO = 5000;
 
 export default function FormularioDonacion({
@@ -28,7 +47,7 @@ export default function FormularioDonacion({
   const [errorOrgs, setErrorOrgs] = useState<string | null>(null);
 
   const [montoSeleccionado, setMontoSeleccionado] = useState<number | null>(
-    1000
+    5000
   );
   const [montoCustom, setMontoCustom] = useState("");
   const [usarMontoCustom, setUsarMontoCustom] = useState(false);
@@ -192,30 +211,31 @@ export default function FormularioDonacion({
               {organizaciones.map((org) => (
                 <option key={org.id} value={org.id}>
                   {org.nombre}
-                  {org.monto_sugerido
-                    ? ` - Sugerido: ${formatearMonto(org.monto_sugerido)}`
-                    : ""}
                 </option>
               ))}
             </select>
 
             {/* Información de la organización seleccionada */}
             {organizacionSeleccionada && (
-              <div className="mt-3 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                <h4 className="font-semibold text-purple-900 mb-2">
-                  {organizacionSeleccionada.nombre}
-                </h4>
-                {organizacionSeleccionada.descripcion && (
-                  <p className="text-sm text-gray-700 mb-2">
-                    {organizacionSeleccionada.descripcion}
-                  </p>
-                )}
-                {organizacionSeleccionada.monto_sugerido && (
-                  <p className="text-sm text-purple-600 font-medium">
-                    💰 Monto sugerido:{" "}
-                    {formatearMonto(organizacionSeleccionada.monto_sugerido)}
-                  </p>
-                )}
+              <div className="mt-4 p-5 bg-white border border-slate-200 shadow-sm rounded-xl flex flex-col md:flex-row items-center gap-5 text-center md:text-left transition-all">
+                <div className="relative w-36 h-36 rounded-full border shadow-sm border-slate-100 overflow-hidden flex-shrink-0 bg-white">
+                  <Image
+                    src={`/logos/${LOGO_MAP[organizacionSeleccionada.nombre] || "FUNDACION PADRES.jpg"}`}
+                    alt={organizacionSeleccionada.nombre}
+                    fill
+                    className="object-contain p-2"
+                  />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-bold text-slate-900 text-lg mb-1">
+                    {organizacionSeleccionada.nombre}
+                  </h4>
+                  {organizacionSeleccionada.descripcion && (
+                    <p className="text-sm text-slate-600 line-clamp-3">
+                      {organizacionSeleccionada.descripcion}
+                    </p>
+                  )}
+                </div>
               </div>
             )}
           </>
@@ -229,58 +249,62 @@ export default function FormularioDonacion({
         </label>
 
         {/* Montos sugeridos */}
-        <div className="grid grid-cols-3 md:grid-cols-5 gap-3 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
           {MONTOS_SUGERIDOS.map((monto) => (
             <button
               key={monto}
               type="button"
               onClick={() => handleMontoSugeridoClick(monto)}
-              className={`py-3 px-4 rounded-lg font-medium text-center transition-all ${
-                montoSeleccionado === monto && !usarMontoCustom
-                  ? "bg-purple-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
+              className={`py-3 px-4 rounded-lg font-medium text-center transition-all ${montoSeleccionado === monto && !usarMontoCustom
+                ? "bg-purple-600 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
             >
               {formatearMonto(monto)}
             </button>
           ))}
+
+          <button
+            type="button"
+            onClick={() => {
+              setUsarMontoCustom(true);
+              setMontoSeleccionado(null);
+            }}
+            className={`py-3 px-4 rounded-lg font-bold text-center transition-all ${usarMontoCustom
+              ? "bg-[#16a459] text-white"
+              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              }`}
+          >
+            Donar +
+          </button>
         </div>
 
         {/* Monto personalizado */}
-        <div>
-          <label className="block text-sm text-gray-600 mb-2">
-            O ingresá otro monto:
-          </label>
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-              $
-            </span>
-            <input
-              type="number"
-              min={MONTO_MINIMO}
-              step="1"
-              value={montoCustom}
-              onChange={(e) => handleMontoCustomChange(e.target.value)}
-              placeholder={MONTO_MINIMO.toString()}
-              className={`w-full pl-8 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 ${
-                usarMontoCustom
-                  ? "border-purple-600 focus:ring-purple-600"
-                  : "border-gray-200 focus:ring-purple-500"
-              }`}
-            />
+        {usarMontoCustom && (
+          <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                $
+              </span>
+              <input
+                type="number"
+                min={MONTO_MINIMO}
+                step="1"
+                value={montoCustom}
+                onChange={(e) => handleMontoCustomChange(e.target.value)}
+                placeholder={MONTO_MINIMO.toString()}
+                autoFocus
+                className="w-full pl-8 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 border-purple-600 focus:ring-purple-600"
+              />
+            </div>
           </div>
-        </div>
-
-        {/* Mostrar monto mínimo global */}
-        <p className="text-sm text-purple-600 font-medium mt-2">
-          * Monto mínimo para donar: {formatearMonto(MONTO_MINIMO)}
-        </p>
+        )}
 
         {/* Mostrar monto mínimo de organización si es mayor */}
         {organizacionSeleccionada?.monto_minimo &&
           organizacionSeleccionada.monto_minimo > MONTO_MINIMO && (
             <p className="text-sm text-orange-600 font-medium mt-1">
-              * Esta organización requiere un monto mínimo de{" "}
+              * Esta organización requiere un monto mínimo explícito de{" "}
               {formatearMonto(organizacionSeleccionada.monto_minimo)}
             </p>
           )}
@@ -316,8 +340,8 @@ export default function FormularioDonacion({
         </div>
 
         <div className="mt-4 pt-4 border-t border-purple-200">
-          <div className="flex items-start gap-2 text-sm text-purple-800">
-            <span>🎁</span>
+          <div className="flex items-start gap-3 text-sm text-purple-800">
+            <Gift className="w-5 h-5 flex-shrink-0 mt-0.5 text-purple-600" />
             <p>
               Al donar, obtendrás acceso exclusivo a cupones de descuento de
               Bonda en marcas reconocidas.
@@ -330,21 +354,25 @@ export default function FormularioDonacion({
       <button
         type="submit"
         disabled={loading || loadingOrgs || !organizacionId}
-        className="w-full py-4 px-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+        className="w-full py-4 px-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
       >
         {loading ? (
-          <span className="flex items-center justify-center gap-2">
+          <>
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
             Procesando...
-          </span>
+          </>
         ) : (
-          "💳 Proceder al Pago"
+          <>
+            <CreditCard className="w-5 h-5" /> Proceder al Pago
+          </>
         )}
       </button>
 
       {/* Información de seguridad */}
       <div className="text-center text-sm text-gray-500">
-        <p>🔒 Pago seguro procesado por Fiserv Connect</p>
+        <p className="flex justify-center items-center gap-1.5 font-medium text-slate-600">
+          <Lock className="w-4 h-4 text-slate-500" /> Pago seguro procesado por Fiserv Connect
+        </p>
         <p className="mt-1">
           Serás redirigido a una página segura para completar el pago
         </p>

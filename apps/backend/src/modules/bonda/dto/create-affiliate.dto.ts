@@ -35,6 +35,9 @@ export class CreateAffiliateDto {
   @IsOptional()
   localidad?: string; // Localidad/Ciudad
 
+  @IsOptional()
+  dni?: number | string; // DNI requerido por ciertas ONGs de Bonda como un número
+
   // Agregar aquí más campos según lo que Bonda permita en su micrositio
   // Consultar la documentación de referencias de Bonda
 }

@@ -119,8 +119,14 @@ export default function DashboardPage() {
     try {
       const data = await obtenerCuponesRecibidos("beneficios-fundacion-padres");
       setCuponesRecibidos(data.count || 0);
-    } catch (error) {
-      console.error("Error al cargar cupones recibidos:", error);
+    } catch (error: any) {
+      // Es 100% normal que un usuario nuevo no tenga código de afiliado aún.
+      // Así evitamos que Next.js levante una pantalla roja de error en desarrollo.
+      if (error && error.message && error.message.includes('código de afiliado')) {
+        setCuponesRecibidos(0);
+        return;
+      }
+      console.warn("Aviso al cargar cupones recibidos:", error.message || error);
       setCuponesRecibidos(0);
     }
   };
@@ -394,12 +400,12 @@ export default function DashboardPage() {
             <span className="text-slate-600">
               {dashboard.estadisticas?.ultimoCuponSolicitado
                 ? new Date(
-                    dashboard.estadisticas.ultimoCuponSolicitado,
-                  ).toLocaleDateString("es-AR", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })
+                  dashboard.estadisticas.ultimoCuponSolicitado,
+                ).toLocaleDateString("es-AR", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })
                 : "Nunca"}
             </span>
           </p>
@@ -521,11 +527,10 @@ export default function DashboardPage() {
                     <button
                       key={categoria.id}
                       onClick={() => setCategoriaSeleccionada(categoria.nombre)}
-                      className={`flex items-center gap-2 whitespace-nowrap px-5 py-2.5 rounded-full font-bold text-sm transition-all hover:scale-110 ${
-                        categoriaSeleccionada === categoria.nombre
+                      className={`flex items-center gap-2 whitespace-nowrap px-5 py-2.5 rounded-full font-bold text-sm transition-all hover:scale-110 ${categoriaSeleccionada === categoria.nombre
                           ? "bg-emerald-600 text-white shadow-md"
                           : "bg-white text-slate-600 border border-emerald-100 hover:border-emerald-400 hover:shadow-md"
-                      }`}
+                        }`}
                     >
                       <IconComponent className="w-4 h-4" strokeWidth={2.5} />
                       {categoria.nombre}

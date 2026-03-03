@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { validateNotificationHash } from './fiserv-connect/utils/connect-hash.util';
+import { validateNotificationHash, validateResponseHash } from './fiserv-connect/utils/connect-hash.util';
 import { FiservConnectService } from './fiserv-connect/fiserv-connect.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { BondaService } from './../bonda/bonda.service';
@@ -22,7 +22,7 @@ export class FiservWebhookService {
     private readonly fiservConnect: FiservConnectService,
     private readonly supabase: SupabaseService,
     private readonly bonda: BondaService,
-  ) {}
+  ) { }
 
   /**
    * Procesa la notificación de pago de Fiserv.
@@ -32,13 +32,21 @@ export class FiservWebhookService {
     const str = (v: string | string[] | undefined) =>
       Array.isArray(v) ? (v[0] ?? '') : (v ?? '');
 
+    const config = this.fiservConnect.getConfig();
+    if (!config) {
+      this.logger.warn('Fiserv notification: config no disponible');
+      return;
+    }
+
     const oid = str(body.oid) || str(body.merchantTransactionId);
+    // ¡CRÍTICO! chargetotal DEBE tomarse exacto (ej. "5000,00" con coma si así viene)
     const chargetotal = str(body.chargetotal);
     const currency = str(body.currency);
     const txndatetime = str(body.txndatetime);
-    const storename = str(body.storename);
+    // ¡CRÍTICO! Fiserv omite el storename en el webhook, usamos el del config.
+    const storename = str(body.storename) || config.storeId;
     const approvalCode = str(body.approval_code);
-    const notificationHash = str(body.notification_hash) || str(body.hash);
+    const notificationHash = str(body.response_hash) || str(body.hash) || str(body.notification_hash);
     const ipgTransactionId = str(body.ipgTransactionId);
 
     // Sin approval_code o sin oid: no es un éxito o no podemos vincular el pago
@@ -49,17 +57,18 @@ export class FiservWebhookService {
       return;
     }
 
-    const config = this.fiservConnect.getConfig();
-    if (!config) {
-      this.logger.warn('Fiserv notification: config no disponible');
-      return;
-    }
-
     if (!notificationHash) {
-      this.logger.warn('Fiserv notification: sin notification_hash');
+      this.logger.warn('Fiserv notification: sin response_hash o notification_hash en el body');
       return;
     }
 
+    this.logger.debug('Webhook Payload:', body);
+    this.logger.debug('Valores extraídos para validación:', {
+      chargetotal, currency, txndatetime, storename, approvalCode, notificationHash
+    });
+
+    // Fiserv devuelve el chargetotal con comas en vez de puntos a veces (ej. "5000,00"), validemos con el formato sin adaptar para el hash.
+    // Usamos validateResponseHash ya que Fiserv envía response_hash en webhook también
     const hashValid = validateNotificationHash(
       chargetotal,
       currency,
@@ -69,8 +78,20 @@ export class FiservWebhookService {
       notificationHash,
       config.sharedSecret,
     );
-    if (!hashValid) {
-      this.logger.warn('Fiserv notification: hash inválido');
+
+    // Fallback: Si no pasa con Notification Hash, prueba con formato Response Hash
+    const hashValidFallback = validateResponseHash(
+      approvalCode,
+      chargetotal,
+      currency,
+      txndatetime,
+      storename,
+      notificationHash,
+      config.sharedSecret,
+    );
+
+    if (!hashValid && !hashValidFallback) {
+      this.logger.warn('Fiserv notification: hash inválido (ni como fallback)');
       throw new Error('Hash de notificación inválido');
     }
 
@@ -164,7 +185,10 @@ export class FiservWebhookService {
       return;
     }
 
-    const code = this.generateAffiliateCode(user.email);
+    // Bonda requiere que el 'code' coincida con su configuración de acceso (ej: 'Número de DNI').
+    // Si la ONG exige DNI, el code DEBE ser numerico puro, de lo contrario da error de DNI.
+    const code = user.dni ? String(user.dni) : this.generateAffiliateCode(user.email);
+
     try {
       const res = await this.bonda.crearAfiliado(
         {
@@ -174,25 +198,49 @@ export class FiservWebhookService {
           telefono: user.telefono ?? undefined,
           provincia: user.provincia ?? undefined,
           localidad: user.localidad ?? undefined,
+          // Bonda requiere DNI numérico. Usamos el DNI del usuario registrado en base de datos.
+          dni: user.dni ? Number(user.dni) : undefined,
         },
         { organizacionId },
       );
 
-      if (res?.success && res?.data?.code) {
+      if (res?.success && res?.data?.member?.code) {
         await this.supabase.upsertAffiliateForUser(
           userId,
           microsite.id,
-          res.data.code,
+          res.data.member.code,
         );
         this.logger.log(
-          `Fiserv webhook: afiliado Bonda creado user=${userId} microsite=${microsite.slug} code=${res.data.code}`,
+          `Fiserv webhook: afiliado Bonda creado user=${userId} microsite=${microsite.slug} code=${res.data.member.code}`,
+        );
+      } else if (
+        res?.error?.code === 'HttpPublicResponseException' &&
+        res?.error?.detail?.code?.[0]?.includes('ya lo está utilizando')
+      ) {
+        // Bonda rechazó la creación porque el afiliado (DNI/code) ya existe.
+        // Esto es un falso error para nosotros, simplemente lo vinculamos en nuestra BD.
+        this.logger.log(
+          `Fiserv webhook: afiliado Bonda ya existía en Bonda org=${organizacionId}. Vinculando user=${userId} code=${code}`,
+        );
+        await this.supabase.upsertAffiliateForUser(userId, microsite.id, code);
+      } else {
+        this.logger.error(`Fiserv webhook: Bonda retornó success: false al crear afiliado`, res);
+      }
+    } catch (err: any) {
+      if (
+        err?.response?.data?.error?.code === 'HttpPublicResponseException' &&
+        err?.response?.data?.error?.detail?.code?.[0]?.includes('ya lo está utilizando')
+      ) {
+        this.logger.log(
+          `Fiserv webhook: afiliado Bonda ya existía en Bonda org=${organizacionId}. Vinculando user=${userId} code=${code}`,
+        );
+        await this.supabase.upsertAffiliateForUser(userId, microsite.id, code);
+      } else {
+        this.logger.error(
+          `Fiserv webhook: excepción al crear afiliado Bonda user=${userId} org=${organizacionId}`,
+          err,
         );
       }
-    } catch (err) {
-      this.logger.error(
-        `Fiserv webhook: error al crear afiliado Bonda user=${userId} org=${organizacionId}`,
-        err,
-      );
     }
   }
 

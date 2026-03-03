@@ -339,6 +339,13 @@ export default function DashboardPage() {
               <Gift className="w-6 h-6" strokeWidth={2} />
               <span className={`text-xs ${activeTab === "cupones" ? "font-semibold" : "font-medium"}`}>Mis Cupones</span>
             </button>
+            <a
+              href="/donar"
+              className="flex flex-col items-center gap-1 text-slate-400 hover:text-[#16a459] transition-colors"
+            >
+              <Heart className="w-6 h-6" strokeWidth={2} />
+              <span className="text-xs font-medium">Donar +</span>
+            </a>
             <button
               onClick={logout}
               className="flex flex-col items-center gap-1 text-slate-400 hover:text-red-500 transition-colors"
@@ -417,13 +424,6 @@ export default function DashboardPage() {
             <h3 className="text-xl font-bold text-[#1A202C]">
               Mis Fundaciones
             </h3>
-            <a
-              href="/donar"
-              className="bg-[#16a459] text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md shadow-[#16a459]/20 active:scale-95 transition-transform"
-            >
-              <span className="text-sm">+</span>
-              Donar Más
-            </a>
           </div>
           <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4">
             {dashboard.fundaciones && dashboard.fundaciones.length > 0 ? (
@@ -528,8 +528,8 @@ export default function DashboardPage() {
                       key={categoria.id}
                       onClick={() => setCategoriaSeleccionada(categoria.nombre)}
                       className={`flex items-center gap-2 whitespace-nowrap px-5 py-2.5 rounded-full font-bold text-sm transition-all hover:scale-110 ${categoriaSeleccionada === categoria.nombre
-                          ? "bg-emerald-600 text-white shadow-md"
-                          : "bg-white text-slate-600 border border-emerald-100 hover:border-emerald-400 hover:shadow-md"
+                        ? "bg-emerald-600 text-white shadow-md"
+                        : "bg-white text-slate-600 border border-emerald-100 hover:border-emerald-400 hover:shadow-md"
                         }`}
                     >
                       <IconComponent className="w-4 h-4" strokeWidth={2.5} />

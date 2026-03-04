@@ -486,6 +486,7 @@ export class BondaController {
           slug: f.micrositio_slug,
           codigoAfiliado: f.affiliate_code,
           fechaAfiliacion: f.created_at,
+          totalDonado: Number(f.total_donado ?? 0),
         })),
         cuponesActivos: cuponesActivos.map(this.transformarACuponSolicitadoDto),
         cuponesRecientes: historialReciente.cupones.map(
@@ -496,6 +497,26 @@ export class BondaController {
       console.error('Error crítico en obtenerDashboard:', error);
       throw error;
     }
+  }
+
+  /**
+   * Obtener resumen de pagos/donaciones del usuario
+   * GET /api/bonda/mis-donaciones
+   *
+   * Retorna el listado de donaciones completadas para control del cliente
+   */
+  @Get('mis-donaciones')
+  @UseGuards(JwtAuthGuard)
+  async obtenerMisDonaciones(
+    @Req() req: Request & { user?: { userId: string } },
+  ) {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new BadRequestException('Se requiere autenticación');
+    }
+
+    const donaciones = await this.supabase.getDonacionesUsuario(userId);
+    return donaciones;
   }
 
   /**

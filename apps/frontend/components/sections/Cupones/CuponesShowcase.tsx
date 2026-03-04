@@ -158,7 +158,8 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
 
           {!loading && !error && cupones.length > 0 && (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-8">
+              {/* Mobile: lista vertical; Desktop: grid */}
+              <div className="flex flex-col gap-4 mb-8 md:grid md:grid-cols-3 md:gap-6 lg:grid-cols-4 xl:grid-cols-5">
                 {cupones.map((cupon) => (
                   <CuponCard key={cupon.id} cupon={cupon} />
                 ))}

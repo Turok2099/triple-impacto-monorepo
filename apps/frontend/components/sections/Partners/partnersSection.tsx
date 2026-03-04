@@ -2,236 +2,198 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { getAllPartners } from "@/lib/partners";
-import { Partner } from "@/components/sections/WhyDonate/types";
-
-// Función para obtener 3 ONGs aleatorias sin duplicados
-const getRandomPartners = (
-  allPartners: Partner[],
-  count: number = 3
-): Partner[] => {
-  const shuffled = [...allPartners].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count);
-};
+import { Heart } from "lucide-react";
+import { obtenerOrganizaciones, type Organizacion } from "@/lib/payments";
+import { getOrganizationLogoUrl } from "@/lib/organization-logos";
 
 export default function PartnersSection() {
-  const allPartners = getAllPartners();
-  // Inicializar con las primeras 3 ONGs (sin aleatoriedad) para evitar error de hidratación
-  const [displayedPartners, setDisplayedPartners] = useState<Partner[]>(
-    allPartners.slice(0, 3)
-  );
+  const [organizaciones, setOrganizaciones] = useState<Organizacion[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Hacer la primera selección aleatoria después de montar el componente
-    setDisplayedPartners(getRandomPartners(allPartners, 3));
+    let cancelled = false;
+    obtenerOrganizaciones()
+      .then((orgs) => {
+        if (!cancelled) setOrganizaciones(orgs);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message || "Error al cargar organizaciones");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
 
-    // Configurar el intervalo para cambios subsecuentes
-    const interval = setInterval(() => {
-      setDisplayedPartners(getRandomPartners(allPartners, 3));
-    }, 6000); // Cambia cada 6 segundos
+  if (loading) {
+    return (
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-50/80">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#1A202C] mb-3">
+              Nuestras ONGs aliadas
+            </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Podés donar a cualquiera de estas organizaciones desde la plataforma
+            </p>
+          </div>
+          {/* Mobile skeleton */}
+          <div className="space-y-4 md:hidden">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-20 rounded-2xl bg-white border border-slate-50 shadow-[0_2px_12px_rgba(0,0,0,0.04)] animate-pulse"
+              />
+            ))}
+          </div>
+          {/* Desktop skeleton */}
+          <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="h-72 rounded-3xl bg-white border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.04)] animate-pulse"
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
-    return () => clearInterval(interval);
-  }, [allPartners]);
-
-  return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+  if (error || organizaciones.length === 0) {
+    return (
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-50/80">
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#1A202C] mb-4">
             Nuestras ONGs aliadas
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Trabajamos exclusivamente con organizaciones certificadas, auditadas
-            y con trayectoria comprobada
+          <p className="text-slate-600">
+            {error || "No hay organizaciones disponibles en este momento."}
+          </p>
+          <Link
+            href="/donar"
+            className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-[#16a459] text-white font-semibold rounded-xl hover:bg-[#138c4a] transition-colors"
+          >
+            <Heart className="w-4 h-4" />
+            Ir a donar
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-50/80">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-14">
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#1A202C] mb-3">
+            Nuestras ONGs aliadas
+          </h2>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            Podés donar a cualquiera de estas organizaciones desde la plataforma
           </p>
         </div>
 
-        {/* Grid de ONGs */}
-        <div className="grid gap-x-8 gap-y-12 sm:gap-y-16 md:grid-cols-2 lg:grid-cols-3">
-          {displayedPartners.map((partner, index) => (
-            <div
-              key={`${partner.id}-${Date.now()}`}
-              className="relative animate-fadeIn"
-              style={{
-                animation: `fadeIn 1.2s ease-in-out ${index * 0.2}s both`,
-              }}
-            >
-              {/* Card con imagen/logo interactivo */}
-              {partner.website ? (
-                partner.website.startsWith("/") ? (
-                  <Link href={partner.website} className="block overflow-hidden group rounded-xl shadow-lg cursor-pointer">
-                    <div
-                      className="w-full h-56 sm:h-64 flex items-center justify-center text-7xl transition-all duration-300 ease-out group-hover:scale-110"
-                      style={{
-                        background: `linear-gradient(135deg, ${index % 3 === 0
-                            ? "#16a459"
-                            : index % 3 === 1
-                              ? "#385da0"
-                              : "#cfc755"
-                          } 0%, ${index % 3 === 0
-                            ? "#0d8745"
-                            : index % 3 === 1
-                              ? "#2a4a80"
-                              : "#b8af42"
-                          } 100%)`,
-                      }}
-                    >
-                      {partner.logo.startsWith("http") ? (
-                        <div className="w-full h-full flex items-center justify-center bg-white p-8">
-                          <img
-                            src={partner.logo}
-                            alt={partner.name}
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
-                      ) : (
-                        partner.logo
-                      )}
-                    </div>
-                  </Link>
-                ) : (
-                  <a
-                    href={partner.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block overflow-hidden group rounded-xl shadow-lg cursor-pointer"
-                  >
-                    <div
-                      className="w-full h-56 sm:h-64 flex items-center justify-center text-7xl transition-all duration-300 ease-out group-hover:scale-110"
-                      style={{
-                        background: `linear-gradient(135deg, ${index % 3 === 0
-                            ? "#16a459"
-                            : index % 3 === 1
-                              ? "#385da0"
-                              : "#cfc755"
-                          } 0%, ${index % 3 === 0
-                            ? "#0d8745"
-                            : index % 3 === 1
-                              ? "#2a4a80"
-                              : "#b8af42"
-                          } 100%)`,
-                      }}
-                    >
-                      {partner.logo.startsWith("http") ? (
-                        <div className="w-full h-full flex items-center justify-center bg-white p-8">
-                          <img
-                            src={partner.logo}
-                            alt={partner.name}
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
-                      ) : (
-                        partner.logo
-                      )}
-                    </div>
-                  </a>
-                )
-              ) : (
-                <div className="block overflow-hidden group rounded-xl shadow-lg cursor-pointer">
+        {/* Mobile: cards horizontales (solo visible en móvil) */}
+        <div className="space-y-4 md:hidden">
+          {organizaciones.map((org) => {
+            const logoUrl = getOrganizationLogoUrl(org.nombre);
+            return (
+              <div
+                key={org.id}
+                className="bg-white rounded-2xl p-4 flex items-center justify-between shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-50"
+              >
+                <div className="flex items-center gap-4 min-w-0">
                   <div
-                    className="w-full h-56 sm:h-64 flex items-center justify-center text-7xl transition-all duration-300 ease-out group-hover:scale-110"
-                    style={{
-                      background: `linear-gradient(135deg, ${index % 3 === 0
-                          ? "#16a459"
-                          : index % 3 === 1
-                            ? "#385da0"
-                            : "#cfc755"
-                        } 0%, ${index % 3 === 0
-                          ? "#0d8745"
-                          : index % 3 === 1
-                            ? "#2a4a80"
-                            : "#b8af42"
-                        } 100%)`,
-                    }}
+                    className="size-12 rounded-full bg-slate-100 bg-cover bg-center shrink-0 overflow-hidden"
+                    style={
+                      logoUrl
+                        ? { backgroundImage: `url(${logoUrl})` }
+                        : undefined
+                    }
                   >
-                    {partner.logo.startsWith("http") ? (
-                      <div className="w-full h-full flex items-center justify-center bg-white p-8">
-                        <img
-                          src={partner.logo}
-                          alt={partner.name}
-                          className="w-full h-full object-contain"
-                        />
-                      </div>
-                    ) : (
-                      partner.logo
+                    {!logoUrl && (
+                      <span className="w-full h-full flex items-center justify-center text-lg font-bold text-[#16a459]">
+                        {org.nombre.charAt(0)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="font-bold text-[#1A202C] text-sm leading-tight line-clamp-2">
+                      {org.nombre}
+                    </h3>
+                    {org.descripcion && (
+                      <p className="text-[11px] text-slate-500 font-medium mt-0.5 line-clamp-1">
+                        {org.descripcion}
+                      </p>
                     )}
                   </div>
                 </div>
-              )}
-
-              {/* Contenido de la card */}
-              <div className="relative mt-5">
-                {/* Badge de certificación */}
-                <div className="flex items-center gap-2 mb-3">
-                  {partner.certified && (
-                    <span className="uppercase font-semibold text-xs px-3 py-1 rounded-full bg-[#16a459] text-white">
-                      ✓ Certificada
-                    </span>
-                  )}
-                  {partner.activeProjects && (
-                    <span className="text-xs font-normal text-gray-600">
-                      {partner.activeProjects} proyectos activos
-                    </span>
-                  )}
-                </div>
-
-                {/* Título */}
-                <h4 className="font-bold text-2xl text-gray-900 mb-3 leading-tight">
-                  {partner.name}
-                </h4>
-
-                {/* Descripción */}
-                <p className="text-gray-700 text-base font-normal leading-relaxed mb-4">
-                  {partner.description}
-                </p>
-
-                {/* Stats */}
-                <div className="flex items-center gap-2 text-sm mb-4">
-                  <span className="text-lg">👥</span>
-                  <span className="text-gray-900">
-                    <span className="font-semibold text-[#16a459]">
-                      {partner.beneficiaries}+
-                    </span>{" "}
-                    <span className="text-gray-700">beneficiarios</span>
-                  </span>
-                </div>
-
-                {/* Link */}
-                {partner.website && (
-                  partner.website.startsWith("/") ? (
-                    <Link
-                      href={partner.website}
-                      className="text-[#16a459] font-semibold text-sm hover:underline inline-flex items-center gap-1"
-                    >
-                      Conocer más
-                      <span aria-hidden="true">→</span>
-                    </Link>
-                  ) : (
-                    <a
-                      href={partner.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#16a459] font-semibold text-sm hover:underline inline-flex items-center gap-1"
-                    >
-                      Conocer más
-                      <span aria-hidden="true">→</span>
-                    </a>
-                  )
-                )}
+                <Link
+                  href="/donar"
+                  className="bg-[#16a459] text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-[#16a459]/20 active:scale-95 transition-transform shrink-0"
+                >
+                  Donar
+                </Link>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        {/* CTA para ver todas las ONGs */}
+        {/* Desktop: grid de cards verticales (oculto en móvil) */}
+        <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          {organizaciones.map((org) => {
+            const logoUrl = getOrganizationLogoUrl(org.nombre);
+            return (
+              <div
+                key={org.id}
+                className="group bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300 flex flex-col items-center"
+              >
+                <div className="p-8 pb-4 flex flex-col items-center grow text-center">
+                  <div
+                    className="size-24 rounded-full bg-slate-100 bg-cover bg-center mb-6 ring-4 ring-slate-50 shrink-0 overflow-hidden"
+                    style={
+                      logoUrl
+                        ? { backgroundImage: `url(${logoUrl})` }
+                        : undefined
+                    }
+                  >
+                    {!logoUrl && (
+                      <span className="w-full h-full flex items-center justify-center text-2xl font-bold text-[#16a459]">
+                        {org.nombre.charAt(0)}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-lg font-bold text-[#1A202C] mb-1 group-hover:text-[#16a459] transition-colors leading-tight line-clamp-2">
+                    {org.nombre}
+                  </h3>
+                  {org.descripcion && (
+                    <p className="text-xs text-slate-400 mt-4 leading-relaxed line-clamp-3">
+                      {org.descripcion}
+                    </p>
+                  )}
+                </div>
+                <Link
+                  href="/donar"
+                  className="w-full bg-[#16a459] text-white py-4 font-bold text-sm tracking-wide hover:bg-[#138e4d] transition-colors mt-auto text-center"
+                >
+                  Donar
+                </Link>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* CTA */}
         <div className="text-center mt-12">
           <Link
-            href="/ongs"
-            className="inline-block px-8 py-3 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
-            style={{ backgroundColor: "#16a459" }}
+            href="/donar"
+            className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#16a459] text-white font-semibold rounded-xl shadow-lg hover:bg-[#138c4a] hover:shadow-xl transition-all"
           >
-            Ver todas nuestras ONGs aliadas
+            <Heart className="w-4 h-4" />
+            Ver todas y donar
           </Link>
         </div>
       </div>

@@ -12,9 +12,11 @@ import {
   CategoriaDto,
 } from "@/lib/bonda";
 import { obtenerMisCupones, CuponSolicitado } from "@/lib/dashboard";
+import { getOrganizationLogoUrl } from "@/lib/organization-logos";
 import CuponDetalleModal from "@/components/dashboard/CuponDetalleModal";
 import SeccionPerfil from "@/components/dashboard/SeccionPerfil";
 import SeccionMisCupones from "@/components/dashboard/SeccionMisCupones";
+import SeccionMisPagos from "@/components/dashboard/SeccionMisPagos";
 import {
   Ticket,
   CheckCircle2,
@@ -35,9 +37,10 @@ import {
   Plane,
   Shirt,
   Car,
+  Receipt,
 } from "lucide-react";
 
-type ActiveTab = "inicio" | "perfil" | "cupones";
+type ActiveTab = "inicio" | "perfil" | "cupones" | "pagos";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -60,6 +63,7 @@ export default function DashboardPage() {
   const [busquedaActiva, setBusquedaActiva] = useState(false);
   const [cuponSeleccionado, setCuponSeleccionado] = useState<PublicCouponDto | null>(null);
   const [misCupones, setMisCupones] = useState<CuponSolicitado[]>([]);
+  const [fundacionLogoError, setFundacionLogoError] = useState<Record<string, boolean>>({});
   const CUPONES_POR_PAGINA = 10;
 
   useEffect(() => {
@@ -339,6 +343,13 @@ export default function DashboardPage() {
               <Gift className="w-6 h-6" strokeWidth={2} />
               <span className={`text-xs ${activeTab === "cupones" ? "font-semibold" : "font-medium"}`}>Mis Cupones</span>
             </button>
+            <button
+              onClick={() => setActiveTab("pagos")}
+              className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "pagos" ? "text-[#16a459]" : "text-slate-400 hover:text-[#16a459]"}`}
+            >
+              <Receipt className="w-6 h-6" strokeWidth={2} />
+              <span className={`text-xs ${activeTab === "pagos" ? "font-semibold" : "font-medium"}`}>Mis pagos</span>
+            </button>
             <a
               href="/donar"
               className="flex flex-col items-center gap-1 text-slate-400 hover:text-[#16a459] transition-colors"
@@ -358,9 +369,10 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* Secciones Perfil y Mis Cupones */}
+      {/* Secciones Perfil, Mis Cupones y Mis pagos */}
       {activeTab === "perfil" && <SeccionPerfil />}
       {activeTab === "cupones" && <SeccionMisCupones />}
+      {activeTab === "pagos" && <SeccionMisPagos />}
 
       <main className={`max-w-7xl mx-auto px-6 py-6 space-y-6 ${activeTab !== "inicio" ? "hidden" : ""}`}>
         {/* Impact Summary */}
@@ -427,54 +439,58 @@ export default function DashboardPage() {
           </div>
           <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4">
             {dashboard.fundaciones && dashboard.fundaciones.length > 0 ? (
-              dashboard.fundaciones.map((fundacion) => (
+              dashboard.fundaciones.map((fundacion) => {
+                const logoUrl = getOrganizationLogoUrl(fundacion.nombre, fundacion.slug);
+                const useLogo = !!logoUrl && !fundacionLogoError[fundacion.id];
+                const initialsBg = `url(https://ui-avatars.com/api/?name=${encodeURIComponent(fundacion.nombre)}&background=16a459&color=fff&size=128)`;
+                const totalDonado = fundacion.totalDonado ?? 0;
+                const totalFormateado = totalDonado.toLocaleString("es-AR");
+                return (
                 <div
                   key={fundacion.id}
-                  className="min-w-[280px] bg-white border border-slate-100 rounded-3xl p-5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)]"
+                  className="min-w-[260px] max-w-[280px] bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-[0_4px_20px_-2px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] transition-shadow"
                 >
-                  <div className="flex items-center gap-4 mb-5">
-                    <div
-                      className="size-14 rounded-2xl bg-cover bg-center shrink-0 shadow-sm"
-                      style={{
-                        backgroundImage: `url(https://ui-avatars.com/api/?name=${encodeURIComponent(fundacion.nombre)}&background=16a459&color=fff&size=128)`,
-                      }}
-                    ></div>
-                    <div>
-                      <h4 className="font-bold text-[#1A202C] text-base">
-                        {fundacion.nombre}
-                      </h4>
-                      <p className="text-[11px] text-[#718096]">
-                        Desde{" "}
-                        {new Date(fundacion.fechaAfiliacion).toLocaleDateString(
-                          "es-AR",
-                          {
-                            month: "short",
-                            year: "numeric",
-                          },
-                        )}
-                      </p>
+                  {/* Bloque logo centrado (sin caja: solo logo visible) */}
+                  <div className="pt-6 pb-4 px-6 flex flex-col items-center">
+                    <div className="size-20 shrink-0 flex items-center justify-center overflow-hidden">
+                      {useLogo && logoUrl ? (
+                        <img
+                          src={logoUrl}
+                          alt=""
+                          className="size-20 object-contain object-center"
+                          onError={() => setFundacionLogoError((prev) => ({ ...prev, [fundacion.id]: true }))}
+                        />
+                      ) : (
+                        <div
+                          className="size-20 rounded-full bg-cover bg-center shrink-0"
+                          style={{ backgroundImage: initialsBg }}
+                          aria-hidden
+                        />
+                      )}
                     </div>
+                    <h4 className="font-bold text-[#1A202C] text-sm text-center mt-3 line-clamp-3 min-h-[3.25rem] leading-tight">
+                      {fundacion.nombre}
+                    </h4>
+                    <p className="text-[11px] text-slate-400 mt-1">
+                      Desde{" "}
+                      {new Date(fundacion.fechaAfiliacion).toLocaleDateString("es-AR", {
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </p>
                   </div>
-                  <div className="flex justify-between items-end border-t border-slate-50 pt-4">
-                    <div>
-                      <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">
-                        Impacto
-                      </p>
-                      <p className="text-lg font-bold text-[#16a459]">
-                        $0.00{" "}
-                        <span className="text-[10px] text-slate-400 font-normal">
-                          donado
-                        </span>
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <span className="inline-block px-2 py-1 bg-slate-50 rounded text-[10px] font-bold text-slate-500 uppercase">
-                        Único
-                      </span>
-                    </div>
+                  {/* Bloque donado destacado */}
+                  <div className="bg-[#16a459]/08 border-t border-[#16a459]/15 px-6 py-4">
+                    <p className="text-[10px] text-[#16a459] uppercase font-bold tracking-wider mb-0.5">
+                      Tu aporte
+                    </p>
+                    <p className="text-xl font-bold text-[#16a459]">
+                      ${totalFormateado}
+                    </p>
                   </div>
                 </div>
-              ))
+              );
+              })
             ) : (
               <div className="min-w-full bg-white border border-slate-100 rounded-3xl p-8 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] text-center">
                 <span className="text-4xl mb-2 block">💝</span>

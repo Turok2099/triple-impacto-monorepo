@@ -847,54 +847,75 @@ export class SupabaseService implements OnModuleInit {
   }
 
   /**
-   * Obtener fundaciones/micrositios a los que el usuario ha donado
+   * Obtener listado de donaciones (pagos) del usuario para resumen en dashboard.
+   * Solo donaciones completadas, ordenadas por fecha descendente.
    */
-  async getFundacionesUsuario(usuarioId: string) {
-    // Buscar donaciones completadas únicas por organización
-    const { data: donaciones, error } = await this.from('donaciones')
-      .select(`
-        organizacion_id,
-        organizacion_nombre,
-        created_at
-      `)
+  async getDonacionesUsuario(usuarioId: string) {
+    const { data, error } = await this.from('donaciones')
+      .select('id, monto, moneda, estado, metodo_pago, organizacion_nombre, payment_id, payment_status, created_at')
       .eq('usuario_id', usuarioId)
       .eq('estado', 'completada')
-      .order('created_at', { ascending: true }); // Para mantener la "fecha de afiliación" original
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      this.logger.error('Error al obtener donaciones del usuario:', error);
+      throw error;
+    }
+
+    return data ?? [];
+  }
+
+  /**
+   * Obtener fundaciones/micrositios a los que el usuario ha donado, con total donado por organización
+   */
+  async getFundacionesUsuario(usuarioId: string) {
+    const { data: donaciones, error } = await this.from('donaciones')
+      .select('organizacion_id, organizacion_nombre, monto, created_at')
+      .eq('usuario_id', usuarioId)
+      .eq('estado', 'completada')
+      .order('created_at', { ascending: true });
 
     if (error) {
       this.logger.error('Error al obtener fundaciones (donaciones) del usuario:', error);
       throw error;
     }
 
-    // Deduplicar por organizacion_id en memoria (ya que Supabase JS no tiene DISTINCT nativo fácil)
-    const fundacionesUnicas: any[] = [];
-    const idsVistos = new Set();
-
+    // Agrupar por organizacion_id: sumar montos y conservar primera fecha y nombre
+    const porOrg: Record<string, { organizacion_nombre: string; created_at: string; totalDonado: number }> = {};
     for (const dono of donaciones || []) {
-      if (dono.organizacion_id && !idsVistos.has(dono.organizacion_id)) {
-        idsVistos.add(dono.organizacion_id);
-
-        // Obtener datos del micrositio Bonda asociado a esta ONG para el slug
-        const { data: microsite } = await this.from('bonda_microsites')
-          .select('id, slug')
-          .eq('organizacion_id', dono.organizacion_id)
-          .maybeSingle();
-
-        // Obtener código de afiliado (si existe) para el modal de cupones
-        const { data: afiliado } = await this.from('usuarios_bonda_afiliados')
-          .select('affiliate_code')
-          .eq('user_id', usuarioId)
-          .eq('bonda_microsite_id', microsite?.id)
-          .maybeSingle();
-
-        fundacionesUnicas.push({
-          bonda_microsite_id: microsite?.id || dono.organizacion_id,
-          micrositio_nombre: dono.organizacion_nombre || 'ONG',
-          micrositio_slug: microsite?.slug || '',
-          affiliate_code: afiliado?.affiliate_code || '',
+      if (!dono.organizacion_id) continue;
+      const id = dono.organizacion_id;
+      if (!porOrg[id]) {
+        porOrg[id] = {
+          organizacion_nombre: dono.organizacion_nombre || 'ONG',
           created_at: dono.created_at,
-        });
+          totalDonado: 0,
+        };
       }
+      porOrg[id].totalDonado += Number(dono.monto ?? 0);
+    }
+
+    const fundacionesUnicas: any[] = [];
+    for (const [organizacionId, agg] of Object.entries(porOrg)) {
+      const { data: microsite } = await this.from('bonda_microsites')
+        .select('id, slug')
+        .eq('organizacion_id', organizacionId)
+        .maybeSingle();
+
+      const { data: afiliado } = await this.from('usuarios_bonda_afiliados')
+        .select('affiliate_code')
+        .eq('user_id', usuarioId)
+        .eq('bonda_microsite_id', microsite?.id)
+        .maybeSingle();
+
+      fundacionesUnicas.push({
+        bonda_microsite_id: microsite?.id || organizacionId,
+        micrositio_nombre: agg.organizacion_nombre,
+        micrositio_slug: microsite?.slug || '',
+        affiliate_code: afiliado?.affiliate_code || '',
+        created_at: agg.created_at,
+        total_donado: agg.totalDonado,
+      });
     }
 
     return fundacionesUnicas;

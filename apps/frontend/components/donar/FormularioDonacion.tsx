@@ -10,23 +10,7 @@ import {
   validarMonto,
   type Organizacion,
 } from "@/lib/payments";
-
-const LOGO_MAP: Record<string, string> = {
-  "Biblioteca Popular Rurales Argentinas": "BIBLIOTECAS ARGENTINAS ARGENTINA.jpg",
-  "Fundacion Padres": "FUNDACION PADRES.jpg",
-  "Fundación Padres": "FUNDACION PADRES.jpg",
-  "Haciendo Camino": "HACIENDO CAMINO.jpg",
-  "La Guarida": "LA GUARIDA.jpg",
-  "Loros Parlantes": "LOROS PARLANTES.jpg",
-  "Mamis Solidarias": "MAMIS SOLIDARIAS.jpg",
-  "Monte Adentro": "MONTE ADENTRO.jpg",
-  "Plato Lleno": "PLATO LLENO.jpg",
-  "Fundación Plato Lleno": "PLATO LLENO.jpg",
-  "Proactiva": "PROACTIVA.jpg",
-  "Proyectarr": "PROYECTARR.jpg",
-  "Regenerar": "REGENERAR.jpg",
-  "TECHO Argentina": "TECHO ARGENTINA.jpg"
-};
+import { getOrganizationLogoUrl } from "@/lib/organization-logos";
 
 interface FormularioDonacionProps {
   onSubmit: (monto: number, organizacionId?: string) => void;
@@ -216,15 +200,26 @@ export default function FormularioDonacion({
             </select>
 
             {/* Información de la organización seleccionada */}
-            {organizacionSeleccionada && (
+            {organizacionSeleccionada && (() => {
+              const logoUrl = getOrganizationLogoUrl(organizacionSeleccionada.nombre);
+              return (
               <div className="mt-4 p-5 bg-white border border-slate-200 shadow-sm rounded-xl flex flex-col md:flex-row items-center gap-5 text-center md:text-left transition-all">
-                <div className="relative w-36 h-36 rounded-full border shadow-sm border-slate-100 overflow-hidden flex-shrink-0 bg-white">
-                  <Image
-                    src={`/logos/${LOGO_MAP[organizacionSeleccionada.nombre] || "FUNDACION PADRES.jpg"}`}
-                    alt={organizacionSeleccionada.nombre}
-                    fill
-                    className="object-contain p-2"
-                  />
+                <div className="relative w-36 h-36 overflow-hidden shrink-0 flex items-center justify-center">
+                  {logoUrl ? (
+                    <Image
+                      src={logoUrl}
+                      alt={organizacionSeleccionada.nombre}
+                      fill
+                      className="object-contain object-center"
+                    />
+                  ) : (
+                    <div
+                      className="w-full h-full flex items-center justify-center text-emerald-600 text-4xl font-bold"
+                      aria-hidden
+                    >
+                      {organizacionSeleccionada.nombre.charAt(0)}
+                    </div>
+                  )}
                 </div>
                 <div className="flex-1">
                   <h4 className="font-bold text-slate-900 text-lg mb-1">
@@ -237,7 +232,8 @@ export default function FormularioDonacion({
                   )}
                 </div>
               </div>
-            )}
+              );
+            })()}
           </>
         )}
       </div>

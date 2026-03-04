@@ -46,6 +46,7 @@ export interface FundacionUsuario {
   slug: string;
   codigoAfiliado: string;
   fechaAfiliacion: string;
+  totalDonado: number;
 }
 
 export interface DashboardUsuario {
@@ -66,6 +67,19 @@ export interface HistorialCupones {
   pagina: number;
   limite: number;
   totalPaginas: number;
+}
+
+/** Donación/pago completado para resumen en dashboard */
+export interface DonacionResumen {
+  id: string;
+  monto: string;
+  moneda: string;
+  estado: string;
+  metodo_pago: string | null;
+  organizacion_nombre: string | null;
+  payment_id: string | null;
+  payment_status: string | null;
+  created_at: string;
 }
 
 export interface SolicitarCuponRequest {
@@ -190,6 +204,26 @@ export async function obtenerHistorialCupones(
 
   if (!response.ok) {
     throw new Error('Error al obtener historial de cupones');
+  }
+
+  return response.json();
+}
+
+/**
+ * Obtener resumen de pagos/donaciones del usuario (para control del cliente)
+ */
+export async function obtenerMisDonaciones(
+  token: string,
+): Promise<DonacionResumen[]> {
+  const response = await fetch(`${API_URL}/bonda/mis-donaciones`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Error al obtener tus pagos');
   }
 
   return response.json();

@@ -13,10 +13,13 @@ interface User {
   localidad?: string | null;
 }
 
+const LOGOUT_DELAY_MS = 700;
+
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isLoggingOut: boolean;
   login: (token: string, userData: User) => void;
   logout: () => void;
   handleSessionExpired: () => void;
@@ -27,6 +30,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // Verificar si hay un usuario logueado al cargar
   useEffect(() => {
@@ -54,11 +58,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("user");
-    setUser(null);
-    // Redirigir a la home
-    window.location.href = "/";
+    setIsLoggingOut(true);
+    setTimeout(() => {
+      localStorage.removeItem("auth_token");
+      localStorage.removeItem("user");
+      setUser(null);
+      window.location.href = "/";
+    }, LOGOUT_DELAY_MS);
   };
 
   const handleSessionExpired = () => {
@@ -77,12 +83,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         isAuthenticated: !!user,
         isLoading,
+        isLoggingOut,
         login,
         logout,
         handleSessionExpired,
       }}
     >
       {children}
+      {isLoggingOut && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-white/95 backdrop-blur-sm"
+          aria-live="polite"
+          aria-label="Cerrando sesión"
+        >
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4" />
+            <p className="text-gray-700 font-medium">Cerrando sesión...</p>
+          </div>
+        </div>
+      )}
     </AuthContext.Provider>
   );
 }

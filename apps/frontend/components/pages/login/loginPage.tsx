@@ -93,7 +93,7 @@ export default function LoginPage() {
                     Tu sesión expiró
                   </p>
                   <p className="text-sm text-amber-800">
-                    Por seguridad, las sesiones expiran después de 24 horas. Por favor, iniciá sesión nuevamente.
+                    Por seguridad, las sesiones expiran después de 12 horas. Por favor, iniciá sesión nuevamente.
                   </p>
                 </div>
               </div>

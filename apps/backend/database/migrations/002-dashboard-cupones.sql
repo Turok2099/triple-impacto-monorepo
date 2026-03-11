@@ -102,7 +102,7 @@ CREATE POLICY "Los usuarios pueden actualizar sus propios cupones"
 -- VISTA: Estadísticas de usuario
 -- Para mostrar en el dashboard
 -- ============================================
-CREATE OR REPLACE VIEW usuario_estadisticas_cupones AS
+CREATE OR REPLACE VIEW usuario_estadisticas_cupones WITH (security_invoker = on) AS
 SELECT 
   usuario_id,
   COUNT(*) FILTER (WHERE estado = 'activo') as cupones_activos,

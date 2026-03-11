@@ -109,12 +109,12 @@ export class FiservConnectService implements OnModuleInit {
     const currency = getCurrencyCode(input.currency); // Convertir a código numérico ISO 4217
 
     const params: Record<string, string> = {
-      txntype: 'sale',
+      txntype: input.txntype || 'sale',
       timezone: this.config.timezone,
       txndatetime,
       hash_algorithm: 'HMACSHA256',
       mode: 'payonly',
-      storename: this.config.storeId,
+      storename: input.storename || this.config.storeId,
       chargetotal,
       currency,
       responseFailURL: input.responseFailURL,
@@ -129,6 +129,18 @@ export class FiservConnectService implements OnModuleInit {
     }
     if (input.merchantTransactionId) {
       params.merchantTransactionId = input.merchantTransactionId.slice(0, 40);
+    }
+    if (input.numberOfInstallments) {
+      params.numberOfInstallments = input.numberOfInstallments;
+    }
+    if (input.referencedMerchantTransactionId) {
+      params.referencedMerchantTransactionId = input.referencedMerchantTransactionId.slice(0, 40);
+    }
+    if (input.authenticateTransaction) {
+      params.authenticateTransaction = input.authenticateTransaction;
+    }
+    if (input.threeDSEmvCoMessageCategory) {
+      params.threeDSEmvCoMessageCategory = input.threeDSEmvCoMessageCategory;
     }
 
     params.checkoutoption = 'combinedpage';

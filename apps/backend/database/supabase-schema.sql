@@ -191,6 +191,7 @@ COMMENT ON COLUMN bonda_microsites.slug IS 'Identificador único para resolver c
 -- ============================================
 -- Tabla: usuarios_bonda_afiliados
 -- Relación N:N usuario ↔ micrositio Bonda. Un usuario puede tener un affiliate_code por ONG.
+-- El mismo affiliate_code puede repetirse para el mismo usuario en distintos micrositios (ej. mismo DNI en varias ONGs).
 -- Se crea/actualiza tras la confirmación del primer pago (webhook Fiserv) por esa ONG.
 -- ============================================
 CREATE TABLE IF NOT EXISTS usuarios_bonda_afiliados (
@@ -204,9 +205,9 @@ CREATE TABLE IF NOT EXISTS usuarios_bonda_afiliados (
 
 CREATE INDEX IF NOT EXISTS idx_usuarios_bonda_afiliados_user ON usuarios_bonda_afiliados(user_id);
 CREATE INDEX IF NOT EXISTS idx_usuarios_bonda_afiliados_microsite ON usuarios_bonda_afiliados(bonda_microsite_id);
-CREATE UNIQUE INDEX IF NOT EXISTS idx_usuarios_bonda_afiliados_code ON usuarios_bonda_afiliados(affiliate_code);
+CREATE INDEX IF NOT EXISTS idx_usuarios_bonda_afiliados_code ON usuarios_bonda_afiliados(affiliate_code);
 
-COMMENT ON TABLE usuarios_bonda_afiliados IS 'Afiliados Bonda por usuario y micrositio; un código por (usuario, ONG)';
+COMMENT ON TABLE usuarios_bonda_afiliados IS 'Afiliados Bonda por usuario y micrositio; un usuario puede repetir affiliate_code en distintos micrositios (mismo DNI en varias ONGs).';
 COMMENT ON COLUMN usuarios_bonda_afiliados.affiliate_code IS 'Código de afiliado en Bonda para este usuario en este micrositio';
 
 -- ============================================

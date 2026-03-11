@@ -217,12 +217,18 @@ export class FiservWebhookService {
         res?.error?.code === 'HttpPublicResponseException' &&
         res?.error?.detail?.code?.[0]?.includes('ya lo está utilizando')
       ) {
-        // Bonda rechazó la creación porque el afiliado (DNI/code) ya existe.
-        // Esto es un falso error para nosotros, simplemente lo vinculamos en nuestra BD.
-        this.logger.log(
-          `Fiserv webhook: afiliado Bonda ya existía en Bonda org=${organizacionId}. Vinculando user=${userId} code=${code}`,
-        );
-        await this.supabase.upsertAffiliateForUser(userId, microsite.id, code);
+        // Verificar si el código (DNI) ya pertenece a OTRA cuenta en nuestra BD
+        const userWithCode = await this.supabase.findUserByBondaCode(code);
+        if (userWithCode && userWithCode.id !== userId) {
+          this.logger.warn(
+            `Fiserv webhook ALERTA DE SEGURIDAD: El usuario ${userId} intentó mapearse al afiliado Bonda ${code} que YA pertenece al usuario ${userWithCode.id}. Abortando vinculación.`,
+          );
+        } else {
+          this.logger.log(
+            `Fiserv webhook: afiliado Bonda ya existía en Bonda org=${organizacionId}. Vinculando user=${userId} code=${code}`,
+          );
+          await this.supabase.upsertAffiliateForUser(userId, microsite.id, code);
+        }
       } else {
         this.logger.error(`Fiserv webhook: Bonda retornó success: false al crear afiliado`, res);
       }
@@ -231,10 +237,18 @@ export class FiservWebhookService {
         err?.response?.data?.error?.code === 'HttpPublicResponseException' &&
         err?.response?.data?.error?.detail?.code?.[0]?.includes('ya lo está utilizando')
       ) {
-        this.logger.log(
-          `Fiserv webhook: afiliado Bonda ya existía en Bonda org=${organizacionId}. Vinculando user=${userId} code=${code}`,
-        );
-        await this.supabase.upsertAffiliateForUser(userId, microsite.id, code);
+        // Verificar si el código (DNI) ya pertenece a OTRA cuenta en nuestra BD
+        const userWithCode = await this.supabase.findUserByBondaCode(code);
+        if (userWithCode && userWithCode.id !== userId) {
+          this.logger.warn(
+            `Fiserv webhook ALERTA DE SEGURIDAD: El usuario ${userId} intentó mapearse al afiliado Bonda ${code} que YA pertenece al usuario ${userWithCode.id}. Abortando vinculación.`,
+          );
+        } else {
+          this.logger.log(
+            `Fiserv webhook: afiliado Bonda ya existía en Bonda org=${organizacionId}. Vinculando user=${userId} code=${code}`,
+          );
+          await this.supabase.upsertAffiliateForUser(userId, microsite.id, code);
+        }
       } else {
         this.logger.error(
           `Fiserv webhook: excepción al crear afiliado Bonda user=${userId} org=${organizacionId}`,

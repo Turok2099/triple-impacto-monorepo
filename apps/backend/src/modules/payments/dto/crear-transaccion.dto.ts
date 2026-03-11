@@ -46,4 +46,16 @@ export class CrearTransaccionDto {
   })
   @IsOptional()
   transactionNotificationURL?: string;
+
+  @IsString()
+  @IsOptional()
+  storename?: string;
+
+  @IsString()
+  @IsOptional()
+  txntype?: string;
+
+  @IsString()
+  @IsOptional()
+  numberOfInstallments?: string;
 }

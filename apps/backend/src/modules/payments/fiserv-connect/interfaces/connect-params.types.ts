@@ -21,6 +21,10 @@ export interface ConnectPaymentParams {
   merchantTransactionId?: string;
   /** Opcional: combinedpage para ver formulario en una sola página */
   checkoutoption?: string;
+  /** Opcional: número de cuotas */
+  numberOfInstallments?: string;
+  /** Opcional: ID de la transacción original de venta para anulaciones */
+  referencedMerchantTransactionId?: string;
   [key: string]: string | undefined;
 }
 
@@ -48,4 +52,16 @@ export interface BuildPaymentParamsInput {
   oid?: string;
   /** ID de transacción del comercio (opcional) */
   merchantTransactionId?: string;
+  /** Tienda específica (sobrescribe la default) */
+  storename?: string;
+  /** Tipo de transacción (sale, preauth) */
+  txntype?: string;
+  /** Número de cuotas */
+  numberOfInstallments?: string;
+  /** ID de la transacción original de venta para anulaciones (VOID) */
+  referencedMerchantTransactionId?: string;
+  /** Para Data Only 3DS: autenticación explícita */
+  authenticateTransaction?: string;
+  /** Para Data Only 3DS: categoría de mensaje EMVCo */
+  threeDSEmvCoMessageCategory?: string;
 }

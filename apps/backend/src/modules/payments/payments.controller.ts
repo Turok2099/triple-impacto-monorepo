@@ -40,7 +40,7 @@ export class PaymentsController {
     private readonly fiservWebhook: FiservWebhookService,
     private readonly fiservConnect: FiservConnectService,
     private readonly supabase: SupabaseService,
-  ) {}
+  ) { }
 
   /**
    * Crear transacción: genera payment_attempt y devuelve params + URL para que el front
@@ -57,6 +57,8 @@ export class PaymentsController {
     if (!userId) {
       throw new BadRequestException('Se requiere autenticación');
     }
+
+
 
     const config = this.fiservConnect.getConfig();
     if (!config) {
@@ -101,7 +103,7 @@ export class PaymentsController {
     await this.supabase.createPaymentAttempt({
       user_id: userId,
       order_id: orderId,
-      store_id: config.storeId,
+      store_id: body.storename || config.storeId,
       amount: body.amount,
       currency,
       organizacion_id: body.organizacion_id,
@@ -115,6 +117,12 @@ export class PaymentsController {
       transactionNotificationURL: notificationURL,
       oid: orderId,
       merchantTransactionId: orderId,
+      storename: body.storename,
+      txntype: body.txntype,
+      numberOfInstallments: body.numberOfInstallments,
+      referencedMerchantTransactionId: (body as any).referencedMerchantTransactionId,
+      authenticateTransaction: (body as any).authenticateTransaction,
+      threeDSEmvCoMessageCategory: (body as any).threeDSEmvCoMessageCategory,
     });
 
     if (!formParams) {
@@ -147,5 +155,26 @@ export class PaymentsController {
       this.logger.warn(`Fiserv notification error: ${msg}`);
       throw new BadRequestException(msg);
     }
+  }
+
+  @Post('posauth')
+  @UseGuards(JwtAuthGuard)
+  async captureTransaccion(@Body() body: any) {
+    this.logger.log(`Mock POSAUTH api call para orden: ${JSON.stringify(body)}`);
+    return { ok: true, message: 'POSAUTH procesado vía API REST Backend' };
+  }
+
+  @Post('void')
+  @UseGuards(JwtAuthGuard)
+  async voidTransaccion(@Body() body: any) {
+    this.logger.log(`Mock VOID api call para orden: ${JSON.stringify(body)}`);
+    return { ok: true, message: 'VOID procesado vía API REST Backend' };
+  }
+
+  @Post('return')
+  @UseGuards(JwtAuthGuard)
+  async returnTransaccion(@Body() body: any) {
+    this.logger.log(`Mock RETURN api call para orden: ${JSON.stringify(body)}`);
+    return { ok: true, message: 'RETURN procesado vía API REST Backend' };
   }
 }

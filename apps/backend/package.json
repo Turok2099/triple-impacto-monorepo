@@ -18,7 +18,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "analizar-bonda": "ts-node -r tsconfig-paths/register scripts/analizar-cupones-bonda.ts"
+    "analizar-bonda": "ts-node -r tsconfig-paths/register scripts/analizar-cupones-bonda.ts",
+    "test:fiserv-declined": "ts-node -r tsconfig-paths/register scripts/fiserv-declined-tests.ts",
+    "test:fiserv-connect": "ts-node -r tsconfig-paths/register scripts/fiserv-connect-test-cases.ts"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.1",
@@ -67,7 +69,8 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript-eslint": "^8.20.0"
+    "typescript-eslint": "^8.20.0",
+    "playwright": "^1.49.0"
   },
   "jest": {
     "moduleFileExtensions": [

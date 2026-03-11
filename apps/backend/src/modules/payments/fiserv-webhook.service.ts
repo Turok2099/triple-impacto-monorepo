@@ -43,8 +43,16 @@ export class FiservWebhookService {
     const chargetotal = str(body.chargetotal);
     const currency = str(body.currency);
     const txndatetime = str(body.txndatetime);
-    // ¡CRÍTICO! Fiserv omite el storename en el webhook, usamos el del config.
-    const storename = str(body.storename) || config.storeId;
+    const attempt = await this.supabase.getPaymentAttemptByOrderId(oid);
+    if (!attempt) {
+      this.logger.warn(
+        `Fiserv notification: payment_attempt no encontrado oid=${oid}`,
+      );
+      return;
+    }
+
+    // ¡CRÍTICO! Fiserv omite el storename en el webhook. Usamos el store_id guardado en base de datos.
+    const storename = str(body.storename) || attempt.store_id || config.storeId;
     const approvalCode = str(body.approval_code);
     const notificationHash = str(body.response_hash) || str(body.hash) || str(body.notification_hash);
     const ipgTransactionId = str(body.ipgTransactionId);
@@ -91,16 +99,8 @@ export class FiservWebhookService {
     );
 
     if (!hashValid && !hashValidFallback) {
-      this.logger.warn('Fiserv notification: hash inválido (ni como fallback)');
+      this.logger.warn('Fiserv notification: hash inválido (ni como fallback). Store utilizado: ' + storename);
       throw new Error('Hash de notificación inválido');
-    }
-
-    const attempt = await this.supabase.getPaymentAttemptByOrderId(oid);
-    if (!attempt) {
-      this.logger.warn(
-        `Fiserv notification: payment_attempt no encontrado oid=${oid}`,
-      );
-      return;
     }
 
     if (attempt.status === 'completed') {

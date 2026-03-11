@@ -192,4 +192,8 @@ apps/backend/database/seed-bonda-microsites.sql
 apps/backend/database/seed-test-user-bonda.sql
 apps/backend/database/seed-usuarios-prueba-bonda.sql
 apps/backend/database/setup-test-user-affiliate.sql
+
+# Carpetas enteras con información sensible de base de datos y scripts
+apps/backend/database/
+apps/backend/scripts/
 # NOTA: El README.md de la raíz del proyecto SÍ se sube (no está ignorado)

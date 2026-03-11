@@ -187,4 +187,9 @@ apps/backend/database/ROUND-ROBIN-MICROSITIOS.md
 apps/backend/database/VALIDACION-CUPONES-LANDING.md
 apps/backend/database/PLAN-PRUEBAS-BONDA.md
 
+# Seeds y scripts con credenciales/información de prueba sensible (Bonda + Supabase)
+apps/backend/database/seed-bonda-microsites.sql
+apps/backend/database/seed-test-user-bonda.sql
+apps/backend/database/seed-usuarios-prueba-bonda.sql
+apps/backend/database/setup-test-user-affiliate.sql
 # NOTA: El README.md de la raíz del proyecto SÍ se sube (no está ignorado)

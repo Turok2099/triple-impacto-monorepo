@@ -7,8 +7,8 @@ async function bootstrap() {
 
   // Configurar CORS para desarrollo y producción
   const allowedOrigins = [
-    'http://localhost:3001',              // Frontend local
-    'http://localhost:3000',              // Backend local
+    'http://localhost:3001', // Frontend local
+    'http://localhost:3000', // Backend local
   ];
 
   // En producción, agregar la URL de Vercel
@@ -20,10 +20,10 @@ async function bootstrap() {
     origin: (origin, callback) => {
       // Permitir requests sin origin (Postman, curl, etc)
       if (!origin) return callback(null, true);
-      
+
       // Verificar si el origin está permitido
       if (
-        allowedOrigins.includes(origin) || 
+        allowedOrigins.includes(origin) ||
         origin.endsWith('.vercel.app') ||
         origin.endsWith('.tripleimpacto.site')
       ) {

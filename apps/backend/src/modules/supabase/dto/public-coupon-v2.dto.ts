@@ -6,12 +6,12 @@ export class PublicCouponV2Dto {
   id: string;
   bonda_cupon_id: string;
   bonda_microsite_id?: string;
-  
+
   // Información básica
   nombre: string;
   descuento?: string;
   descripcion_breve?: string;
-  
+
   // Empresa
   empresa_nombre?: string;
   empresa_id?: string;
@@ -25,7 +25,7 @@ export class PublicCouponV2Dto {
     };
     descripcion?: string;
   };
-  
+
   // Imágenes
   imagen_principal_url?: string;
   imagen_thumbnail_url?: string;
@@ -42,12 +42,12 @@ export class PublicCouponV2Dto {
       '240x80'?: string;
     };
   };
-  
+
   // Contenido HTML
   descripcion_micrositio?: string;
   usage_instructions?: string;
   legales?: string;
-  
+
   // Categorización
   categorias?: Array<{
     id: number;
@@ -55,7 +55,7 @@ export class PublicCouponV2Dto {
     parent_id?: string;
   }>;
   categoria_principal?: string;
-  
+
   // Validez y uso
   fecha_vencimiento?: string;
   activo: boolean;
@@ -67,7 +67,7 @@ export class PublicCouponV2Dto {
     whatsapp?: boolean;
   };
   permitir_sms?: boolean;
-  
+
   // Metadata
   orden?: number;
   created_at?: string;

@@ -7,7 +7,7 @@ export class SupabaseService implements OnModuleInit {
   private readonly logger = new Logger(SupabaseService.name);
   private supabaseClient: SupabaseClient;
 
-  constructor(private readonly configService: ConfigService) { }
+  constructor(private readonly configService: ConfigService) {}
 
   onModuleInit() {
     const supabaseUrl = this.configService.get<string>('supabase.url');
@@ -152,7 +152,10 @@ export class SupabaseService implements OnModuleInit {
    */
   async updateUserPassword(userId: string, passwordHash: string) {
     const { error } = await this.from('usuarios')
-      .update({ password_hash: passwordHash, updated_at: new Date().toISOString() })
+      .update({
+        password_hash: passwordHash,
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', userId);
 
     if (error) {
@@ -423,10 +426,10 @@ export class SupabaseService implements OnModuleInit {
 
   /**
    * [DEPRECADO] Obtener cupones desde tabla local public_coupons.
-   * 
+   *
    * ⚠️ Este método ya no se usa. Los cupones ahora se obtienen directamente
    * de Bonda API en tiempo real a través de /public/cupones-bonda
-   * 
+   *
    * La tabla public_coupons se mantiene para sincronizaciones programadas
    * pero NO se usa en el flujo principal del frontend.
    */
@@ -870,7 +873,9 @@ export class SupabaseService implements OnModuleInit {
    */
   async getDonacionesUsuario(usuarioId: string) {
     const { data, error } = await this.from('donaciones')
-      .select('id, monto, moneda, estado, metodo_pago, organizacion_nombre, payment_id, payment_status, created_at')
+      .select(
+        'id, monto, moneda, estado, metodo_pago, organizacion_nombre, payment_id, payment_status, created_at',
+      )
       .eq('usuario_id', usuarioId)
       .eq('estado', 'completada')
       .order('created_at', { ascending: false });
@@ -894,12 +899,18 @@ export class SupabaseService implements OnModuleInit {
       .order('created_at', { ascending: true });
 
     if (error) {
-      this.logger.error('Error al obtener fundaciones (donaciones) del usuario:', error);
+      this.logger.error(
+        'Error al obtener fundaciones (donaciones) del usuario:',
+        error,
+      );
       throw error;
     }
 
     // Agrupar por organizacion_id: sumar montos y conservar primera fecha y nombre
-    const porOrg: Record<string, { organizacion_nombre: string; created_at: string; totalDonado: number }> = {};
+    const porOrg: Record<
+      string,
+      { organizacion_nombre: string; created_at: string; totalDonado: number }
+    > = {};
     for (const dono of donaciones || []) {
       if (!dono.organizacion_id) continue;
       const id = dono.organizacion_id;
@@ -963,14 +974,19 @@ export class SupabaseService implements OnModuleInit {
    */
   async getMicrositiosUsuario(usuarioId: string): Promise<string[]> {
     // Obtener organizaciones a las que el usuario ha donado
-    const { data: donaciones, error: donacionesError } = await this.from('donaciones')
+    const { data: donaciones, error: donacionesError } = await this.from(
+      'donaciones',
+    )
       .select('organizacion_id')
       .eq('usuario_id', usuarioId)
       .eq('estado', 'completada')
       .not('organizacion_id', 'is', null);
 
     if (donacionesError) {
-      this.logger.error('Error al obtener donaciones del usuario:', donacionesError);
+      this.logger.error(
+        'Error al obtener donaciones del usuario:',
+        donacionesError,
+      );
       throw donacionesError;
     }
 
@@ -980,10 +996,14 @@ export class SupabaseService implements OnModuleInit {
     }
 
     // Extraer IDs únicos de organizaciones
-    const organizacionIds = [...new Set(donaciones.map(d => d.organizacion_id))];
+    const organizacionIds = [
+      ...new Set(donaciones.map((d) => d.organizacion_id)),
+    ];
 
     // Obtener micrositios de esas organizaciones
-    const { data: micrositios, error: micrositiosError } = await this.from('bonda_microsites')
+    const { data: micrositios, error: micrositiosError } = await this.from(
+      'bonda_microsites',
+    )
       .select('id')
       .in('organizacion_id', organizacionIds)
       .eq('activo', true);
@@ -993,7 +1013,7 @@ export class SupabaseService implements OnModuleInit {
       throw micrositiosError;
     }
 
-    return (micrositios || []).map(m => m.id);
+    return (micrositios || []).map((m) => m.id);
   }
 
   // ========================================
@@ -1003,14 +1023,16 @@ export class SupabaseService implements OnModuleInit {
   /**
    * Obtener cupones públicos desde public_coupons_v2 con filtros
    */
-  async getPublicCouponsV2(opciones: {
-    categoria?: string;
-    busqueda?: string;
-    limite?: number;
-    offset?: number;
-    soloActivos?: boolean;
-    micrositeIds?: string[];
-  } = {}) {
+  async getPublicCouponsV2(
+    opciones: {
+      categoria?: string;
+      busqueda?: string;
+      limite?: number;
+      offset?: number;
+      soloActivos?: boolean;
+      micrositeIds?: string[];
+    } = {},
+  ) {
     let query = this.from('public_coupons_v2').select('*', { count: 'exact' });
 
     // Filtrar solo activos por defecto
@@ -1036,7 +1058,9 @@ export class SupabaseService implements OnModuleInit {
     }
 
     // Filtrar cupones no vencidos
-    query = query.or(`fecha_vencimiento.is.null,fecha_vencimiento.gte.${new Date().toISOString()}`);
+    query = query.or(
+      `fecha_vencimiento.is.null,fecha_vencimiento.gte.${new Date().toISOString()}`,
+    );
 
     // Ordenar por fecha de sincronización (más recientes primero)
     query = query.order('synced_at', { ascending: false });
@@ -1063,30 +1087,32 @@ export class SupabaseService implements OnModuleInit {
   /**
    * Insertar o actualizar cupones en public_coupons_v2 (upsert por bonda_cupon_id)
    */
-  async upsertPublicCouponsV2(cupones: Array<{
-    bonda_cupon_id: string;
-    bonda_microsite_id?: string;
-    nombre: string;
-    descuento?: string;
-    descripcion_breve?: string;
-    empresa_nombre?: string;
-    empresa_id?: string;
-    empresa_logo_url?: string;
-    empresa_data?: object;
-    imagen_principal_url?: string;
-    imagen_thumbnail_url?: string;
-    imagenes?: object;
-    descripcion_micrositio?: string;
-    usage_instructions?: string;
-    legales?: string;
-    categorias?: object;
-    categoria_principal?: string;
-    fecha_vencimiento?: string;
-    activo?: boolean;
-    usar_en?: object;
-    permitir_sms?: boolean;
-    orden?: number;
-  }>) {
+  async upsertPublicCouponsV2(
+    cupones: Array<{
+      bonda_cupon_id: string;
+      bonda_microsite_id?: string;
+      nombre: string;
+      descuento?: string;
+      descripcion_breve?: string;
+      empresa_nombre?: string;
+      empresa_id?: string;
+      empresa_logo_url?: string;
+      empresa_data?: object;
+      imagen_principal_url?: string;
+      imagen_thumbnail_url?: string;
+      imagenes?: object;
+      descripcion_micrositio?: string;
+      usage_instructions?: string;
+      legales?: string;
+      categorias?: object;
+      categoria_principal?: string;
+      fecha_vencimiento?: string;
+      activo?: boolean;
+      usar_en?: object;
+      permitir_sms?: boolean;
+      orden?: number;
+    }>,
+  ) {
     if (!cupones || cupones.length === 0) {
       this.logger.warn('No hay cupones para insertar en public_coupons_v2');
       return { count: 0 };
@@ -1108,11 +1134,16 @@ export class SupabaseService implements OnModuleInit {
       .select();
 
     if (error) {
-      this.logger.error('Error al insertar cupones en public_coupons_v2:', error);
+      this.logger.error(
+        'Error al insertar cupones en public_coupons_v2:',
+        error,
+      );
       throw error;
     }
 
-    this.logger.log(`✅ ${data?.length || 0} cupones sincronizados en public_coupons_v2`);
+    this.logger.log(
+      `✅ ${data?.length || 0} cupones sincronizados en public_coupons_v2`,
+    );
     return { count: data?.length || 0 };
   }
 
@@ -1135,7 +1166,9 @@ export class SupabaseService implements OnModuleInit {
 
     const count = data?.length || 0;
     if (count > 0) {
-      this.logger.log(`✅ ${count} cupones vencidos eliminados de public_coupons_v2`);
+      this.logger.log(
+        `✅ ${count} cupones vencidos eliminados de public_coupons_v2`,
+      );
     }
     return count;
   }

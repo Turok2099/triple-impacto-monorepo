@@ -40,7 +40,7 @@ export class PaymentsController {
     private readonly fiservWebhook: FiservWebhookService,
     private readonly fiservConnect: FiservConnectService,
     private readonly supabase: SupabaseService,
-  ) { }
+  ) {}
 
   /**
    * Crear transacción: genera payment_attempt y devuelve params + URL para que el front
@@ -57,8 +57,6 @@ export class PaymentsController {
     if (!userId) {
       throw new BadRequestException('Se requiere autenticación');
     }
-
-
 
     const config = this.fiservConnect.getConfig();
     if (!config) {
@@ -120,7 +118,8 @@ export class PaymentsController {
       storename: body.storename,
       txntype: body.txntype,
       numberOfInstallments: body.numberOfInstallments,
-      referencedMerchantTransactionId: (body as any).referencedMerchantTransactionId,
+      referencedMerchantTransactionId: (body as any)
+        .referencedMerchantTransactionId,
       authenticateTransaction: (body as any).authenticateTransaction,
       threeDSEmvCoMessageCategory: (body as any).threeDSEmvCoMessageCategory,
     });
@@ -160,7 +159,9 @@ export class PaymentsController {
   @Post('posauth')
   @UseGuards(JwtAuthGuard)
   async captureTransaccion(@Body() body: any) {
-    this.logger.log(`Mock POSAUTH api call para orden: ${JSON.stringify(body)}`);
+    this.logger.log(
+      `Mock POSAUTH api call para orden: ${JSON.stringify(body)}`,
+    );
     return { ok: true, message: 'POSAUTH procesado vía API REST Backend' };
   }
 

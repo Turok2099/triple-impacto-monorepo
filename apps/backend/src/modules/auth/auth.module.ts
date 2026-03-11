@@ -15,8 +15,15 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
       useFactory: (configService: ConfigService): JwtModuleOptions => {
         const expiresIn = configService.get<string>('jwt.expiresIn') || '12h';
         return {
-          secret: configService.get<string>('jwt.secret') || 'default-secret-key',
-          signOptions: { expiresIn: expiresIn as JwtModuleOptions['signOptions'] extends { expiresIn?: infer E } ? E : never },
+          secret:
+            configService.get<string>('jwt.secret') || 'default-secret-key',
+          signOptions: {
+            expiresIn: expiresIn as JwtModuleOptions['signOptions'] extends {
+              expiresIn?: infer E;
+            }
+              ? E
+              : never,
+          },
         };
       },
       inject: [ConfigService],

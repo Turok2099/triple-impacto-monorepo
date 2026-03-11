@@ -1,10 +1,18 @@
-import { Controller, Post, Get, UseGuards, HttpCode, HttpStatus, Query } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+  Query,
+} from '@nestjs/common';
 import { SyncService } from './sync.service';
 import { ConfigService } from '@nestjs/config';
 
 /**
  * Controlador para sincronización manual de cupones desde Bonda
- * 
+ *
  * ⚠️ ENDPOINTS PROTEGIDOS: Requieren un secret token para ejecutarse
  */
 @Controller('sync')
@@ -17,7 +25,7 @@ export class SyncController {
   /**
    * Sincronizar cupones de un micrositio específico o el siguiente en la cola
    * POST /api/sync/cupones?secret=xxxxx
-   * 
+   *
    * Query params:
    * - secret: Token de seguridad (SYNC_SECRET del .env)
    * - microsite_id: (Opcional) ID del micrositio a sincronizar
@@ -38,9 +46,8 @@ export class SyncController {
     }
 
     try {
-      const resultado = await this.syncService.sincronizarCuponesDesdeBonda(
-        micrositeId,
-      );
+      const resultado =
+        await this.syncService.sincronizarCuponesDesdeBonda(micrositeId);
 
       return {
         success: true,
@@ -104,7 +111,8 @@ export class SyncController {
 
     try {
       // Obtener estadísticas desde Supabase
-      const stats = await this.syncService['supabaseService'].getEstadisticasCuponesV2();
+      const stats =
+        await this.syncService['supabaseService'].getEstadisticasCuponesV2();
 
       return {
         success: true,

@@ -230,14 +230,14 @@ export class BondaService {
       },
       envio: item.envio
         ? {
-          codigoId: item.envio.codigo_id || '',
-          smsId: item.envio.sms_id,
-          codigo: item.envio.codigo,
-          operadora: item.envio.operadora,
-          celular: item.envio.celular,
-          mensaje: item.envio.mensaje,
-          fecha: item.envio.fecha,
-        }
+            codigoId: item.envio.codigo_id || '',
+            smsId: item.envio.sms_id,
+            codigo: item.envio.codigo,
+            operadora: item.envio.operadora,
+            celular: item.envio.celular,
+            mensaje: item.envio.mensaje,
+            fecha: item.envio.fecha,
+          }
         : undefined,
       categorias: item.categorias || undefined,
     }));
@@ -385,7 +385,10 @@ export class BondaService {
       this.logger.error(`Error al crear afiliado en Bonda: ${error.message}`);
 
       if (error.response?.data) {
-        this.logger.error('Respuesta de Bonda (detalles del error):', error.response.data);
+        this.logger.error(
+          'Respuesta de Bonda (detalles del error):',
+          error.response.data,
+        );
         return error.response.data;
       }
 
@@ -487,7 +490,7 @@ export class BondaService {
   /**
    * Obtener un afiliado por código desde Bonda API
    * GET /api/v2/microsite/{microsite_id}/affiliates/{affiliate_code}
-   * 
+   *
    * Retorna el usuario completo con member, segmentation y company.
    * Si el usuario se encuentra soft-deleteado, NO será visible (retorna null).
    */
@@ -518,7 +521,10 @@ export class BondaService {
 
       return response.data;
     } catch (error) {
-      this.logger.error('Error al obtener afiliado desde Bonda:', error.message);
+      this.logger.error(
+        'Error al obtener afiliado desde Bonda:',
+        error.message,
+      );
 
       // Si el usuario no existe (404), retornar null en lugar de lanzar error
       if (error.response?.status === 404) {

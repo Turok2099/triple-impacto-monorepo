@@ -74,6 +74,24 @@ export class SupabaseService implements OnModuleInit {
   }
 
   /**
+   * Buscar un usuario por DNI
+   */
+  async findUserByDni(dni: string) {
+    if (!dni) return null;
+    const { data, error } = await this.from('usuarios')
+      .select('*')
+      .eq('dni', dni)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      this.logger.error('Error al buscar usuario por DNI:', error);
+      throw error;
+    }
+
+    return data;
+  }
+
+  /**
    * Buscar un usuario por código de afiliado de Bonda (tabla usuarios_bonda_afiliados)
    */
   async findUserByBondaCode(bondaCode: string) {

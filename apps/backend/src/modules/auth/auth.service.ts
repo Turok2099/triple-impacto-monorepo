@@ -36,7 +36,15 @@ export class AuthService {
     const { email, password, nombre, telefono, dni, provincia, localidad } =
       registerDto;
 
-    // 1. Verificar si el usuario ya existe
+    // 1. Verificar si el DNI ya existe (si es que enviaron uno)
+    if (dni) {
+      const existingDni = await this.supabaseService.findUserByDni(dni);
+      if (existingDni) {
+        throw new BadRequestException('El DNI ya se encuentra registrado por otro usuario');
+      }
+    }
+
+    // 2. Verificar si el email ya existe
     const existingUser = await this.supabaseService.findUserByEmail(email);
     if (existingUser) {
       throw new ConflictException('El email ya está registrado');
@@ -144,6 +152,14 @@ export class AuthService {
       const existing = await this.supabaseService.findUserByEmail(dto.email);
       if (existing && existing.id !== userId) {
         throw new ConflictException('El email ya está en uso por otra cuenta');
+      }
+    }
+
+    // Si viene DNI (a través de algún bypass, aunque no deberia cambiar), verificar duplicidad
+    if ((dto as any).dni) {
+      const existingDni = await this.supabaseService.findUserByDni((dto as any).dni);
+      if (existingDni && existingDni.id !== userId) {
+        throw new BadRequestException('El DNI ya se encuentra registrado por otro usuario');
       }
     }
 

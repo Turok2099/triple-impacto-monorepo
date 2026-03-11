@@ -12,7 +12,7 @@ export class SyncService {
     private readonly bondaService: BondaService,
     private readonly supabaseService: SupabaseService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   /**
    * Sincronizar todos los cupones desde Bonda API a Supabase
@@ -44,7 +44,9 @@ export class SyncService {
           .single();
 
         if (error || !data) {
-          throw new Error(`No se encontró el micrositio con id: ${micrositeId}`);
+          throw new Error(
+            `No se encontró el micrositio con id: ${micrositeId}`,
+          );
         }
         microsite = data;
       } else {
@@ -142,7 +144,9 @@ export class SyncService {
           if (primeraCategoria.parent_id) {
             // Es una subcategoría, buscar el nombre de la categoría padre
             categoriaPrincipal =
-              CATEGORIAS_PRINCIPALES_MAP[primeraCategoria.parent_id.toString()] || null;
+              CATEGORIAS_PRINCIPALES_MAP[
+                primeraCategoria.parent_id.toString()
+              ] || null;
           } else {
             // Es una categoría principal
             categoriaPrincipal = primeraCategoria.nombre;
@@ -163,25 +167,91 @@ export class SyncService {
             categoriaPrincipal = 'Teatros';
           } else if (texto.includes('moto') || texto.includes('motocicleta')) {
             categoriaPrincipal = 'Motos';
-          } else if (texto.includes('auto') || texto.includes('automóvil') || texto.includes('taller mecánico') || texto.includes('lubricentro') || texto.includes('lavadero')) {
+          } else if (
+            texto.includes('auto') ||
+            texto.includes('automóvil') ||
+            texto.includes('taller mecánico') ||
+            texto.includes('lubricentro') ||
+            texto.includes('lavadero')
+          ) {
             categoriaPrincipal = 'Autos';
           } else if (texto.includes('inmobiliaria')) {
             categoriaPrincipal = 'Inmobiliarias';
-          } else if (texto.includes('inmueble') || texto.includes('departamento') || texto.includes('alquiler') || texto.includes('propiedad')) {
+          } else if (
+            texto.includes('inmueble') ||
+            texto.includes('departamento') ||
+            texto.includes('alquiler') ||
+            texto.includes('propiedad')
+          ) {
             categoriaPrincipal = 'Inmuebles';
-          } else if (texto.includes('restaurant') || texto.includes('restaurante') || texto.includes('comida') || texto.includes('café') || texto.includes('cafetería') || texto.includes('parrilla') || texto.includes('pizza') || texto.includes('bar') || texto.includes('gastronomía')) {
+          } else if (
+            texto.includes('restaurant') ||
+            texto.includes('restaurante') ||
+            texto.includes('comida') ||
+            texto.includes('café') ||
+            texto.includes('cafetería') ||
+            texto.includes('parrilla') ||
+            texto.includes('pizza') ||
+            texto.includes('bar') ||
+            texto.includes('gastronomía')
+          ) {
             categoriaPrincipal = 'Gastronomía';
-          } else if (texto.includes('gym') || texto.includes('gimnasio') || texto.includes('deporte') || texto.includes('fitness') || texto.includes('entrenamiento') || texto.includes('crossfit')) {
+          } else if (
+            texto.includes('gym') ||
+            texto.includes('gimnasio') ||
+            texto.includes('deporte') ||
+            texto.includes('fitness') ||
+            texto.includes('entrenamiento') ||
+            texto.includes('crossfit')
+          ) {
             categoriaPrincipal = 'Gimnasios y Deportes';
-          } else if (texto.includes('viaje') || texto.includes('hotel') || texto.includes('turismo') || texto.includes('hostel') || texto.includes('hospedaje') || texto.includes('alojamiento')) {
+          } else if (
+            texto.includes('viaje') ||
+            texto.includes('hotel') ||
+            texto.includes('turismo') ||
+            texto.includes('hostel') ||
+            texto.includes('hospedaje') ||
+            texto.includes('alojamiento')
+          ) {
             categoriaPrincipal = 'Turismo';
-          } else if (texto.includes('spa') || texto.includes('peluquería') || texto.includes('salón') || texto.includes('belleza') || texto.includes('masaje') || texto.includes('estética') || texto.includes('salud') || texto.includes('clínica')) {
+          } else if (
+            texto.includes('spa') ||
+            texto.includes('peluquería') ||
+            texto.includes('salón') ||
+            texto.includes('belleza') ||
+            texto.includes('masaje') ||
+            texto.includes('estética') ||
+            texto.includes('salud') ||
+            texto.includes('clínica')
+          ) {
             categoriaPrincipal = 'Belleza y Salud';
-          } else if (texto.includes('ropa') || texto.includes('calzado') || texto.includes('zapatilla') || texto.includes('moda') || texto.includes('fashion') || texto.includes('jean') || texto.includes('remera') || texto.includes('indumentaria')) {
+          } else if (
+            texto.includes('ropa') ||
+            texto.includes('calzado') ||
+            texto.includes('zapatilla') ||
+            texto.includes('moda') ||
+            texto.includes('fashion') ||
+            texto.includes('jean') ||
+            texto.includes('remera') ||
+            texto.includes('indumentaria')
+          ) {
             categoriaPrincipal = 'Indumentaria, Calzado y Moda';
-          } else if (texto.includes('curso') || texto.includes('escuela') || texto.includes('instituto') || texto.includes('capacitación') || texto.includes('formación') || texto.includes('educación') || texto.includes('academia')) {
+          } else if (
+            texto.includes('curso') ||
+            texto.includes('escuela') ||
+            texto.includes('instituto') ||
+            texto.includes('capacitación') ||
+            texto.includes('formación') ||
+            texto.includes('educación') ||
+            texto.includes('academia')
+          ) {
             categoriaPrincipal = 'Educación';
-          } else if (texto.includes('tienda') || texto.includes('shop') || texto.includes('comercio') || texto.includes('compra')) {
+          } else if (
+            texto.includes('tienda') ||
+            texto.includes('shop') ||
+            texto.includes('comercio') ||
+            texto.includes('compra')
+          ) {
             categoriaPrincipal = 'Compras';
           }
         }
@@ -220,9 +290,8 @@ export class SyncService {
 
       // Insertar cupones en Supabase (upsert)
       this.logger.log('💾 Guardando cupones en Supabase...');
-      const { count } = await this.supabaseService.upsertPublicCouponsV2(
-        cuponesParaSupabase,
-      );
+      const { count } =
+        await this.supabaseService.upsertPublicCouponsV2(cuponesParaSupabase);
 
       // Actualizar timestamp de última sincronización del micrositio
       await this.supabaseService.updateMicrositeLastSynced(microsite.id);
@@ -293,7 +362,9 @@ export class SyncService {
       error?: string;
     }>;
   }> {
-    this.logger.log('🔄 Sincronizando catálogo global de Bonda usando micrositio maestro...');
+    this.logger.log(
+      '🔄 Sincronizando catálogo global de Bonda usando micrositio maestro...',
+    );
 
     // Trataremos de usar "Beneficios La Guarida" porque en las pruebas nos devolvió 1672 cupones
     // (el máximo de catálogo disponible) o caer en el primero activo
@@ -304,14 +375,16 @@ export class SyncService {
       .limit(10);
 
     if (!masterMicrosites || masterMicrosites.length === 0) {
-      this.logger.warn('⚠️ No hay micrositios activos para utilizar como maestro');
+      this.logger.warn(
+        '⚠️ No hay micrositios activos para utilizar como maestro',
+      );
       return { total_micrositios: 0, resultados: [] };
     }
 
     // Priorizar Beneficios La Guarida (o Fundación Padres)
-    let masterMicrosite =
-      masterMicrosites.find(m => m.slug === 'beneficios-la-guarida') ||
-      masterMicrosites.find(m => m.slug === 'beneficios-fundacion-padres') ||
+    const masterMicrosite =
+      masterMicrosites.find((m) => m.slug === 'beneficios-la-guarida') ||
+      masterMicrosites.find((m) => m.slug === 'beneficios-fundacion-padres') ||
       masterMicrosites[0];
 
     const resultados: Array<{
@@ -322,16 +395,19 @@ export class SyncService {
     }> = [];
 
     try {
-      this.logger.log(`\n📡 Sincronizando catálogo usando maestro: ${masterMicrosite.nombre}...`);
+      this.logger.log(
+        `\n📡 Sincronizando catálogo usando maestro: ${masterMicrosite.nombre}...`,
+      );
 
-      const resultado = await this.sincronizarCuponesDesdeBonda(masterMicrosite.id);
+      const resultado = await this.sincronizarCuponesDesdeBonda(
+        masterMicrosite.id,
+      );
 
       resultados.push({
         microsite_nombre: masterMicrosite.nombre,
         exito: true,
         total_cupones: resultado.total_cupones,
       });
-
     } catch (error: any) {
       this.logger.error(
         `❌ Error sincronizando catálogo maestro (${masterMicrosite.nombre}): ${error.message}`,
@@ -351,10 +427,10 @@ export class SyncService {
 
   /**
    * Cron job: Sincronizar cupones diariamente a las 3 AM Argentina (UTC-3)
-   * 
+   *
    * Horario Argentina (ART): 3:00 AM
    * Horario UTC: 6:00 AM
-   * 
+   *
    * Cron expression: '0 6 * * *' (A las 6:00 AM UTC todos los días)
    */
   @Cron('0 6 * * *', {
@@ -362,7 +438,9 @@ export class SyncService {
     timeZone: 'UTC',
   })
   async sincronizacionAutomaticaDiaria() {
-    this.logger.log('⏰ Cron job iniciado: Sincronización diaria de cupones (3 AM Argentina)');
+    this.logger.log(
+      '⏰ Cron job iniciado: Sincronización diaria de cupones (3 AM Argentina)',
+    );
 
     try {
       const resultado = await this.sincronizarTodosMicrositios();
@@ -378,7 +456,9 @@ export class SyncService {
         response_data: resultado,
       });
     } catch (error) {
-      this.logger.error(`❌ Error en cron job de sincronización: ${error.message}`);
+      this.logger.error(
+        `❌ Error en cron job de sincronización: ${error.message}`,
+      );
 
       // Log de error en base de datos
       await this.supabaseService.logBondaOperation({

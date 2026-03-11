@@ -134,7 +134,8 @@ export class FiservConnectService implements OnModuleInit {
       params.numberOfInstallments = input.numberOfInstallments;
     }
     if (input.referencedMerchantTransactionId) {
-      params.referencedMerchantTransactionId = input.referencedMerchantTransactionId.slice(0, 40);
+      params.referencedMerchantTransactionId =
+        input.referencedMerchantTransactionId.slice(0, 40);
     }
     if (input.authenticateTransaction) {
       params.authenticateTransaction = input.authenticateTransaction;

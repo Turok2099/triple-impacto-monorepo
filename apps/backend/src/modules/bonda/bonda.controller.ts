@@ -49,7 +49,13 @@ function filtrarEnvioSensible(cupon: CuponDto): CuponDto {
   const { codigo, codigoId, smsId, mensaje, ...envioResto } = cupon.envio;
   return {
     ...cupon,
-    envio: { ...envioResto, codigoId: '', codigo: null, smsId: undefined, mensaje: undefined },
+    envio: {
+      ...envioResto,
+      codigoId: '',
+      codigo: null,
+      smsId: undefined,
+      mensaje: undefined,
+    },
   };
 }
 
@@ -92,9 +98,7 @@ export class BondaController {
 
     const micrositeRow = microsite
       ? await this.supabase.getBondaMicrositeBySlug(microsite)
-      : await this.supabase.getBondaMicrositeByOrganizacionId(
-          organizacionId!,
-        );
+      : await this.supabase.getBondaMicrositeByOrganizacionId(organizacionId!);
 
     if (!micrositeRow) {
       throw new NotFoundException(
@@ -186,9 +190,7 @@ export class BondaController {
 
     const micrositeRow = microsite
       ? await this.supabase.getBondaMicrositeBySlug(microsite)
-      : await this.supabase.getBondaMicrositeByOrganizacionId(
-          organizacionId!,
-        );
+      : await this.supabase.getBondaMicrositeByOrganizacionId(organizacionId!);
 
     if (!micrositeRow) {
       throw new NotFoundException(
@@ -288,10 +290,10 @@ export class BondaController {
   /**
    * GET /api/bonda/affiliates/:code
    * Query: microsite (slug) u organizacion_id para usar config desde bonda_microsites.
-   * 
+   *
    * Obtiene un afiliado por su código desde Bonda API.
    * Retorna el usuario completo incluyendo member, segmentation y company.
-   * 
+   *
    * Si el usuario se encuentra soft-deleteado, retorna 404 (null).
    */
   @Get('affiliates/:code')
@@ -313,7 +315,7 @@ export class BondaController {
   /**
    * Solicitar un cupón específico de Bonda
    * POST /api/bonda/solicitar-cupon
-   * 
+   *
    * El usuario solicita un cupón y se guarda en su dashboard con el código visible
    */
   @Post('solicitar-cupon')
@@ -343,7 +345,7 @@ export class BondaController {
   /**
    * Obtener cupones activos del usuario (dashboard)
    * GET /api/bonda/mis-cupones
-   * 
+   *
    * Retorna los cupones que el usuario ha solicitado y están activos
    */
   @Get('mis-cupones')
@@ -364,7 +366,7 @@ export class BondaController {
   /**
    * Obtener historial completo de cupones del usuario
    * GET /api/bonda/historial-cupones
-   * 
+   *
    * Retorna el historial paginado de todos los cupones solicitados
    */
   @Get('historial-cupones')
@@ -373,7 +375,8 @@ export class BondaController {
     @Req() req: Request & { user?: { userId: string } },
     @Query('pagina') pagina?: number,
     @Query('limite') limite?: number,
-    @Query('estado') estado?: 'activo' | 'usado' | 'vencido' | 'cancelado' | 'todos',
+    @Query('estado')
+    estado?: 'activo' | 'usado' | 'vencido' | 'cancelado' | 'todos',
   ): Promise<HistorialCuponesDto> {
     const userId = req.user?.userId;
     if (!userId) {
@@ -398,7 +401,7 @@ export class BondaController {
   /**
    * Obtener dashboard completo del usuario
    * GET /api/bonda/dashboard
-   * 
+   *
    * Retorna estadísticas, cupones activos, recientes y fundaciones
    */
   @Get('dashboard')
@@ -423,7 +426,10 @@ export class BondaController {
       try {
         stats = await this.supabase.getEstadisticasCuponesUsuario(userId);
       } catch (error) {
-        console.warn('Error al obtener estadísticas, usando valores por defecto:', error);
+        console.warn(
+          'Error al obtener estadísticas, usando valores por defecto:',
+          error,
+        );
         stats = {
           cupones_activos: 0,
           cupones_usados: 0,
@@ -445,7 +451,10 @@ export class BondaController {
       try {
         fundaciones = await this.supabase.getFundacionesUsuario(userId);
       } catch (error) {
-        console.warn('Error al obtener fundaciones, usando array vacío:', error);
+        console.warn(
+          'Error al obtener fundaciones, usando array vacío:',
+          error,
+        );
       }
 
       // Obtener cupones activos (con manejo de errores)
@@ -453,18 +462,30 @@ export class BondaController {
       try {
         cuponesActivos = await this.supabase.getCuponesActivosUsuario(userId);
       } catch (error) {
-        console.warn('Error al obtener cupones activos, usando array vacío:', error);
+        console.warn(
+          'Error al obtener cupones activos, usando array vacío:',
+          error,
+        );
       }
 
       // Obtener últimos 5 cupones (con manejo de errores)
-      let historialReciente: any = { cupones: [], total: 0, pagina: 1, limite: 5, totalPaginas: 0 };
+      let historialReciente: any = {
+        cupones: [],
+        total: 0,
+        pagina: 1,
+        limite: 5,
+        totalPaginas: 0,
+      };
       try {
         historialReciente = await this.supabase.getHistorialCuponesUsuario(
           userId,
           { pagina: 1, limite: 5 },
         );
       } catch (error) {
-        console.warn('Error al obtener historial reciente, usando array vacío:', error);
+        console.warn(
+          'Error al obtener historial reciente, usando array vacío:',
+          error,
+        );
       }
 
       return {

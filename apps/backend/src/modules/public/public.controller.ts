@@ -67,15 +67,23 @@ export class PublicController {
   ) {
     // Inicializar configuración de Fundación Padres desde variables de entorno
     this.FUNDACION_PADRES_CONFIG = {
-      slug: this.configService.get<string>('BONDA_MICROSITE_SLUG') || 'beneficios-fundacion-padres',
+      slug:
+        this.configService.get<string>('BONDA_MICROSITE_SLUG') ||
+        'beneficios-fundacion-padres',
       micrositeId: this.configService.get<string>('BONDA_MICROSITE_ID') || '',
       apiToken: this.configService.get<string>('BONDA_API_KEY') || '',
-      codigoAfiliado: this.configService.get<string>('BONDA_CODIGO_AFILIADO') || '',
+      codigoAfiliado:
+        this.configService.get<string>('BONDA_CODIGO_AFILIADO') || '',
     };
 
     // Validar que las credenciales de Bonda estén configuradas
-    if (!this.FUNDACION_PADRES_CONFIG.apiToken || !this.FUNDACION_PADRES_CONFIG.micrositeId) {
-      console.warn('⚠️ ADVERTENCIA: Credenciales de Bonda no configuradas en variables de entorno');
+    if (
+      !this.FUNDACION_PADRES_CONFIG.apiToken ||
+      !this.FUNDACION_PADRES_CONFIG.micrositeId
+    ) {
+      console.warn(
+        '⚠️ ADVERTENCIA: Credenciales de Bonda no configuradas en variables de entorno',
+      );
     }
   }
 
@@ -235,7 +243,9 @@ export class PublicController {
           }
         } catch (error) {
           // Token inválido o expirado, continuar sin filtrar por micrositios
-          console.warn('Token JWT inválido o expirado, mostrando todos los cupones');
+          console.warn(
+            'Token JWT inválido o expirado, mostrando todos los cupones',
+          );
         }
       }
 
@@ -257,7 +267,8 @@ export class PublicController {
         empresa: {
           nombre: cupon.empresa_nombre,
         },
-        imagen_url: cupon.imagen_principal_url || cupon.imagen_thumbnail_url || null,
+        imagen_url:
+          cupon.imagen_principal_url || cupon.imagen_thumbnail_url || null,
         logo_empresa: cupon.empresa_logo_url || null,
         categoria_principal: cupon.categoria_principal || null,
         fecha_vencimiento: cupon.fecha_vencimiento || null,
@@ -267,8 +278,10 @@ export class PublicController {
       const shouldDeduplicate = deduplicate !== 'false'; // Por defecto true
       const cuponesFinal = shouldDeduplicate
         ? Array.from(
-          new Map(cuponesTransformados.map((c) => [c.empresa.nombre, c])).values(),
-        )
+            new Map(
+              cuponesTransformados.map((c) => [c.empresa.nombre, c]),
+            ).values(),
+          )
         : cuponesTransformados;
 
       return {

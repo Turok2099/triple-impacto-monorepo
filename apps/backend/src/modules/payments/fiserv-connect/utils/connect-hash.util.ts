@@ -23,7 +23,7 @@ const HASH_PARAM_NAMES = ['hashExtended', 'hash'];
 export function createExtendedHash(
   params: Record<string, string>,
   sharedSecret: string,
-  algorithm: 'sha256' | 'sha384' | 'sha512' = 'sha256'
+  algorithm: 'sha256' | 'sha384' | 'sha512' = 'sha256',
 ): string {
   const filtered = { ...params };
   for (const name of HASH_PARAM_NAMES) {
@@ -33,7 +33,10 @@ export function createExtendedHash(
   const sortedKeys = Object.keys(filtered).sort();
   const stringToHash = sortedKeys.map((k) => filtered[k]).join('|');
 
-  const hmac = crypto.createHmac(`sha${algorithm === 'sha256' ? 256 : algorithm === 'sha384' ? 384 : 512}`, sharedSecret);
+  const hmac = crypto.createHmac(
+    `sha${algorithm === 'sha256' ? 256 : algorithm === 'sha384' ? 384 : 512}`,
+    sharedSecret,
+  );
   hmac.update(stringToHash);
   return hmac.digest('base64');
 }
@@ -58,11 +61,20 @@ export function validateResponseHash(
   txndatetime: string,
   storename: string,
   responseHash: string,
-  sharedSecret: string
+  sharedSecret: string,
 ): boolean {
   try {
-    const stringToHash = [approvalCode, chargetotal, currency, txndatetime, storename].join('|');
-    const expected = crypto.createHmac('sha256', sharedSecret).update(stringToHash).digest('base64');
+    const stringToHash = [
+      approvalCode,
+      chargetotal,
+      currency,
+      txndatetime,
+      storename,
+    ].join('|');
+    const expected = crypto
+      .createHmac('sha256', sharedSecret)
+      .update(stringToHash)
+      .digest('base64');
     const a = Buffer.from(expected, 'base64');
     const b = Buffer.from(responseHash, 'base64');
     return a.length === b.length && crypto.timingSafeEqual(a, b);
@@ -91,11 +103,20 @@ export function validateNotificationHash(
   storename: string,
   approvalCode: string,
   notificationHash: string,
-  sharedSecret: string
+  sharedSecret: string,
 ): boolean {
   try {
-    const stringToHash = [chargetotal, currency, txndatetime, storename, approvalCode].join('|');
-    const expected = crypto.createHmac('sha256', sharedSecret).update(stringToHash).digest('base64');
+    const stringToHash = [
+      chargetotal,
+      currency,
+      txndatetime,
+      storename,
+      approvalCode,
+    ].join('|');
+    const expected = crypto
+      .createHmac('sha256', sharedSecret)
+      .update(stringToHash)
+      .digest('base64');
     const a = Buffer.from(expected, 'base64');
     const b = Buffer.from(notificationHash, 'base64');
     return a.length === b.length && crypto.timingSafeEqual(a, b);

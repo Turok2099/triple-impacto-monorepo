@@ -40,7 +40,9 @@ export class AuthService {
     if (dni) {
       const existingDni = await this.supabaseService.findUserByDni(dni);
       if (existingDni) {
-        throw new BadRequestException('El DNI ya se encuentra registrado por otro usuario');
+        throw new BadRequestException(
+          'El DNI ya se encuentra registrado por otro usuario',
+        );
       }
     }
 
@@ -157,9 +159,13 @@ export class AuthService {
 
     // Si viene DNI (a través de algún bypass, aunque no deberia cambiar), verificar duplicidad
     if ((dto as any).dni) {
-      const existingDni = await this.supabaseService.findUserByDni((dto as any).dni);
+      const existingDni = await this.supabaseService.findUserByDni(
+        (dto as any).dni,
+      );
       if (existingDni && existingDni.id !== userId) {
-        throw new BadRequestException('El DNI ya se encuentra registrado por otro usuario');
+        throw new BadRequestException(
+          'El DNI ya se encuentra registrado por otro usuario',
+        );
       }
     }
 
@@ -188,13 +194,18 @@ export class AuthService {
       throw new UnauthorizedException('Usuario no encontrado');
     }
 
-    const passwordMatch = await bcrypt.compare(dto.passwordActual, usuario.password_hash);
+    const passwordMatch = await bcrypt.compare(
+      dto.passwordActual,
+      usuario.password_hash,
+    );
     if (!passwordMatch) {
       throw new BadRequestException('La contraseña actual es incorrecta');
     }
 
     if (dto.passwordActual === dto.passwordNueva) {
-      throw new BadRequestException('La nueva contraseña debe ser diferente a la actual');
+      throw new BadRequestException(
+        'La nueva contraseña debe ser diferente a la actual',
+      );
     }
 
     const saltRounds = 10;

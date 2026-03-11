@@ -1,5 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { validateNotificationHash, validateResponseHash } from './fiserv-connect/utils/connect-hash.util';
+import {
+  validateNotificationHash,
+  validateResponseHash,
+} from './fiserv-connect/utils/connect-hash.util';
 import { FiservConnectService } from './fiserv-connect/fiserv-connect.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { BondaService } from './../bonda/bonda.service';
@@ -22,7 +25,7 @@ export class FiservWebhookService {
     private readonly fiservConnect: FiservConnectService,
     private readonly supabase: SupabaseService,
     private readonly bonda: BondaService,
-  ) { }
+  ) {}
 
   /**
    * Procesa la notificación de pago de Fiserv.
@@ -54,7 +57,8 @@ export class FiservWebhookService {
     // ¡CRÍTICO! Fiserv omite el storename en el webhook. Usamos el store_id guardado en base de datos.
     const storename = str(body.storename) || attempt.store_id || config.storeId;
     const approvalCode = str(body.approval_code);
-    const notificationHash = str(body.response_hash) || str(body.hash) || str(body.notification_hash);
+    const notificationHash =
+      str(body.response_hash) || str(body.hash) || str(body.notification_hash);
     const ipgTransactionId = str(body.ipgTransactionId);
 
     // Sin approval_code o sin oid: no es un éxito o no podemos vincular el pago
@@ -66,13 +70,20 @@ export class FiservWebhookService {
     }
 
     if (!notificationHash) {
-      this.logger.warn('Fiserv notification: sin response_hash o notification_hash en el body');
+      this.logger.warn(
+        'Fiserv notification: sin response_hash o notification_hash en el body',
+      );
       return;
     }
 
     this.logger.debug('Webhook Payload:', body);
     this.logger.debug('Valores extraídos para validación:', {
-      chargetotal, currency, txndatetime, storename, approvalCode, notificationHash
+      chargetotal,
+      currency,
+      txndatetime,
+      storename,
+      approvalCode,
+      notificationHash,
     });
 
     // Fiserv devuelve el chargetotal con comas en vez de puntos a veces (ej. "5000,00"), validemos con el formato sin adaptar para el hash.
@@ -99,7 +110,10 @@ export class FiservWebhookService {
     );
 
     if (!hashValid && !hashValidFallback) {
-      this.logger.warn('Fiserv notification: hash inválido (ni como fallback). Store utilizado: ' + storename);
+      this.logger.warn(
+        'Fiserv notification: hash inválido (ni como fallback). Store utilizado: ' +
+          storename,
+      );
       throw new Error('Hash de notificación inválido');
     }
 
@@ -187,7 +201,9 @@ export class FiservWebhookService {
 
     // Bonda requiere que el 'code' coincida con su configuración de acceso (ej: 'Número de DNI').
     // Si la ONG exige DNI, el code DEBE ser numerico puro, de lo contrario da error de DNI.
-    const code = user.dni ? String(user.dni) : this.generateAffiliateCode(user.email);
+    const code = user.dni
+      ? String(user.dni)
+      : this.generateAffiliateCode(user.email);
 
     try {
       const res = await this.bonda.crearAfiliado(
@@ -227,15 +243,24 @@ export class FiservWebhookService {
           this.logger.log(
             `Fiserv webhook: afiliado Bonda ya existía en Bonda org=${organizacionId}. Vinculando user=${userId} code=${code}`,
           );
-          await this.supabase.upsertAffiliateForUser(userId, microsite.id, code);
+          await this.supabase.upsertAffiliateForUser(
+            userId,
+            microsite.id,
+            code,
+          );
         }
       } else {
-        this.logger.error(`Fiserv webhook: Bonda retornó success: false al crear afiliado`, res);
+        this.logger.error(
+          `Fiserv webhook: Bonda retornó success: false al crear afiliado`,
+          res,
+        );
       }
     } catch (err: any) {
       if (
         err?.response?.data?.error?.code === 'HttpPublicResponseException' &&
-        err?.response?.data?.error?.detail?.code?.[0]?.includes('ya lo está utilizando')
+        err?.response?.data?.error?.detail?.code?.[0]?.includes(
+          'ya lo está utilizando',
+        )
       ) {
         // Verificar si el código (DNI) ya pertenece a OTRA cuenta en nuestra BD
         const userWithCode = await this.supabase.findUserByBondaCode(code);
@@ -247,7 +272,11 @@ export class FiservWebhookService {
           this.logger.log(
             `Fiserv webhook: afiliado Bonda ya existía en Bonda org=${organizacionId}. Vinculando user=${userId} code=${code}`,
           );
-          await this.supabase.upsertAffiliateForUser(userId, microsite.id, code);
+          await this.supabase.upsertAffiliateForUser(
+            userId,
+            microsite.id,
+            code,
+          );
         }
       } else {
         this.logger.error(

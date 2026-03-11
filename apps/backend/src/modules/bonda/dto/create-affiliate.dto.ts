@@ -2,10 +2,10 @@ import { IsString, IsNotEmpty, IsEmail, IsOptional } from 'class-validator';
 
 /**
  * DTO para crear un afiliado en Bonda
- * 
+ *
  * Según la documentación de Bonda, el único campo requerido es "code".
  * Los campos adicionales dependen de la configuración del micrositio.
- * 
+ *
  * Consultar con el ejecutivo de implementaciones de Bonda para obtener
  * el listado completo de campos permitidos en:
  * Panel de administración → Usuarios → Administracion Masiva → Agregar → Ver Referencias

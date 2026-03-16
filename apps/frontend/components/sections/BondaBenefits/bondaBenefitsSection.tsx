@@ -171,7 +171,7 @@ export default function BondaBenefitsSection() {
                 onClick={() => setSelectedCategory(cat.id as Category)}
                 className={`px-5 py-2.5 rounded-full font-medium transition-all duration-200 ${
                   selectedCategory === cat.id
-                    ? "bg-emerald-600 text-white shadow-lg scale-105"
+                    ? "bg-teal-600 text-white shadow-lg scale-105"
                     : "bg-white text-gray-700 hover:bg-gray-100 border-2 border-gray-200"
                 }`}
               >
@@ -211,15 +211,15 @@ export default function BondaBenefitsSection() {
           {visibleBenefits.map((benefit, index) => (
             <div
               key={benefit.id}
-              className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-transparent hover:border-emerald-200"
+              className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-transparent hover:border-teal-200"
               style={{
                 animation: `slideInUp 0.5s ease-out ${index * 0.1}s both`,
               }}
             >
               {/* Header de la card */}
-              <div className="relative bg-linear-to-br from-emerald-500 to-blue-500 p-6 text-white">
+              <div className="relative bg-linear-to-br from-teal-500 to-blue-500 p-6 text-white">
                 {benefit.popular && (
-                  <div className="absolute top-3 right-3 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full">
+                  <div className="absolute top-3 right-3 bg-amber-400 text-amber-900 text-xs font-bold px-3 py-1 rounded-full">
                     ⭐ Popular
                   </div>
                 )}
@@ -227,7 +227,7 @@ export default function BondaBenefitsSection() {
                 <div className="text-5xl font-bold mb-1">
                   -{benefit.discount}%
                 </div>
-                <div className="text-emerald-100 text-sm font-medium">
+                <div className="text-teal-100 text-sm font-medium">
                   de descuento
                 </div>
               </div>
@@ -252,7 +252,7 @@ export default function BondaBenefitsSection() {
                 </div>
 
                 {/* CTA */}
-                <button className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all duration-200 transform group-hover:scale-105 shadow-lg hover:shadow-xl">
+                <button className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl transition-all duration-200 transform group-hover:scale-105 shadow-lg hover:shadow-xl">
                   Obtener con mi donación →
                 </button>
               </div>
@@ -276,7 +276,7 @@ export default function BondaBenefitsSection() {
           <div className="text-center">
             <button
               onClick={() => setItemsToShow(itemsToShow + 6)}
-              className="px-8 py-4 bg-white text-gray-800 font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 border-2 border-gray-200 hover:border-emerald-300"
+              className="px-8 py-4 bg-white text-gray-800 font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 border-2 border-gray-200 hover:border-teal-300"
             >
               Cargar más beneficios ({filteredBenefits.length - itemsToShow}{" "}
               restantes)
@@ -288,7 +288,7 @@ export default function BondaBenefitsSection() {
         <div className="mt-16 bg-white rounded-2xl shadow-lg p-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-              <div className="text-4xl font-bold text-emerald-600 mb-2">
+              <div className="text-4xl font-bold text-teal-600 mb-2">
                 {mockBenefits.length}
               </div>
               <div className="text-gray-600 text-sm">Beneficios activos</div>

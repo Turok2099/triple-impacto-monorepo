@@ -10,6 +10,33 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Brand colors mapping */
+  --color-teal-50: #eaf5f5;
+  --color-teal-100: #d6ebec;
+  --color-teal-200: #aadddf;
+  --color-teal-300: #7ec4c7;
+  --color-teal-400: #58a9ac;
+  --color-teal-500: #40a8ab; /* Main Teal */
+  --color-teal-600: #358588;
+  --color-teal-700: #2d6b6e;
+  --color-teal-800: #265558;
+  --color-teal-900: #224749;
+
+  --color-amber-50: #fbf6ec;
+  --color-amber-100: #f5eed3;
+  --color-amber-200: #eddda4;
+  --color-amber-300: #e3c76d;
+  --color-amber-400: #d6aa41;
+  --color-amber-500: #c9953a; /* Main Gold/Mustard */
+  --color-amber-600: #b0762c;
+  --color-amber-700: #8c5525;
+  --color-amber-800: #744525;
+  --color-amber-900: #623a23;
+
+  --color-gray-700: #4a4f54;
+  --color-gray-800: #363a3e; /* Main Charcoal */
+  --color-gray-900: #24272a;
 }
 
 body {

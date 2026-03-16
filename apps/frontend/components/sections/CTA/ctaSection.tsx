@@ -4,7 +4,7 @@ import { Zap, Gift, ShieldCheck } from "lucide-react";
 
 export default function CTASection() {
   return (
-    <section className="mt-20 py-20 px-4 sm:px-6 lg:px-8 bg-linear-to-br from-emerald-600 via-blue-600 to-purple-700 relative overflow-hidden">
+    <section className="mt-20 py-20 px-4 sm:px-6 lg:px-8 bg-linear-to-br from-teal-600 via-blue-600 to-purple-700 relative overflow-hidden">
       {/* Elementos decorativos de fondo */}
       <div className="absolute inset-0 overflow-hidden opacity-20">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-white rounded-full filter blur-3xl"></div>
@@ -23,7 +23,7 @@ export default function CTASection() {
         </h2>
 
         {/* Subtítulo */}
-        <p className="text-xl text-emerald-50 mb-10 leading-relaxed max-w-2xl mx-auto">
+        <p className="text-xl text-teal-50 mb-10 leading-relaxed max-w-2xl mx-auto">
           Cada donación transforma vidas y te recompensa.
           <span className="block mt-2 font-semibold">
             Doná hoy, cambia el futuro.Todo lo que das, vuelve multiplicado.
@@ -47,7 +47,7 @@ export default function CTASection() {
         </div>
 
         {/* Trust elements */}
-        <div className="flex flex-wrap justify-center gap-4 text-emerald-50 text-sm">
+        <div className="flex flex-wrap justify-center gap-4 text-teal-50 text-sm">
           <div className="flex items-center gap-2">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path
@@ -85,15 +85,15 @@ export default function CTASection() {
           <div className="grid grid-cols-3 gap-4 text-white max-w-2xl mx-auto">
             <div>
               <div className="text-3xl font-bold mb-1">1.2K+</div>
-              <div className="text-emerald-100 text-sm">Donantes activos</div>
+              <div className="text-teal-100 text-sm">Donantes activos</div>
             </div>
             <div>
               <div className="text-3xl font-bold mb-1">$2.5M</div>
-              <div className="text-emerald-100 text-sm">Recaudado</div>
+              <div className="text-teal-100 text-sm">Recaudado</div>
             </div>
             <div>
               <div className="text-3xl font-bold mb-1">98%</div>
-              <div className="text-emerald-100 text-sm">Satisfacción</div>
+              <div className="text-teal-100 text-sm">Satisfacción</div>
             </div>
           </div>
         </div>

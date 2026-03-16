@@ -41,7 +41,7 @@ export default function OngFAQ() {
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="text-center mb-12">
-                    <span className="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 text-sm font-semibold rounded-full mb-4">
+                    <span className="inline-block px-3 py-1 bg-teal-100 text-teal-700 text-sm font-semibold rounded-full mb-4">
                         FAQ
                     </span>
                     <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -71,11 +71,11 @@ export default function OngFAQ() {
                                     {item.question}
                                 </span>
                                 <span
-                                    className={`flex-shrink-0 w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center transition-transform duration-200 ${openId === item.id ? "rotate-180" : ""
+                                    className={`flex-shrink-0 w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center transition-transform duration-200 ${openId === item.id ? "rotate-180" : ""
                                         }`}
                                 >
                                     <svg
-                                        className="w-4 h-4 text-emerald-600"
+                                        className="w-4 h-4 text-teal-600"
                                         fill="none"
                                         stroke="currentColor"
                                         viewBox="0 0 24 24"
@@ -110,7 +110,7 @@ export default function OngFAQ() {
                     <p className="text-gray-600 mb-4">¿Tenés otra pregunta?</p>
                     <a
                         href="mailto:contacto@ong.org"
-                        className="inline-flex items-center gap-2 text-emerald-600 font-semibold hover:text-emerald-700 transition-colors"
+                        className="inline-flex items-center gap-2 text-teal-600 font-semibold hover:text-teal-700 transition-colors"
                     >
                         Escribinos
                         <svg

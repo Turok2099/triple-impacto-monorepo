@@ -53,7 +53,7 @@ export default function SeccionMisPagos() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#16a459] mx-auto mb-3" />
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#40a8ab] mx-auto mb-3" />
           <p className="text-slate-500 text-sm">Cargando tus pagos...</p>
         </div>
       </div>
@@ -74,23 +74,23 @@ export default function SeccionMisPagos() {
         <div className="grid grid-cols-2 gap-3 mb-8">
           <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)]">
             <div className="flex items-center gap-2 mb-1">
-              <Receipt className="w-5 h-5 text-[#16a459]" strokeWidth={1.5} />
+              <Receipt className="w-5 h-5 text-[#40a8ab]" strokeWidth={1.5} />
               <span className="text-[10px] font-semibold text-[#718096] uppercase tracking-tight">
                 Total de pagos
               </span>
             </div>
-            <p className="text-2xl font-bold text-[#16a459]">
+            <p className="text-2xl font-bold text-[#40a8ab]">
               {donaciones.length}
             </p>
           </div>
           <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)]">
             <div className="flex items-center gap-2 mb-1">
-              <Heart className="w-5 h-5 text-[#16a459]" strokeWidth={1.5} />
+              <Heart className="w-5 h-5 text-[#40a8ab]" strokeWidth={1.5} />
               <span className="text-[10px] font-semibold text-[#718096] uppercase tracking-tight">
                 Total donado
               </span>
             </div>
-            <p className="text-2xl font-bold text-[#16a459]">
+            <p className="text-2xl font-bold text-[#40a8ab]">
               ${totalFormateado}
             </p>
           </div>
@@ -107,9 +107,9 @@ export default function SeccionMisPagos() {
 
       <section className="px-6">
         {donaciones.length === 0 ? (
-          <div className="rounded-2xl bg-[#E8F5EE] border border-[#16a459]/20 p-10 text-center mt-2">
+          <div className="rounded-2xl bg-[#E8F5EE] border border-[#40a8ab]/20 p-10 text-center mt-2">
             <div className="flex justify-center mb-4">
-              <CreditCard className="w-16 h-16 text-[#16a459]" strokeWidth={1.5} />
+              <CreditCard className="w-16 h-16 text-[#40a8ab]" strokeWidth={1.5} />
             </div>
             <h3 className="text-lg font-bold text-[#2D3748] mb-2">
               Aún no tenés pagos registrados
@@ -119,7 +119,7 @@ export default function SeccionMisPagos() {
             </p>
             <Link
               href="/donar"
-              className="inline-block px-6 py-3 bg-[#16a459] text-white rounded-full text-sm font-bold hover:bg-[#12854a] transition-colors"
+              className="inline-block px-6 py-3 bg-[#40a8ab] text-white rounded-full text-sm font-bold hover:bg-[#12854a] transition-colors"
             >
               Donar ahora
             </Link>
@@ -158,7 +158,7 @@ export default function SeccionMisPagos() {
                     )}
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-lg font-bold text-[#16a459]">
+                    <p className="text-lg font-bold text-[#40a8ab]">
                       {formatMonto(d.monto, d.moneda)}
                     </p>
                     <span className="inline-block mt-1 text-[10px] font-medium text-slate-400 uppercase">

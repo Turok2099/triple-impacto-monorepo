@@ -57,18 +57,18 @@ const impactStats = [
 const testimonials: Testimonial[] = [
   {
     id: 1,
-    name: "María González",
-    role: "Donante regular",
+    name: "Lara BLanco",
+    role: "Coord. de Fidelización",
     avatar: "👩",
-    text: "Donar nunca fue tan fácil y transparente. Veo el impacto de cada peso que aporto y además obtengo descuentos que uso mensualmente. Es ganar-ganar.",
+    text: "Con Club Triple Impacto logramos aumentar la permanencia de socios, reduciendo también las bajas. Vamos a seguir integrando esta herramienta en nuestras acciones de comunicación para fortalecer el vínculo con nuestra comunidad.",
     rating: 5,
   },
   {
     id: 2,
-    name: "Carlos Rodríguez",
-    role: "Empresario",
-    avatar: "👨‍💼",
-    text: "Como empresa, buscábamos una forma de generar impacto social real. Club Triple Impacto nos permite hacerlo de manera medible y obtener beneficios para nuestro equipo.",
+    name: "MIcaela Romano",
+    role: "Analista de Marketing",
+    avatar: "👩",
+    text: "Desde el inicio me pareció un beneficio que genera un verdadero círculo virtuoso: impulsa las economías locales, acompaña a una ONG, ofrece valor directo a quienes la utilizamos y permite a las empresas brindar a sus colaboradores un beneficio que hace más eficiente su presupuesto.Gracias a Coripa por trabajar en la mejora continua, buscando generar impacto positivo para la empresa y sus colaboradores.",
     rating: 5,
   },
   {
@@ -128,7 +128,7 @@ export default function WhyDonateSection() {
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
-            ¿Por qué donar con Club Triple Impacto?
+            ¿Por qué donar con AYNI?
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Somos el puente entre tu generosidad y el cambio real. Cada donación
@@ -146,20 +146,19 @@ export default function WhyDonateSection() {
               return (
                 <div
                   key={index}
-                  className={`mb-12 text-center md:mb-0 ${
-                    !isLast ? "md:border-r-2 md:border-gray-200" : ""
-                  }`}
+                  className={`mb-12 text-center md:mb-0 ${!isLast ? "md:border-r-2 md:border-gray-200" : ""
+                    }`}
                 >
                   {/* Icono */}
                   <div className="flex justify-center mb-4">
                     <IconComponent
-                      className="w-12 h-12 text-[#16a459]"
+                      className="w-12 h-12 text-[#40a8ab]"
                       strokeWidth={1.5}
                     />
                   </div>
 
                   {/* Valor */}
-                  <div className="font-bold text-[2.6rem] lg:text-5xl xl:text-6xl text-[#16a459] mb-2">
+                  <div className="font-bold text-[2.6rem] lg:text-5xl xl:text-6xl text-[#40a8ab] mb-2">
                     {stat.value}
                   </div>
 
@@ -173,57 +172,21 @@ export default function WhyDonateSection() {
           </div>
         </div>
 
-        {/* Áreas de Impacto */}
+        {/* Áreas de Impacto (ODS) */}
         <div className="mb-20">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-gray-900 mb-4">
-              Áreas donde generamos impacto
-            </h3>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Tu donación llega a donde realmente se necesita
+          <div className="text-center mb-12 px-4">
+            <p className="text-xl md:text-2xl font-medium text-gray-800 max-w-4xl mx-auto leading-relaxed">
+              AYNI aborda los 17 ODS, generando beneficios económicos, sociales y ambientales, y promoviendo la sostenibilidad y el desarrollo equitativo.
             </p>
           </div>
 
-          <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 md:px-12 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
-              {impactAreas.map((area, index) => {
-                const IconComponent = area.icon;
-                const isLast = index === impactAreas.length - 1;
-
-                return (
-                  <div
-                    key={index}
-                    className={`text-center ${
-                      !isLast && index < 5
-                        ? "lg:border-r-2 lg:border-gray-200"
-                        : ""
-                    }`}
-                  >
-                    {/* Icono */}
-                    <div className="flex justify-center mb-3">
-                      <IconComponent
-                        className="w-10 h-10 text-[#16a459]"
-                        strokeWidth={1.5}
-                      />
-                    </div>
-
-                    {/* Count */}
-                    <div className="font-bold text-3xl lg:text-4xl text-[#16a459] mb-1">
-                      {area.count}
-                    </div>
-
-                    {/* Description */}
-                    <p className="text-xs font-semibold text-gray-600 mb-2">
-                      {area.description}
-                    </p>
-
-                    {/* Title */}
-                    <p className="text-xs font-semibold uppercase tracking-wider text-gray-800">
-                      {area.title}
-                    </p>
-                  </div>
-                );
-              })}
+          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 flex justify-center">
+            <div className="relative w-full aspect-[16/9] md:aspect-[2/1] rounded-3xl overflow-hidden shadow-lg border-2 border-slate-100 bg-white hover:border-teal-200 transition-colors duration-300">
+              <img
+                src="/17ODS.png"
+                alt="17 Objetivos de Desarrollo Sostenible"
+                className="w-full h-full object-contain p-4 md:p-8"
+              />
             </div>
           </div>
         </div>
@@ -243,7 +206,7 @@ export default function WhyDonateSection() {
             {testimonials.map((testimonial, index) => (
               <div
                 key={testimonial.id}
-                className="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:border-emerald-400 hover:shadow-xl transition-all duration-300"
+                className="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:border-teal-400 hover:shadow-xl transition-all duration-300"
                 style={{
                   animation: `slideInUp 0.6s ease-out ${index * 0.15}s both`,
                 }}
@@ -251,7 +214,7 @@ export default function WhyDonateSection() {
                 {/* Rating */}
                 <div className="flex gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <span key={i} className="text-yellow-400 text-xl">
+                    <span key={i} className="text-amber-400 text-xl">
                       ⭐
                     </span>
                   ))}
@@ -282,7 +245,7 @@ export default function WhyDonateSection() {
         </div>
 
         {/* Sello de Confianza */}
-        <div className="rounded-3xl p-8 lg:p-12 text-white text-center bg-linear-to-r from-emerald-600 to-emerald-700">
+        <div className="rounded-3xl p-8 lg:p-12 text-white text-center bg-linear-to-r from-teal-600 to-teal-700">
           <div className="max-w-3xl mx-auto">
             <div className="text-6xl mb-4">🛡️</div>
             <h3 className="text-3xl font-bold mb-4">

@@ -58,15 +58,15 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
       );
 
       const cuponesDto = publicos.map(publicToCuponDto);
-      
+
       // Eliminar duplicados por MARCA
       const cuponesUnicosPorMarca = Array.from(
         new Map(cuponesDto.map((c) => [c.empresa.nombre, c])).values()
       );
-      
+
       // Guardar todos los cupones para rotación
       setTodosLosCupones(cuponesUnicosPorMarca);
-      
+
       // Mostrar 10 cupones aleatorios iniciales
       const cuponesIniciales = shuffleArray([...cuponesUnicosPorMarca]).slice(0, 10);
       setCupones(cuponesIniciales);
@@ -100,7 +100,7 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
     } else {
       // Sin clics restantes → verificar autenticación
       const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
-      
+
       if (!token) {
         // No autenticado → redirigir a login
         router.push("/login");
@@ -121,7 +121,7 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Al donar, obtenés acceso a descuentos exclusivos en servicios que
-            usas todos los días.
+            usás todos los días.
           </p>
         </div>
 
@@ -129,7 +129,7 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
         <div className="min-h-[200px]">
           {loading && (
             <div className="flex flex-col items-center justify-center py-16">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mb-4" />
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mb-4" />
               <p className="text-gray-600">Cargando cupones...</p>
             </div>
           )}
@@ -169,13 +169,13 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
               <div className="flex justify-center mt-12">
                 <button
                   onClick={handleVerMas}
-                  className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#16a459] to-emerald-600 text-white font-bold text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                  className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#40a8ab] to-teal-600 text-white font-bold text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
                 >
                   <span>Ver más descuentos</span>
-                  <svg 
-                    className="w-5 h-5 group-hover:translate-x-1 transition-transform" 
-                    fill="none" 
-                    stroke="currentColor" 
+                  <svg
+                    className="w-5 h-5 group-hover:translate-x-1 transition-transform"
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />

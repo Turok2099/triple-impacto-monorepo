@@ -26,12 +26,12 @@ export default function FounderQuote() {
                 Mariano Leguizamón
               </h1>
               <p className="text-gray-600 text-sm text-center">
-                Co Fundador, Club Triple Impacto
+                Co Fundador, AYNI
               </p>
               <p className="text-center text-gray-700 text-base pt-6 font-normal leading-relaxed italic">
-                "Cada vez que compramos y vendemos,{" "}
-                <span className="text-[#16a459] font-semibold">
-                  elegimos el mundo en el que queremos vivir"
+                "La solidaridad es un acto de amor, es un acto de justicia, es un acto de humanidad.{" "}
+                <span className="text-[#40a8ab] font-semibold">
+                  Cada vez que compramos y vendemos, elegimos el mundo en el que queremos vivir"
                 </span>
               </p>
 
@@ -50,7 +50,7 @@ export default function FounderQuote() {
                     height="24"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#16a459"
+                    stroke="#40a8ab"
                     strokeWidth="1.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -80,7 +80,7 @@ export default function FounderQuote() {
                     height="24"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#16a459"
+                    stroke="#40a8ab"
                     strokeWidth="1.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -103,7 +103,7 @@ export default function FounderQuote() {
                     height="24"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#16a459"
+                    stroke="#40a8ab"
                     strokeWidth="1.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"

@@ -65,7 +65,7 @@ export default function SeccionMisCupones() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#16a459] mx-auto mb-3" />
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#40a8ab] mx-auto mb-3" />
           <p className="text-slate-500 text-sm">Cargando tus cupones...</p>
         </div>
       </div>
@@ -81,12 +81,12 @@ export default function SeccionMisCupones() {
           <button
             onClick={() => setTab('activos')}
             className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${
-              tab === 'activos' ? 'bg-white text-[#16a459] shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              tab === 'activos' ? 'bg-white text-[#40a8ab] shadow-sm' : 'text-slate-500 hover:text-slate-700'
             }`}
           >
             Activos
             <span className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full font-black ${
-              tab === 'activos' ? 'bg-[#16a459]/10 text-[#16a459]' : 'bg-slate-200 text-slate-500'
+              tab === 'activos' ? 'bg-[#40a8ab]/10 text-[#40a8ab]' : 'bg-slate-200 text-slate-500'
             }`}>
               {cuponesActivos.length}
             </span>
@@ -110,9 +110,9 @@ export default function SeccionMisCupones() {
       {/* Lista */}
       <section className="px-6">
         {lista.length === 0 ? (
-          <div className="rounded-2xl bg-[#E8F5EE] border border-[#16a459]/20 p-10 text-center mt-2">
+          <div className="rounded-2xl bg-[#E8F5EE] border border-[#40a8ab]/20 p-10 text-center mt-2">
             <div className="flex justify-center mb-4">
-              <Ticket className="w-16 h-16 text-[#16a459]" strokeWidth={1.5} />
+              <Ticket className="w-16 h-16 text-[#40a8ab]" strokeWidth={1.5} />
             </div>
             <h3 className="text-lg font-bold text-[#2D3748] mb-2">
               {tab === 'activos' ? 'No tenés cupones activos' : 'No tenés cupones usados'}
@@ -129,7 +129,7 @@ export default function SeccionMisCupones() {
               <div
                 key={cupon.id}
                 className={`rounded-2xl border p-5 shadow-sm ${
-                  tab === 'activos' ? 'bg-[#E8F5EE] border-[#16a459]/20' : 'bg-slate-50 border-slate-200'
+                  tab === 'activos' ? 'bg-[#E8F5EE] border-[#40a8ab]/20' : 'bg-slate-50 border-slate-200'
                 }`}
               >
                 <div className="flex justify-between items-start mb-3">
@@ -141,7 +141,7 @@ export default function SeccionMisCupones() {
                       <p className="text-xs text-slate-500 mt-0.5">{cupon.empresaNombre}</p>
                     )}
                     {cupon.descuento && (
-                      <span className="inline-block mt-1 text-[10px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
+                      <span className="inline-block mt-1 text-[10px] font-bold bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full">
                         {cupon.descuento}
                       </span>
                     )}
@@ -160,12 +160,12 @@ export default function SeccionMisCupones() {
 
                 {cupon.codigo && (
                   <div className={`bg-white rounded-xl p-3 border border-dashed mb-3 flex justify-between items-center ${
-                    tab === 'activos' ? 'border-[#16a459]/30' : 'border-slate-200'
+                    tab === 'activos' ? 'border-[#40a8ab]/30' : 'border-slate-200'
                   }`}>
                     <div>
                       <p className="text-[8px] uppercase font-bold text-slate-400 mb-0.5">Código de descuento</p>
                       <p className={`text-base font-mono font-black tracking-widest uppercase ${
-                        tab === 'activos' ? 'text-[#16a459]' : 'text-slate-400 line-through'
+                        tab === 'activos' ? 'text-[#40a8ab]' : 'text-slate-400 line-through'
                       }`}>
                         {cupon.codigo}
                       </p>
@@ -176,7 +176,7 @@ export default function SeccionMisCupones() {
                         className={`size-8 rounded-full flex items-center justify-center transition-colors ${
                           copiedCode === cupon.id
                             ? 'bg-green-100 text-green-600'
-                            : 'bg-[#16a459]/10 text-[#16a459] hover:bg-[#16a459]/20'
+                            : 'bg-[#40a8ab]/10 text-[#40a8ab] hover:bg-[#40a8ab]/20'
                         }`}
                       >
                         {copiedCode === cupon.id ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
@@ -193,7 +193,7 @@ export default function SeccionMisCupones() {
                   <button
                     onClick={() => handleMarcarUsado(cupon.id)}
                     disabled={marcandoUsado === cupon.id}
-                    className="w-full py-2.5 bg-[#16a459] hover:bg-[#12854a] text-white text-xs font-bold rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                    className="w-full py-2.5 bg-[#40a8ab] hover:bg-[#12854a] text-white text-xs font-bold rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
                   >
                     {marcandoUsado === cupon.id ? (
                       <>

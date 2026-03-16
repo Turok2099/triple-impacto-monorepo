@@ -27,6 +27,30 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function isTokenExpired(token: string): boolean {
+  if (!token) return true;
+  try {
+    const base64Url = token.split('.')[1];
+    if (!base64Url) return true;
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      window
+        .atob(base64)
+        .split('')
+        .map(function (c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join(''),
+    );
+    const payload = JSON.parse(jsonPayload);
+    // JWT exp is in seconds, Date.now() is in milliseconds
+    const currentTime = Math.floor(Date.now() / 1000);
+    return payload.exp < currentTime;
+  } catch (e) {
+    return true; // Si falla el decodificado, asumimos expirado
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,13 +62,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const userData = localStorage.getItem("user");
 
     if (token && userData) {
-      try {
-        const parsedUser = JSON.parse(userData);
-        setUser(parsedUser);
-      } catch (error) {
-        console.error("Error parsing user data:", error);
+      if (isTokenExpired(token)) {
+        // Token expirado localmente, limpiar rastro
         localStorage.removeItem("auth_token");
         localStorage.removeItem("user");
+        sessionStorage.setItem("session_expired", "true");
+        setUser(null);
+      } else {
+        try {
+          const parsedUser = JSON.parse(userData);
+          setUser(parsedUser);
+        } catch (error) {
+          console.error("Error parsing user data:", error);
+          localStorage.removeItem("auth_token");
+          localStorage.removeItem("user");
+        }
       }
     }
 
@@ -97,7 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           aria-label="Cerrando sesión"
         >
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4" />
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4" />
             <p className="text-gray-700 font-medium">Cerrando sesión...</p>
           </div>
         </div>

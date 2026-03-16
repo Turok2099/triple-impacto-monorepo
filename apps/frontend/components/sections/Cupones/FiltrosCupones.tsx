@@ -70,7 +70,7 @@ export default function FiltrosCupones({
   if (loading) {
     return (
       <div className="mb-8 flex items-center justify-center py-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
       </div>
     );
   }
@@ -92,8 +92,8 @@ export default function FiltrosCupones({
                 onClick={() => handleCategoriaClick(categoria.id, categoria.nombre)}
                 className={`shrink-0 whitespace-nowrap px-5 py-2 rounded-full font-bold text-sm transition-all ${
                   isSelected
-                    ? "bg-emerald-600 text-white shadow-sm"
-                    : "bg-white text-slate-600 border border-emerald-100 hover:border-emerald-400"
+                    ? "bg-teal-600 text-white shadow-sm"
+                    : "bg-white text-slate-600 border border-teal-100 hover:border-teal-400"
                 }`}
               >
                 {categoria.nombre}

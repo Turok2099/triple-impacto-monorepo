@@ -8,7 +8,7 @@ export default function HowItWorksSection() {
     },
     {
       number: "2",
-      title: "Creá tu cuenta y hacé tu donación Fácil y sin complicaciones. ",
+      title: "Creá tu cuenta y hacé tu donación: Fácil y sin complicaciones. ",
       description:
         "Al instante, sin trámites. Accedé a tus beneficios desde donde quieras.",
     },
@@ -52,7 +52,7 @@ export default function HowItWorksSection() {
           <div className="relative grid grid-cols-1 text-center gap-y-12 md:grid-cols-3 gap-x-12">
             {steps.map((step, index) => (
               <div key={index}>
-                <div className="flex items-center justify-center w-16 h-16 mx-auto bg-[#16a459] border-2 border-[#16a459] rounded-full shadow-lg">
+                <div className="flex items-center justify-center w-16 h-16 mx-auto bg-[#40a8ab] border-2 border-[#40a8ab] rounded-full shadow-lg">
                   <span className="text-xl font-semibold text-white">
                     {step.number}
                   </span>

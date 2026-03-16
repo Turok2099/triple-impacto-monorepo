@@ -120,7 +120,7 @@ export default function SeccionPerfil() {
       {toast && (
         <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-xl text-sm font-semibold transition-all animate-in fade-in slide-in-from-bottom-4 ${
           toast.tipo === 'ok'
-            ? 'bg-[#16a459] text-white'
+            ? 'bg-[#40a8ab] text-white'
             : 'bg-red-500 text-white'
         }`}>
           {toast.tipo === 'ok'
@@ -145,18 +145,18 @@ export default function SeccionPerfil() {
               backgroundImage: `url(https://ui-avatars.com/api/?name=${encodeURIComponent(user.nombre)}&background=16a459&color=fff&size=192)`,
             }}
           />
-          <button className="absolute bottom-0 right-0 bg-[#16a459] text-white p-1.5 rounded-full border-2 border-white shadow-md active:scale-95 transition-transform hover:bg-[#16a459]/90">
+          <button className="absolute bottom-0 right-0 bg-[#40a8ab] text-white p-1.5 rounded-full border-2 border-white shadow-md active:scale-95 transition-transform hover:bg-[#40a8ab]/90">
             <Camera className="w-4 h-4" />
           </button>
         </div>
-        <p className="mt-3 text-[#16a459] text-xs font-bold uppercase tracking-wider">Cambiar Foto</p>
+        <p className="mt-3 text-[#40a8ab] text-xs font-bold uppercase tracking-wider">Cambiar Foto</p>
       </section>
 
       {/* Badge miembro activo */}
       <section className="px-6 mb-8">
-        <div className="bg-[#16a459]/5 border border-[#16a459]/10 rounded-2xl p-4 flex items-center justify-between">
+        <div className="bg-[#40a8ab]/5 border border-[#40a8ab]/10 rounded-2xl p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-[#16a459] text-white p-2 rounded-xl">
+            <div className="bg-[#40a8ab] text-white p-2 rounded-xl">
               <CheckCircle className="w-5 h-5" />
             </div>
             <div>
@@ -180,7 +180,7 @@ export default function SeccionPerfil() {
           <div>
             <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1">NOMBRE COMPLETO</label>
             <input
-              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#16a459] focus:border-[#16a459] transition-all shadow-sm"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all shadow-sm"
               type="text"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
@@ -189,7 +189,7 @@ export default function SeccionPerfil() {
           <div>
             <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1">CORREO ELECTRÓNICO</label>
             <input
-              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#16a459] focus:border-[#16a459] transition-all shadow-sm"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all shadow-sm"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -198,7 +198,7 @@ export default function SeccionPerfil() {
           <div>
             <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1">NÚMERO DE TELÉFONO</label>
             <input
-              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#16a459] focus:border-[#16a459] transition-all shadow-sm"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all shadow-sm"
               type="tel"
               value={telefono}
               onChange={(e) => setTelefono(e.target.value)}
@@ -225,7 +225,7 @@ export default function SeccionPerfil() {
             <div>
               <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1">PROVINCIA</label>
               <select
-                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#16a459] focus:border-[#16a459] transition-all appearance-none cursor-pointer shadow-sm"
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all appearance-none cursor-pointer shadow-sm"
                 value={provincia}
                 onChange={(e) => setProvincia(e.target.value)}
               >
@@ -238,7 +238,7 @@ export default function SeccionPerfil() {
             <div>
               <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1">LOCALIDAD</label>
               <input
-                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#16a459] focus:border-[#16a459] transition-all shadow-sm"
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all shadow-sm"
                 type="text"
                 value={localidad}
                 onChange={(e) => setLocalidad(e.target.value)}
@@ -250,7 +250,7 @@ export default function SeccionPerfil() {
           <button
             onClick={handleGuardarPerfil}
             disabled={guardando}
-            className="w-full bg-[#16a459] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-[#16a459]/20 active:scale-[0.98] transition-all mt-2 hover:bg-[#16a459]/90 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-[#40a8ab] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-[#40a8ab]/20 active:scale-[0.98] transition-all mt-2 hover:bg-[#40a8ab]/90 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {guardando ? 'Guardando...' : 'Guardar Cambios'}
           </button>
@@ -261,7 +261,7 @@ export default function SeccionPerfil() {
       <section className="px-6 mb-8">
         <button
           onClick={() => setMostrarCambioPass((v) => !v)}
-          className="w-full flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl shadow-sm hover:border-[#16a459]/40 transition-colors"
+          className="w-full flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl shadow-sm hover:border-[#40a8ab]/40 transition-colors"
         >
           <div className="flex items-center gap-3">
             <div className="bg-slate-100 p-2 rounded-xl">
@@ -282,7 +282,7 @@ export default function SeccionPerfil() {
               <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1">CONTRASEÑA ACTUAL</label>
               <div className="relative">
                 <input
-                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 pr-11 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#16a459] focus:border-[#16a459] transition-all shadow-sm"
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 pr-11 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all shadow-sm"
                   type={verPassActual ? 'text' : 'password'}
                   value={passActual}
                   onChange={(e) => setPassActual(e.target.value)}
@@ -303,7 +303,7 @@ export default function SeccionPerfil() {
               <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1">NUEVA CONTRASEÑA</label>
               <div className="relative">
                 <input
-                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 pr-11 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#16a459] focus:border-[#16a459] transition-all shadow-sm"
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 pr-11 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all shadow-sm"
                   type={verPassNueva ? 'text' : 'password'}
                   value={passNueva}
                   onChange={(e) => setPassNueva(e.target.value)}
@@ -324,7 +324,7 @@ export default function SeccionPerfil() {
               <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1">CONFIRMAR NUEVA CONTRASEÑA</label>
               <div className="relative">
                 <input
-                  className={`w-full bg-white border rounded-xl px-4 py-3 pr-11 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#16a459] focus:border-[#16a459] transition-all shadow-sm ${
+                  className={`w-full bg-white border rounded-xl px-4 py-3 pr-11 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all shadow-sm ${
                     passConfirmar && passNueva !== passConfirmar
                       ? 'border-red-300'
                       : 'border-slate-200'
@@ -372,12 +372,12 @@ export default function SeccionPerfil() {
                 <p className="text-[11px] text-slate-400 font-medium">Vence 12/26</p>
               </div>
             </div>
-            <button className="text-[#16a459] text-xs font-bold px-3 py-1 bg-[#16a459]/5 rounded-lg hover:bg-[#16a459]/10 transition-colors">
+            <button className="text-[#40a8ab] text-xs font-bold px-3 py-1 bg-[#40a8ab]/5 rounded-lg hover:bg-[#40a8ab]/10 transition-colors">
               Editar
             </button>
           </div>
         </div>
-        <button className="w-full border-2 border-dashed border-[#16a459]/30 text-[#16a459] font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 bg-[#16a459]/5 hover:bg-[#16a459]/10 transition-colors">
+        <button className="w-full border-2 border-dashed border-[#40a8ab]/30 text-[#40a8ab] font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 bg-[#40a8ab]/5 hover:bg-[#40a8ab]/10 transition-colors">
           <PlusCircle className="w-5 h-5" />
           Agregar Método de Pago
         </button>

@@ -51,14 +51,14 @@ export default function ContactPage() {
               {/* Email */}
               <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
                 <div className="flex items-start gap-4">
-                  <div className="shrink-0 w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                    <Mail className="w-6 h-6 text-emerald-600" />
+                  <div className="shrink-0 w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center">
+                    <Mail className="w-6 h-6 text-teal-600" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
                     <a
                       href="mailto:clubtripleimpacto@gmail.com"
-                      className="text-emerald-600 hover:text-emerald-700 transition-colors"
+                      className="text-teal-600 hover:text-teal-700 transition-colors"
                     >
                       clubtripleimpacto@gmail.com
                     </a>
@@ -113,15 +113,15 @@ export default function ContactPage() {
             </div>
 
             {/* Preguntas frecuentes */}
-            <div className="bg-linear-to-br from-emerald-500 to-blue-600 rounded-2xl p-8 text-white">
+            <div className="bg-linear-to-br from-teal-500 to-blue-600 rounded-2xl p-8 text-white">
               <h3 className="text-2xl font-bold mb-4">¿Tienes dudas rápidas?</h3>
-              <p className="text-emerald-50 mb-6">
+              <p className="text-teal-50 mb-6">
                 Consulta nuestra sección de preguntas frecuentes antes de
                 escribirnos.
               </p>
               <a
                 href="/#preguntas"
-                className="inline-block px-6 py-3 bg-white text-emerald-700 font-semibold rounded-xl hover:shadow-lg transition-all"
+                className="inline-block px-6 py-3 bg-white text-teal-700 font-semibold rounded-xl hover:shadow-lg transition-all"
               >
                 Ver FAQ
               </a>
@@ -243,7 +243,7 @@ export default function ContactPage() {
               {/* Submit */}
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-linear-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 transform hover:-translate-y-0.5"
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 transform hover:-translate-y-0.5"
               >
                 <Send className="w-5 h-5" />
                 <span>Enviar mensaje</span>
@@ -254,7 +254,7 @@ export default function ContactPage() {
               Al enviar este formulario, aceptas nuestra{" "}
               <a
                 href="/privacidad"
-                className="text-emerald-600 hover:text-emerald-700"
+                className="text-teal-600 hover:text-teal-700"
               >
                 Política de Privacidad
               </a>
@@ -267,7 +267,7 @@ export default function ContactPage() {
           <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">
             Horarios de atención
           </h3>
-          <div className="max-w-md mx-auto text-center p-6 bg-linear-to-br from-emerald-50 to-blue-50 rounded-xl">
+          <div className="max-w-md mx-auto text-center p-6 bg-linear-to-br from-teal-50 to-blue-50 rounded-xl">
             <div className="text-5xl mb-4">🕐</div>
             <h4 className="text-2xl font-bold text-gray-900 mb-2">
               Disponibles 24 horas
@@ -275,7 +275,7 @@ export default function ContactPage() {
             <p className="text-gray-600 mb-2">
               Atención continua vía WhatsApp y Email
             </p>
-            <p className="text-emerald-600 font-medium">
+            <p className="text-teal-600 font-medium">
               Los 7 días de la semana
             </p>
           </div>

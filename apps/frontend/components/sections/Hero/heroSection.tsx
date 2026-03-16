@@ -38,7 +38,7 @@ export default function HeroSection() {
             <div className="flex flex-col sm:flex-row gap-4">
               <a
                 href="/donar"
-                className="group px-8 py-4 bg-linear-to-r from-emerald-600 to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 flex items-center justify-center gap-2"
+                className="group px-8 py-4 bg-linear-to-r from-teal-600 to-teal-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 flex items-center justify-center gap-2"
               >
                 <span>Quiero donar y obtener descuentos</span>
                 <svg
@@ -55,19 +55,14 @@ export default function HeroSection() {
                   />
                 </svg>
               </a>
-              <a
-                href="#cupones"
-                className="px-8 py-4 bg-white text-gray-800 font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 border-2 border-gray-200 hover:border-emerald-300"
-              >
-                Ver beneficios disponibles
-              </a>
+
             </div>
 
             {/* Trust indicators */}
             <div className="mt-8 flex flex-wrap items-center gap-6 text-sm text-white">
               <div className="flex items-center gap-2">
                 <svg
-                  className="w-5 h-5 text-emerald-400"
+                  className="w-5 h-5 text-teal-400"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -81,7 +76,7 @@ export default function HeroSection() {
               </div>
               <div className="flex items-center gap-2">
                 <svg
-                  className="w-5 h-5 text-emerald-400"
+                  className="w-5 h-5 text-teal-400"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -95,7 +90,7 @@ export default function HeroSection() {
               </div>
               <div className="flex items-center gap-2">
                 <svg
-                  className="w-5 h-5 text-emerald-400"
+                  className="w-5 h-5 text-teal-400"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -112,20 +107,6 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Flecha scroll down */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <svg
-          className="w-6 h-6 text-white/70"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-        </svg>
-      </div>
     </section>
   );
 }

@@ -24,7 +24,7 @@ export default function OngFooter() {
                             href="#"
                             className="inline-flex items-center gap-2 text-xl font-bold text-white mb-2"
                         >
-                            <span className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center text-sm">
+                            <span className="w-8 h-8 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg flex items-center justify-center text-sm">
                                 ONG
                             </span>
                             <span>Nombre ONG</span>
@@ -53,7 +53,7 @@ export default function OngFooter() {
                             <a
                                 key={social.name}
                                 href={social.href}
-                                className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-lg hover:bg-emerald-600 transition-colors"
+                                className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-lg hover:bg-teal-600 transition-colors"
                                 aria-label={social.name}
                             >
                                 {social.icon}

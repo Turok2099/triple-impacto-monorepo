@@ -2,11 +2,14 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, isAuthenticated, logout, isLoading } = useAuth();
+  const pathname = usePathname();
 
   // Prevenir scroll cuando el menú mobile está abierto
   useEffect(() => {
@@ -24,7 +27,10 @@ export default function Navbar() {
     { name: "Contacto", href: "/contact", icon: "📞" },
   ];
 
-  const handleNavClick = () => {
+  const handleNavClick = (e?: React.MouseEvent<HTMLAnchorElement>, href?: string) => {
+    if (e && href && pathname === href) {
+      e.preventDefault();
+    }
     setIsMobileMenuOpen(false);
   };
 
@@ -39,30 +45,34 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             {/* Logo + Branding */}
-            <a
+            <Link
               href="/"
+              onClick={(e) => handleNavClick(e, "/")}
               className="flex items-center group transition-transform hover:scale-110"
             >
               <Image
-                src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1768059717/LOGO_CLUB_TRIPLE_IMPACTO_jztcqa.png"
-                alt="Club Triple Impacto"
+                src="/ayani_logo.png"
+                alt="AYNI"
                 width={180}
                 height={60}
                 className="h-14 w-auto object-contain"
                 priority
               />
-            </a>
+            </Link>
 
             {/* Links Desktop */}
             <div className="hidden lg:flex items-center gap-1">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.name}
                   href={link.href}
-                  className="px-4 py-2 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all duration-200 font-medium text-sm"
+                  onClick={(e) => {
+                    if (pathname === link.href) e.preventDefault();
+                  }}
+                  className="px-4 py-2 text-gray-700 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-all duration-200 font-medium text-sm"
                 >
                   {link.name}
-                </a>
+                </Link>
               ))}
             </div>
 
@@ -73,15 +83,18 @@ export default function Navbar() {
                   {/* Auth - Usuario logueado */}
                   {isAuthenticated && user ? (
                     <div className="flex items-center gap-3">
-                      <a
+                      <Link
                         href="/dashboard"
-                        className="px-4 py-2 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-all duration-200 font-medium text-sm"
+                        onClick={(e) => {
+                          if (pathname === "/dashboard") e.preventDefault();
+                        }}
+                        className="px-4 py-2 text-teal-600 hover:text-teal-700 hover:bg-teal-50 rounded-lg transition-all duration-200 font-medium text-sm"
                       >
                         Dashboard
-                      </a>
+                      </Link>
                       <span className="text-sm text-gray-700 font-medium">
                         Hola,{" "}
-                        <span className="text-emerald-600">{user.nombre}</span>
+                        <span className="text-teal-600">{user.nombre}</span>
                       </span>
                       <button
                         onClick={handleLogout}
@@ -92,12 +105,15 @@ export default function Navbar() {
                     </div>
                   ) : (
                     /* Auth - Usuario no logueado */
-                    <a
+                    <Link
                       href="/login"
-                      className="px-4 py-2 text-gray-700 hover:text-emerald-600 transition-colors font-medium text-sm"
+                      onClick={(e) => {
+                        if (pathname === "/login") e.preventDefault();
+                      }}
+                      className="px-4 py-2 text-gray-700 hover:text-teal-600 transition-colors font-medium text-sm"
                     >
                       Iniciar sesión
-                    </a>
+                    </Link>
                   )}
 
                 </>
@@ -170,14 +186,14 @@ export default function Navbar() {
           {/* Header del menu */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-linear-to-br from-emerald-500 to-blue-500 rounded-xl flex items-center justify-center text-xl">
+              <div className="w-10 h-10 bg-linear-to-br from-teal-500 to-blue-500 rounded-xl flex items-center justify-center text-xl">
                 💚
               </div>
               <div>
                 <div className="text-gray-900 font-bold">
-                  Club Triple Impacto
+                  AYNI
                 </div>
-                <div className="text-emerald-600 text-xs">Menú</div>
+                <div className="text-teal-600 text-xs">Menú</div>
               </div>
             </div>
             <button
@@ -203,15 +219,15 @@ export default function Navbar() {
           {/* Links */}
           <div className="p-6 space-y-2">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
                 href={link.href}
-                onClick={handleNavClick}
-                className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-xl transition-all duration-200 font-medium"
+                onClick={(e) => handleNavClick(e, link.href)}
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-teal-50 hover:text-teal-600 rounded-xl transition-all duration-200 font-medium"
               >
                 <span className="text-2xl">{link.icon}</span>
                 <span>{link.name}</span>
-              </a>
+              </Link>
             ))}
 
             {/* Separador */}
@@ -222,20 +238,20 @@ export default function Navbar() {
               <>
                 {isAuthenticated && user ? (
                   <>
-                    <div className="px-4 py-3 bg-emerald-50 rounded-xl">
+                    <div className="px-4 py-3 bg-teal-50 rounded-xl">
                       <div className="text-sm text-gray-600">Bienvenido/a</div>
-                      <div className="text-lg font-bold text-emerald-600">
+                      <div className="text-lg font-bold text-teal-600">
                         {user.nombre}
                       </div>
                     </div>
-                    <a
+                    <Link
                       href="/dashboard"
-                      onClick={handleNavClick}
-                      className="flex items-center gap-3 px-4 py-3 text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors font-medium"
+                      onClick={(e) => handleNavClick(e, "/dashboard")}
+                      className="flex items-center gap-3 px-4 py-3 text-teal-600 hover:bg-teal-50 rounded-xl transition-colors font-medium"
                     >
                       <span className="text-2xl">📊</span>
                       <span>Dashboard</span>
-                    </a>
+                    </Link>
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors font-medium"
@@ -246,23 +262,23 @@ export default function Navbar() {
                   </>
                 ) : (
                   <>
-                    <a
+                    <Link
                       href="/login"
-                      onClick={handleNavClick}
+                      onClick={(e) => handleNavClick(e, "/login")}
                       className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-colors font-medium"
                     >
                       <span className="text-2xl">👤</span>
                       <span>Iniciar sesión</span>
-                    </a>
+                    </Link>
 
-                    <a
+                    <Link
                       href="/registro"
-                      onClick={handleNavClick}
+                      onClick={(e) => handleNavClick(e, "/registro")}
                       className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-colors font-medium"
                     >
                       <span className="text-2xl">✨</span>
                       <span>Registrarse</span>
-                    </a>
+                    </Link>
                   </>
                 )}
               </>

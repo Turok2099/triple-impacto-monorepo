@@ -34,7 +34,7 @@ export default function FormularioPagoFiserv({
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <div className="flex flex-col items-center max-w-sm text-center">
         <div className="mb-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#16a459] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#40a8ab] mx-auto"></div>
         </div>
 
         <h2 className="text-xl font-bold text-[#1A202C] mb-2">
@@ -53,7 +53,7 @@ export default function FormularioPagoFiserv({
             Si tu navegador bloquea la redirección,{' '}
             <button
               onClick={() => enviarFormularioFiserv(gatewayUrl, formParams)}
-              className="text-[#16a459] hover:underline font-semibold"
+              className="text-[#40a8ab] hover:underline font-semibold"
             >
               continúa manualmente aquí
             </button>

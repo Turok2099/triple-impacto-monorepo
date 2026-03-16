@@ -44,7 +44,7 @@ type ActiveTab = "inicio" | "perfil" | "cupones" | "pagos";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, isLoading: authLoading, logout } = useAuth();
+  const { user, isLoading: authLoading, logout, handleSessionExpired } = useAuth();
   const [activeTab, setActiveTab] = useState<ActiveTab>("inicio");
   const [dashboard, setDashboard] = useState<DashboardUsuario | null>(null);
   const [cupones, setCupones] = useState<PublicCouponDto[]>([]);
@@ -107,10 +107,7 @@ export default function DashboardPage() {
       console.error("Error crítico al cargar dashboard:", err);
       // Solo setear error si el dashboard principal falló
       if (err.message.includes("401") || err.message.includes("Unauthorized")) {
-        setError("Tu sesión ha expirado. Redirigiendo a login...");
-        setTimeout(() => {
-          router.push("/login");
-        }, 1500);
+        handleSessionExpired();
       } else {
         setError(err.message || "Error al cargar el dashboard");
       }
@@ -187,9 +184,7 @@ export default function DashboardPage() {
     } catch (err: any) {
       // Si es error 401, redirigir a login
       if (err.message.includes("401") || err.message.includes("Unauthorized")) {
-        localStorage.removeItem("auth_token");
-        localStorage.removeItem("user");
-        router.push("/login");
+        handleSessionExpired();
         throw new Error("Sesión expirada");
       }
       throw err;
@@ -263,7 +258,7 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Cargando tu dashboard...</p>
         </div>
       </div>
@@ -282,7 +277,7 @@ export default function DashboardPage() {
             <p className="text-gray-600 mb-4">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+              className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
             >
               Reintentar
             </button>
@@ -314,7 +309,7 @@ export default function DashboardPage() {
               <span className="font-bold text-xl text-[#1A202C]">
                 ¡Hola, {dashboard.usuario.nombre.split(" ")[0]}!
               </span>
-              <span className="bg-[#16a459]/10 text-[#16a459] text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+              <span className="bg-[#40a8ab]/10 text-[#40a8ab] text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
                 Miembro Activo
               </span>
             </div>
@@ -324,35 +319,35 @@ export default function DashboardPage() {
           <div className="flex items-center justify-center gap-8">
             <button
               onClick={() => setActiveTab("inicio")}
-              className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "inicio" ? "text-[#16a459]" : "text-slate-400 hover:text-[#16a459]"}`}
+              className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "inicio" ? "text-[#40a8ab]" : "text-slate-400 hover:text-[#40a8ab]"}`}
             >
               <LayoutGrid className="w-6 h-6" strokeWidth={2} />
               <span className={`text-xs ${activeTab === "inicio" ? "font-semibold" : "font-medium"}`}>Inicio</span>
             </button>
             <button
               onClick={() => setActiveTab("perfil")}
-              className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "perfil" ? "text-[#16a459]" : "text-slate-400 hover:text-[#16a459]"}`}
+              className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "perfil" ? "text-[#40a8ab]" : "text-slate-400 hover:text-[#40a8ab]"}`}
             >
               <UserCircle className="w-6 h-6" strokeWidth={2} />
               <span className={`text-xs ${activeTab === "perfil" ? "font-semibold" : "font-medium"}`}>Perfil</span>
             </button>
             <button
               onClick={() => setActiveTab("cupones")}
-              className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "cupones" ? "text-[#16a459]" : "text-slate-400 hover:text-[#16a459]"}`}
+              className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "cupones" ? "text-[#40a8ab]" : "text-slate-400 hover:text-[#40a8ab]"}`}
             >
               <Gift className="w-6 h-6" strokeWidth={2} />
               <span className={`text-xs ${activeTab === "cupones" ? "font-semibold" : "font-medium"}`}>Mis Cupones</span>
             </button>
             <button
               onClick={() => setActiveTab("pagos")}
-              className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "pagos" ? "text-[#16a459]" : "text-slate-400 hover:text-[#16a459]"}`}
+              className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "pagos" ? "text-[#40a8ab]" : "text-slate-400 hover:text-[#40a8ab]"}`}
             >
               <Receipt className="w-6 h-6" strokeWidth={2} />
               <span className={`text-xs ${activeTab === "pagos" ? "font-semibold" : "font-medium"}`}>Mis pagos</span>
             </button>
             <a
               href="/donar"
-              className="flex flex-col items-center gap-1 text-slate-400 hover:text-[#16a459] transition-colors"
+              className="flex flex-col items-center gap-1 text-slate-400 hover:text-[#40a8ab] transition-colors"
             >
               <Heart className="w-6 h-6" strokeWidth={2} />
               <span className="text-xs font-medium">Donar +</span>
@@ -382,32 +377,32 @@ export default function DashboardPage() {
           </h2>
           <div className="grid grid-cols-3 gap-3">
             <div className="bg-white p-4 rounded-2xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-slate-50 flex flex-col items-center gap-2">
-              <Ticket className="w-8 h-8 text-[#16a459]" strokeWidth={1.5} />
+              <Ticket className="w-8 h-8 text-[#40a8ab]" strokeWidth={1.5} />
               <p className="text-[10px] font-semibold text-[#718096] uppercase tracking-tight text-center">
                 Cupones Activos
               </p>
-              <p className="text-2xl font-bold text-[#16a459]">
+              <p className="text-2xl font-bold text-[#40a8ab]">
                 {dashboard.estadisticas?.cuponesActivos || 0}
               </p>
             </div>
             <div className="bg-white p-4 rounded-2xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-slate-50 flex flex-col items-center gap-2">
               <CheckCircle2
-                className="w-8 h-8 text-[#16a459]"
+                className="w-8 h-8 text-[#40a8ab]"
                 strokeWidth={1.5}
               />
               <p className="text-[10px] font-semibold text-[#718096] uppercase tracking-tight text-center">
                 Cupones Usados
               </p>
-              <p className="text-2xl font-bold text-[#16a459]">
+              <p className="text-2xl font-bold text-[#40a8ab]">
                 {dashboard.estadisticas?.cuponesUsados || 0}
               </p>
             </div>
             <div className="bg-white p-4 rounded-2xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-slate-50 flex flex-col items-center gap-2">
-              <Heart className="w-8 h-8 text-[#16a459]" strokeWidth={1.5} />
+              <Heart className="w-8 h-8 text-[#40a8ab]" strokeWidth={1.5} />
               <p className="text-[10px] font-semibold text-[#718096] uppercase tracking-tight text-center">
                 Total Donado
               </p>
-              <p className="text-2xl font-bold text-[#16a459]">
+              <p className="text-2xl font-bold text-[#40a8ab]">
                 $
                 {dashboard.estadisticas?.totalDonado?.toLocaleString("es-AR") ||
                   "0"}
@@ -437,7 +432,7 @@ export default function DashboardPage() {
               Mis Fundaciones
             </h3>
           </div>
-          <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-4">
             {dashboard.fundaciones && dashboard.fundaciones.length > 0 ? (
               dashboard.fundaciones.map((fundacion) => {
                 const logoUrl = getOrganizationLogoUrl(fundacion.nombre, fundacion.slug);
@@ -448,10 +443,10 @@ export default function DashboardPage() {
                 return (
                 <div
                   key={fundacion.id}
-                  className="min-w-[260px] max-w-[280px] bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-[0_4px_20px_-2px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] transition-shadow"
+                  className="bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-[0_4px_20px_-2px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] transition-shadow flex flex-col h-full"
                 >
                   {/* Bloque logo centrado (sin caja: solo logo visible) */}
-                  <div className="pt-6 pb-4 px-6 flex flex-col items-center">
+                  <div className="pt-6 pb-4 px-6 flex flex-col items-center flex-1">
                     <div className="size-20 shrink-0 flex items-center justify-center overflow-hidden">
                       {useLogo && logoUrl ? (
                         <img
@@ -468,10 +463,10 @@ export default function DashboardPage() {
                         />
                       )}
                     </div>
-                    <h4 className="font-bold text-[#1A202C] text-sm text-center mt-3 line-clamp-3 min-h-[3.25rem] leading-tight">
+                    <h4 className="font-bold text-[#1A202C] text-sm text-center mt-3 line-clamp-3 leading-tight">
                       {fundacion.nombre}
                     </h4>
-                    <p className="text-[11px] text-slate-400 mt-1">
+                    <p className="text-[11px] text-slate-400 mt-1 mb-2">
                       Desde{" "}
                       {new Date(fundacion.fechaAfiliacion).toLocaleDateString("es-AR", {
                         month: "short",
@@ -480,11 +475,11 @@ export default function DashboardPage() {
                     </p>
                   </div>
                   {/* Bloque donado destacado */}
-                  <div className="bg-[#16a459]/08 border-t border-[#16a459]/15 px-6 py-4">
-                    <p className="text-[10px] text-[#16a459] uppercase font-bold tracking-wider mb-0.5">
+                  <div className="bg-[#40a8ab]/10 border-t border-[#40a8ab]/15 px-6 py-4 mt-auto">
+                    <p className="text-[10px] text-[#40a8ab] uppercase font-bold tracking-wider mb-0.5">
                       Tu aporte
                     </p>
-                    <p className="text-xl font-bold text-[#16a459]">
+                    <p className="text-xl font-bold text-[#40a8ab]">
                       ${totalFormateado}
                     </p>
                   </div>
@@ -492,14 +487,14 @@ export default function DashboardPage() {
               );
               })
             ) : (
-              <div className="min-w-full bg-white border border-slate-100 rounded-3xl p-8 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] text-center">
+              <div className="col-span-full bg-white border border-slate-100 rounded-3xl p-8 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] text-center">
                 <span className="text-4xl mb-2 block">💝</span>
                 <p className="text-slate-600 text-sm mb-4">
                   Aún no has realizado donaciones. ¡Comienza hoy!
                 </p>
                 <a
                   href="/donar"
-                  className="inline-block px-6 py-3 bg-[#16a459] text-white rounded-full text-sm font-bold hover:bg-[#12854a] transition-colors"
+                  className="inline-block px-6 py-3 bg-[#40a8ab] text-white rounded-full text-sm font-bold hover:bg-[#12854a] transition-colors"
                 >
                   Donar Ahora
                 </a>
@@ -514,18 +509,18 @@ export default function DashboardPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-center text-slate-900 tracking-tight">
               TUS DESCUENTOS EXCLUSIVOS
             </h2>
-            <span className="inline-flex items-center justify-center px-4 py-2 bg-[#16a459] text-white text-lg font-bold rounded-full shadow-lg">
+            <span className="inline-flex items-center justify-center px-4 py-2 bg-[#40a8ab] text-white text-lg font-bold rounded-full shadow-lg">
               {totalCuponesDisponibles}
             </span>
           </div>
 
           {/* Search Bar */}
           <div className="relative group">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors">
               🔍
             </span>
             <input
-              className="w-full bg-white border border-emerald-100 rounded-xl py-3 pl-10 pr-4 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all"
+              className="w-full bg-white border border-teal-100 rounded-xl py-3 pl-10 pr-4 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all"
               placeholder="Buscar marcas y cupones..."
               type="text"
               value={busqueda}
@@ -544,8 +539,8 @@ export default function DashboardPage() {
                       key={categoria.id}
                       onClick={() => setCategoriaSeleccionada(categoria.nombre)}
                       className={`flex items-center gap-2 whitespace-nowrap px-5 py-2.5 rounded-full font-bold text-sm transition-all hover:scale-110 ${categoriaSeleccionada === categoria.nombre
-                        ? "bg-emerald-600 text-white shadow-md"
-                        : "bg-white text-slate-600 border border-emerald-100 hover:border-emerald-400 hover:shadow-md"
+                        ? "bg-teal-600 text-white shadow-md"
+                        : "bg-white text-slate-600 border border-teal-100 hover:border-teal-400 hover:shadow-md"
                         }`}
                     >
                       <IconComponent className="w-4 h-4" strokeWidth={2.5} />
@@ -559,9 +554,9 @@ export default function DashboardPage() {
 
           {/* Indicador de búsqueda activa */}
           {busquedaActiva && busqueda && (
-            <div className="bg-emerald-100 border border-emerald-200 rounded-xl px-4 py-3 flex items-center justify-between mb-6">
+            <div className="bg-teal-100 border border-teal-200 rounded-xl px-4 py-3 flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
-                <span className="text-emerald-700 font-bold">🔍 Buscando:</span>
+                <span className="text-teal-700 font-bold">🔍 Buscando:</span>
                 <span className="text-gray-700">"{busqueda}"</span>
                 <span className="text-gray-500 text-sm">
                   ({totalCuponesDisponibles} resultados)
@@ -569,7 +564,7 @@ export default function DashboardPage() {
               </div>
               <button
                 onClick={() => setBusqueda("")}
-                className="text-emerald-600 hover:text-emerald-800 font-bold text-sm"
+                className="text-teal-600 hover:text-teal-800 font-bold text-sm"
               >
                 Limpiar ✕
               </button>
@@ -640,14 +635,14 @@ export default function DashboardPage() {
                       return yaSolicitado ? (
                         <button
                           onClick={() => setCuponSeleccionado(cupon)}
-                          className="mt-4 w-full py-2.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-semibold rounded-xl transition-colors text-sm flex items-center justify-center gap-1.5"
+                          className="mt-4 w-full py-2.5 bg-teal-100 hover:bg-teal-200 text-teal-700 font-semibold rounded-xl transition-colors text-sm flex items-center justify-center gap-1.5"
                         >
                           ✓ Ver mi código
                         </button>
                       ) : (
                         <button
                           onClick={() => setCuponSeleccionado(cupon)}
-                          className="mt-4 w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-colors text-sm"
+                          className="mt-4 w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl transition-colors text-sm"
                         >
                           Obtener descuento
                         </button>
@@ -657,7 +652,7 @@ export default function DashboardPage() {
                 </div>
               ))
             ) : (
-              <div className="col-span-full bg-white rounded-xl p-8 text-center border border-emerald-100">
+              <div className="col-span-full bg-white rounded-xl p-8 text-center border border-teal-100">
                 <span className="text-5xl mb-3 block">🔍</span>
                 <p className="text-slate-600">No se encontraron cupones</p>
                 <button
@@ -665,7 +660,7 @@ export default function DashboardPage() {
                     setBusqueda("");
                     setCategoriaSeleccionada("Todo");
                   }}
-                  className="mt-3 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-bold hover:bg-emerald-700"
+                  className="mt-3 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-bold hover:bg-teal-700"
                 >
                   Limpiar filtros
                 </button>
@@ -703,7 +698,7 @@ export default function DashboardPage() {
                       cargarCupones(paginaActual + 1, busquedaActiva ? busqueda : undefined);
                     }}
                     disabled={loadingMore}
-                    className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white font-bold rounded-xl transition-colors flex items-center gap-2"
+                    className="px-6 py-3 bg-teal-600 hover:bg-teal-700 disabled:bg-gray-400 text-white font-bold rounded-xl transition-colors flex items-center gap-2"
                   >
                     {loadingMore ? (
                       <>

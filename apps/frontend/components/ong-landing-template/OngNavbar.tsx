@@ -31,9 +31,9 @@ export default function OngNavbar() {
           {/* Logo / Nombre ONG */}
           <a
             href="#"
-            className="flex items-center gap-2 text-xl font-bold text-emerald-700 hover:text-emerald-600 transition-colors"
+            className="flex items-center gap-2 text-xl font-bold text-teal-700 hover:text-teal-600 transition-colors"
           >
-            <span className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center text-white text-sm font-bold">
+            <span className="w-8 h-8 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg flex items-center justify-center text-white text-sm font-bold">
               ONG
             </span>
             <span>Nombre ONG</span>
@@ -46,7 +46,7 @@ export default function OngNavbar() {
                 key={link.href}
                 href={link.href}
                 onClick={(e) => handleScrollTo(e, link.href)}
-                className="text-gray-600 hover:text-emerald-600 font-medium transition-colors"
+                className="text-gray-600 hover:text-teal-600 font-medium transition-colors"
               >
                 {link.label}
               </a>
@@ -54,7 +54,7 @@ export default function OngNavbar() {
             <a
               href="#donar"
               onClick={(e) => handleScrollTo(e, "#donar")}
-              className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-full hover:from-emerald-700 hover:to-teal-700 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+              className="px-5 py-2.5 bg-gradient-to-r from-teal-600 to-teal-600 text-white font-semibold rounded-full hover:from-teal-700 hover:to-teal-700 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
               Donar
             </a>
@@ -62,7 +62,7 @@ export default function OngNavbar() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 text-gray-600 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded-lg"
+            className="md:hidden p-2 text-gray-600 hover:text-teal-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded-lg"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-expanded={isMobileMenuOpen}
             aria-label="Abrir menú de navegación"
@@ -101,7 +101,7 @@ export default function OngNavbar() {
                   key={link.href}
                   href={link.href}
                   onClick={(e) => handleScrollTo(e, link.href)}
-                  className="px-4 py-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg font-medium transition-colors"
+                  className="px-4 py-2 text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-lg font-medium transition-colors"
                 >
                   {link.label}
                 </a>
@@ -109,7 +109,7 @@ export default function OngNavbar() {
               <a
                 href="#donar"
                 onClick={(e) => handleScrollTo(e, "#donar")}
-                className="mx-4 mt-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-full text-center hover:from-emerald-700 hover:to-teal-700 transition-all"
+                className="mx-4 mt-2 px-5 py-2.5 bg-gradient-to-r from-teal-600 to-teal-600 text-white font-semibold rounded-full text-center hover:from-teal-700 hover:to-teal-700 transition-all"
               >
                 Donar
               </a>

@@ -98,6 +98,7 @@ export class PaymentsController {
       }
     }
 
+    // Generar registro inicial de la transacción (Estado 'pendiente')
     await this.supabase.createPaymentAttempt({
       user_id: userId,
       order_id: orderId,

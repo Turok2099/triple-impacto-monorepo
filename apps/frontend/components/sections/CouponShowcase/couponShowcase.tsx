@@ -11,7 +11,7 @@ export default function CouponShowcase() {
                 -30%
               </div>
               <div className="mb-4">
-                <div className="w-16 h-16 bg-linear-to-br from-emerald-400 to-blue-400 rounded-xl flex items-center justify-center text-3xl mb-4">
+                <div className="w-16 h-16 bg-linear-to-br from-teal-400 to-blue-400 rounded-xl flex items-center justify-center text-3xl mb-4">
                   🛍️
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">
@@ -23,7 +23,7 @@ export default function CouponShowcase() {
                 <div className="border-t-2 border-dashed border-gray-200 pt-4">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Tu donación:</span>
-                    <span className="font-bold text-emerald-600">$10.000</span>
+                    <span className="font-bold text-teal-600">$10.000</span>
                   </div>
                   <div className="flex items-center justify-between text-sm mt-2">
                     <span className="text-gray-600">Tu ahorro:</span>
@@ -31,8 +31,8 @@ export default function CouponShowcase() {
                   </div>
                 </div>
               </div>
-              <div className="bg-emerald-50 rounded-lg p-3 text-center">
-                <p className="text-sm font-medium text-emerald-800">
+              <div className="bg-teal-50 rounded-lg p-3 text-center">
+                <p className="text-sm font-medium text-teal-800">
                   ¡Ganas más de lo que donas! 💚
                 </p>
               </div>

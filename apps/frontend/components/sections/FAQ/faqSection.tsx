@@ -22,7 +22,7 @@ const faqs: FAQItem[] = [
     id: 1,
     question: "¿Por qué recibo descuentos por donar?",
     answer:
-      "Nuestro modelo de Triple Impacto conecta tu generosidad con comercios aliados que creen en la responsabilidad social. Ellos ofrecen descuentos exclusivos como reconocimiento a tu compromiso con el cambio social. Así, tu donación genera impacto positivo y tú recibes beneficios tangibles.",
+      "Nuestro modelo de AYNI conecta tu generosidad con comercios aliados que creen en la responsabilidad social. Ellos ofrecen descuentos exclusivos como reconocimiento a tu compromiso con el cambio social. Así, tu donación genera impacto positivo y tú recibes beneficios tangibles.",
     icon: Gift,
   },
   {
@@ -78,7 +78,7 @@ export default function FAQSection() {
             Preguntas frecuentes
           </h2>
           <p className="text-xl text-gray-600">
-            Todo lo que necesitás saber sobre cómo funciona Club Triple Impacto
+            Todo lo que necesitás saber sobre cómo funciona AYNI
           </p>
         </div>
 
@@ -98,9 +98,9 @@ export default function FAQSection() {
                 className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors duration-200"
               >
                 <div className="flex items-center gap-4 flex-1">
-                  <div className="shrink-0 w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
+                  <div className="shrink-0 w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center">
                     <faq.icon
-                      className="w-6 h-6 text-emerald-600"
+                      className="w-6 h-6 text-teal-600"
                       strokeWidth={2}
                     />
                   </div>
@@ -153,7 +153,7 @@ export default function FAQSection() {
           </p>
           <a
             href="/contact"
-            className="inline-block px-8 py-4 bg-linear-to-r from-emerald-600 to-emerald-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
+            className="inline-block px-8 py-4 bg-linear-to-r from-teal-600 to-teal-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
           >
             Ir al formulario de contacto
           </a>

@@ -82,7 +82,7 @@ function PagoErrorContent() {
             {/* Aviso central de seguridad */}
             <div className="bg-rose-50/50 border border-rose-100 rounded-xl p-5 mb-8 flex gap-3 text-sm text-rose-800">
               <ShieldAlert className="w-5 h-5 flex-shrink-0 text-rose-500" />
-              <p className="font-medium">Ningún débito ha sido aplicado. Al tratarse de Fiserv Connect, tus credenciales ni siquiera transitaron por tu perfil en Triple Impacto.</p>
+              <p className="font-medium">Ningún débito ha sido aplicado. Al tratarse de Fiserv Connect, tus credenciales ni siquiera transitaron por tu perfil en AYNI.</p>
             </div>
 
             {/* Botones de acción */}

@@ -93,7 +93,7 @@ export default function PerfilPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#16a459] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#40a8ab] mx-auto mb-4"></div>
           <p className="text-[#1A202C]">Cargando perfil...</p>
         </div>
       </div>
@@ -124,20 +124,20 @@ export default function PerfilPage() {
                 backgroundImage: `url(https://ui-avatars.com/api/?name=${encodeURIComponent(user.nombre)}&background=16a459&color=fff&size=192)`,
               }}
             />
-            <button className="absolute bottom-0 right-0 bg-[#16a459] text-white p-1.5 rounded-full border-2 border-white shadow-md active:scale-95 transition-transform hover:bg-[#16a459]/90">
+            <button className="absolute bottom-0 right-0 bg-[#40a8ab] text-white p-1.5 rounded-full border-2 border-white shadow-md active:scale-95 transition-transform hover:bg-[#40a8ab]/90">
               <Camera className="w-4 h-4" />
             </button>
           </div>
-          <p className="mt-3 text-[#16a459] text-xs font-bold uppercase tracking-wider">
+          <p className="mt-3 text-[#40a8ab] text-xs font-bold uppercase tracking-wider">
             Cambiar Foto
           </p>
         </section>
 
         {/* Badge de miembro activo */}
         <section className="px-6 mb-8">
-          <div className="bg-[#16a459]/5 border border-[#16a459]/10 rounded-2xl p-4 flex items-center justify-between">
+          <div className="bg-[#40a8ab]/5 border border-[#40a8ab]/10 rounded-2xl p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="bg-[#16a459] text-white p-2 rounded-xl">
+              <div className="bg-[#40a8ab] text-white p-2 rounded-xl">
                 <CheckCircle className="w-5 h-5" />
               </div>
               <div>
@@ -168,7 +168,7 @@ export default function PerfilPage() {
                 NOMBRE COMPLETO
               </label>
               <input
-                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#16a459] focus:border-[#16a459] transition-all shadow-sm"
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all shadow-sm"
                 type="text"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
@@ -179,7 +179,7 @@ export default function PerfilPage() {
                 CORREO ELECTRÓNICO
               </label>
               <input
-                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#16a459] focus:border-[#16a459] transition-all shadow-sm"
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all shadow-sm"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -190,7 +190,7 @@ export default function PerfilPage() {
                 NÚMERO DE TELÉFONO
               </label>
               <input
-                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#16a459] focus:border-[#16a459] transition-all shadow-sm"
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all shadow-sm"
                 type="tel"
                 value={telefono}
                 onChange={(e) => setTelefono(e.target.value)}
@@ -202,7 +202,7 @@ export default function PerfilPage() {
                 DNI
               </label>
               <input
-                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#16a459] focus:border-[#16a459] transition-all shadow-sm"
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all shadow-sm"
                 type="text"
                 value={dni}
                 onChange={(e) => setDni(e.target.value)}
@@ -219,7 +219,7 @@ export default function PerfilPage() {
                   PROVINCIA
                 </label>
                 <select
-                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#16a459] focus:border-[#16a459] transition-all appearance-none cursor-pointer shadow-sm"
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all appearance-none cursor-pointer shadow-sm"
                   value={provincia}
                   onChange={(e) => setProvincia(e.target.value)}
                 >
@@ -236,7 +236,7 @@ export default function PerfilPage() {
                   LOCALIDAD
                 </label>
                 <input
-                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#16a459] focus:border-[#16a459] transition-all shadow-sm"
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-[#1A202C] focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all shadow-sm"
                   type="text"
                   value={localidad}
                   onChange={(e) => setLocalidad(e.target.value)}
@@ -247,7 +247,7 @@ export default function PerfilPage() {
             <button
               onClick={handleGuardarCambios}
               disabled={guardando}
-              className="w-full bg-[#16a459] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-[#16a459]/20 active:scale-[0.98] transition-all mt-2 hover:bg-[#16a459]/90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[#40a8ab] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-[#40a8ab]/20 active:scale-[0.98] transition-all mt-2 hover:bg-[#40a8ab]/90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {guardando ? "Guardando..." : "Guardar Cambios"}
             </button>
@@ -274,12 +274,12 @@ export default function PerfilPage() {
                   </p>
                 </div>
               </div>
-              <button className="text-[#16a459] text-xs font-bold px-3 py-1 bg-[#16a459]/5 rounded-lg hover:bg-[#16a459]/10 transition-colors">
+              <button className="text-[#40a8ab] text-xs font-bold px-3 py-1 bg-[#40a8ab]/5 rounded-lg hover:bg-[#40a8ab]/10 transition-colors">
                 Editar
               </button>
             </div>
           </div>
-          <button className="w-full border-2 border-dashed border-[#16a459]/30 text-[#16a459] font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 bg-[#16a459]/5 hover:bg-[#16a459]/10 transition-colors">
+          <button className="w-full border-2 border-dashed border-[#40a8ab]/30 text-[#40a8ab] font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 bg-[#40a8ab]/5 hover:bg-[#40a8ab]/10 transition-colors">
             <PlusCircle className="w-5 h-5" />
             Agregar Método de Pago
           </button>

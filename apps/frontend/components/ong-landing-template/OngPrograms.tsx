@@ -34,12 +34,12 @@ export default function OngPrograms() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="text-center max-w-3xl mx-auto mb-16">
-                    <span className="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 text-sm font-semibold rounded-full mb-4">
+                    <span className="inline-block px-3 py-1 bg-teal-100 text-teal-700 text-sm font-semibold rounded-full mb-4">
                         Nuestros Programas
                     </span>
                     <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                         Programas que{" "}
-                        <span className="text-emerald-600">transforman vidas</span>
+                        <span className="text-teal-600">transforman vidas</span>
                     </h2>
                     <p className="text-lg text-gray-600">
                         Desarrollamos iniciativas integrales que abordan las necesidades más
@@ -53,9 +53,9 @@ export default function OngPrograms() {
                     {programs.map((program) => (
                         <article
                             key={program.id}
-                            className="group bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:border-emerald-200 transition-all duration-300 hover:-translate-y-1"
+                            className="group bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:border-teal-200 transition-all duration-300 hover:-translate-y-1"
                         >
-                            <div className="w-16 h-16 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
+                            <div className="w-16 h-16 bg-gradient-to-br from-teal-100 to-teal-100 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
                                 {program.icon}
                             </div>
 
@@ -68,12 +68,12 @@ export default function OngPrograms() {
                             </p>
 
                             <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                                <span className="text-sm font-medium text-emerald-600">
+                                <span className="text-sm font-medium text-teal-600">
                                     {program.stats}
                                 </span>
                                 <button
                                     type="button"
-                                    className="text-sm font-semibold text-gray-500 hover:text-emerald-600 flex items-center gap-1 group-hover:gap-2 transition-all"
+                                    className="text-sm font-semibold text-gray-500 hover:text-teal-600 flex items-center gap-1 group-hover:gap-2 transition-all"
                                 >
                                     Ver más
                                     <svg
@@ -99,7 +99,7 @@ export default function OngPrograms() {
                 <div className="text-center mt-12">
                     <a
                         href="#donar"
-                        className="inline-flex items-center gap-2 px-6 py-3 text-emerald-700 font-semibold hover:text-emerald-800 transition-colors"
+                        className="inline-flex items-center gap-2 px-6 py-3 text-teal-700 font-semibold hover:text-teal-800 transition-colors"
                     >
                         Conocé cómo podés sumarte
                         <svg

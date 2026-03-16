@@ -135,7 +135,7 @@ export default function FormularioDonacion({
   if (authLoading) {
     return (
       <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500 mx-auto mb-4"></div>
         <p className="text-gray-600">Verificando sesión...</p>
       </div>
     );
@@ -143,13 +143,13 @@ export default function FormularioDonacion({
 
   if (!user) {
     return (
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
-        <p className="text-yellow-800 mb-4">
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 text-center">
+        <p className="text-amber-800 mb-4">
           Debes iniciar sesión para realizar una donación
         </p>
         <a
           href="/login"
-          className="inline-block px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+          className="inline-block px-6 py-2 bg-[#40a8ab] text-white rounded-lg hover:bg-teal-600"
         >
           Iniciar Sesión
         </a>
@@ -167,7 +167,7 @@ export default function FormularioDonacion({
 
         {loadingOrgs ? (
           <div className="text-center py-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500 mx-auto"></div>
           </div>
         ) : errorOrgs ? (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -186,7 +186,7 @@ export default function FormularioDonacion({
             <select
               value={organizacionId}
               onChange={(e) => setOrganizacionId(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 bg-white"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-gray-900 bg-white"
               required
             >
               <option value="" disabled>
@@ -214,7 +214,7 @@ export default function FormularioDonacion({
                     />
                   ) : (
                     <div
-                      className="w-full h-full flex items-center justify-center text-emerald-600 text-4xl font-bold"
+                      className="w-full h-full flex items-center justify-center text-teal-600 text-4xl font-bold"
                       aria-hidden
                     >
                       {organizacionSeleccionada.nombre.charAt(0)}
@@ -252,7 +252,7 @@ export default function FormularioDonacion({
               type="button"
               onClick={() => handleMontoSugeridoClick(monto)}
               className={`py-3 px-4 rounded-lg font-medium text-center transition-all ${montoSeleccionado === monto && !usarMontoCustom
-                ? "bg-purple-600 text-white"
+                ? "bg-[#40a8ab] text-white"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
             >
@@ -267,7 +267,7 @@ export default function FormularioDonacion({
               setMontoSeleccionado(null);
             }}
             className={`py-3 px-4 rounded-lg font-bold text-center transition-all ${usarMontoCustom
-              ? "bg-[#16a459] text-white"
+              ? "bg-[#40a8ab] text-white"
               : "bg-slate-100 text-slate-700 hover:bg-slate-200"
               }`}
           >
@@ -290,7 +290,7 @@ export default function FormularioDonacion({
                 onChange={(e) => handleMontoCustomChange(e.target.value)}
                 placeholder={MONTO_MINIMO.toString()}
                 autoFocus
-                className="w-full pl-8 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 border-purple-600 focus:ring-purple-600"
+                className="w-full pl-8 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 border-teal-500 focus:ring-teal-500"
               />
             </div>
           </div>
@@ -314,7 +314,7 @@ export default function FormularioDonacion({
       )}
 
       {/* Resumen */}
-      <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6">
+      <div className="bg-gradient-to-r from-teal-50 to-slate-50 rounded-lg p-6">
         <h3 className="font-bold text-gray-900 mb-3">Resumen de tu donación</h3>
         <div className="space-y-2">
           <div className="flex justify-between">
@@ -335,9 +335,9 @@ export default function FormularioDonacion({
           </div>
         </div>
 
-        <div className="mt-4 pt-4 border-t border-purple-200">
-          <div className="flex items-start gap-3 text-sm text-purple-800">
-            <Gift className="w-5 h-5 flex-shrink-0 mt-0.5 text-purple-600" />
+        <div className="mt-4 pt-4 border-t border-teal-200">
+          <div className="flex items-start gap-3 text-sm text-teal-800">
+            <Gift className="w-5 h-5 flex-shrink-0 mt-0.5 text-[#40a8ab]" />
             <p>
               Al donar, obtendrás acceso exclusivo a cupones de descuento de
               Bonda en marcas reconocidas.
@@ -350,7 +350,7 @@ export default function FormularioDonacion({
       <button
         type="submit"
         disabled={loading || loadingOrgs || !organizacionId}
-        className="w-full py-4 px-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+        className="w-full py-4 px-6 bg-gradient-to-r from-[#40a8ab] to-teal-600 text-white font-bold rounded-lg hover:from-teal-600 hover:to-teal-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
       >
         {loading ? (
           <>

@@ -69,7 +69,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-emerald-50 via-white to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-linear-to-br from-teal-50 via-white to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* Logo y Header */}
         <div className="text-center">
@@ -77,7 +77,7 @@ export default function LoginPage() {
             Bienvenido de nuevo
           </h2>
           <p className="text-gray-600">
-            Ingresá a tu cuenta de Club Triple Impacto
+            Ingresá a tu cuenta de AYNI
           </p>
         </div>
 
@@ -171,7 +171,7 @@ export default function LoginPage() {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
+                  className="h-4 w-4 text-teal-600 focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
                 />
                 <label
                   htmlFor="remember-me"
@@ -184,7 +184,7 @@ export default function LoginPage() {
               <div className="text-sm">
                 <a
                   href="/forgot-password"
-                  className="font-medium text-emerald-600 hover:text-emerald-500 transition-colors"
+                  className="font-medium text-teal-600 hover:text-teal-500 transition-colors"
                 >
                   ¿Olvidaste tu contraseña?
                 </a>
@@ -195,7 +195,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-linear-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               {loading ? "Iniciando sesión..." : "Iniciar sesión"}
             </button>
@@ -240,7 +240,7 @@ export default function LoginPage() {
             ¿No tienes cuenta?{" "}
             <a
               href="/registro"
-              className="font-semibold text-emerald-600 hover:text-emerald-500 transition-colors"
+              className="font-semibold text-teal-600 hover:text-teal-500 transition-colors"
             >
               Regístrate gratis
             </a>
@@ -248,25 +248,25 @@ export default function LoginPage() {
         </div>
 
         {/* Benefits reminder */}
-        <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-100">
-          <h3 className="text-sm font-semibold text-emerald-900 mb-3">
+        <div className="bg-teal-50 rounded-2xl p-6 border border-teal-100">
+          <h3 className="text-sm font-semibold text-teal-900 mb-3">
             Al iniciar sesión puedes:
           </h3>
-          <ul className="space-y-2 text-sm text-emerald-800">
+          <ul className="space-y-2 text-sm text-teal-800">
             <li className="flex items-start gap-2">
-              <span className="text-emerald-600 shrink-0">✓</span>
+              <span className="text-teal-600 shrink-0">✓</span>
               <span>Gestionar tus donaciones</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-emerald-600 shrink-0">✓</span>
+              <span className="text-teal-600 shrink-0">✓</span>
               <span>Acceder a tus cupones de descuento</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-emerald-600 shrink-0">✓</span>
+              <span className="text-teal-600 shrink-0">✓</span>
               <span>Ver el impacto de tus aportes</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-emerald-600 shrink-0">✓</span>
+              <span className="text-teal-600 shrink-0">✓</span>
               <span>Recibir beneficios exclusivos</span>
             </li>
           </ul>

@@ -31,7 +31,7 @@ function PagoExitosoContent() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="flex flex-col items-center max-w-sm text-center">
-          <Loader2 className="w-12 h-12 text-[#16a459] animate-spin mb-6" />
+          <Loader2 className="w-12 h-12 text-[#40a8ab] animate-spin mb-6" />
           <h2 className="text-xl font-bold text-slate-900 mb-2">
             Verificando tu donación...
           </h2>
@@ -49,7 +49,7 @@ function PagoExitosoContent() {
         {/* Main Success Card */}
         <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
           {/* Header */}
-          <div className="bg-[#16a459] p-8 text-center text-white flex flex-col items-center">
+          <div className="bg-[#40a8ab] p-8 text-center text-white flex flex-col items-center">
             <CheckCircle2 className="w-16 h-16 mb-4 text-white" strokeWidth={1.5} />
             <h1 className="text-2xl font-bold mb-1">¡Donación Exitosa!</h1>
             <p className="text-green-100 text-sm font-medium">
@@ -93,8 +93,8 @@ function PagoExitosoContent() {
             </div>
 
             {/* Beneficios activados */}
-            <div className="bg-[#16a459]/5 border border-[#16a459]/10 rounded-xl p-5 mb-8">
-              <h2 className="font-bold text-[#16a459] mb-3 flex items-center gap-2">
+            <div className="bg-[#40a8ab]/5 border border-[#40a8ab]/10 rounded-xl p-5 mb-8">
+              <h2 className="font-bold text-[#40a8ab] mb-3 flex items-center gap-2">
                 <Gift className="w-5 h-5" /> Beneficios activados
               </h2>
               <div className="text-sm text-slate-700 space-y-2 font-medium">
@@ -107,7 +107,7 @@ function PagoExitosoContent() {
             <div className="flex flex-col gap-3">
               <Link
                 href="/dashboard"
-                className="w-full flex items-center justify-center gap-2 py-3.5 px-6 bg-[#16a459] text-white font-semibold rounded-xl hover:bg-[#128a4a] transition-colors"
+                className="w-full flex items-center justify-center gap-2 py-3.5 px-6 bg-[#40a8ab] text-white font-semibold rounded-xl hover:bg-[#128a4a] transition-colors"
               >
                 Ir a mi Dashboard <ArrowRight className="w-4 h-4" />
               </Link>
@@ -137,7 +137,7 @@ export default function PagoExitosoPage() {
       fallback={
         <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
           <div className="flex flex-col items-center">
-            <Loader2 className="w-12 h-12 text-[#16a459] animate-spin mb-4" />
+            <Loader2 className="w-12 h-12 text-[#40a8ab] animate-spin mb-4" />
             <p className="text-slate-600 font-medium">Validando operación...</p>
           </div>
         </div>

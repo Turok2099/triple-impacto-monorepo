@@ -38,13 +38,13 @@ export default function OngMission() {
                 <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
                     {/* Text content */}
                     <div>
-                        <span className="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 text-sm font-semibold rounded-full mb-4">
+                        <span className="inline-block px-3 py-1 bg-teal-100 text-teal-700 text-sm font-semibold rounded-full mb-4">
                             Nuestra Misión
                         </span>
 
                         <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
                             Creemos en el poder de las{" "}
-                            <span className="text-emerald-600">comunidades</span>
+                            <span className="text-teal-600">comunidades</span>
                         </h2>
 
                         <p className="text-lg text-gray-600 mb-8">
@@ -58,7 +58,7 @@ export default function OngMission() {
                         <div className="space-y-6">
                             {missionBullets.map((bullet, index) => (
                                 <div key={index} className="flex gap-4">
-                                    <div className="flex-shrink-0 w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center text-2xl">
+                                    <div className="flex-shrink-0 w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center text-2xl">
                                         {bullet.icon}
                                     </div>
                                     <div>
@@ -73,7 +73,7 @@ export default function OngMission() {
                     </div>
 
                     {/* Areas of action */}
-                    <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-3xl p-8 lg:p-10">
+                    <div className="bg-gradient-to-br from-teal-50 to-teal-50 rounded-3xl p-8 lg:p-10">
                         <h3 className="text-xl font-bold text-gray-900 mb-6">
                             Áreas de acción
                         </h3>
@@ -82,16 +82,16 @@ export default function OngMission() {
                             {actionAreas.map((area, index) => (
                                 <span
                                     key={index}
-                                    className="px-4 py-2 bg-white text-gray-700 rounded-full text-sm font-medium shadow-sm border border-emerald-100 hover:border-emerald-300 hover:shadow-md transition-all cursor-default"
+                                    className="px-4 py-2 bg-white text-gray-700 rounded-full text-sm font-medium shadow-sm border border-teal-100 hover:border-teal-300 hover:shadow-md transition-all cursor-default"
                                 >
                                     {area}
                                 </span>
                             ))}
                         </div>
 
-                        <div className="bg-white rounded-2xl p-6 shadow-sm border border-emerald-100">
+                        <div className="bg-white rounded-2xl p-6 shadow-sm border border-teal-100">
                             <div className="flex items-center gap-4 mb-4">
-                                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center text-white text-xl">
+                                <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl flex items-center justify-center text-white text-xl">
                                     📍
                                 </div>
                                 <div>

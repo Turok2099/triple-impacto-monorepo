@@ -8,6 +8,8 @@ import {
   MapPin,
   Clock,
 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -44,13 +46,16 @@ export default function Footer() {
           {/* Columna 1: Logo y descripción */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-linear-to-br from-emerald-500 to-blue-500 rounded-xl"></div>
-              <div>
-                <h3 className="text-white font-bold text-lg">Club</h3>
-                <h3 className="text-emerald-400 font-bold text-lg -mt-1">
-                  Triple Impacto
-                </h3>
-              </div>
+              <Link href="/">
+                <Image
+                  src="/ayani_logo.png"
+                  alt="AYNI"
+                  width={140}
+                  height={50}
+                  className="object-contain"
+                  priority
+                />
+              </Link>
             </div>
             <p className="text-sm text-gray-400 mb-6 leading-relaxed">
             Transformamos tu generosidad en impacto social y ambiental real real y en beneficios exclusivos. Doná, ayudá y ahorrá.
@@ -65,7 +70,7 @@ export default function Footer() {
                     href={social.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 bg-gray-800 hover:bg-emerald-600 rounded-lg flex items-center justify-center transition-colors duration-200"
+                    className="w-10 h-10 bg-gray-800 hover:bg-teal-600 rounded-lg flex items-center justify-center transition-colors duration-200"
                     aria-label={social.name}
                     title={social.name}
                   >
@@ -86,7 +91,7 @@ export default function Footer() {
             </p>
             <a
               href="/ongs"
-              className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors duration-200 font-medium"
+              className="inline-flex items-center gap-2 text-teal-400 hover:text-teal-300 transition-colors duration-200 font-medium"
             >
               Ver todas las ONGs
               <span>→</span>
@@ -98,40 +103,40 @@ export default function Footer() {
             <h4 className="text-white font-semibold text-lg mb-4">Contacto</h4>
             <ul className="space-y-4 text-sm mb-6">
               <li className="flex items-start gap-3">
-                <Mail className="text-emerald-500 w-6 h-6 shrink-0 mt-0.5" />
+                <Mail className="text-teal-500 w-6 h-6 shrink-0 mt-0.5" />
                 <a
                   href="mailto:clubtripleimpacto@gmail.com"
-                  className="text-gray-400 hover:text-emerald-400 transition-colors"
+                  className="text-gray-400 hover:text-teal-400 transition-colors"
                 >
                   clubtripleimpacto@gmail.com
                 </a>
               </li>
               <li className="flex items-start gap-3">
-                <Phone className="text-emerald-500 w-6 h-6 shrink-0 mt-0.5" />
+                <Phone className="text-teal-500 w-6 h-6 shrink-0 mt-0.5" />
                 <a
                   href="https://wa.me/5491156393261"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-emerald-400 transition-colors"
+                  className="text-gray-400 hover:text-teal-400 transition-colors"
                 >
                   +54 11 5639-3261 (WhatsApp)
                 </a>
               </li>
               <li className="flex items-start gap-3">
-                <MapPin className="text-emerald-500 w-6 h-6 shrink-0 mt-0.5" />
+                <MapPin className="text-teal-500 w-6 h-6 shrink-0 mt-0.5" />
                 <span className="text-gray-400">
                   Caseros 1213, San Isidro, Buenos Aires
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <Clock className="text-emerald-500 w-6 h-6 shrink-0 mt-0.5" />
+                <Clock className="text-teal-500 w-6 h-6 shrink-0 mt-0.5" />
                 <span className="text-gray-400">Atención 24 horas</span>
               </li>
             </ul>
 
             <a
               href="/contact"
-              className="inline-block px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg transition-colors"
+              className="inline-block px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-lg transition-colors"
             >
               Formulario de contacto
             </a>
@@ -145,9 +150,9 @@ export default function Footer() {
                 <input
                   type="email"
                   placeholder="Tu email"
-                  className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
-                <button className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors text-sm font-medium">
+                <button className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors text-sm font-medium">
                   →
                 </button>
               </div>
@@ -162,7 +167,7 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             {/* Copyright */}
             <div className="text-sm text-gray-400 text-center md:text-left">
-              © {currentYear} Club Triple Impacto. Todos los derechos
+              © {currentYear} AYNI. Todos los derechos
               reservados.
             </div>
 
@@ -170,19 +175,19 @@ export default function Footer() {
             <div className="flex flex-wrap justify-center gap-6 text-sm">
               <a
                 href="#terminos"
-                className="text-gray-400 hover:text-emerald-400 transition-colors"
+                className="text-gray-400 hover:text-teal-400 transition-colors"
               >
                 Términos y condiciones
               </a>
               <a
                 href="#privacidad"
-                className="text-gray-400 hover:text-emerald-400 transition-colors"
+                className="text-gray-400 hover:text-teal-400 transition-colors"
               >
                 Política de privacidad
               </a>
               <a
                 href="#cookies"
-                className="text-gray-400 hover:text-emerald-400 transition-colors"
+                className="text-gray-400 hover:text-teal-400 transition-colors"
               >
                 Política de cookies
               </a>

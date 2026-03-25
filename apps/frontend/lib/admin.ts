@@ -74,8 +74,8 @@ export const deleteAdminUser = async (token: string, id: string) => {
   return await res.json();
 };
 
-export const deleteAffiliation = async (token: string, userId: string, bondaCode: string) => {
-  const url = `${API_URL}/admin/users/${userId}/affiliate/${bondaCode}`;
+export const deleteAffiliation = async (token: string, userId: string, bondaCode: string, micrositeId: string) => {
+  const url = `${API_URL}/admin/users/${userId}/affiliate/${bondaCode}/microsite/${micrositeId}`;
   const res = await fetch(url, {
     method: 'DELETE',
     headers: getHeaders(token)

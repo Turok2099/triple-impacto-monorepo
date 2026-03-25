@@ -71,7 +71,7 @@ export default function SeccionAdmin() {
     }
   };
 
-  const handleDeleteAffiliate = async (userId: string, bondaCode: string) => {
+  const handleDeleteAffiliate = async (userId: string, bondaCode: string, micrositeId: string) => {
     const result = await Swal.fire({
       title: '¿Desvincular Afiliación?',
       text: `¿Seguro que deseas dar de baja la afiliación ${bondaCode}? Perderá sus beneficios en esta ONG por 30 días.`,
@@ -87,7 +87,7 @@ export default function SeccionAdmin() {
 
     try {
       const token = localStorage.getItem("auth_token") || "";
-      await deleteAffiliation(token, userId, bondaCode);
+      await deleteAffiliation(token, userId, bondaCode, micrositeId);
       Swal.fire({
         title: '¡Desvinculado!',
         text: `La afiliación ${bondaCode} fue cancelada exitosamente.`,
@@ -222,7 +222,7 @@ export default function SeccionAdmin() {
                               </span>
                               {aff.is_active && (
                                 <button 
-                                  onClick={() => handleDeleteAffiliate(u.id, aff.affiliate_code)}
+                                  onClick={() => handleDeleteAffiliate(u.id, aff.affiliate_code, aff.bonda_microsite_id)}
                                   className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-white hover:bg-red-500 rounded p-1 transition-all ml-2"
                                   title="Desvincular afiliación"
                                 >

@@ -18,7 +18,7 @@ export class AdminService {
 
     const { data: users, error, count } = await this.supabaseService.getClient()
       .from('usuarios')
-      .select('*, donaciones(estado), usuarios_bonda_afiliados(affiliate_code, bonda_microsites(nombre), is_active)', { count: 'exact' })
+      .select('*, donaciones(estado), usuarios_bonda_afiliados(affiliate_code, bonda_microsite_id, bonda_microsites(nombre), is_active)', { count: 'exact' })
       .range(offset, offset + limit - 1)
       .order('created_at', { ascending: false });
 
@@ -32,6 +32,7 @@ export class AdminService {
       status: u.is_active ? 'ACTIVO' : 'INACTIVO (Local)',
       usuarios_bonda_afiliados: u.usuarios_bonda_afiliados?.map((a: any) => ({
          affiliate_code: a.affiliate_code,
+         bonda_microsite_id: a.bonda_microsite_id,
          ong_name: (a.bonda_microsites as any)?.nombre || (a.bonda_microsites as any)?.[0]?.nombre || 'Suscripción Bonda',
          is_active: a.is_active !== false // Defaults to true if historically null
       }))
@@ -144,30 +145,30 @@ export class AdminService {
     return { success: true, message: 'Usuario dado de baja (Soft-delete en Bonda por 30 días activado)' };
   }
 
-  async deleteAffiliate(adminId: string, userId: string, bondaCode: string) {
+  async deleteAffiliate(adminId: string, userId: string, bondaCode: string, micrositeId: string) {
     try {
       // Find the specific slug for this code to satisfy Bonda API requirements
-      const { data: aff } = await this.supabaseService.getClient()
-        .from('usuarios_bonda_afiliados')
-        .select('bonda_microsites(slug)')
-        .match({ user_id: userId, affiliate_code: bondaCode })
+      const { data: microsite } = await this.supabaseService.getClient()
+        .from('bonda_microsites')
+        .select('slug')
+        .eq('id', micrositeId)
         .single();
         
-      const slug = (aff?.bonda_microsites as any)?.slug || (aff?.bonda_microsites as any)?.[0]?.slug;
+      const slug = microsite?.slug;
       
       const res = await this.bondaService.eliminarAfiliado(bondaCode, slug ? { slug } : undefined);
       if ((res as any)?.success === false || (res as any)?.error) {
         throw new Error(JSON.stringify((res as any)?.error || res));
       }
     } catch (e: any) {
-      this.logger.error(`Bonda Soft Delete Failed for ${bondaCode}`, e.message);
+      this.logger.error(`Bonda Soft Delete Failed for ${bondaCode} at microsite ${micrositeId}`, e.message);
       throw new InternalServerErrorException('Fallo al dar de baja en Bonda. Revisa los logs. ' + e.message);
     }
 
     const { error } = await this.supabaseService.getClient()
       .from('usuarios_bonda_afiliados')
       .update({ is_active: false })
-      .match({ user_id: userId, affiliate_code: bondaCode });
+      .match({ user_id: userId, bonda_microsite_id: micrositeId });
 
     if (error) {
       this.logger.error('Failed to remove affiliate locally', error);

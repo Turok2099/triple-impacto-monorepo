@@ -158,11 +158,10 @@ export class AdminService {
       
       const res = await this.bondaService.eliminarAfiliado(bondaCode, slug ? { slug } : undefined);
       if ((res as any)?.success === false || (res as any)?.error) {
-        throw new Error(JSON.stringify((res as any)?.error || res));
+        this.logger.warn(`Bonda delete for ${bondaCode} rejected (possibly already deleted or offline). Overriding error to force local sync.`, res);
       }
     } catch (e: any) {
-      this.logger.error(`Bonda Soft Delete Failed for ${bondaCode} at microsite ${micrositeId}`, e.message);
-      throw new InternalServerErrorException('Fallo al dar de baja en Bonda. Revisa los logs. ' + e.message);
+      this.logger.warn(`Bonda Soft Delete Failed for ${bondaCode} at microsite ${micrositeId}. Forcing local sync anyway.`, e.message);
     }
 
     const { error } = await this.supabaseService.getClient()

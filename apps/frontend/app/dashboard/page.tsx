@@ -17,6 +17,7 @@ import CuponDetalleModal from "@/components/dashboard/CuponDetalleModal";
 import SeccionPerfil from "@/components/dashboard/SeccionPerfil";
 import SeccionMisCupones from "@/components/dashboard/SeccionMisCupones";
 import SeccionMisPagos from "@/components/dashboard/SeccionMisPagos";
+import SeccionAdmin from "@/components/dashboard/SeccionAdmin";
 import {
   Ticket,
   CheckCircle2,
@@ -26,6 +27,7 @@ import {
   Gift,
   LogOut,
   Grid3x3,
+  Shield,
   UtensilsCrossed,
   Sparkles,
   Laptop,
@@ -40,7 +42,7 @@ import {
   Receipt,
 } from "lucide-react";
 
-type ActiveTab = "inicio" | "perfil" | "cupones" | "pagos";
+type ActiveTab = "inicio" | "perfil" | "cupones" | "pagos" | "admin";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -345,6 +347,15 @@ export default function DashboardPage() {
               <Receipt className="w-6 h-6" strokeWidth={2} />
               <span className={`text-xs ${activeTab === "pagos" ? "font-semibold" : "font-medium"}`}>Mis pagos</span>
             </button>
+            {user?.role === 'superadmin' && (
+              <button
+                onClick={() => setActiveTab("admin")}
+                className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "admin" ? "text-emerald-600" : "text-slate-400 hover:text-emerald-500"}`}
+              >
+                <Shield className="w-6 h-6" strokeWidth={2} />
+                <span className={`text-xs ${activeTab === "admin" ? "font-semibold" : "font-medium"}`}>Admin</span>
+              </button>
+            )}
             <a
               href="/donar"
               className="flex flex-col items-center gap-1 text-slate-400 hover:text-[#40a8ab] transition-colors"
@@ -368,6 +379,7 @@ export default function DashboardPage() {
       {activeTab === "perfil" && <SeccionPerfil />}
       {activeTab === "cupones" && <SeccionMisCupones />}
       {activeTab === "pagos" && <SeccionMisPagos />}
+      {activeTab === "admin" && <SeccionAdmin />}
 
       <main className={`max-w-7xl mx-auto px-6 py-6 space-y-6 ${activeTab !== "inicio" ? "hidden" : ""}`}>
         {/* Impact Summary */}

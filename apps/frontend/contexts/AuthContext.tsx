@@ -11,6 +11,7 @@ interface User {
   dni?: string | null;
   provincia?: string | null;
   localidad?: string | null;
+  role?: string; // added to identify superadmin
 }
 
 const LOGOUT_DELAY_MS = 700;

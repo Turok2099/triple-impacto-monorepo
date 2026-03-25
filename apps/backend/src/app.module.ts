@@ -9,6 +9,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { PublicModule } from './modules/public/public.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { SyncModule } from './modules/sync/sync.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { SyncModule } from './modules/sync/sync.module';
     PublicModule,
     PaymentsModule,
     SyncModule, // Módulo de sincronización
+    AdminModule, // Panel de Súper Administrador
   ],
   controllers: [AppController],
   providers: [AppService],

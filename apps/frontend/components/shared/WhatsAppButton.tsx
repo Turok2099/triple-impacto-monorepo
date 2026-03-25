@@ -1,8 +1,9 @@
 "use client";
 
+import { memo } from "react";
 import { MessageCircle } from "lucide-react";
 
-export default function WhatsAppButton() {
+export default memo(function WhatsAppButton() {
   const whatsappNumber = "5491156393261"; // +54 11 5639-3261
   const whatsappURL = `https://wa.me/${whatsappNumber}`;
 
@@ -21,4 +22,4 @@ export default function WhatsAppButton() {
       <span className="absolute inset-0 rounded-full bg-[#25D366] opacity-75 animate-ping"></span>
     </a>
   );
-}
+});

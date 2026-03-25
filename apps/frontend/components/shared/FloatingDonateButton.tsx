@@ -1,8 +1,9 @@
 "use client";
 
+import { memo } from "react";
 import { usePathname } from "next/navigation";
 
-export default function FloatingDonateButton() {
+export default memo(function FloatingDonateButton() {
   const pathname = usePathname();
 
   if (pathname?.startsWith("/dashboard")) return null;
@@ -32,4 +33,4 @@ export default function FloatingDonateButton() {
       `}</style>
     </>
   );
-}
+});

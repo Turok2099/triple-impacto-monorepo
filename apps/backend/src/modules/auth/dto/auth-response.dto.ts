@@ -8,6 +8,7 @@ export class AuthResponseDto {
     dni?: string | null;
     provincia?: string | null;
     localidad?: string | null;
+    role?: string;
   };
   token: string;
 }

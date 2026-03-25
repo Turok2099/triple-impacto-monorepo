@@ -74,7 +74,8 @@ export class AuthService {
     }
 
     // 4. Generar JWT
-    const token = this.generarToken(usuario);
+    const role = 'user';
+    const token = this.generarToken(usuario, role);
 
     this.logger.log(`✅ Usuario registrado: ${email}`);
 
@@ -88,6 +89,7 @@ export class AuthService {
         dni: usuario.dni ?? null,
         provincia: usuario.provincia ?? null,
         localidad: usuario.localidad ?? null,
+        role,
       },
       token,
     };
@@ -111,10 +113,11 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    // 3. Generar JWT
-    const token = this.generarToken(usuario);
+    // 3. Generar JWT recuperando el rol de Supabase Auth
+    const role = await this.supabaseService.getUserRole(usuario.id);
+    const token = this.generarToken(usuario, role);
 
-    this.logger.log(`✅ Login exitoso: ${email}`);
+    this.logger.log(`✅ Login exitoso: ${email} (Role: ${role})`);
 
     return {
       user: {
@@ -126,6 +129,7 @@ export class AuthService {
         dni: usuario.dni ?? null,
         provincia: usuario.provincia ?? null,
         localidad: usuario.localidad ?? null,
+        role,
       },
       token,
     };
@@ -134,11 +138,12 @@ export class AuthService {
   /**
    * Generar token JWT
    */
-  private generarToken(usuario: any): string {
+  private generarToken(usuario: any, role: string = 'user'): string {
     const payload = {
       sub: usuario.id,
       email: usuario.email,
       bondaCode: usuario.bonda_affiliate_code ?? null,
+      app_metadata: { role }
     };
 
     return this.jwtService.sign(payload);

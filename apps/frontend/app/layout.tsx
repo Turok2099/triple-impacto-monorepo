@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "@/components/sections/Navbar/navbar";
-import Footer from "@/components/sections/Footer/footer";
-import WhatsAppButton from "@/components/shared/WhatsAppButton";
-import FloatingDonateButton from "@/components/shared/FloatingDonateButton";
+import dynamic from "next/dynamic";
 import { AuthProvider } from "@/contexts/AuthContext";
 import "./globals.css";
+
+const Footer = dynamic(() => import("@/components/sections/Footer/footer"));
+const WhatsAppButton = dynamic(() => import("@/components/shared/WhatsAppButton"));
+const FloatingDonateButton = dynamic(() => import("@/components/shared/FloatingDonateButton"));
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

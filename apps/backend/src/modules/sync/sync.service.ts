@@ -468,4 +468,55 @@ export class SyncService {
       });
     }
   }
+
+  /**
+   * Cron job: Reconciliar estados de usuarios (Supabase vs Bonda)
+   * Se ejecuta diariamente a las 4 AM Argentina (UTC-3)
+   */
+  @Cron('0 7 * * *', {
+    name: 'reconciliar_usuarios_bonda',
+    timeZone: 'UTC',
+  })
+  async reconciliarUsuariosBonda() {
+    this.logger.log('⏰ Iniciando Reconciliación de Usuarios (Local vs Bonda)');
+    try {
+      // 1. Obtener batch de usuarios locales activos
+      const { data: usuarios } = await this.supabaseService.getClient()
+        .from('usuarios')
+        .select('id, dni, email, is_active, usuarios_bonda_afiliados(affiliate_code, bonda_microsite_id)')
+        .eq('is_active', true)
+        .limit(100);
+
+      if (!usuarios || usuarios.length === 0) return;
+
+      let fallos = 0;
+      let desincronizados = 0;
+
+      for (const usuario of usuarios) {
+        if (!usuario.usuarios_bonda_afiliados?.length) continue;
+        
+        for (const aff of usuario.usuarios_bonda_afiliados as any[]) {
+          try {
+             const bondaUser = await this.bondaService.obtenerAfiliado(aff.affiliate_code, { slug: aff.bonda_microsite_id || 'ctfin' });
+             
+             // Si retorna null (soft-deleteado) o error
+             if (bondaUser === null || bondaUser?.error?.code === 'USER_NOT_FOUND') {
+                this.logger.warn(`Desincronización detectada: Usuario ${usuario.id} está Activo Local pero Soft-Deleteado/No Encontrado en Bonda.`);
+                // Marcar alerta o desactivar
+                await this.supabaseService.getClient().from('usuarios').update({ is_active: false }).eq('id', usuario.id);
+                desincronizados++;
+             }
+          } catch (e) {
+             fallos++;
+          }
+          // Evitar rate-limit Bonda
+          await this.delay(300);
+        }
+      }
+
+      this.logger.log(`✅ Reconciliación completada: ${desincronizados} usuarios desactivados tras revisión. Fallos/Throttles: ${fallos}`);
+    } catch (e: any) {
+      this.logger.error('❌ Error general en job de reconciliación:', e.message);
+    }
+  }
 }

@@ -137,6 +137,9 @@ export class FiservConnectService implements OnModuleInit {
       params.referencedMerchantTransactionId =
         input.referencedMerchantTransactionId.slice(0, 40);
     }
+    if ((input as any).tdate) {
+      params.tdate = (input as any).tdate;
+    }
     if (input.authenticateTransaction) {
       params.authenticateTransaction = input.authenticateTransaction;
     }

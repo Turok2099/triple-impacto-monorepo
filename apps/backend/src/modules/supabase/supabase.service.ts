@@ -190,6 +190,32 @@ export class SupabaseService implements OnModuleInit {
     return data;
   }
 
+  /**
+   * Obtener el rol de un usuario desde el sistema de Auth de Supabase.
+   */
+  async getUserRole(userId: string): Promise<string> {
+    try {
+      const { data, error } = await this.getClient().auth.admin.getUserById(userId);
+      if (!error && data?.user) {
+         return data.user.app_metadata?.role || 'user';
+      }
+
+      // Fallback: Si el usuario existe en BD pero no coincide su UUID en Auth,
+      // buscamos por su email.
+      const { data: localData } = await this.from('usuarios').select('email').eq('id', userId).single();
+      if (localData?.email) {
+          const { data: { users } } = await this.getClient().auth.admin.listUsers();
+          const authUser = users.find((u: any) => u.email === localData.email);
+          if (authUser) {
+             return authUser.app_metadata?.role || 'user';
+          }
+      }
+      return 'user';
+    } catch (e) {
+      return 'user';
+    }
+  }
+
   // ========================================
   // USUARIOS_BONDA_AFILIADOS (afiliado por micrositio/ONG)
   // ========================================

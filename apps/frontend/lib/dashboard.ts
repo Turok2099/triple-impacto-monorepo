@@ -47,6 +47,7 @@ export interface FundacionUsuario {
   codigoAfiliado: string;
   fechaAfiliacion: string;
   totalDonado: number;
+  isActive?: boolean;
 }
 
 export interface DashboardUsuario {

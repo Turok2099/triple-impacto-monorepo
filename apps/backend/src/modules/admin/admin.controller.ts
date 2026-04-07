@@ -18,6 +18,11 @@ export class AdminController {
     return this.adminService.getUsers(Number(page), Number(limit));
   }
 
+  @Get('users/:id/payments')
+  async getUserPayments(@Param('id') userId: string) {
+    return this.adminService.getUserPayments(userId);
+  }
+
   @Post('users')
   async createUser(@Req() req: any, @Body() payload: any) {
     const adminId = req.user?.userId;
@@ -36,9 +41,14 @@ export class AdminController {
     return this.adminService.deleteUser(adminId, userId);
   }
 
-  @Delete('users/:id/affiliate/:bondaCode')
-  async deleteAffiliate(@Req() req: any, @Param('id') userId: string, @Param('bondaCode') bondaCode: string) {
+  @Delete('users/:id/affiliate/:bondaCode/microsite/:micrositeId')
+  async deleteAffiliate(
+    @Req() req: any, 
+    @Param('id') userId: string, 
+    @Param('bondaCode') bondaCode: string,
+    @Param('micrositeId') micrositeId: string
+  ) {
     const adminId = req.user?.userId;
-    return this.adminService.deleteAffiliate(adminId, userId, bondaCode);
+    return this.adminService.deleteAffiliate(adminId, userId, bondaCode, micrositeId);
   }
 }

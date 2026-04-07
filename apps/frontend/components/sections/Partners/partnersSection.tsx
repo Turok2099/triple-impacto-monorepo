@@ -39,7 +39,7 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
           {!hideHeader && (
             <div className="text-center mb-14">
               <h2 className="text-3xl sm:text-4xl font-bold text-[#1A202C] mb-3">
-                Nuestras ONGs aliadas
+                ONGs
               </h2>
               <p className="text-lg text-slate-600 max-w-2xl mx-auto">
                 Podés donar a cualquiera de estas organizaciones desde la plataforma
@@ -74,7 +74,7 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
       <section className={className || "py-20 px-4 sm:px-6 lg:px-8 bg-slate-50/80"}>
         <div className="max-w-7xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-[#1A202C] mb-4">
-            Nuestras ONGs aliadas
+            ONGs
           </h2>
           <p className="text-slate-600">
             {error || "No hay organizaciones disponibles en este momento."}
@@ -98,7 +98,7 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
         {!hideHeader && (
           <div className="text-center mb-14">
             <h2 className="text-3xl sm:text-4xl font-bold text-[#1A202C] mb-3">
-              Nuestras ONGs aliadas
+              ONGs
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
               Podés donar a cualquiera de estas organizaciones desde la plataforma
@@ -163,7 +163,7 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                     className="h-28 w-full bg-transparent mb-6 shrink-0 overflow-hidden flex items-center justify-center p-2"
                   >
                     {logoUrl ? (
-                       <img src={logoUrl} alt={org.nombre} className="w-full h-full object-contain" />
+                      <img src={logoUrl} alt={org.nombre} className="w-full h-full object-contain" />
                     ) : (
                       <span className="w-full h-full flex items-center justify-center text-2xl font-bold text-teal-500">
                         {org.nombre.charAt(0)}
@@ -190,18 +190,7 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
           })}
         </div>
 
-        {/* CTA */}
-        {!hideCTA && (
-          <div className="text-center mt-12">
-            <Link
-              href="/donar"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-teal-500 text-white font-semibold rounded-xl shadow-lg hover:bg-teal-600 hover:shadow-xl transition-all"
-            >
-              <Heart className="w-4 h-4" />
-              Ver todas y donar
-            </Link>
-          </div>
-        )}
+
       </div>
     </section>
   );

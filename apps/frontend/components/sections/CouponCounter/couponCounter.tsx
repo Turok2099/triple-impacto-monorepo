@@ -39,7 +39,7 @@ export default function CouponCounter() {
     if (!isVisible) return;
 
     let inicio = 0;
-    const fin = 6000;
+    const fin = 10000;
     const duracion = 2000; // 2 segundos
     const incremento = fin / (duracion / 16); // 60fps
 
@@ -66,7 +66,7 @@ export default function CouponCounter() {
             <div className="text-center lg:text-left">
               <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
                 Descubrí los más de{" "}
-                <span className="text-teal-600">6000 cupones</span> que tenemos
+                <span className="text-teal-600">10.000 cupones</span> que tenemos
                 para ti
               </h3>
               <div className="flex items-center justify-center lg:justify-start gap-3 mb-6">
@@ -80,7 +80,7 @@ export default function CouponCounter() {
                 </div>
               </div>
               <p className="text-gray-700 text-lg max-w-xl mx-auto lg:mx-0">
-                Nuevos beneficios se agregan constantemente. ¡Seguí explorando y
+                Incorporamos nuevos beneficios todos los meses. ¡Seguí explorando y
                 aprovechá descuentos exclusivos!
               </p>
             </div>

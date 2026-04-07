@@ -8,15 +8,15 @@ export default function HowItWorksSection() {
     },
     {
       number: "2",
-      title: "Creá tu cuenta y hacé tu donación: Fácil y sin complicaciones. ",
+      title: "Creá tu cuenta y hacé tu donación: Fácil y sin complicaciones.",
       description:
         "Al instante, sin trámites. Accedé a tus beneficios desde donde quieras.",
     },
     {
       number: "3",
-      title: "Usá tu cuponera mientras generás impacto.",
+      title: "Usá tu cuponera mientras generás impacto positivo.",
       description:
-        "Usá tus beneficios en más de 2,000 comercios. Disfrutá descuentos exclusivos y recordá que cada compra ya generó un cambio positivo en la sociedad y el ambiente.",
+        "Más de 10.000 descuentos en marcas de Gastronomía, Entretenimientos, Compras, Turismo, Educación, Servicios, Salud y Bienestar.",
     },
   ];
 

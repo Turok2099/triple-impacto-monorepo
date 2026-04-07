@@ -23,42 +23,42 @@ const faqs: FAQItem[] = [
     id: 1,
     question: "¿Por qué recibo descuentos por donar?",
     answer:
-      "Nuestro modelo de AYNI conecta tu generosidad con comercios aliados que creen en la responsabilidad social. Ellos ofrecen descuentos exclusivos como reconocimiento a tu compromiso con el cambio social. Así, tu donación genera impacto positivo y tú recibes beneficios tangibles.",
+      "Nuestro modelo de AYNI conecta tu generosidad con comercios aliados que creen en la responsabilidad social. Ellos ofrecen descuentos exclusivos como reconocimiento a tu compromiso con el cambio social. Así, tu donación genera impacto positivo y vos recibís beneficios tangibles.",
     icon: Gift,
   },
   {
     id: 2,
     question: "¿Cómo recibo mis cupones?",
     answer:
-      "Los cupones se envían automáticamente a tu correo electrónico inmediatamente después de confirmar tu donación. También puedes acceder a todos tus beneficios desde tu dashboard personal en cualquier momento. Los cupones incluyen códigos únicos y condiciones de uso claras.",
+      "Los cupones se envían automáticamente a tu correo electrónico inmediatamente después de confirmar tu donación. También podés acceder a todos tus beneficios desde tu dashboard personal en cualquier momento. Los cupones incluyen códigos únicos y condiciones de uso claras.",
     icon: Mail,
   },
   {
     id: 3,
     question: "¿Qué pasa si no uso el cupón?",
     answer:
-      "No hay problema. Los cupones tienen una validez que aparece claramente indicada (generalmente de 30 a 90 días). Si no los usas, no pierdes nada: tu donación ya generó el impacto social que buscabas. Los descuentos son un beneficio adicional, no una obligación.",
+      "No hay problema. Los cupones tienen una validez que aparece claramente indicada (generalmente de 30 a 90 días). Si no los usás, no perdés nada: tu donación ya generó el impacto social que buscabas. Los descuentos son un beneficio adicional, no una obligación.",
     icon: Clock,
   },
   {
     id: 5,
     question: "¿Qué proyectos apoyo con mi donación?",
     answer:
-      "Puedes elegir el proyecto específico que quieres apoyar: educación, salud, vivienda, alimentación, entre otros. Cada proyecto incluye descripción detallada, objetivos y reportes de impacto. También ofrecemos la opción de que tu donación se distribuya automáticamente según las necesidades más urgentes.",
+      "Podés elegir el proyecto específico que querés apoyar: educación, salud, vivienda, alimentación, entre otros. Cada proyecto incluye una descripción detallada, objetivos y reportes de impacto. También ofrecemos la opción de que tu donación se distribuya automáticamente según las necesidades más urgentes.",
     icon: Target,
   },
   {
     id: 6,
     question: "¿Cuál es el monto mínimo para donar?",
     answer:
-      "Puedes donar desde $5.000 en adelante. Creemos que cada aporte cuenta y genera impacto. Los beneficios y descuentos están disponibles desde la primera donación, independientemente del monto.",
+      "Podés donar desde $5.000 en adelante. Creemos que cada aporte cuenta y genera impacto. Los beneficios y descuentos están disponibles desde la primera donación, independientemente del monto.",
     icon: DollarSign,
   },
   {
     id: 8,
     question: "¿Puedo cancelar mis donaciones recurrentes?",
     answer:
-      "Absolutamente. Si elegiste donar de forma recurrente (mensual), puedes cancelar en cualquier momento desde tu dashboard sin penalidades ni preguntas. Tienes control total sobre tus donaciones.",
+      "Absolutamente. Si elegiste donar de forma recurrente (mensual), podés cancelar en cualquier momento desde tu dashboard sin penalidades ni preguntas. Tenés control total sobre tus donaciones.",
     icon: RefreshCw,
   },
 ];
@@ -91,7 +91,7 @@ export default function FAQsPage() {
               Preguntas frecuentes
             </h1>
             <p className="text-xl text-gray-600">
-              Todo lo que necesitas saber sobre cómo funciona AYNI
+              Todo lo que necesitás saber sobre cómo funciona AYNI
             </p>
           </div>
 
@@ -159,7 +159,7 @@ export default function FAQsPage() {
           {/* CTA de contacto */}
           <div className="mt-12 text-center bg-white rounded-2xl p-10 shadow-lg border-2 border-gray-100">
             <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              ¿Tienes otra pregunta?
+              ¿Tenés otra pregunta?
             </h3>
             <p className="text-lg text-gray-600 mb-8 max-w-xl mx-auto">
               Nuestro equipo está disponible para ayudarte en cualquier momento

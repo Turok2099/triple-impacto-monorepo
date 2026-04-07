@@ -83,3 +83,13 @@ export const deleteAffiliation = async (token: string, userId: string, bondaCode
   if (!res.ok) throw new Error('Error al desafiliar usuario en Bonda');
   return await res.json();
 };
+
+export const getUserAdminPayments = async (token: string, userId: string) => {
+  const url = `${API_URL}/admin/users/${userId}/payments`;
+  const res = await fetch(url, { headers: getHeaders(token) });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => null);
+    throw new Error(errorData?.message || 'Error recuperando historial de pagos');
+  }
+  return await res.json();
+};

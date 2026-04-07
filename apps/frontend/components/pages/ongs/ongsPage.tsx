@@ -10,7 +10,7 @@ export default function ONGsPage() {
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
-            Nuestras ONGs Aliadas
+            ONGs
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
             Trabajamos exclusivamente con organizaciones comprobadas y autorizadas
@@ -27,7 +27,7 @@ export default function ONGsPage() {
         <div className="mt-24 text-center bg-linear-to-br from-teal-500 to-teal-700 rounded-[2rem] p-10 md:p-16 text-white shadow-2xl relative overflow-hidden">
           {/* Decorative background circle */}
           <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-teal-400 opacity-20 blur-3xl"></div>
-          
+
           <h2 className="text-3xl md:text-4xl font-bold mb-4 relative z-10 text-white">
             Transformá con nosotos
           </h2>

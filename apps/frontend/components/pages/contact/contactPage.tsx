@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Clock } from "lucide-react";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -39,7 +39,7 @@ export default function ContactPage() {
             Hablemos
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            ¿Tienes dudas o quieres saber más? Estamos aquí para ayudarte
+            ¿Tenés dudas o querés saber más? ¡Estamos para ayudarte!
           </p>
         </div>
 
@@ -110,17 +110,41 @@ export default function ContactPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Horarios de atención */}
+              <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                <div className="flex items-start gap-4">
+                  <div className="shrink-0 w-12 h-12 bg-sky-100 rounded-xl flex items-center justify-center">
+                    <Clock className="w-6 h-6 text-sky-600" />
+                  </div>
+                  <div className="w-full">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-semibold text-gray-900">
+                        Horarios
+                      </h3>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
+                        En línea
+                      </span>
+                    </div>
+                    <p className="text-gray-600">Disponibles 24/7</p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Todos los días de la semana
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Preguntas frecuentes */}
-            <div className="bg-linear-to-br from-teal-500 to-blue-600 rounded-2xl p-8 text-white">
-              <h3 className="text-2xl font-bold mb-4">¿Tienes dudas rápidas?</h3>
+            <div className="bg-linear-to-br from-[#40a8ab] to-teal-700 rounded-2xl p-8 text-white">
+              <h3 className="text-2xl font-bold mb-4">¿Tenés dudas rápidas?</h3>
               <p className="text-teal-50 mb-6">
-                Consulta nuestra sección de preguntas frecuentes antes de
+                Consultá nuestra sección de preguntas frecuentes antes de
                 escribirnos.
               </p>
               <a
-                href="/#preguntas"
+                href="/faqs"
                 className="inline-block px-6 py-3 bg-white text-teal-700 font-semibold rounded-xl hover:shadow-lg transition-all"
               >
                 Ver FAQ
@@ -258,25 +282,6 @@ export default function ContactPage() {
               >
                 Política de Privacidad
               </a>
-            </p>
-          </div>
-        </div>
-
-        {/* Horarios de atención */}
-        <div className="mt-12 bg-white rounded-2xl shadow-lg p-8">
-          <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-            Horarios de atención
-          </h3>
-          <div className="max-w-md mx-auto text-center p-6 bg-linear-to-br from-teal-50 to-blue-50 rounded-xl">
-            <div className="text-5xl mb-4">🕐</div>
-            <h4 className="text-2xl font-bold text-gray-900 mb-2">
-              Disponibles 24 horas
-            </h4>
-            <p className="text-gray-600 mb-2">
-              Atención continua vía WhatsApp y Email
-            </p>
-            <p className="text-teal-600 font-medium">
-              Los 7 días de la semana
             </p>
           </div>
         </div>

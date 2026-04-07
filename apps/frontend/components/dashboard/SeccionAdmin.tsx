@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Swal from 'sweetalert2';
-import { getAdminUsers, deleteAdminUser, AdminUser, createAdminUser, updateAdminUser, deleteAffiliation } from "@/lib/admin";
+import { getAdminUsers, deleteAdminUser, AdminUser, createAdminUser, updateAdminUser, deleteAffiliation, getUserAdminPayments } from "@/lib/admin";
 import { useAuth } from "@/contexts/AuthContext";
-import { Users, MoreVertical, Edit2, Trash2, UserPlus, X, ShieldAlert, CheckCircle, XCircle } from "lucide-react";
+import { Users, MoreVertical, Edit2, Trash2, UserPlus, X, ShieldAlert, CheckCircle, XCircle, Receipt } from "lucide-react";
 
 export default function SeccionAdmin() {
   const { user } = useAuth();
@@ -68,6 +68,61 @@ export default function SeccionAdmin() {
         icon: 'error',
         confirmButtonColor: '#059669'
       });
+    }
+  };
+
+  const handleViewPayments = async (user: AdminUser) => {
+    try {
+      const token = localStorage.getItem("auth_token") || "";
+      Swal.fire({
+        title: "Cargando pagos...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+      const payments = await getUserAdminPayments(token, user.id);
+      
+      if (!payments || payments.length === 0) {
+        Swal.fire('Historial', 'Este usuario no tiene pagos registrados.', 'info');
+        return;
+      }
+
+      const rowsHtml = payments.map((p: any) => `
+        <tr>
+          <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: left;">${new Date(p.created_at).toLocaleDateString()}</td>
+          <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: left;">${p.organizacion_nombre || 'N/A'}</td>
+          <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: right; font-weight: 500;">$${p.amount} ${p.currency}</td>
+          <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: center;">
+            <span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: ${p.status === 'COMPLETED' ? '#dcfce7' : '#fef08a'}; color: ${p.status === 'COMPLETED' ? '#166534' : '#854d0e'};">${p.status}</span>
+          </td>
+        </tr>
+      `).join('');
+
+      Swal.fire({
+        title: `<div class="text-xl font-bold text-slate-800 mb-2">Pagos de ${user.nombre}</div>`,
+        html: `
+          <div style="font-size: 14px; text-align: left; max-height: 400px; overflow-y: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr>
+                  <th style="padding: 10px; border-bottom: 2px solid #cbd5e1; text-align: left; color: #475569; font-size: 12px; text-transform: uppercase;">Fecha</th>
+                  <th style="padding: 10px; border-bottom: 2px solid #cbd5e1; text-align: left; color: #475569; font-size: 12px; text-transform: uppercase;">Aporte a</th>
+                  <th style="padding: 10px; border-bottom: 2px solid #cbd5e1; text-align: right; color: #475569; font-size: 12px; text-transform: uppercase;">Monto</th>
+                  <th style="padding: 10px; border-bottom: 2px solid #cbd5e1; text-align: center; color: #475569; font-size: 12px; text-transform: uppercase;">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rowsHtml}
+              </tbody>
+            </table>
+          </div>
+        `,
+        width: '650px',
+        confirmButtonColor: '#059669',
+        confirmButtonText: 'Cerrar'
+      });
+
+    } catch (e: any) {
+      Swal.fire('Error', e.message, 'error');
     }
   };
 
@@ -238,6 +293,13 @@ export default function SeccionAdmin() {
                     </td>
                     <td className="py-4 px-6 text-right">
                       <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => handleViewPayments(u)}
+                          className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          title="Ver historial de pagos"
+                        >
+                          <Receipt className="w-4 h-4" />
+                        </button>
                         <button
                           onClick={() => openEditModal(u)}
                           className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"

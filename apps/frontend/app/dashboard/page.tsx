@@ -18,6 +18,7 @@ import SeccionPerfil from "@/components/dashboard/SeccionPerfil";
 import SeccionMisCupones from "@/components/dashboard/SeccionMisCupones";
 import SeccionMisPagos from "@/components/dashboard/SeccionMisPagos";
 import SeccionAdmin from "@/components/dashboard/SeccionAdmin";
+import SeccionDonacion from "@/components/dashboard/SeccionDonacion";
 import {
   Ticket,
   CheckCircle2,
@@ -42,7 +43,7 @@ import {
   Receipt,
 } from "lucide-react";
 
-type ActiveTab = "inicio" | "perfil" | "cupones" | "pagos" | "admin";
+type ActiveTab = "inicio" | "perfil" | "cupones" | "pagos" | "admin" | "donar";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -307,13 +308,24 @@ export default function DashboardPage() {
                 backgroundImage: `url(https://ui-avatars.com/api/?name=${encodeURIComponent(dashboard.usuario.nombre)}&background=16a459&color=fff&size=192)`,
               }}
             ></div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-xl text-[#1A202C]">
+            <div className="flex flex-col md:flex-row items-center gap-3">
+              <span className="font-bold text-xl text-[#1A202C] whitespace-nowrap">
                 ¡Hola, {dashboard.usuario.nombre.split(" ")[0]}!
               </span>
-              <span className="bg-[#40a8ab]/10 text-[#40a8ab] text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
-                Miembro Activo
-              </span>
+              {user?.role === 'superadmin' ? (
+                <span className="bg-purple-100 text-purple-700 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
+                  <Shield className="w-3 h-3" />
+                  Administrador
+                </span>
+              ) : dashboard.fundaciones.some(f => f.isActive) ? (
+                <span className="bg-emerald-100/60 text-emerald-700 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
+                  Colaborador
+                </span>
+              ) : (
+                <span className="bg-slate-100 text-slate-500 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
+                  Inactivo
+                </span>
+              )}
             </div>
           </div>
 
@@ -350,19 +362,19 @@ export default function DashboardPage() {
             {user?.role === 'superadmin' && (
               <button
                 onClick={() => setActiveTab("admin")}
-                className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "admin" ? "text-emerald-600" : "text-slate-400 hover:text-emerald-500"}`}
+                className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "admin" ? "text-[#40a8ab]" : "text-slate-400 hover:text-[#40a8ab]"}`}
               >
                 <Shield className="w-6 h-6" strokeWidth={2} />
                 <span className={`text-xs ${activeTab === "admin" ? "font-semibold" : "font-medium"}`}>Admin</span>
               </button>
             )}
-            <a
-              href="/donar"
-              className="flex flex-col items-center gap-1 text-slate-400 hover:text-[#40a8ab] transition-colors"
+            <button
+              onClick={() => setActiveTab("donar")}
+              className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "donar" ? "text-[#40a8ab]" : "text-slate-400 hover:text-[#40a8ab]"}`}
             >
               <Heart className="w-6 h-6" strokeWidth={2} />
-              <span className="text-xs font-medium">Donar +</span>
-            </a>
+              <span className={`text-xs ${activeTab === "donar" ? "font-semibold" : "font-medium"}`}>Donar +</span>
+            </button>
             <button
               onClick={logout}
               className="flex flex-col items-center gap-1 text-slate-400 hover:text-red-500 transition-colors"
@@ -380,6 +392,7 @@ export default function DashboardPage() {
       {activeTab === "cupones" && <SeccionMisCupones />}
       {activeTab === "pagos" && <SeccionMisPagos />}
       {activeTab === "admin" && <SeccionAdmin />}
+      {activeTab === "donar" && <SeccionDonacion />}
 
       <main className={`max-w-7xl mx-auto px-6 py-6 space-y-6 ${activeTab !== "inicio" ? "hidden" : ""}`}>
         {/* Impact Summary */}
@@ -452,11 +465,19 @@ export default function DashboardPage() {
                 const initialsBg = `url(https://ui-avatars.com/api/?name=${encodeURIComponent(fundacion.nombre)}&background=16a459&color=fff&size=128)`;
                 const totalDonado = fundacion.totalDonado ?? 0;
                 const totalFormateado = totalDonado.toLocaleString("es-AR");
+                const isInactive = fundacion.isActive === false;
+                
                 return (
                 <div
                   key={fundacion.id}
-                  className="bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-[0_4px_20px_-2px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] transition-shadow flex flex-col h-full"
+                  className={`bg-white border rounded-3xl overflow-hidden shadow-[0_4px_20px_-2px_rgba(0,0,0,0.06)] transition-shadow flex flex-col h-full relative ${isInactive ? 'border-slate-200 opacity-60 grayscale' : 'border-slate-100 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)]'}`}
                 >
+                  {isInactive && (
+                    <div className="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl z-20 shadow-sm flex items-center gap-1">
+                      <Shield className="w-3 h-3" />
+                      Inactiva
+                    </div>
+                  )}
                   {/* Bloque logo centrado (sin caja: solo logo visible) */}
                   <div className="pt-6 pb-4 px-6 flex flex-col items-center flex-1">
                     <div className="size-20 shrink-0 flex items-center justify-center overflow-hidden">
@@ -517,7 +538,34 @@ export default function DashboardPage() {
 
         {/* Exclusive Benefits Section */}
         <section className="space-y-6">
-          <div className="flex items-center justify-center gap-3">
+          {(() => {
+            const hasActiveOngs = dashboard.fundaciones?.some(f => f.isActive !== false) ?? false;
+            
+            if (!hasActiveOngs) {
+              return (
+                <div className="bg-white border border-slate-100 rounded-3xl p-10 text-center shadow-sm relative overflow-hidden mt-8">
+                  <div className="absolute inset-0 bg-slate-50/50 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-6">
+                    <Shield className="w-16 h-16 text-slate-300 mb-4" />
+                    <h3 className="text-xl font-bold text-slate-700 mb-2">Bloqueo de Beneficios</h3>
+                    <p className="text-slate-500 max-w-md mx-auto">
+                      Actualmente no cuentas con ninguna afiliación activa en nuestras ONGs. 
+                      Para acceder a la red de descuentos exclusivos, debes estar acreditado 
+                      en al menos una fundación activa.
+                    </p>
+                  </div>
+                  {/* Fondo difuminado simulando cupones */}
+                  <div className="opacity-10 blur-sm flex justify-center gap-4 pointer-events-none">
+                    <div className="w-48 h-64 bg-slate-200 rounded-xl"></div>
+                    <div className="w-48 h-64 bg-slate-200 rounded-xl"></div>
+                    <div className="w-48 h-64 bg-slate-200 rounded-xl"></div>
+                  </div>
+                </div>
+              );
+            }
+
+            return (
+              <>
+                <div className="flex items-center justify-center gap-3">
             <h2 className="text-3xl md:text-4xl font-bold text-center text-slate-900 tracking-tight">
               TUS DESCUENTOS EXCLUSIVOS
             </h2>
@@ -727,6 +775,9 @@ export default function DashboardPage() {
                 )}
               </div>
             )}
+              </>
+            );
+          })()}
         </section>
       </main>
 

@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AYNI - Dona y recibe descuentos exclusivos",
+  title: "AYNI - Doná y recibí descuentos exclusivos",
   description:
     "Tu donación apoya proyectos sociales y te da acceso a cupones de Bonda. Impacto real, beneficios reales.",
 };

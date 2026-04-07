@@ -113,7 +113,7 @@ export class BondaController {
       micrositeRow.id,
     );
 
-    if (!afiliado) {
+    if (!afiliado || !afiliado.is_active) {
       throw new NotFoundException(
         'Complete una donación en esta ONG para acceder a cupones',
       );
@@ -508,6 +508,7 @@ export class BondaController {
           codigoAfiliado: f.affiliate_code,
           fechaAfiliacion: f.created_at,
           totalDonado: Number(f.total_donado ?? 0),
+          isActive: f.is_active,
         })),
         cuponesActivos: cuponesActivos.map(this.transformarACuponSolicitadoDto),
         cuponesRecientes: historialReciente.cupones.map(

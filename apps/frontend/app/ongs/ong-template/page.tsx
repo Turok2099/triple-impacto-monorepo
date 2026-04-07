@@ -5,7 +5,6 @@ import {
     OngPrograms,
     OngImpact,
     OngHowToHelp,
-    OngFAQ,
     OngFooter,
 } from "@/components/ong-landing-template";
 
@@ -18,7 +17,6 @@ export default function OngTemplatePage() {
             <OngPrograms />
             <OngImpact />
             <OngHowToHelp />
-            <OngFAQ />
 
         </main>
     );

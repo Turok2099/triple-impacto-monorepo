@@ -15,6 +15,7 @@ import {
   ChevronDown,
   CheckCircle2,
   XCircle,
+  Shield,
 } from 'lucide-react';
 
 const PROVINCIAS = [
@@ -25,7 +26,12 @@ const PROVINCIAS = [
   'Tierra del Fuego', 'Tucumán',
 ];
 
-export default function SeccionPerfil() {
+interface SeccionPerfilProps {
+  isActive?: boolean;
+  role?: string;
+}
+
+export default function SeccionPerfil({ isActive = false, role = 'user' }: SeccionPerfilProps) {
   const { user, logout } = useAuth();
 
   // Toast flotante
@@ -152,18 +158,27 @@ export default function SeccionPerfil() {
         <p className="mt-3 text-[#40a8ab] text-xs font-bold uppercase tracking-wider">Cambiar Foto</p>
       </section>
 
-      {/* Badge miembro activo */}
+      {/* Badge de Título/Estado */}
       <section className="px-6 mb-8">
-        <div className="bg-[#40a8ab]/5 border border-[#40a8ab]/10 rounded-2xl p-4 flex items-center justify-between">
+        <div className={`border rounded-2xl p-4 flex items-center justify-between ${
+          role === 'superadmin' 
+            ? 'bg-purple-100/50 border-purple-200' 
+            : isActive 
+              ? 'bg-[#40a8ab]/5 border-[#40a8ab]/10' 
+              : 'bg-slate-100/50 border-slate-200'
+        }`}>
           <div className="flex items-center gap-3">
-            <div className="bg-[#40a8ab] text-white p-2 rounded-xl">
-              <CheckCircle className="w-5 h-5" />
+            <div className={`p-2 rounded-xl text-white ${
+              role === 'superadmin' ? 'bg-purple-600' : isActive ? 'bg-[#40a8ab]' : 'bg-slate-400'
+            }`}>
+              {role === 'superadmin' ? <Shield className="w-5 h-5" /> : isActive ? <CheckCircle className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
             </div>
             <div>
-              <p className="text-sm font-bold text-[#1A202C]">Miembro Activo</p>
+              <p className="text-sm font-bold text-[#1A202C]">
+                {role === 'superadmin' ? 'Administrador' : isActive ? 'Colaborador' : 'Inactivo'}
+              </p>
               <p className="text-[11px] text-slate-500">
-                Miembro desde{' '}
-                {new Date().toLocaleDateString('es-AR', { month: 'short', year: 'numeric' })}
+                {role === 'superadmin' ? 'Acceso total al sistema' : isActive ? 'Suscripción al día' : 'Sin pagos activos'}
               </p>
             </div>
           </div>

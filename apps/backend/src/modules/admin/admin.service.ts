@@ -47,6 +47,20 @@ export class AdminService {
     };
   }
 
+  async getUserPayments(userId: string) {
+    const { data, error } = await this.supabaseService.getClient()
+      .from('donaciones')
+      .select('id, amount:monto, currency:moneda, status:estado, created_at, organizacion_nombre')
+      .eq('usuario_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      this.logger.error('Error fetching user payments', error);
+      throw new InternalServerErrorException('Error fetch payments');
+    }
+    return data;
+  }
+
   async createUser(adminId: string, payload: any) {
     // 1. Crear localmente
     const { data: user, error } = await this.supabaseService.getClient().from('usuarios')
@@ -137,6 +151,8 @@ export class AdminService {
          }
        }
     }
+    // Cascading soft-delete to local affiliations
+    await this.supabaseService.getClient().from('usuarios_bonda_afiliados').update({ is_active: false }).eq('user_id', id);
 
     const { error } = await this.supabaseService.getClient().from('usuarios').update({ is_active: false }).eq('id', id);
     if (error) throw new InternalServerErrorException('Failed to soft delete local user');

@@ -78,7 +78,15 @@ export async function obtenerOrganizaciones(): Promise<Organizacion[]> {
     throw new Error('Error al obtener organizaciones');
   }
 
-  return response.json();
+  const data: Organizacion[] = await response.json();
+
+  // Renombramos la ONG para que no diga "Popular" en el frontend según el requerimiento
+  return data.map((org) => {
+    if (org.nombre.toUpperCase().includes('BIBLIOTECA POPULAR RURALES')) {
+      return { ...org, nombre: 'Bibliotecas Rurales Argentinas' };
+    }
+    return org;
+  });
 }
 
 /**

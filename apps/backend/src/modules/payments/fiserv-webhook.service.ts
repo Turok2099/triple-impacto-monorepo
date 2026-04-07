@@ -189,7 +189,7 @@ export class FiservWebhookService {
       userId,
       microsite.id,
     );
-    if (existing) {
+    if (existing && existing.is_active === true) {
       return;
     }
 

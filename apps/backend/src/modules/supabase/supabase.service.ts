@@ -227,9 +227,9 @@ export class SupabaseService implements OnModuleInit {
   async getAffiliateForUserAndMicrosite(
     userId: string,
     bondaMicrositeId: string,
-  ): Promise<{ affiliate_code: string } | null> {
+  ): Promise<{ affiliate_code: string; is_active: boolean } | null> {
     const { data, error } = await this.from('usuarios_bonda_afiliados')
-      .select('affiliate_code')
+      .select('affiliate_code, is_active')
       .eq('user_id', userId)
       .eq('bonda_microsite_id', bondaMicrositeId)
       .maybeSingle();
@@ -238,7 +238,7 @@ export class SupabaseService implements OnModuleInit {
       this.logger.error('Error al obtener afiliado usuario+micrositio:', error);
       throw error;
     }
-    return data ? { affiliate_code: data.affiliate_code } : null;
+    return data ? { affiliate_code: data.affiliate_code, is_active: data.is_active } : null;
   }
 
   /**
@@ -256,10 +256,11 @@ export class SupabaseService implements OnModuleInit {
           user_id: userId,
           bonda_microsite_id: bondaMicrositeId,
           affiliate_code: affiliateCode,
+          is_active: true,
         },
         {
           onConflict: 'user_id,bonda_microsite_id',
-          ignoreDuplicates: true,
+          ignoreDuplicates: false,
         },
       )
       .select()
@@ -958,7 +959,7 @@ export class SupabaseService implements OnModuleInit {
         .maybeSingle();
 
       const { data: afiliado } = await this.from('usuarios_bonda_afiliados')
-        .select('affiliate_code')
+        .select('affiliate_code, is_active')
         .eq('user_id', usuarioId)
         .eq('bonda_microsite_id', microsite?.id)
         .maybeSingle();
@@ -968,6 +969,7 @@ export class SupabaseService implements OnModuleInit {
         micrositio_nombre: agg.organizacion_nombre,
         micrositio_slug: microsite?.slug || '',
         affiliate_code: afiliado?.affiliate_code || '',
+        is_active: afiliado ? afiliado.is_active : false,
         created_at: agg.created_at,
         total_donado: agg.totalDonado,
       });

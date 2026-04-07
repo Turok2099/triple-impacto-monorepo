@@ -8,6 +8,7 @@ import HowItWorksSection from "@/components/sections/HowItWorks/howItWorksSectio
 import PartnersSection from "@/components/sections/Partners/partnersSection";
 import SponsorsSection from "@/components/sections/Sponsors/sponsorsSection";
 import WhyDonateSection from "@/components/sections/WhyDonate/whyDonateSection";
+import JoinUsSection from "@/components/sections/JoinUs/joinUsSection";
 
 export default function HomePage() {
   return (
@@ -19,6 +20,7 @@ export default function HomePage() {
       <CouponCounter />
       <SponsorsSection />
       <PartnersSection />
+      <JoinUsSection />
       <WhyDonateSection />
       <CTASection />
       <FAQCTASection />

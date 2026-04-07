@@ -197,3 +197,6 @@ apps/backend/database/setup-test-user-affiliate.sql
 apps/backend/database/
 apps/backend/scripts/
 # NOTA: El README.md de la raíz del proyecto SÍ se sube (no está ignorado)
+
+# Antigravity Agents
+.agents/

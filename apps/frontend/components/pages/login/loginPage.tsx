@@ -237,7 +237,7 @@ export default function LoginPage() {
         {/* Sign up link */}
         <div className="text-center">
           <p className="text-sm text-gray-600">
-            ¿No tienes cuenta?{" "}
+            ¿No tenés cuenta?{" "}
             <a
               href="/registro"
               className="font-semibold text-teal-600 hover:text-teal-500 transition-colors"
@@ -250,7 +250,7 @@ export default function LoginPage() {
         {/* Benefits reminder */}
         <div className="bg-teal-50 rounded-2xl p-6 border border-teal-100">
           <h3 className="text-sm font-semibold text-teal-900 mb-3">
-            Al iniciar sesión puedes:
+            Al iniciar sesión podés:
           </h3>
           <ul className="space-y-2 text-sm text-teal-800">
             <li className="flex items-start gap-2">

@@ -145,7 +145,7 @@ export default function FormularioDonacion({
     return (
       <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 text-center">
         <p className="text-amber-800 mb-4">
-          Debes iniciar sesión para realizar una donación
+          Tenés que iniciar sesión para realizar una donación
         </p>
         <a
           href="/login"
@@ -203,35 +203,35 @@ export default function FormularioDonacion({
             {organizacionSeleccionada && (() => {
               const logoUrl = getOrganizationLogoUrl(organizacionSeleccionada.nombre);
               return (
-              <div className="mt-4 p-5 bg-white border border-slate-200 shadow-sm rounded-xl flex flex-col md:flex-row items-center gap-5 text-center md:text-left transition-all">
-                <div className="relative w-36 h-36 overflow-hidden shrink-0 flex items-center justify-center">
-                  {logoUrl ? (
-                    <Image
-                      src={logoUrl}
-                      alt={organizacionSeleccionada.nombre}
-                      fill
-                      className="object-contain object-center"
-                    />
-                  ) : (
-                    <div
-                      className="w-full h-full flex items-center justify-center text-teal-600 text-4xl font-bold"
-                      aria-hidden
-                    >
-                      {organizacionSeleccionada.nombre.charAt(0)}
-                    </div>
-                  )}
+                <div className="mt-4 p-5 bg-white border border-slate-200 shadow-sm rounded-xl flex flex-col md:flex-row items-center gap-5 text-center md:text-left transition-all">
+                  <div className="relative w-36 h-36 overflow-hidden shrink-0 flex items-center justify-center">
+                    {logoUrl ? (
+                      <Image
+                        src={logoUrl}
+                        alt={organizacionSeleccionada.nombre}
+                        fill
+                        className="object-contain object-center"
+                      />
+                    ) : (
+                      <div
+                        className="w-full h-full flex items-center justify-center text-teal-600 text-4xl font-bold"
+                        aria-hidden
+                      >
+                        {organizacionSeleccionada.nombre.charAt(0)}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-slate-900 text-lg mb-1">
+                      {organizacionSeleccionada.nombre}
+                    </h4>
+                    {organizacionSeleccionada.descripcion && (
+                      <p className="text-sm text-slate-600 line-clamp-3">
+                        {organizacionSeleccionada.descripcion}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h4 className="font-bold text-slate-900 text-lg mb-1">
-                    {organizacionSeleccionada.nombre}
-                  </h4>
-                  {organizacionSeleccionada.descripcion && (
-                    <p className="text-sm text-slate-600 line-clamp-3">
-                      {organizacionSeleccionada.descripcion}
-                    </p>
-                  )}
-                </div>
-              </div>
               );
             })()}
           </>

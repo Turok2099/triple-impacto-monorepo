@@ -450,7 +450,7 @@ export default function RegisterPage() {
         {/* Login link */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
-            ¿Ya tienes cuenta?{" "}
+            ¿Ya tenés cuenta?{" "}
             <a
               href="/login"
               className="font-semibold text-teal-600 hover:text-teal-500 transition-colors"
@@ -463,7 +463,7 @@ export default function RegisterPage() {
         {/* Benefits reminder */}
         <div className="mt-6 bg-teal-50 rounded-2xl p-6 border border-teal-100">
           <h3 className="text-sm font-semibold text-teal-900 mb-3">
-            Al registrarte obtienes:
+            Al registrarte obtenés:
           </h3>
           <ul className="space-y-2 text-sm text-teal-800">
             <li className="flex items-start gap-2">

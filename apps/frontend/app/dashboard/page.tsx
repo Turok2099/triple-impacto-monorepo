@@ -845,6 +845,18 @@ export default function DashboardPage() {
             onClose={() => setCuponSeleccionado(null)}
             onCuponSolicitado={(nuevoCupon) => {
               setMisCupones((prev) => [...prev, nuevoCupon]);
+              if (dashboard) {
+                setDashboard({
+                  ...dashboard,
+                  estadisticas: {
+                    ...(dashboard.estadisticas || {}),
+                    cuponesActivos: (dashboard.estadisticas?.cuponesActivos || 0) + 1,
+                    ultimoCuponSolicitado: new Date().toISOString(),
+                    cuponesUsados: dashboard.estadisticas?.cuponesUsados || 0,
+                    totalDonado: dashboard.estadisticas?.totalDonado || 0,
+                  }
+                });
+              }
             }}
           />
         );

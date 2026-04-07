@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { Heart, X, ExternalLink, Mail, Globe } from "lucide-react";
 import { obtenerOrganizaciones, type Organizacion } from "@/lib/payments";
 import { getOrganizationLogoUrl } from "@/lib/organization-logos";
 
@@ -12,10 +12,100 @@ interface PartnersSectionProps {
   className?: string;
 }
 
+const ONG_DETAILS = [
+  {
+    "organizacion": "Bibliotecas Rurales Argentinas",
+    "proposito": "Asociación civil fundada en 1963 que busca garantizar el acceso igualitario a la cultura y la educación en todo el país. Se dedica a crear y fortalecer bibliotecas en comunidades rurales y aisladas para que a nadie le falte un centro de lectura y aprendizaje cercano.",
+    "contacto": "comunicacionbibliotecasrurales@gmail.com | +54 (011) 4774-8938",
+    "sitio_web": "https://www.bibliotecasrurales.org.ar/",
+    "sitio_bonda": "https://beneficiosbibliotecaruralesargentinas.bonda.com/"
+  },
+  {
+    "organizacion": "Haciendo Camino",
+    "proposito": "Trabaja para mejorar la calidad de vida de familias en situación de vulnerabilidad social en el Norte argentino. Su enfoque integral combina programas de nutrición, prevención de la desnutrición infantil, estimulación temprana y capacitación en oficios para las madres.",
+    "contacto": "info@haciendocamino.org.ar | +54 9 11 5199-6482",
+    "sitio_web": "https://haciendocamino.org.ar/",
+    "sitio_bonda": "https://beneficioshaciendocamino.bonda.com/"
+  },
+  {
+    "organizacion": "Mamis Solidarias",
+    "proposito": "Organización que lucha por una infancia con igualdad de oportunidades a través de programas de apoyo escolar, alimentación y contención emocional. Trabajan activamente en merenderos y centros propios en el Gran Buenos Aires y Misiones.",
+    "contacto": "info@mamissolidarias.org.ar",
+    "sitio_web": "https://www.mamissolidarias.org.ar/",
+    "sitio_bonda": "https://comunidadmamissolidarias.bonda.com/"
+  },
+  {
+    "organizacion": "Plato Lleno",
+    "proposito": "Iniciativa solidaria que busca evitar el desperdicio de alimentos. Se encargan de 'rescatar' comida excedente de eventos y comercios, que se encuentra en perfecto estado, para distribuirla de forma inmediata en comedores e instituciones que la necesitan.",
+    "contacto": "proyectoplatolleno@gmail.com | logistica@platolleno.org",
+    "sitio_web": "https://www.platolleno.org/buenos-aires.html",
+    "sitio_bonda": "https://clubplatolleno.bonda.com/"
+  },
+  {
+    "organizacion": "Monte Adentro",
+    "proposito": "Promueve el desarrollo integral de comunidades rurales en el Chaco argentino. Trabaja en ejes de educación, salud, oficios e infraestructura, buscando que las familias puedan crecer y progresar en su lugar de origen con dignidad y oportunidades.",
+    "contacto": "hola@monteadentro.org | +54 9 11 6657-1366",
+    "sitio_web": "https://monteadentro.org/",
+    "sitio_bonda": "https://beneficiosmonteadentro.bonda.com/"
+  },
+  {
+    "organizacion": "Fundación Padres",
+    "proposito": "Institución dedicada a concientizar a los padres sobre su rol protagónico en la crianza y educación de sus hijos. Busca fortalecer el vínculo familiar para prevenir conductas de riesgo y promover el desarrollo de hijos saludables emocionalmente.",
+    "contacto": "info@fundacionpadres.org | +54 11 4805-5693",
+    "sitio_web": "https://fundacionpadres.org/inicio/",
+    "sitio_bonda": "https://beneficiosfundacionpadres.bonda.com/"
+  },
+  {
+    "organizacion": "Proactiva",
+    "proposito": "ONG que trabaja por la inclusión social y laboral de personas con discapacidad intelectual y psicosocial. A través de su programa 'Feriactivos', impulsan el emprendedurismo y la visibilización de las capacidades de las personas para su participación activa en la comunidad.",
+    "contacto": "info@proactivaac.org",
+    "sitio_web": "https://proactivaac.org/",
+    "sitio_bonda": "https://clubproactiva.bonda.com/"
+  },
+  {
+    "organizacion": "La Guarida",
+    "proposito": "Proyecto innovador que construye consolas de videojuegos artesanales e intervenidas artísticamente para donarlas a hospitales públicos pediátricos. Su misión es utilizar el juego como una herramienta terapéutica para ayudar a los niños a transitar sus tratamientos.",
+    "contacto": "hola@laguarida.org.ar",
+    "sitio_web": "https://laguarida.org.ar/",
+    "sitio_bonda": "https://beneficioslaguarida.com/"
+  },
+  {
+    "organizacion": "Techo Argentina",
+    "proposito": "Organización presente en Latinoamérica que busca superar la situación de pobreza en los asentamientos populares. Trabaja mediante la construcción de viviendas de emergencia y proyectos de desarrollo comunitario liderados por jóvenes voluntarios y vecinos.",
+    "contacto": "info.argentina@techo.org | 0810-345-0504",
+    "sitio_web": "https://argentina.techo.org/",
+    "sitio_bonda": "https://comunidadtecho.com/"
+  },
+  {
+    "organizacion": "Regenerar",
+    "proposito": "Fundación dedicada a la gestión ambiental y la promoción de la economía circular. Trabaja en la educación ambiental y en la implementación de sistemas de reciclaje y compostaje para reducir el impacto negativo de los residuos en el planeta.",
+    "contacto": "contacto@regenerar.org.ar",
+    "sitio_web": "https://www.regenerar.org.ar/",
+    "sitio_bonda": "https://regenerarclub.com/"
+  },
+  {
+    "organizacion": "Loros Parlantes",
+    "proposito": "Asociación que utiliza la expresión artística, la comunicación y la creatividad como medios para la inclusión social de jóvenes con discapacidad. Fomenta un espacio de convivencia donde se estimulan talentos individuales para potenciar la autonomía.",
+    "contacto": "lorosparlantesoficial@gmail.com",
+    "sitio_web": "https://lorosparlantes.org.ar/",
+    "sitio_bonda": "https://beneficioslorosparlantes.com/"
+  },
+  {
+    "organizacion": "Proyectar ONG",
+    "proposito": "Organización que actúa como puente para generar impacto social y ambiental positivo. Se enfoca en la educación ambiental, la integración de comunidades vulnerables y el desarrollo de proyectos que transforman realidades sociales en Argentina.",
+    "contacto": "contacto@proyectarong.ar",
+    "sitio_web": "https://proyectarong.ar/",
+    "sitio_bonda": "https://beneficioslorosparlantes.com/"
+  }
+];
+
 export default function PartnersSection({ hideHeader = false, hideCTA = false, className }: PartnersSectionProps = {}) {
   const [organizaciones, setOrganizaciones] = useState<Organizacion[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Estado para el modal
+  const [selectedOrg, setSelectedOrg] = useState<(Organizacion & { details?: any }) | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -29,8 +119,26 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
-    return () => { cancelled = true; };
-  }, []);
+
+    // Control del scroll cuando el modal está abierto
+    if (selectedOrg) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => { 
+      cancelled = true; 
+      document.body.style.overflow = "auto";
+    };
+  }, [selectedOrg]);
+
+  const handleCardClick = (org: Organizacion) => {
+    const detail = ONG_DETAILS.find((d) => d.organizacion === org.nombre);
+    setSelectedOrg({ ...org, details: detail });
+  };
+
+  const closeModal = () => setSelectedOrg(null);
 
   if (loading) {
     return (
@@ -92,7 +200,7 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
   }
 
   return (
-    <section className={className || "py-20 px-4 sm:px-6 lg:px-8 bg-slate-50/80"}>
+    <section className={className || "py-20 px-4 sm:px-6 lg:px-8 bg-slate-50/80 relative"}>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         {!hideHeader && (
@@ -113,12 +221,11 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
             return (
               <div
                 key={org.id}
-                className="bg-white rounded-2xl p-4 flex items-center justify-between shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-50"
+                onClick={() => handleCardClick(org)}
+                className="bg-white rounded-2xl p-4 flex items-center justify-between shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-50 cursor-pointer hover:shadow-md transition-shadow"
               >
-                <div className="flex items-center gap-4 min-w-0">
-                  <div
-                    className="size-16 rounded-full bg-transparent shrink-0 overflow-hidden flex items-center justify-center p-1"
-                  >
+                <div className="flex items-center gap-4 min-w-0 pointer-events-none">
+                  <div className="size-16 rounded-full bg-transparent shrink-0 overflow-hidden flex items-center justify-center p-1">
                     {logoUrl ? (
                       <img src={logoUrl} alt={org.nombre} className="w-full h-full object-contain" />
                     ) : (
@@ -140,6 +247,7 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                 </div>
                 <Link
                   href="/donar"
+                  onClick={(e) => e.stopPropagation()}
                   className="bg-teal-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-teal-500/20 active:scale-95 transition-transform shrink-0"
                 >
                   Donar
@@ -156,12 +264,11 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
             return (
               <div
                 key={org.id}
-                className="group bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300 flex flex-col items-center"
+                onClick={() => handleCardClick(org)}
+                className="group bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300 flex flex-col items-center cursor-pointer"
               >
-                <div className="p-8 pb-4 flex flex-col items-center grow text-center">
-                  <div
-                    className="h-28 w-full bg-transparent mb-6 shrink-0 overflow-hidden flex items-center justify-center p-2"
-                  >
+                <div className="p-8 pb-4 flex flex-col items-center grow text-center pointer-events-none">
+                  <div className="h-28 w-full bg-transparent mb-6 shrink-0 overflow-hidden flex items-center justify-center p-2">
                     {logoUrl ? (
                       <img src={logoUrl} alt={org.nombre} className="w-full h-full object-contain" />
                     ) : (
@@ -181,6 +288,7 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                 </div>
                 <Link
                   href="/donar"
+                  onClick={(e) => e.stopPropagation()}
                   className="w-full bg-teal-500 text-white py-4 font-bold text-sm tracking-wide hover:bg-teal-600 transition-colors mt-auto text-center"
                 >
                   Donar
@@ -189,9 +297,95 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
             );
           })}
         </div>
-
-
       </div>
+
+      {/* Modal / Vista Emergente */}
+      {selectedOrg && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={closeModal}
+        >
+          <div 
+            className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button 
+              onClick={closeModal}
+              className="absolute top-4 right-4 p-2.5 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors z-10"
+              aria-label="Cerrar modal"
+            >
+              <X className="w-5 h-5 text-slate-600" />
+            </button>
+
+            <div className="p-8 md:p-10">
+              <div className="flex flex-col sm:flex-row items-center gap-6 mb-8 text-center sm:text-left">
+                <div className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center shrink-0 p-3 shadow-md border border-slate-100">
+                  {(() => {
+                    const logoUrl = getOrganizationLogoUrl(selectedOrg.nombre);
+                    return logoUrl ? (
+                      <img src={logoUrl} alt={selectedOrg.nombre} className="w-full h-full object-contain" />
+                    ) : (
+                      <span className="text-4xl font-bold text-teal-500">{selectedOrg.nombre.charAt(0)}</span>
+                    );
+                  })()}
+                </div>
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-1">{selectedOrg.nombre}</h2>
+                  <p className="text-teal-600 font-medium text-sm">Organización Aliada</p>
+                </div>
+              </div>
+
+              {selectedOrg.details ? (
+                <div className="space-y-8">
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Propósito</h3>
+                    <p className="text-slate-700 leading-relaxed text-lg">
+                      {selectedOrg.details.proposito}
+                    </p>
+                  </div>
+                  
+                  <div className="bg-slate-50 p-6 rounded-2xl space-y-5 border border-slate-100">
+                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Información y Contacto</h3>
+                    <div className="flex items-start gap-4">
+                      <Mail className="w-5 h-5 text-teal-500 mt-0.5 shrink-0" />
+                      <p className="text-base text-slate-700">{selectedOrg.details.contacto}</p>
+                    </div>
+                    
+                    <div className="flex items-start gap-4">
+                      <Globe className="w-5 h-5 text-teal-500 mt-0.5 shrink-0" />
+                      <a href={selectedOrg.details.sitio_web} target="_blank" rel="noopener noreferrer" className="text-base text-teal-600 hover:text-teal-700 hover:underline break-all">
+                        {selectedOrg.details.sitio_web}
+                      </a>
+                    </div>
+                    
+                    <div className="flex items-start gap-4">
+                      <ExternalLink className="w-5 h-5 text-teal-500 mt-0.5 shrink-0" />
+                      <a href={selectedOrg.details.sitio_bonda} target="_blank" rel="noopener noreferrer" className="text-base text-teal-600 hover:text-teal-700 hover:underline break-all">
+                        Sitio de beneficios Bonda
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-slate-600 text-center py-8 bg-slate-50 rounded-2xl border border-slate-100">
+                  <p>{selectedOrg.descripcion || "No hay información detallada disponible para esta organización en este momento."}</p>
+                </div>
+              )}
+
+              <div className="mt-10">
+                <Link
+                  href="/donar"
+                  onClick={closeModal}
+                  className="w-full flex justify-center items-center gap-2 bg-teal-500 text-white font-bold py-4 px-6 rounded-xl hover:bg-teal-600 transition-colors shadow-lg shadow-teal-500/20 text-lg active:scale-[0.98]"
+                >
+                  <Heart className="w-5 h-5" />
+                  Donar a esta Organización
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

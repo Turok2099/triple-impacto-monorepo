@@ -25,20 +25,41 @@ export default function AboutPage() {
     <div className="min-h-screen bg-linear-to-b from-gray-50 to-white pt-24 pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Intro Section */}
-        <section className="text-center max-w-4xl mx-auto mb-28 mt-8">
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold text-gray-900 mb-8 leading-tight tracking-tight">
-            El bien que <span className="text-transparent bg-clip-text bg-linear-to-r from-teal-500 to-teal-700">vuelve</span>
-          </h1>
-          <div className="space-y-6 text-xl sm:text-2xl text-gray-600 leading-relaxed font-light">
+        {/* Purpose Section - Hero */}
+        <section className="max-w-5xl mx-auto mb-20 mt-8 relative">
+          <div className="absolute inset-0 bg-linear-to-r from-teal-50 to-teal-100 transform -skew-y-2 rounded-3xl -z-10"></div>
+          <div className="bg-white/80 backdrop-blur-md border border-teal-100 rounded-3xl p-10 md:p-14 shadow-[0_8px_30px_rgb(64,168,171,0.1)]">
+            <div className="text-center mb-8">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-6 tracking-tight">
+                Nuestro <span className="text-transparent bg-clip-text bg-linear-to-r from-teal-500 to-teal-700">Propósito</span>
+              </h1>
+              <div className="w-16 h-1.5 bg-teal-500 mx-auto rounded-full"></div>
+            </div>
+            <p className="text-lg md:text-2xl text-gray-700 leading-relaxed text-center font-medium">
+              <strong className="text-teal-700 font-bold">AYNI</strong> es una plataforma que promueve la reciprocidad y el apoyo mutuo, inspirada en el concepto ancestral andino de &quot;ayni&quot;, que significa &quot;reciprocidad&quot; o &quot;intercambio mutuo&quot;. La plataforma conecta a personas con ONGs y causas socioambientales, permitiendo donaciones, voluntariado digital y acceso a descuentos exclusivos, con el objetivo de crear una comunidad que genere un impacto positivo en la sociedad y el ambiente, promoviendo la solidaridad, la empatía y la reciprocidad.
+            </p>
+          </div>
+        </section>
+
+        {/* Vision / El bien que vuelve Section Redesign */}
+        <section className="mb-28 max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-12">
+            El bien que <span className="text-teal-600">vuelve</span>
+          </h2>
+          
+          <div className="flex justify-center mb-12 text-teal-600">
+            <RefreshCw className="w-32 h-32 opacity-80 animate-[spin_12s_linear_infinite]" strokeWidth={1} />
+          </div>
+
+          <div className="space-y-6 text-xl text-gray-700 leading-relaxed bg-white p-8 md:p-12 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:shadow-[0_8px_40px_rgb(64,168,171,0.1)] transition-all duration-300">
             <p>
               Imaginate un mundo donde cada acción cuenta, donde el bien que hacés a otros regresa de manera multiplicada.
             </p>
             <p>
-              En AYNI, creemos en la filosofía ancestral andina de <strong className="text-teal-700 font-bold">"Ayni"</strong>, que significa "el bien que vuelve".
+              En AYNI, creemos en la filosofía ancestral andina de <strong className="text-teal-700 font-bold">&quot;Ayni&quot;</strong>, que significa &quot;el bien que vuelve&quot;.
             </p>
-            <p>
-              Nuestra plataforma <strong className="text-teal-700 font-bold">Fintech de Reciprocidad</strong> combina tecnología y propósito para revolucionar la forma en que las personas y empresas generan impacto socioambiental.
+            <p className="font-medium text-gray-900">
+              Nuestra plataforma <span className="text-teal-600 font-bold">Fintech de Reciprocidad</span> combina tecnología y propósito para revolucionar la forma en que las personas y empresas generan impacto socioambiental.
             </p>
           </div>
         </section>

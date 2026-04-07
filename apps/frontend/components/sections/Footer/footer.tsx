@@ -28,7 +28,7 @@ export default function Footer() {
     {
       name: "Instagram",
       icon: Instagram,
-      url: "https://www.instagram.com/comunidadclubtripleimpacto/?igsh=emZzOGIzd25ldjZz",
+      url: "https://www.instagram.com/ayni.loquedasvuelve?igsh=emZzOGIzd25ldjZz",
     },
     { name: "Twitter", icon: Twitter, url: "#" },
     {

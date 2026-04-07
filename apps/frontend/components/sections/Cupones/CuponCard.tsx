@@ -1,12 +1,25 @@
 "use client";
 
 import { CuponDto } from "@/lib/types/cupon";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 interface CuponCardProps {
   cupon: CuponDto;
 }
 
 export default function CuponCard({ cupon }: CuponCardProps) {
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+
+  const handleObtenerDescuento = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isAuthenticated) {
+      router.push("/dashboard");
+    } else {
+      router.push("/register");
+    }
+  };
   const defaultImage =
     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='190' viewBox='0 0 280 190'%3E%3Crect fill='%2310b981' width='280' height='190'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-size='16' fill='%23fff' text-anchor='middle' dy='.3em'%3ECupón%3C/text%3E%3C/svg%3E";
 
@@ -51,7 +64,10 @@ export default function CuponCard({ cupon }: CuponCardProps) {
             </p>
           </div>
         </div>
-        <button className="bg-[#40a8ab] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg shadow-[#40a8ab]/20 active:scale-95 transition-transform shrink-0">
+        <button 
+          onClick={handleObtenerDescuento}
+          className="bg-[#40a8ab] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg shadow-[#40a8ab]/20 active:scale-95 transition-transform shrink-0"
+        >
           Obtener descuento
         </button>
       </div>
@@ -90,7 +106,10 @@ export default function CuponCard({ cupon }: CuponCardProps) {
             {cupon.descuento}
           </p>
           <p className="text-sm text-gray-500 line-clamp-3 min-h-[3.6rem]">{descripcion}</p>
-          <button className="mt-4 w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl transition-colors text-sm">
+          <button 
+            onClick={handleObtenerDescuento}
+            className="mt-4 w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl transition-colors text-sm"
+          >
             Obtener descuento
           </button>
         </div>

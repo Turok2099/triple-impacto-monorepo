@@ -632,67 +632,99 @@ export default function DashboardPage() {
           )}
 
           {/* Coupon Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-6">
             {cuponesMostrados.length > 0 ? (
-              cuponesMostrados.map((cupon) => (
-                <div
-                  key={cupon.id}
-                  className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 relative"
-                >
-                  {/* Bloque superior: imagen de fondo */}
-                  <div className="relative h-44 overflow-hidden bg-gray-100">
-                    <img
-                      src={
-                        cupon.imagen_url ||
-                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='190' viewBox='0 0 280 190'%3E%3Crect fill='%2310b981' width='280' height='190'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-size='16' fill='%23fff' text-anchor='middle' dy='.3em'%3ECupón%3C/text%3E%3C/svg%3E"
-                      }
-                      alt={cupon.titulo}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src =
-                          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='190' viewBox='0 0 280 190'%3E%3Crect fill='%2310b981' width='280' height='190'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-size='16' fill='%23fff' text-anchor='middle' dy='.3em'%3ECupón%3C/text%3E%3C/svg%3E";
-                      }}
-                    />
-                    {/* Nombre de la marca: esquina superior derecha, blanco con texto negro */}
-                    <div className="absolute top-3 right-3 z-10 px-3 py-1.5 rounded-full bg-white text-black text-sm font-medium shadow-md">
-                      {cupon.empresa || "Marca"}
+              cuponesMostrados.map((cupon) => {
+                const yaSolicitado = misCupones.find(
+                  (mc) => mc.bondaCuponId === cupon.id && mc.estado === "activo"
+                );
+                const defaultLogo = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'%3E%3Crect fill='%23f3f4f6' rx='12' width='90' height='90'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-size='24' fill='%236b7280' text-anchor='middle' dy='.3em'%3E🎁%3C/text%3E%3C/svg%3E";
+
+                return (
+                <div key={cupon.id} className="w-full h-full">
+                  {/* Mobile: card horizontal compacta */}
+                  <div className="md:hidden bg-white rounded-2xl p-4 flex items-center justify-between shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-50 w-full h-full">
+                    <div className="flex items-center gap-3 min-w-0 pr-2">
+                      <div className="size-[4.5rem] shrink-0 overflow-hidden flex items-center justify-center">
+                        <img
+                          src={cupon.logo_empresa || defaultLogo}
+                          alt=""
+                          className="w-full h-full object-contain scale-125"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = defaultLogo;
+                          }}
+                        />
+                      </div>
+                      <div className="min-w-0 pt-0.5">
+                        <p className="font-bold text-[#1A202C] text-sm leading-tight line-clamp-1">
+                          {cupon.descuento || "Descuento especial"}
+                        </p>
+                        <p className="text-[11px] text-slate-500 font-medium mt-0.5 line-clamp-1 flex-1">
+                          {cupon.empresa || "Marca"}
+                        </p>
+                      </div>
                     </div>
+                    {yaSolicitado ? (
+                      <button
+                        onClick={() => setCuponSeleccionado(cupon)}
+                        className="bg-teal-100 text-teal-700 text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm active:scale-95 transition-transform shrink-0 whitespace-nowrap"
+                      >
+                        ✓ Activo
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setCuponSeleccionado(cupon)}
+                        className="bg-[#40a8ab] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg shadow-[#40a8ab]/20 active:scale-95 transition-transform shrink-0 whitespace-nowrap"
+                      >
+                        Obtener
+                      </button>
+                    )}
                   </div>
 
-                  {/* Logo: bloque cuadrado (alto = ancho), imagen ajustada solo al ancho del bloque */}
-                  <div className="absolute left-1/2 top-32 sm:top-28 -translate-x-1/2 z-10 w-36 h-36 sm:w-42 sm:h-42 rounded-xl bg-white shadow-lg flex items-center justify-center p-1 ring-2 ring-white overflow-hidden">
-                    <img
-                      src={
-                        cupon.logo_empresa ||
-                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'%3E%3Crect fill='%23f3f4f6' rx='12' width='90' height='90'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-size='24' fill='%236b7280' text-anchor='middle' dy='.3em'%3E🎁%3C/text%3E%3C/svg%3E"
-                      }
-                      alt={cupon.empresa || "Logo"}
-                      className="w-full h-full object-contain"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src =
-                          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'%3E%3Crect fill='%23f3f4f6' rx='12' width='90' height='90'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-size='24' fill='%236b7280' text-anchor='middle' dy='.3em'%3E🎁%3C/text%3E%3C/svg%3E";
-                      }}
-                    />
-                  </div>
+                  {/* Desktop: card vertical (oculta en móvil) */}
+                  <div className="hidden md:flex bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 relative flex-col h-full">
+                    <div className="relative h-44 overflow-hidden bg-gray-100 shrink-0">
+                      <img
+                        src={
+                          cupon.imagen_url ||
+                          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='190' viewBox='0 0 280 190'%3E%3Crect fill='%2310b981' width='280' height='190'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-size='16' fill='%23fff' text-anchor='middle' dy='.3em'%3ECupón%3C/text%3E%3C/svg%3E"
+                        }
+                        alt={cupon.titulo}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src =
+                            "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='190' viewBox='0 0 280 190'%3E%3Crect fill='%2310b981' width='280' height='190'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-size='16' fill='%23fff' text-anchor='middle' dy='.3em'%3ECupón%3C/text%3E%3C/svg%3E";
+                        }}
+                      />
+                      <div className="absolute top-3 right-3 z-10 px-3 py-1.5 rounded-full bg-white text-black text-sm font-medium shadow-md">
+                        {cupon.empresa || "Marca"}
+                      </div>
+                    </div>
 
-                  {/* Contenido debajo de la imagen (padding para no quedar bajo el logo) */}
-                  <div className="relative z-0 pt-24 sm:pt-28 pb-5 px-5 text-center">
-                    {/* Descuento destacado */}
-                    <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
-                      {cupon.descuento || "Descuento especial"}
-                    </p>
-                    {/* Descripción en gris - Siempre 3 líneas */}
-                    <p className="text-sm text-gray-500 line-clamp-3 min-h-[3.6rem]">
-                      {cupon.descripcion || cupon.titulo}
-                    </p>
-                    {/* CTA */}
-                    {(() => {
-                      const yaSolicitado = misCupones.find(
-                        (mc) => mc.bondaCuponId === cupon.id && mc.estado === "activo"
-                      );
-                      return yaSolicitado ? (
+                    <div className="absolute left-1/2 top-32 sm:top-28 -translate-x-1/2 z-10 w-36 h-36 sm:w-42 sm:h-42 rounded-xl bg-white shadow-lg flex items-center justify-center p-1 ring-2 ring-white overflow-hidden">
+                      <img
+                        src={cupon.logo_empresa || defaultLogo}
+                        alt={cupon.empresa || "Logo"}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = defaultLogo;
+                        }}
+                      />
+                    </div>
+
+                    <div className="relative z-0 pt-24 sm:pt-28 pb-5 px-5 text-center flex-col flex flex-1 justify-between">
+                      <div>
+                        <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
+                          {cupon.descuento || "Descuento especial"}
+                        </p>
+                        <p className="text-sm text-gray-500 line-clamp-3 min-h-[3.6rem]">
+                          {cupon.descripcion || cupon.titulo}
+                        </p>
+                      </div>
+                      {yaSolicitado ? (
                         <button
                           onClick={() => setCuponSeleccionado(cupon)}
                           className="mt-4 w-full py-2.5 bg-teal-100 hover:bg-teal-200 text-teal-700 font-semibold rounded-xl transition-colors text-sm flex items-center justify-center gap-1.5"
@@ -706,11 +738,12 @@ export default function DashboardPage() {
                         >
                           Obtener descuento
                         </button>
-                      );
-                    })()}
+                      )}
+                    </div>
                   </div>
                 </div>
-              ))
+                );
+              })
             ) : (
               <div className="col-span-full bg-white rounded-xl p-8 text-center border border-teal-100">
                 <span className="text-5xl mb-3 block">🔍</span>

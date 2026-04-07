@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { HeartHandshake, Info, HelpCircle, PhoneCall, LayoutDashboard, LogOut, User, Sparkles, Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -21,10 +22,10 @@ export default function Navbar() {
   }, [isMobileMenuOpen]);
 
   const navLinks = [
-    { name: "ONGs", href: "/ongs", icon: "🤝" },
-    { name: "Sobre nosotros", href: "/about", icon: "ℹ️" },
-    { name: "Preguntas frecuentes", href: "/faqs", icon: "❓" },
-    { name: "Contacto", href: "/contact", icon: "📞" },
+    { name: "ONGs", href: "/ongs", icon: <HeartHandshake className="w-5 h-5" /> },
+    { name: "Sobre nosotros", href: "/about", icon: <Info className="w-5 h-5" /> },
+    { name: "Preguntas frecuentes", href: "/faqs", icon: <HelpCircle className="w-5 h-5" /> },
+    { name: "Contacto", href: "/contact", icon: <PhoneCall className="w-5 h-5" /> },
   ];
 
   const handleNavClick = (e?: React.MouseEvent<HTMLAnchorElement>, href?: string) => {
@@ -129,33 +130,9 @@ export default function Navbar() {
                 aria-label="Menú"
               >
                 {isMobileMenuOpen ? (
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
+                  <X className="w-6 h-6" />
                 ) : (
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
-                  </svg>
+                  <Menu className="w-6 h-6" />
                 )}
               </button>
             </div>
@@ -186,8 +163,8 @@ export default function Navbar() {
           {/* Header del menu */}
           <div className="flex items-center justify-between p-5 border-b border-gray-100 shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-linear-to-br from-teal-500 to-emerald-500 rounded-xl flex items-center justify-center text-xl shadow-inner shadow-white/20">
-                💚
+              <div className="size-10 rounded-xl flex items-center justify-center overflow-hidden bg-white border border-slate-100 p-1.5 shadow-sm">
+                <img src="/icon.png" alt="AYNI" className="w-full h-full object-contain" />
               </div>
               <div>
                 <div className="text-gray-900 font-black text-lg tracking-tight">
@@ -199,19 +176,7 @@ export default function Navbar() {
               onClick={() => setIsMobileMenuOpen(false)}
               className="p-2.5 text-gray-400 hover:bg-red-50 hover:text-red-500 rounded-xl transition-colors"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              <X className="w-6 h-6" />
             </button>
           </div>
 
@@ -224,7 +189,7 @@ export default function Navbar() {
                 onClick={(e) => handleNavClick(e, link.href)}
                 className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-teal-50 hover:text-teal-600 rounded-xl transition-all duration-200 font-medium"
               >
-                <span className="text-2xl">{link.icon}</span>
+                <span className="text-teal-600 opacity-80">{link.icon}</span>
                 <span>{link.name}</span>
               </Link>
             ))}
@@ -248,14 +213,14 @@ export default function Navbar() {
                       onClick={(e) => handleNavClick(e, "/dashboard")}
                       className="flex items-center gap-3 px-4 py-3 text-teal-600 hover:bg-teal-50 rounded-xl transition-colors font-medium"
                     >
-                      <span className="text-2xl">📊</span>
+                      <LayoutDashboard className="w-5 h-5 opacity-80" />
                       <span>Dashboard</span>
                     </Link>
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors font-medium"
                     >
-                      <span className="text-2xl">🚪</span>
+                      <LogOut className="w-5 h-5 opacity-80" />
                       <span>Cerrar sesión</span>
                     </button>
                   </>
@@ -266,7 +231,7 @@ export default function Navbar() {
                       onClick={(e) => handleNavClick(e, "/login")}
                       className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-colors font-medium"
                     >
-                      <span className="text-2xl">👤</span>
+                      <User className="w-5 h-5 text-gray-400" />
                       <span>Iniciar sesión</span>
                     </Link>
 
@@ -275,7 +240,7 @@ export default function Navbar() {
                       onClick={(e) => handleNavClick(e, "/registro")}
                       className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-colors font-medium"
                     >
-                      <span className="text-2xl">✨</span>
+                      <Sparkles className="w-5 h-5 text-gray-400" />
                       <span>Registrarse</span>
                     </Link>
                   </>

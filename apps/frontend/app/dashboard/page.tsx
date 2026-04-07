@@ -588,10 +588,31 @@ export default function DashboardPage() {
             />
           </div>
 
-          {/* Horizontal Chip Filter Bar - Deshabilitado durante búsqueda */}
+          {/* Filter Bar / Dropdown - Deshabilitado durante búsqueda */}
           {!busquedaActiva && (
             <div className="relative mb-4">
-              <div className="flex flex-wrap gap-3 py-2 justify-center">
+              {/* Mobile: Select Dropdown */}
+              <div className="md:hidden">
+                <div className="relative">
+                  <select
+                    value={categoriaSeleccionada}
+                    onChange={(e) => setCategoriaSeleccionada(e.target.value)}
+                    className="w-full bg-white border border-teal-100 rounded-xl py-3 pl-4 pr-10 appearance-none focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none font-bold text-slate-700 shadow-sm transition-all"
+                  >
+                    {categorias.map((categoria) => (
+                      <option key={categoria.id} value={categoria.nombre}>
+                        {categoria.nombre}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Desktop: Horizontal Chip Filter Bar */}
+              <div className="hidden md:flex flex-wrap gap-3 py-2 justify-center">
                 {categorias.map((categoria) => {
                   const IconComponent = getCategoryIcon(categoria.nombre);
                   return (

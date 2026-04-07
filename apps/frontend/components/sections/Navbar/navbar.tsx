@@ -165,7 +165,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed inset-0 z-40 lg:hidden transition-all duration-300 ${
+        className={`fixed inset-0 z-[60] lg:hidden transition-all duration-300 ${
           isMobileMenuOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
@@ -179,26 +179,25 @@ export default function Navbar() {
 
         {/* Menu Panel */}
         <div
-          className={`absolute top-0 right-0 bottom-0 w-full max-w-sm bg-white shadow-2xl transition-transform duration-300 ${
+          className={`absolute top-0 right-0 bottom-0 w-[85%] max-w-sm bg-white shadow-2xl transition-transform duration-300 flex flex-col ${
             isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
           }`}
         >
           {/* Header del menu */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between p-5 border-b border-gray-100 shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-linear-to-br from-teal-500 to-blue-500 rounded-xl flex items-center justify-center text-xl">
+              <div className="w-10 h-10 bg-linear-to-br from-teal-500 to-emerald-500 rounded-xl flex items-center justify-center text-xl shadow-inner shadow-white/20">
                 💚
               </div>
               <div>
-                <div className="text-gray-900 font-bold">
+                <div className="text-gray-900 font-black text-lg tracking-tight">
                   AYNI
                 </div>
-                <div className="text-teal-600 text-xs">Menú</div>
               </div>
             </div>
             <button
               onClick={() => setIsMobileMenuOpen(false)}
-              className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
+              className="p-2.5 text-gray-400 hover:bg-red-50 hover:text-red-500 rounded-xl transition-colors"
             >
               <svg
                 className="w-6 h-6"
@@ -216,8 +215,8 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* Links */}
-          <div className="p-6 space-y-2">
+          {/* Links e Info */}
+          <div className="p-5 space-y-2 flex-1 overflow-y-auto">
             {navLinks.map((link) => (
               <Link
                 key={link.name}

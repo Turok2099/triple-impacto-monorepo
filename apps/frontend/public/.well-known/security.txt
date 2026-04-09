@@ -1,0 +1,4 @@
+Contact: https://www.tripleimpacto.site/contact
+Contact: admin@tripleimpacto.site
+Preferred-Languages: es
+Canonical: https://www.tripleimpacto.site/.well-known/security.txt

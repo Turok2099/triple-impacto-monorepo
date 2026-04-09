@@ -7,6 +7,7 @@ import { SyncCuponesService } from './sync-cupones.service';
 import { BondaModule } from '../bonda/bonda.module';
 import { SupabaseModule } from '../supabase/supabase.module';
 import { SyncModule } from '../sync/sync.module';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { SyncModule } from '../sync/sync.module';
     BondaModule,
     SupabaseModule,
     SyncModule,
+    MailModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

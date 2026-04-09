@@ -6,6 +6,8 @@ import {
   UnauthorizedException,
   Req,
   Headers,
+  Body,
+  BadRequestException,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
@@ -14,6 +16,7 @@ import { SyncCuponesService } from './sync-cupones.service';
 import { SyncService } from '../sync/sync.service';
 import { ConfigService } from '@nestjs/config';
 import { BondaService } from '../bonda/bonda.service';
+import { MailService } from '../mail/mail.service';
 
 /** Cupón público para el catálogo de visitantes (sin códigos). */
 export interface PublicCouponDto {
@@ -64,6 +67,7 @@ export class PublicController {
     private readonly configService: ConfigService,
     private readonly bondaService: BondaService,
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {
     // Inicializar configuración de Fundación Padres desde variables de entorno
     this.FUNDACION_PADRES_CONFIG = {
@@ -331,6 +335,36 @@ export class PublicController {
       message: 'Sync de cupones ejecutado exitosamente',
       timestamp: new Date().toISOString(),
       data: resultado,
+    };
+  }
+
+  /**
+   * Endpoint público para el formulario de contacto.
+   * Envía un email al administrador usando Resend.
+   */
+  @Post('contact')
+  async contactForm(
+    @Body() body: { nombre: string; email: string; telefono?: string; asunto: string; mensaje: string }
+  ) {
+    if (!body.nombre || !body.email || !body.asunto || !body.mensaje) {
+      throw new BadRequestException('Faltan campos obligatorios');
+    }
+
+    const success = await this.mailService.sendContactEmail(
+      body.nombre,
+      body.email,
+      body.telefono || '',
+      body.asunto,
+      body.mensaje
+    );
+
+    if (!success) {
+      throw new BadRequestException('Ocurrió un error al enviar el mensaje');
+    }
+
+    return {
+      success: true,
+      message: 'Mensaje enviado exitosamente',
     };
   }
 }

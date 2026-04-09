@@ -10,6 +10,8 @@ import { PublicModule } from './modules/public/public.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { SyncModule } from './modules/sync/sync.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { MailModule } from './modules/mail/mail.module';
+import { NewsletterModule } from './modules/newsletter/newsletter.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { AdminModule } from './modules/admin/admin.module';
     PaymentsModule,
     SyncModule, // Módulo de sincronización
     AdminModule, // Panel de Súper Administrador
+    MailModule, // Servicio de Correos (Resend)
+    NewsletterModule,
   ],
   controllers: [AppController],
   providers: [AppService],

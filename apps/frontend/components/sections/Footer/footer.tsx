@@ -1,7 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import {
   Facebook,
   Instagram,
-  Twitter,
   Linkedin,
   Mail,
   Phone,
@@ -11,8 +13,56 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 
+const Tiktok = ({ className }: { className?: string }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+  </svg>
+);
+
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+
+  // Newsletter State
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<{ type: "success" | "error" | null; message: string }>({ type: null, message: "" });
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setLoading(true);
+    setStatus({ type: null, message: "" });
+
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+      const res = await fetch(`${baseUrl}/newsletter/subscribe`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Error al procesar la suscripción.");
+      }
+
+      setStatus({ type: "success", message: data.message || "¡Suscripción exitosa!" });
+      setEmail("");
+    } catch (err: any) {
+      setStatus({ type: "error", message: err.message || "Ocurrió un error." });
+    } finally {
+      setLoading(false);
+      // Timeout para limpiar el mensaje después de 5 segundos
+      setTimeout(() => setStatus({ type: null, message: "" }), 5000);
+    }
+  };
 
   // Links rápidos
   const quickLinks = [
@@ -30,7 +80,11 @@ export default function Footer() {
       icon: Instagram,
       url: "https://www.instagram.com/ayni.loquedasvuelve?igsh=emZzOGIzd25ldjZz",
     },
-    { name: "Twitter", icon: Twitter, url: "#" },
+    {
+      name: "TikTok",
+      icon: Tiktok,
+      url: "https://www.tiktok.com/@ayni.loquedasvuelve?_r=1&_t=ZS-95NeryvhHBh",
+    },
     {
       name: "LinkedIn",
       icon: Linkedin,
@@ -48,7 +102,7 @@ export default function Footer() {
             <div className="flex items-center gap-3 mb-4">
               <Link href="/">
                 <Image
-                  src="/ayani_logo.png"
+                  src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1775685229/ISOLOGOTIPO_AYNI_FONDO_TRANSPARENTE_iwyuaw.png"
                   alt="AYNI"
                   width={140}
                   height={50}
@@ -143,19 +197,36 @@ export default function Footer() {
 
             {/* Newsletter */}
             <div className="mt-6">
-              <h5 className="text-white font-medium text-sm mb-3">
-                Newsletter
-              </h5>
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  placeholder="Tu email"
-                  className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                />
-                <button className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors text-sm font-medium">
-                  →
-                </button>
-              </div>
+              <h5 className="text-white font-medium text-sm mb-3">Newsletter</h5>
+              <form onSubmit={handleSubscribe} className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Tu email"
+                    required
+                    disabled={loading}
+                    className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-50"
+                  />
+                  <button 
+                    type="submit" 
+                    disabled={loading}
+                    className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors text-sm font-medium disabled:opacity-50 flex items-center justify-center shrink-0 w-12"
+                  >
+                    {loading ? (
+                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    ) : (
+                      "→"
+                    )}
+                  </button>
+                </div>
+                {status.type && (
+                  <div className={`text-xs px-2 py-1.5 rounded-lg border ${status.type === 'success' ? 'bg-teal-500/10 text-teal-400 border-teal-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'} animate-in fade-in slide-in-from-top-1`}>
+                    {status.message}
+                  </div>
+                )}
+              </form>
             </div>
           </div>
         </div>

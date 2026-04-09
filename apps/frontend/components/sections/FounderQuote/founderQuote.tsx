@@ -39,7 +39,7 @@ export default function FounderQuote() {
             </span>
             {" "}
             <span className="text-gray-800">
-              ¡TODO LO QUE DAS VUELVE MULTIPLICADO!
+              LO QUE DAS, VUELVE!
             </span>
           </h2>
         </div>

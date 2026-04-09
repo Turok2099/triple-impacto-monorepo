@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   MinLength,
   IsOptional,
+  IsBoolean,
 } from 'class-validator';
 
 export class RegisterDto {
@@ -35,4 +36,8 @@ export class RegisterDto {
   @IsString()
   @IsOptional()
   localidad?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  acceptsNewsletter?: boolean;
 }

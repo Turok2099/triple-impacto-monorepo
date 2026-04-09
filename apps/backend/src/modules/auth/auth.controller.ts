@@ -4,15 +4,20 @@ import {
   Patch,
   Body,
   Get,
+  Query,
+  Res,
   UseGuards,
   Request,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
@@ -38,6 +43,22 @@ export class AuthController {
   }
 
   /**
+   * GET /api/auth/verify-email
+   * Verificar correo electrónico con token
+   */
+  @Get('verify-email')
+  async verifyEmail(@Query('token') token: string, @Res() res: Response) {
+    try {
+      await this.authService.verifyEmail(token);
+      // Tras validar, redirigimos al login del FRONTEND con mensaje de éxito
+      return res.redirect('http://localhost:3001/login?verified=true');
+    } catch (err) {
+      // Si falla, redirigimos con parámetro de error
+      return res.redirect('http://localhost:3001/login?error=invalid_token');
+    }
+  }
+
+  /**
    * GET /api/auth/profile
    * Obtener perfil del usuario autenticado (protegido con JWT)
    */
@@ -47,6 +68,24 @@ export class AuthController {
     return {
       user: req.user,
     };
+  }
+
+  /**
+   * POST /api/auth/forgot-password
+   * Solicitar recuperación de contraseña
+   */
+  @Post('forgot-password')
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(dto);
+  }
+
+  /**
+   * POST /api/auth/reset-password
+   * Configurar nueva contraseña mediante token seguro
+   */
+  @Post('reset-password')
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto);
   }
 
   /**

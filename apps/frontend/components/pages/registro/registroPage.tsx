@@ -6,17 +6,18 @@ import { useAuth } from "@/contexts/AuthContext";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
 export default function RegisterPage() {
-  const { login: loginContext } = useAuth();
   const [formData, setFormData] = useState({
     nombre: "",
     email: "",
     password: "",
     confirmPassword: "",
-    telefono: "",
+    telefonoCodigo: "+54", // Region default Argentina
+    telefonoNumero: "",
     dni: "",
     provincia: "",
     localidad: "",
     aceptaTerminos: false,
+    aceptaNewsletter: false,
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -24,6 +25,18 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  // Configuraciones de países
+  const COUNTRY_CODES = [
+    { code: "+54", country: "AR (+54)", maxLength: 10 },
+    { code: "+52", country: "MX (+52)", maxLength: 10 },
+    { code: "+57", country: "CO (+57)", maxLength: 10 },
+    { code: "+56", country: "CL (+56)", maxLength: 9 },
+    { code: "+51", country: "PE (+51)", maxLength: 9 },
+    { code: "+598", country: "UY (+598)", maxLength: 8 },
+    { code: "+1", country: "US/CA (+1)", maxLength: 10 },
+    { code: "+34", country: "ES (+34)", maxLength: 9 },
+  ];
 
   const provincias = [
     "Buenos Aires",
@@ -55,11 +68,16 @@ export default function RegisterPage() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { name, value, type } = e.target;
+    let { name, value, type } = e.target;
+
+    // Solo permitir números en el input de teléfono
+    if (name === "telefonoNumero") {
+      value = value.replace(/[^0-9]/g, "");
+    }
+
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
+      [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
   };
 
@@ -82,6 +100,14 @@ export default function RegisterPage() {
       return;
     }
 
+    // Validar teléfono según región
+    const activeCountry = COUNTRY_CODES.find(c => c.code === formData.telefonoCodigo);
+    if (activeCountry && formData.telefonoNumero.length < activeCountry.maxLength) {
+      setError(`El número de teléfono debe tener ${activeCountry.maxLength} dígitos para esta región.`);
+      setLoading(false);
+      return;
+    }
+
     try {
       // Enviar datos al backend
       const response = await fetch(`${API_URL}/auth/register`, {
@@ -93,10 +119,11 @@ export default function RegisterPage() {
           nombre: formData.nombre,
           email: formData.email,
           password: formData.password,
-          telefono: formData.telefono,
+          telefono: `${formData.telefonoCodigo}${formData.telefonoNumero}`,
           dni: formData.dni,
           provincia: formData.provincia,
           localidad: formData.localidad,
+          acceptsNewsletter: formData.aceptaNewsletter,
         }),
       });
 
@@ -106,16 +133,13 @@ export default function RegisterPage() {
         throw new Error(data.message || "Error al crear la cuenta");
       }
 
-      // Usar el contexto de autenticación
-      loginContext(data.token, data.user);
-
       // Mostrar éxito
       setSuccess(true);
 
-      // Redirigir al dashboard después de 2 segundos
+      // Redirigir al login después de 3 segundos para que puedan validar su correo
       setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 2000);
+        window.location.href = "/login?check_email=true";
+      }, 3000);
     } catch (err: any) {
       setError(err.message || "Error al crear la cuenta. Por favor, intenta nuevamente.");
       console.error("Error en registro:", err);
@@ -149,8 +173,8 @@ export default function RegisterPage() {
           {/* Mensaje de éxito */}
           {success && (
             <div className="mb-6 bg-teal-50 border border-teal-200 rounded-xl p-4">
-              <p className="text-sm text-teal-800">
-                ¡Cuenta creada exitosamente! Redirigiendo...
+              <p className="text-sm text-teal-800 font-medium">
+                ¡Cuenta creada exitosamente! Revisa tu bandeja de entrada o SPAM para confirmar tu correo. Redirigiendo al login...
               </p>
             </div>
           )}
@@ -201,25 +225,38 @@ export default function RegisterPage() {
 
             {/* Teléfono y DNI */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Teléfono */}
+              {/* Teléfono Combinado */}
               <div>
-                <label
-                  htmlFor="telefono"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Teléfono *
                 </label>
-                <input
-                  id="telefono"
-                  name="telefono"
-                  type="tel"
-                  required
-                  value={formData.telefono}
-                  onChange={handleChange}
-                  className="block w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-                  placeholder="+54 9 11 1234-5678"
-                  disabled={loading}
-                />
+                <div className="flex rounded-xl shadow-sm">
+                  <select
+                    name="telefonoCodigo"
+                    value={formData.telefonoCodigo}
+                    onChange={handleChange}
+                    className="flex-none w-28 px-2 py-3 border border-r-0 border-gray-300 rounded-l-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all bg-gray-50 text-sm"
+                    disabled={loading}
+                  >
+                    {COUNTRY_CODES.map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.country}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    id="telefonoNumero"
+                    name="telefonoNumero"
+                    type="tel"
+                    required
+                    value={formData.telefonoNumero}
+                    onChange={handleChange}
+                    maxLength={COUNTRY_CODES.find(c => c.code === formData.telefonoCodigo)?.maxLength || 15}
+                    className="flex-1 block w-full px-4 py-3 border border-gray-300 rounded-r-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                    placeholder="11 1234 5678"
+                    disabled={loading}
+                  />
+                </div>
               </div>
 
               {/* DNI */}
@@ -400,6 +437,28 @@ export default function RegisterPage() {
                     Política de Privacidad
                   </a>
                   *
+                </label>
+              </div>
+            </div>
+
+            {/* Suscripción a Newsletter */}
+            <div className="flex items-start">
+              <div className="flex items-center h-5">
+                <input
+                  id="aceptaNewsletter"
+                  name="aceptaNewsletter"
+                  type="checkbox"
+                  checked={formData.aceptaNewsletter}
+                  onChange={handleChange}
+                  className="h-4 w-4 text-teal-600 focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
+                />
+              </div>
+              <div className="ml-3">
+                <label
+                  htmlFor="aceptaNewsletter"
+                  className="text-sm text-gray-700 cursor-pointer"
+                >
+                  Quiero recibir novedades, promociones y reportes de impacto mensual en mi correo.
                 </label>
               </div>
             </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Heart, X, ExternalLink, Mail, Globe } from "lucide-react";
+import { Heart, X, ExternalLink, Mail, Globe, Phone, MapPin } from "lucide-react";
 import { obtenerOrganizaciones, type Organizacion } from "@/lib/payments";
 import { getOrganizationLogoUrl } from "@/lib/organization-logos";
 
@@ -16,84 +16,91 @@ const ONG_DETAILS = [
   {
     "organizacion": "Bibliotecas Rurales Argentinas",
     "proposito": "Asociación civil fundada en 1963 que busca garantizar el acceso igualitario a la cultura y la educación en todo el país. Se dedica a crear y fortalecer bibliotecas en comunidades rurales y aisladas para que a nadie le falte un centro de lectura y aprendizaje cercano.",
-    "contacto": "comunicacionbibliotecasrurales@gmail.com | +54 (011) 4774-8938",
+    "email": "comunicacionbibliotecasrurales@gmail.com",
+    "telefono": "+54 (011) 4774-8938",
     "sitio_web": "https://www.bibliotecasrurales.org.ar/",
     "sitio_bonda": "https://beneficiosbibliotecaruralesargentinas.bonda.com/"
   },
   {
     "organizacion": "Haciendo Camino",
     "proposito": "Trabaja para mejorar la calidad de vida de familias en situación de vulnerabilidad social en el Norte argentino. Su enfoque integral combina programas de nutrición, prevención de la desnutrición infantil, estimulación temprana y capacitación en oficios para las madres.",
-    "contacto": "info@haciendocamino.org.ar | +54 9 11 5199-6482",
+    "email": "info@haciendocamino.org.ar",
+    "telefono": "+54 9 11 5199-6482",
     "sitio_web": "https://haciendocamino.org.ar/",
     "sitio_bonda": "https://beneficioshaciendocamino.bonda.com/"
   },
   {
     "organizacion": "Mamis Solidarias",
     "proposito": "Organización que lucha por una infancia con igualdad de oportunidades a través de programas de apoyo escolar, alimentación y contención emocional. Trabajan activamente en merenderos y centros propios en el Gran Buenos Aires y Misiones.",
-    "contacto": "info@mamissolidarias.org.ar",
+    "email": "info@mamissolidarias.org.ar",
     "sitio_web": "https://www.mamissolidarias.org.ar/",
     "sitio_bonda": "https://comunidadmamissolidarias.bonda.com/"
   },
   {
     "organizacion": "Plato Lleno",
     "proposito": "Iniciativa solidaria que busca evitar el desperdicio de alimentos. Se encargan de 'rescatar' comida excedente de eventos y comercios, que se encuentra en perfecto estado, para distribuirla de forma inmediata en comedores e instituciones que la necesitan.",
-    "contacto": "proyectoplatolleno@gmail.com | logistica@platolleno.org",
+    "email": "proyectoplatolleno@gmail.com | logistica@platolleno.org",
     "sitio_web": "https://www.platolleno.org/buenos-aires.html",
     "sitio_bonda": "https://clubplatolleno.bonda.com/"
   },
   {
     "organizacion": "Monte Adentro",
     "proposito": "Promueve el desarrollo integral de comunidades rurales en el Chaco argentino. Trabaja en ejes de educación, salud, oficios e infraestructura, buscando que las familias puedan crecer y progresar en su lugar de origen con dignidad y oportunidades.",
-    "contacto": "hola@monteadentro.org | +54 9 11 6657-1366",
+    "email": "hola@monteadentro.org",
+    "telefono": "+54 9 11 6657-1366",
     "sitio_web": "https://monteadentro.org/",
     "sitio_bonda": "https://beneficiosmonteadentro.bonda.com/"
   },
   {
     "organizacion": "Fundación Padres",
     "proposito": "Institución dedicada a concientizar a los padres sobre su rol protagónico en la crianza y educación de sus hijos. Busca fortalecer el vínculo familiar para prevenir conductas de riesgo y promover el desarrollo de hijos saludables emocionalmente.",
-    "contacto": "info@fundacionpadres.org | +54 11 4805-5693",
+    "email": "info@fundacionpadres.org",
+    "telefono": "+54 11 4805-5693",
     "sitio_web": "https://fundacionpadres.org/inicio/",
     "sitio_bonda": "https://beneficiosfundacionpadres.bonda.com/"
   },
   {
     "organizacion": "Proactiva",
     "proposito": "ONG que trabaja por la inclusión social y laboral de personas con discapacidad intelectual y psicosocial. A través de su programa 'Feriactivos', impulsan el emprendedurismo y la visibilización de las capacidades de las personas para su participación activa en la comunidad.",
-    "contacto": "info@proactivaac.org",
+    "email": "info@proactivaac.org",
     "sitio_web": "https://proactivaac.org/",
     "sitio_bonda": "https://clubproactiva.bonda.com/"
   },
   {
     "organizacion": "La Guarida",
     "proposito": "Proyecto innovador que construye consolas de videojuegos artesanales e intervenidas artísticamente para donarlas a hospitales públicos pediátricos. Su misión es utilizar el juego como una herramienta terapéutica para ayudar a los niños a transitar sus tratamientos.",
-    "contacto": "hola@laguarida.org.ar",
+    "email": "hola@laguarida.org.ar",
     "sitio_web": "https://laguarida.org.ar/",
     "sitio_bonda": "https://beneficioslaguarida.com/"
   },
   {
     "organizacion": "Techo Argentina",
     "proposito": "Organización presente en Latinoamérica que busca superar la situación de pobreza en los asentamientos populares. Trabaja mediante la construcción de viviendas de emergencia y proyectos de desarrollo comunitario liderados por jóvenes voluntarios y vecinos.",
-    "contacto": "info.argentina@techo.org | 0810-345-0504",
+    "email": "info.argentina@techo.org",
+    "telefono": "0810-345-0504",
     "sitio_web": "https://argentina.techo.org/",
     "sitio_bonda": "https://comunidadtecho.com/"
   },
   {
     "organizacion": "Regenerar",
     "proposito": "Fundación dedicada a la gestión ambiental y la promoción de la economía circular. Trabaja en la educación ambiental y en la implementación de sistemas de reciclaje y compostaje para reducir el impacto negativo de los residuos en el planeta.",
-    "contacto": "contacto@regenerar.org.ar",
+    "email": "contacto@regenerar.org.ar",
     "sitio_web": "https://www.regenerar.org.ar/",
     "sitio_bonda": "https://regenerarclub.com/"
   },
   {
     "organizacion": "Loros Parlantes",
     "proposito": "Asociación que utiliza la expresión artística, la comunicación y la creatividad como medios para la inclusión social de jóvenes con discapacidad. Fomenta un espacio de convivencia donde se estimulan talentos individuales para potenciar la autonomía.",
-    "contacto": "lorosparlantesoficial@gmail.com",
+    "email": "lorosparlantesoficial@gmail.com",
     "sitio_web": "https://lorosparlantes.org.ar/",
     "sitio_bonda": "https://beneficioslorosparlantes.com/"
   },
   {
     "organizacion": "Proyectar ONG",
-    "proposito": "Organización que actúa como puente para generar impacto social y ambiental positivo. Se enfoca en la educación ambiental, la integración de comunidades vulnerables y el desarrollo de proyectos que transforman realidades sociales en Argentina.",
-    "contacto": "contacto@proyectarong.ar",
+    "proposito": "Organización impulsada por la vocación de generar un impacto social y ambiental positivo. A través de sus mesas de Educación y Ambiente, construyen puentes entre comunidades e instituciones para responder a dos grandes preguntas: '¿qué planeta le dejamos a nuestros hijos?' y '¿qué hijos les dejamos a nuestro planeta?'. Su objetivo es promover la integración ciudadana para garantizar un futuro más justo, solidario y sostenible.",
+    "email": "contacto@proyectarong.ar",
+    "telefono": "+54 9 11 3770 - 6653",
+    "direccion": "Marcos Sastre 1031, Tigre",
     "sitio_web": "https://proyectarong.ar/",
     "sitio_bonda": "https://beneficioslorosparlantes.com/"
   }
@@ -134,7 +141,13 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
   }, [selectedOrg]);
 
   const handleCardClick = (org: Organizacion) => {
-    const detail = ONG_DETAILS.find((d) => d.organizacion === org.nombre);
+    const detail = ONG_DETAILS.find((d) => {
+      const orgName = org.nombre.toLowerCase().trim();
+      const detailName = d.organizacion.toLowerCase().trim();
+      return orgName === detailName || 
+             detailName.includes(orgName) || 
+             orgName.includes(detailName);
+    });
     setSelectedOrg({ ...org, details: detail });
   };
 
@@ -346,10 +359,24 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                   
                   <div className="bg-slate-50 p-6 rounded-2xl space-y-5 border border-slate-100">
                     <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Información y Contacto</h3>
-                    <div className="flex items-start gap-4">
-                      <Mail className="w-5 h-5 text-teal-500 mt-0.5 shrink-0" />
-                      <p className="text-base text-slate-700">{selectedOrg.details.contacto}</p>
-                    </div>
+                    {selectedOrg.details.email && (
+                      <div className="flex items-start gap-4">
+                        <Mail className="w-5 h-5 text-teal-500 mt-0.5 shrink-0" />
+                        <p className="text-base text-slate-700 break-all sm:break-words">{selectedOrg.details.email}</p>
+                      </div>
+                    )}
+                    {selectedOrg.details.telefono && (
+                      <div className="flex items-start gap-4">
+                        <Phone className="w-5 h-5 text-teal-500 mt-0.5 shrink-0" />
+                        <p className="text-base text-slate-700">{selectedOrg.details.telefono}</p>
+                      </div>
+                    )}
+                    {selectedOrg.details.direccion && (
+                      <div className="flex items-start gap-4">
+                        <MapPin className="w-5 h-5 text-teal-500 mt-0.5 shrink-0" />
+                        <p className="text-base text-slate-700">{selectedOrg.details.direccion}</p>
+                      </div>
+                    )}
                     
                     <div className="flex items-start gap-4">
                       <Globe className="w-5 h-5 text-teal-500 mt-0.5 shrink-0" />

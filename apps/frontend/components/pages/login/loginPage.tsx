@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { CheckCircle2, AlertCircle, Mail, KeyRound } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
@@ -13,14 +14,33 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [sessionExpiredMsg, setSessionExpiredMsg] = useState(false);
 
-  // Verificar si la sesión expiró
+  // Verificar si la sesión expiró o si venimos de algún proceso de Auth
   useEffect(() => {
+    // 1. Sesión Expirada
     const expired = sessionStorage.getItem("session_expired");
     if (expired === "true") {
       setSessionExpiredMsg(true);
       sessionStorage.removeItem("session_expired");
+    }
+
+    // 2. Parámetros de URL para Verificación de Correo
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("check_email") === "true") {
+      setSuccessMsg("¡Cuenta creada! Revisa tu bandeja de entrada o SPAM para confirmar tu correo antes de iniciar sesión.");
+    } else if (params.get("verified") === "true") {
+      setSuccessMsg("¡Tu correo ha sido verificado con éxito! Ya podés iniciar sesión normalmente.");
+    } else if (params.get("success") === "password_reset") {
+      setSuccessMsg("¡Tu contraseña ha sido actualizada exitosamente! Iniciá sesión con tu nueva clave.");
+    } else if (params.get("error") === "invalid_token") {
+      setError("El enlace es inválido o expiró. Intenta nuevamente o contactá a soporte.");
+    }
+
+    // Limpiar la URL para que no persista si recargan la página
+    if (params.get("check_email") || params.get("verified") || params.get("success") || params.get("error")) {
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
 
@@ -102,8 +122,45 @@ export default function LoginPage() {
 
           {/* Mensaje de error */}
           {error && (
-            <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
-              <p className="text-sm text-red-800">{error}</p>
+            <div className="mb-6 bg-red-50/80 border border-red-200/60 shadow-sm rounded-xl p-4 transition-all animate-in fade-in slide-in-from-top-4 duration-500">
+              <div className="flex items-start gap-4">
+                <div className="bg-red-100/80 p-2 rounded-full shrink-0">
+                  <AlertCircle className="w-5 h-5 text-red-600" />
+                </div>
+                <div className="pt-0.5">
+                  <p className="text-sm font-bold text-red-900 mb-1 tracking-tight">
+                    Ocurrió un problema
+                  </p>
+                  <p className="text-sm text-red-800 leading-relaxed font-medium">
+                    {error}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Mensaje de validación o check Email */}
+          {successMsg && (
+            <div className="mb-6 bg-teal-50/80 border border-teal-200/60 shadow-sm rounded-xl p-4 transition-all animate-in fade-in slide-in-from-top-4 duration-500">
+              <div className="flex items-start gap-4">
+                <div className="bg-teal-100/80 p-2 rounded-full shrink-0">
+                  {successMsg.includes("etapa de verificación") || successMsg.includes("correo") ? (
+                    <Mail className="w-5 h-5 text-teal-600" />
+                  ) : successMsg.includes("contraseña") ? (
+                    <KeyRound className="w-5 h-5 text-teal-600" />
+                  ) : (
+                    <CheckCircle2 className="w-5 h-5 text-teal-600" />
+                  )}
+                </div>
+                <div className="pt-0.5">
+                  <p className="text-sm font-bold text-teal-900 mb-1 tracking-tight">
+                    Completado con éxito
+                  </p>
+                  <p className="text-sm text-teal-800 leading-relaxed font-medium">
+                    {successMsg}
+                  </p>
+                </div>
+              </div>
             </div>
           )}
 
@@ -272,16 +329,7 @@ export default function LoginPage() {
           </ul>
         </div>
 
-        {/* Back to home */}
-        <div className="text-center">
-          <a
-            href="/"
-            className="text-sm text-gray-500 hover:text-gray-700 transition-colors inline-flex items-center gap-2"
-          >
-            <span>←</span>
-            Volver al inicio
-          </a>
-        </div>
+
       </div>
     </div>
   );

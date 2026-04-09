@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Phone, MapPin, Send, Clock } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Clock, Loader2 } from "lucide-react";
+import Swal from "sweetalert2";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -24,10 +25,48 @@ export default function ContactPage() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí iría la lógica de envío
-    console.log("Contacto:", formData);
+    setIsSubmitting(true);
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+      const response = await fetch(`${baseUrl}/public/contact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al enviar el mensaje");
+      }
+
+      Swal.fire({
+        title: '¡Enviado!',
+        text: 'Hemos recibido tu mensaje. Nos pondremos en contacto contigo pronto.',
+        icon: 'success',
+        confirmButtonColor: '#0d9488'
+      });
+
+      setFormData({
+        nombre: "",
+        email: "",
+        telefono: "",
+        asunto: "",
+        mensaje: "",
+      });
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        title: 'Error',
+        text: 'Hubo un problema al enviar el mensaje. Por favor intenta más tarde.',
+        icon: 'error',
+        confirmButtonColor: '#0d9488'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -267,10 +306,15 @@ export default function ContactPage() {
               {/* Submit */}
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 transform hover:-translate-y-0.5"
+                disabled={isSubmitting}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 disabled:opacity-75 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 transform hover:-translate-y-0.5"
               >
-                <Send className="w-5 h-5" />
-                <span>Enviar mensaje</span>
+                {isSubmitting ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Send className="w-5 h-5" />
+                )}
+                <span>{isSubmitting ? 'Enviando...' : 'Enviar mensaje'}</span>
               </button>
             </form>
 

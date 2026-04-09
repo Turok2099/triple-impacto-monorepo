@@ -6,6 +6,8 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { MailModule } from '../mail/mail.module';
+import { NewsletterModule } from '../newsletter/newsletter.module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
       inject: [ConfigService],
     }),
     ConfigModule,
+    MailModule,
+    NewsletterModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtAuthGuard],

@@ -12,8 +12,13 @@ import { SupabaseService } from '../supabase/supabase.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
+import { MailService } from '../mail/mail.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { NewsletterService } from '../newsletter/newsletter.service';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +27,8 @@ export class AuthService {
   constructor(
     private readonly supabaseService: SupabaseService,
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
+    private readonly newsletterService: NewsletterService,
   ) {}
 
   /**
@@ -33,7 +40,7 @@ export class AuthService {
    * 4. Genera JWT
    */
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
-    const { email, password, nombre, telefono, dni, provincia, localidad } =
+    const { email, password, nombre, telefono, dni, provincia, localidad, acceptsNewsletter } =
       registerDto;
 
     // 1. Verificar si el DNI ya existe (si es que enviaron uno)
@@ -73,13 +80,26 @@ export class AuthService {
       throw new InternalServerErrorException('Error al crear usuario');
     }
 
-    // 4. Generar JWT
-    const role = 'user';
-    const token = this.generarToken(usuario, role);
+    // 4. Enviar correo de bienvenida/verificación (fire-and-forget)
+    // Usamos el token autogenerado por Supabase en la columna email_verification_token
+    const verificationToken = usuario.email_verification_token;
+    if (verificationToken) {
+      this.mailService.sendVerificationEmail(email, nombre, verificationToken).catch((err) => {
+        this.logger.error('Fallo no crítico: no se pudo enviar correo de bienvenida', err);
+      });
+    } else {
+      this.logger.warn(`No se encontró token de verificación para ${email}`);
+    }
 
-    this.logger.log(`✅ Usuario registrado: ${email}`);
+    // 5. Suscribir al newsletter si aceptó
+    if (acceptsNewsletter) {
+      this.newsletterService.subscribe({ email }).catch(err => {
+        this.logger.error(`Fallo no crítico: no se pudo suscribir al newsletter a ${email}`, err);
+      });
+    }
 
     return {
+      message: 'Revisa tu bandeja de entrada para verificar tu cuenta.',
       user: {
         id: usuario.id,
         nombre: usuario.nombre,
@@ -89,9 +109,9 @@ export class AuthService {
         dni: usuario.dni ?? null,
         provincia: usuario.provincia ?? null,
         localidad: usuario.localidad ?? null,
-        role,
+        role: 'user', // Predeterminado al registrarse
       },
-      token,
+      token: '', // No devolvemos JWT hasta que se loguee verificado
     };
   }
 
@@ -107,7 +127,12 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    // 2. Verificar contraseña
+    // 2. Verificar si está verificado el correo electrónico
+    if (usuario.is_email_verified === false) {
+      throw new UnauthorizedException('Debes confirmar tu correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada.');
+    }
+
+    // 3. Verificar contraseña
     const passwordMatch = await bcrypt.compare(password, usuario.password_hash);
     if (!passwordMatch) {
       throw new UnauthorizedException('Credenciales inválidas');
@@ -133,6 +158,124 @@ export class AuthService {
       },
       token,
     };
+  }
+
+  /**
+   * Verificar correo electrónico usando un Token
+   */
+  async verifyEmail(token: string): Promise<boolean> {
+    const { data: usuario, error: findError } = await this.supabaseService
+      .from('usuarios')
+      .select('id, is_email_verified')
+      .eq('email_verification_token', token)
+      .single();
+
+    if (findError || !usuario) {
+      throw new BadRequestException('Token de verificación inválido o expirado.');
+    }
+
+    if (usuario.is_email_verified) {
+      return true; // Ya estaba verificado
+    }
+
+    const { error: updateError } = await this.supabaseService
+      .from('usuarios')
+      .update({
+        is_email_verified: true,
+        email_verification_token: null,
+      })
+      .eq('id', usuario.id);
+
+    if (updateError) {
+      this.logger.error('Error al actualizar verificación de correo:', updateError);
+      throw new InternalServerErrorException('No se pudo verificar la cuenta.');
+    }
+
+    this.logger.log(`✅ Cuenta verificada: usuario ID ${usuario.id}`);
+    return true;
+  }
+
+  /**
+   * Solicitar recuperación de contraseña
+   */
+  async forgotPassword(dto: ForgotPasswordDto): Promise<{ message: string }> {
+    const { email } = dto;
+    const usuario = await this.supabaseService.findUserByEmail(email);
+
+    // Retorna éxito encubierto para no permitir enumeración de cuentas
+    if (!usuario) {
+      this.logger.warn(`forgotPassword solicitado para correo inexistente: ${email}`);
+      return { message: 'Si el correo existe en nuestra base de datos, te hemos enviado un enlace de recuperación.' };
+    }
+
+    // Generar token UUID y Fecha de Expiración (1 hora)
+    const resetToken = crypto.randomUUID();
+    const expiresInHs = new Date();
+    expiresInHs.setHours(expiresInHs.getHours() + 1);
+
+    const { error: updateError } = await this.supabaseService
+      .from('usuarios')
+      .update({
+        password_reset_token: resetToken,
+        password_reset_expires: expiresInHs.toISOString(),
+      })
+      .eq('id', usuario.id);
+
+    if (updateError) {
+      this.logger.error('Error al guardar token de reseteo:', updateError);
+      throw new InternalServerErrorException('No se pudo procesar la solicitud.');
+    }
+
+    // Enviar correo electrónico
+    this.mailService.sendPasswordResetEmail(email, usuario.nombre, resetToken).catch((err) => {
+      this.logger.error('Fallo no crítico al enviar correo de reseteo', err);
+    });
+
+    return { message: 'Si el correo existe en nuestra base de datos, te hemos enviado un enlace de recuperación.' };
+  }
+
+  /**
+   * Confirmar la nueva contraseña mediante Token
+   */
+  async resetPassword(dto: ResetPasswordDto): Promise<{ message: string }> {
+    const { token, newPassword } = dto;
+
+    const { data: usuario, error: findError } = await this.supabaseService
+      .from('usuarios')
+      .select('id, password_reset_expires')
+      .eq('password_reset_token', token)
+      .single();
+
+    if (findError || !usuario) {
+      throw new BadRequestException('El enlace es inválido o el usuario no existe.');
+    }
+
+    // Validar expiración (Timestamptz vs Date.now)
+    const expiresAt = new Date(usuario.password_reset_expires).getTime();
+    if (expiresAt < Date.now()) {
+      throw new BadRequestException('Este enlace ha caducado. Solicita uno nuevo.');
+    }
+
+    // Hashear y guardar nueva clave limpiando tokens
+    const saltRounds = 10;
+    const newHash = await bcrypt.hash(newPassword, saltRounds);
+
+    const { error: updateError } = await this.supabaseService
+      .from('usuarios')
+      .update({
+        password_hash: newHash,
+        password_reset_token: null,
+        password_reset_expires: null,
+      })
+      .eq('id', usuario.id);
+
+    if (updateError) {
+      this.logger.error('Error al actualizar la contraseña del usuario:', updateError);
+      throw new InternalServerErrorException('Hubo un problema actualizando la contraseña.');
+    }
+
+    this.logger.log(`✅ Contraseña restablaciada con token: usuario ID ${usuario.id}`);
+    return { message: 'Tu contraseña ha sido actualizada con éxito.' };
   }
 
   /**

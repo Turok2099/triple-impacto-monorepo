@@ -26,7 +26,7 @@ export default function CTASection() {
         <p className="text-xl text-teal-50 mb-10 leading-relaxed max-w-2xl mx-auto">
           Cada donación transforma vidas y te recompensa.
           <span className="block mt-2 font-semibold">
-            Doná hoy, cambia el futuro.Todo lo que das, vuelve multiplicado.
+            Doná hoy, cambia el futuro. Lo que das, vuelve!
           </span>
         </p>
 

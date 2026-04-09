@@ -11,6 +11,7 @@ export class AuthResponseDto {
     role?: string;
   };
   token: string;
+  message?: string;
 }
 
 export class UserDto {

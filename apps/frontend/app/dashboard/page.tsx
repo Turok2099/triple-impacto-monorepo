@@ -520,16 +520,19 @@ export default function DashboardPage() {
               );
               })
             ) : (
-              <div className="col-span-full bg-white border border-slate-100 rounded-3xl p-8 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] text-center">
-                <span className="text-4xl mb-2 block">💝</span>
-                <p className="text-slate-600 text-sm mb-4">
-                  Aún no has realizado donaciones. ¡Comienza hoy!
+              <div className="col-span-full bg-white border border-teal-100 rounded-3xl p-10 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] text-center flex flex-col items-center justify-center">
+                <div className="bg-teal-50 w-16 h-16 rounded-full flex items-center justify-center mb-4">
+                  <Heart className="w-8 h-8 text-teal-500 fill-teal-100" />
+                </div>
+                <h4 className="text-xl font-bold text-slate-800 mb-2">¡Aún no tenés fundaciones!</h4>
+                <p className="text-slate-600 text-sm mb-6 max-w-sm">
+                  Todavía no hiciste ninguna donación. Sumate hoy a nuestra red, bancá una buena causa y destrabá todos los beneficios.
                 </p>
                 <a
                   href="/donar"
-                  className="inline-block px-6 py-3 bg-[#40a8ab] text-white rounded-full text-sm font-bold hover:bg-[#12854a] transition-colors"
+                  className="inline-block px-8 py-3 bg-[#40a8ab] text-white rounded-xl shadow-lg shadow-teal-500/20 text-sm font-bold hover:bg-teal-700 hover:-translate-y-0.5 transition-all"
                 >
-                  Donar Ahora
+                  Hacer mi primera donación
                 </a>
               </div>
             )}

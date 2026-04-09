@@ -49,13 +49,14 @@ export class AuthController {
    */
   @Get('verify-email')
   async verifyEmail(@Query('token') token: string, @Res() res: Response) {
+    const frontUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
     try {
       await this.authService.verifyEmail(token);
       // Tras validar, redirigimos al login del FRONTEND con mensaje de éxito
-      return res.redirect('http://localhost:3001/login?verified=true');
+      return res.redirect(`${frontUrl}/login?verified=true`);
     } catch (err) {
       // Si falla, redirigimos con parámetro de error
-      return res.redirect('http://localhost:3001/login?error=invalid_token');
+      return res.redirect(`${frontUrl}/login?error=invalid_token`);
     }
   }
 

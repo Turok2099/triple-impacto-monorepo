@@ -31,8 +31,8 @@ export class MailService {
    */
   async sendVerificationEmail(userEmail: string, userName: string, token: string) {
     // La URL debe apuntar al Backend, que procesa y luego redirecciona al Front
-    // API_URL o localhost:3000 (puerto del backend)
-    const baseUrl = this.configService.get<string>('API_URL') || 'http://localhost:3000';
+    // Priorizamos API_BASE_URL (produccion/ngrok) sobre API_URL o localhost:3000
+    const baseUrl = this.configService.get<string>('API_BASE_URL') || this.configService.get<string>('API_URL') || 'http://localhost:3000';
     const verifyLink = `${baseUrl}/api/auth/verify-email?token=${token}`;
 
     try {

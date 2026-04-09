@@ -70,8 +70,8 @@ export default function RegisterPage() {
   ) => {
     let { name, value, type } = e.target;
 
-    // Solo permitir números en el input de teléfono
-    if (name === "telefonoNumero") {
+    // Solo permitir números en el input de teléfono y DNI
+    if (name === "telefonoNumero" || name === "dni") {
       value = value.replace(/[^0-9]/g, "");
     }
 

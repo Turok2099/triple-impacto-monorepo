@@ -14,8 +14,11 @@ export class MailService {
     const apiKey = this.configService.get<string>('RESEND_API_KEY');
     if (!apiKey) {
       this.logger.warn('RESEND_API_KEY no está configurada, los correos no se enviarán.');
+      // Inicializamos con un valor falso para evitar que la app crashee en el arranque.
+      this.resend = new Resend('re_dummy_para_evitar_crasheo');
+    } else {
+      this.resend = new Resend(apiKey);
     }
-    this.resend = new Resend(apiKey);
   }
 
   /**

@@ -199,10 +199,17 @@ export class FiservWebhookService {
       return;
     }
 
-    // Bonda requiere que el 'code' coincida con su configuración de acceso (ej: 'Número de DNI').
-    // Si la ONG exige DNI, el code DEBE ser numerico puro, de lo contrario da error de DNI.
-    const code = user.dni
-      ? String(user.dni)
+    // Bonda requiere DNI numérico puro. Limpiamos cualquier punto, espacio o guion.
+    let safeDni: number | undefined = undefined;
+    if (user.dni) {
+      const sanitized = String(user.dni).replace(/\D/g, '');
+      if (sanitized.length > 0) {
+        safeDni = Number(sanitized);
+      }
+    }
+
+    const code = safeDni
+      ? String(safeDni)
       : this.generateAffiliateCode(user.email);
 
     try {
@@ -214,8 +221,8 @@ export class FiservWebhookService {
           telefono: user.telefono ?? undefined,
           provincia: user.provincia ?? undefined,
           localidad: user.localidad ?? undefined,
-          // Bonda requiere DNI numérico. Usamos el DNI del usuario registrado en base de datos.
-          dni: user.dni ? Number(user.dni) : undefined,
+          // Bonda requiere DNI numérico estricto, sin caracteres especiales.
+          dni: safeDni,
         },
         { organizacionId },
       );

@@ -17,6 +17,7 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { NewsletterService } from '../newsletter/newsletter.service';
 import * as crypto from 'crypto';
 
@@ -193,6 +194,46 @@ export class AuthService {
 
     this.logger.log(`✅ Cuenta verificada: usuario ID ${usuario.id}`);
     return true;
+  }
+
+  /**
+   * Reenviar correo de verificación
+   */
+  async resendVerification(dto: ResendVerificationDto): Promise<{ message: string }> {
+    const { email } = dto;
+    const usuario = await this.supabaseService.findUserByEmail(email);
+
+    // Retorna éxito encubierto para no permitir enumeración de cuentas
+    if (!usuario) {
+      this.logger.warn(`resendVerification solicitado para correo inexistente: ${email}`);
+      return { message: 'Si tu cuenta existe y no está verificada, te hemos enviado un nuevo enlace.' };
+    }
+
+    if (usuario.is_email_verified) {
+      throw new BadRequestException('Esta cuenta ya ha sido verificada.');
+    }
+
+    // Generar nuevo token
+    const newVerificationToken = crypto.randomUUID();
+
+    const { error: updateError } = await this.supabaseService
+      .from('usuarios')
+      .update({
+        email_verification_token: newVerificationToken,
+      })
+      .eq('id', usuario.id);
+
+    if (updateError) {
+      this.logger.error('Error al generar nuevo token de verificación:', updateError);
+      throw new InternalServerErrorException('No se pudo procesar tu solicitud.');
+    }
+
+    // Enviar correo
+    this.mailService.sendVerificationEmail(email, usuario.nombre, newVerificationToken).catch((err) => {
+      this.logger.error('Fallo no crítico al reenviar correo de bienvenida', err);
+    });
+
+    return { message: 'Si tu cuenta existe y no está verificada, te hemos enviado un nuevo enlace.' };
   }
 
   /**

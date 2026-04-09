@@ -18,6 +18,7 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
@@ -56,6 +57,15 @@ export class AuthController {
       // Si falla, redirigimos con parámetro de error
       return res.redirect('http://localhost:3001/login?error=invalid_token');
     }
+  }
+
+  /**
+   * POST /api/auth/resend-verification
+   * Reenviar correo de verificación
+   */
+  @Post('resend-verification')
+  async resendVerification(@Body() dto: ResendVerificationDto) {
+    return this.authService.resendVerification(dto);
   }
 
   /**

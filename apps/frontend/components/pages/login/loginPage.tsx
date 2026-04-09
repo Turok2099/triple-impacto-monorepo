@@ -16,6 +16,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [sessionExpiredMsg, setSessionExpiredMsg] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
 
   // Verificar si la sesión expiró o si venimos de algún proceso de Auth
   useEffect(() => {
@@ -43,6 +44,31 @@ export default function LoginPage() {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
+
+  const handleResendVerification = async () => {
+    if (!email) {
+      setError("Por favor, ingresá tu correo electrónico en el formulario antes de solicitar un nuevo enlace.");
+      return;
+    }
+    setResendLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/auth/resend-verification`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Error al reenviar el correo.");
+      }
+      setSuccessMsg(data.message || "Te hemos enviado un nuevo enlace. Revisa tu bandeja de entrada o SPAM.");
+      setError(null);
+    } catch (err: any) {
+      setError(err.message || "Ocurrió un problema al intentar reenviar el enlace.");
+    } finally {
+      setResendLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,13 +153,23 @@ export default function LoginPage() {
                 <div className="bg-red-100/80 p-2 rounded-full shrink-0">
                   <AlertCircle className="w-5 h-5 text-red-600" />
                 </div>
-                <div className="pt-0.5">
+                <div className="pt-0.5 w-full">
                   <p className="text-sm font-bold text-red-900 mb-1 tracking-tight">
                     Ocurrió un problema
                   </p>
                   <p className="text-sm text-red-800 leading-relaxed font-medium">
                     {error}
                   </p>
+                  {(error.includes("confirmar tu correo") || error.includes("Debes confirmar")) && (
+                    <button
+                      type="button"
+                      onClick={handleResendVerification}
+                      disabled={resendLoading}
+                      className="mt-3 text-sm font-semibold text-teal-700 hover:text-teal-800 underline underline-offset-2 transition-colors disabled:opacity-50"
+                    >
+                      {resendLoading ? "Enviando enlace..." : "¿No recibiste o perdiste el correo? Reenviar enlace"}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

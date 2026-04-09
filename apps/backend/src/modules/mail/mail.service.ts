@@ -11,12 +11,16 @@ export class MailService {
   private readonly defaultSenderEmail = 'hola@tripleimpacto.site';
 
   constructor(private readonly configService: ConfigService) {
-    const apiKey = this.configService.get<string>('RESEND_API_KEY');
+    const rawEnv = process.env.RESEND_API_KEY;
+    const configEnv = this.configService.get<string>('RESEND_API_KEY');
+    const apiKey = configEnv || rawEnv;
+    
     if (!apiKey) {
-      this.logger.warn('RESEND_API_KEY no está configurada, los correos no se enviarán.');
+      this.logger.warn('RESEND_API_KEY no está configurada ni en ConfigService ni en process.env.');
       // Inicializamos con un valor falso para evitar que la app crashee en el arranque.
       this.resend = new Resend('re_dummy_para_evitar_crasheo');
     } else {
+      this.logger.log(`Resend API Key leída exitosamente: ${apiKey.substring(0, 5)}...`);
       this.resend = new Resend(apiKey);
     }
   }

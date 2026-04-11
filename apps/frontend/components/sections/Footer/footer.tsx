@@ -124,7 +124,7 @@ export default function Footer() {
                     href={social.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 bg-gray-800 hover:bg-teal-600 rounded-lg flex items-center justify-center transition-colors duration-200"
+                    className="w-10 h-10 bg-gray-800 hover:bg-[#40a8ab] rounded-lg flex items-center justify-center transition-colors duration-200"
                     aria-label={social.name}
                     title={social.name}
                   >
@@ -157,7 +157,7 @@ export default function Footer() {
             <h4 className="text-white font-semibold text-lg mb-4">Contacto</h4>
             <ul className="space-y-4 text-sm mb-6">
               <li className="flex items-start gap-3">
-                <Mail className="text-teal-500 w-6 h-6 shrink-0 mt-0.5" />
+                <Mail className="text-[#40a8ab] w-6 h-6 shrink-0 mt-0.5" />
                 <a
                   href="mailto:clubtripleimpacto@gmail.com"
                   className="text-gray-400 hover:text-teal-400 transition-colors"
@@ -166,7 +166,7 @@ export default function Footer() {
                 </a>
               </li>
               <li className="flex items-start gap-3">
-                <Phone className="text-teal-500 w-6 h-6 shrink-0 mt-0.5" />
+                <Phone className="text-[#40a8ab] w-6 h-6 shrink-0 mt-0.5" />
                 <a
                   href="https://wa.me/5491156393261"
                   target="_blank"
@@ -177,20 +177,20 @@ export default function Footer() {
                 </a>
               </li>
               <li className="flex items-start gap-3">
-                <MapPin className="text-teal-500 w-6 h-6 shrink-0 mt-0.5" />
+                <MapPin className="text-[#40a8ab] w-6 h-6 shrink-0 mt-0.5" />
                 <span className="text-gray-400">
                   Caseros 1213, San Isidro, Buenos Aires
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <Clock className="text-teal-500 w-6 h-6 shrink-0 mt-0.5" />
+                <Clock className="text-[#40a8ab] w-6 h-6 shrink-0 mt-0.5" />
                 <span className="text-gray-400">Atención 24 horas</span>
               </li>
             </ul>
 
             <a
               href="/contact"
-              className="inline-block px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-lg transition-colors"
+              className="inline-block px-4 py-2 bg-[#40a8ab] hover:bg-[#2c8184] text-white text-sm font-semibold rounded-lg transition-colors"
             >
               Formulario de contacto
             </a>
@@ -207,12 +207,12 @@ export default function Footer() {
                     placeholder="Tu email"
                     required
                     disabled={loading}
-                    className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-50"
+                    className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#40a8ab] disabled:opacity-50"
                   />
                   <button 
                     type="submit" 
                     disabled={loading}
-                    className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors text-sm font-medium disabled:opacity-50 flex items-center justify-center shrink-0 w-12"
+                    className="px-4 py-2 bg-[#40a8ab] hover:bg-[#2c8184] text-white rounded-lg transition-colors text-sm font-medium disabled:opacity-50 flex items-center justify-center shrink-0 w-12"
                   >
                     {loading ? (
                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -222,7 +222,7 @@ export default function Footer() {
                   </button>
                 </div>
                 {status.type && (
-                  <div className={`text-xs px-2 py-1.5 rounded-lg border ${status.type === 'success' ? 'bg-teal-500/10 text-teal-400 border-teal-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'} animate-in fade-in slide-in-from-top-1`}>
+                  <div className={`text-xs px-2 py-1.5 rounded-lg border ${status.type === 'success' ? 'bg-[#40a8ab]/10 text-teal-400 border-[#40a8ab]/20' : 'bg-red-500/10 text-red-400 border-red-500/20'} animate-in fade-in slide-in-from-top-1`}>
                     {status.message}
                   </div>
                 )}

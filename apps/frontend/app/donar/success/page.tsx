@@ -60,37 +60,19 @@ function PagoExitosoContent() {
           {/* Contenido */}
           <div className="p-8">
             {/* Información de la transacción */}
-            <div className="mb-8">
-              <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4 border-b pb-2">
-                Detalles del comprobante
-              </h2>
-              <div className="space-y-3 text-sm">
-                {chargetotal && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-500 font-medium">Monto acreditado</span>
-                    <span className="font-bold text-slate-900">
-                      ${parseFloat(chargetotal).toLocaleString('es-AR')} ARS
-                    </span>
-                  </div>
-                )}
-                {approval_code && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-500 font-medium">Código de aprobación</span>
-                    <span className="font-mono text-slate-900 bg-slate-100 px-2 py-1 rounded">
-                      {approval_code}
-                    </span>
-                  </div>
-                )}
-                {oid && (
-                  <div className="flex justify-between items-center mt-2">
-                    <span className="text-slate-500 font-medium">Ref. Fiserv (OID)</span>
-                    <span className="font-mono text-xs text-slate-500 truncate max-w-[200px]">
-                      {oid}
-                    </span>
-                  </div>
-                )}
+            {/* Monto Aportado (Central) */}
+            {chargetotal && (
+              <div className="mb-8 text-center bg-slate-50 border border-slate-100 rounded-2xl p-6">
+                <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                  Monto acreditado
+                </p>
+                <div className="flex items-center justify-center text-4xl sm:text-5xl font-black text-[#40a8ab] tracking-tight">
+                  <span className="text-2xl sm:text-3xl mr-1 opacity-80">$</span>
+                  {parseFloat(chargetotal).toLocaleString('es-AR')}
+                  <span className="text-xl sm:text-2xl text-slate-400 font-bold ml-2">ARS</span>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Beneficios activados */}
             <div className="bg-[#40a8ab]/5 border border-[#40a8ab]/10 rounded-xl p-5 mb-8">

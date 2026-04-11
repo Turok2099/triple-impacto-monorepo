@@ -119,7 +119,7 @@ export default function SeccionMisPagos() {
             </p>
             <Link
               href="/donar"
-              className="inline-block px-6 py-3 bg-[#40a8ab] text-white rounded-full text-sm font-bold hover:bg-[#12854a] transition-colors"
+              className="inline-block px-6 py-3 bg-[#40a8ab] text-white rounded-full text-sm font-bold hover:bg-[#2c8184] transition-colors"
             >
               Donar ahora
             </Link>

@@ -76,7 +76,7 @@ export default function FAQsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         <a
           href="/"
-          className="inline-flex items-center gap-2 text-gray-600 hover:text-teal-600 transition-colors"
+          className="inline-flex items-center gap-2 text-gray-600 hover:text-[#40a8ab] transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
           <span>Volver al inicio</span>
@@ -113,7 +113,7 @@ export default function FAQsPage() {
                   <div className="flex items-center gap-4 flex-1">
                     <div className="shrink-0 w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center">
                       <faq.icon
-                        className="w-6 h-6 text-teal-600"
+                        className="w-6 h-6 text-[#40a8ab]"
                         strokeWidth={2}
                       />
                     </div>

@@ -157,6 +157,20 @@ export class PaymentsController {
     }
   }
 
+  /**
+   * Endpoint interno (o que puede ser llamado por frontend confiable)
+   * para notificar un pago declinado desde la redirección.
+   */
+  @Post('notification/declined')
+  @HttpCode(HttpStatus.OK)
+  async handleFiservDeclined(@Body() body: { oid: string; failReason?: string; responseCode?: string }) {
+    if (!body.oid) {
+      throw new BadRequestException('Falta oid');
+    }
+    await this.fiservWebhook.handleDeclined(body.oid, body.failReason, body.responseCode);
+    return { ok: true };
+  }
+
   @Post('posauth')
   @UseGuards(JwtAuthGuard)
   async captureTransaccion(@Body() body: any) {

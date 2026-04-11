@@ -412,7 +412,7 @@ export default function RegisterPage() {
                   required
                   checked={formData.aceptaTerminos}
                   onChange={handleChange}
-                  className="h-4 w-4 text-teal-600 focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
+                  className="h-4 w-4 text-[#40a8ab] focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
                 />
               </div>
               <div className="ml-3">
@@ -423,7 +423,7 @@ export default function RegisterPage() {
                   Acepto los{" "}
                   <a
                     href="/terminos"
-                    className="text-teal-600 hover:text-teal-500 font-medium"
+                    className="text-[#40a8ab] hover:text-[#40a8ab] font-medium"
                     target="_blank"
                   >
                     Términos y Condiciones
@@ -431,7 +431,7 @@ export default function RegisterPage() {
                   y la{" "}
                   <a
                     href="/privacidad"
-                    className="text-teal-600 hover:text-teal-500 font-medium"
+                    className="text-[#40a8ab] hover:text-[#40a8ab] font-medium"
                     target="_blank"
                   >
                     Política de Privacidad
@@ -450,7 +450,7 @@ export default function RegisterPage() {
                   type="checkbox"
                   checked={formData.aceptaNewsletter}
                   onChange={handleChange}
-                  className="h-4 w-4 text-teal-600 focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
+                  className="h-4 w-4 text-[#40a8ab] focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
                 />
               </div>
               <div className="ml-3">
@@ -512,7 +512,7 @@ export default function RegisterPage() {
             ¿Ya tenés cuenta?{" "}
             <a
               href="/login"
-              className="font-semibold text-teal-600 hover:text-teal-500 transition-colors"
+              className="font-semibold text-[#40a8ab] hover:text-[#40a8ab] transition-colors"
             >
               Iniciá sesión
             </a>
@@ -526,19 +526,19 @@ export default function RegisterPage() {
           </h3>
           <ul className="space-y-2 text-sm text-teal-800">
             <li className="flex items-start gap-2">
-              <span className="text-teal-600 shrink-0">✓</span>
+              <span className="text-[#40a8ab] shrink-0">✓</span>
               <span>Acceso a descuentos exclusivos de Bonda</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-teal-600 shrink-0">✓</span>
+              <span className="text-[#40a8ab] shrink-0">✓</span>
               <span>Dashboard personal para gestionar donaciones</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-teal-600 shrink-0">✓</span>
+              <span className="text-[#40a8ab] shrink-0">✓</span>
               <span>Reportes de impacto de tus aportes</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-teal-600 shrink-0">✓</span>
+              <span className="text-[#40a8ab] shrink-0">✓</span>
               <span>Certificados de donación para deducir impuestos</span>
             </li>
           </ul>

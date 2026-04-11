@@ -97,7 +97,7 @@ export default function OngHero() {
             {/* Scroll indicator */}
             <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
                 <svg
-                    className="w-6 h-6 text-teal-600"
+                    className="w-6 h-6 text-[#40a8ab]"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

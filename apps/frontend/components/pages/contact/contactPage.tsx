@@ -91,13 +91,13 @@ export default function ContactPage() {
               <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
                 <div className="flex items-start gap-4">
                   <div className="shrink-0 w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center">
-                    <Mail className="w-6 h-6 text-teal-600" />
+                    <Mail className="w-6 h-6 text-[#40a8ab]" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
                     <a
                       href="mailto:clubtripleimpacto@gmail.com"
-                      className="text-teal-600 hover:text-teal-700 transition-colors"
+                      className="text-[#40a8ab] hover:text-[#2c8184] transition-colors"
                     >
                       clubtripleimpacto@gmail.com
                     </a>
@@ -162,7 +162,7 @@ export default function ContactPage() {
                         Horarios
                       </h3>
                       <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#40a8ab] mr-1.5 animate-pulse"></span>
                         En línea
                       </span>
                     </div>
@@ -322,7 +322,7 @@ export default function ContactPage() {
               Al enviar este formulario, aceptas nuestra{" "}
               <a
                 href="/privacidad"
-                className="text-teal-600 hover:text-teal-700"
+                className="text-[#40a8ab] hover:text-[#2c8184]"
               >
                 Política de Privacidad
               </a>

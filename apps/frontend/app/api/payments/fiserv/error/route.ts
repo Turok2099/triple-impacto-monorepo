@@ -17,6 +17,28 @@ export async function POST(request: Request) {
             console.log(`- ${key}: ${value}`);
         }
 
+        // Notificar al backend de NestJS sobre el pago declinado para que envíe email y actualice estado
+        const failReason = formData.get('failReason') || formData.get('fail_reason');
+        const responseCode = formData.get('response_code');
+        const oid = formData.get('oid') || formData.get('merchantTransactionId');
+
+        if (oid) {
+            try {
+                const apiBaseUrl = process.env.API_BASE_URL?.replace(/\/$/, '') || 'http://localhost:3000';
+                await fetch(`${apiBaseUrl}/api/payments/fiserv/notification/declined`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        oid: oid.toString(),
+                        failReason: failReason?.toString(),
+                        responseCode: responseCode?.toString(),
+                    })
+                });
+            } catch (notifyErr) {
+                console.error('Error notificando declinado al backend:', notifyErr);
+            }
+        }
+
         // Redirigimos a la página de error visual, inyectando todos los motivos de Fiserv en la URL
         const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001';
         return NextResponse.redirect(`${baseUrl}/donar/error?${searchParams.toString()}`, 303);

@@ -43,7 +43,7 @@ export class MailService {
         html: `
           <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
             <div style="background-color: #40a8ab; padding: 30px; text-align: center;">
-              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1775685229/ISOLOGOTIPO_AYNI_BLANCO_FONDO_TRANSPARENTE_lkwqog.png" alt="AYNI Logo" style="height: 50px;" />
+              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto/f_auto/v1775685229/ISOLOGOTIPO_AYNI_FONDO_TRANSPARENTE_iwyuaw.png" alt="AYNI Logo" style="height: 50px;" />
             </div>
             <div style="padding: 40px 30px;">
               <h1 style="color: #40a8ab; font-size: 24px; margin-bottom: 20px;">¡Hola, ${userName}! 👋</h1>
@@ -97,7 +97,7 @@ export class MailService {
         html: `
           <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
             <div style="background-color: #40a8ab; padding: 30px; text-align: center;">
-              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1775685229/ISOLOGOTIPO_AYNI_BLANCO_FONDO_TRANSPARENTE_lkwqog.png" alt="AYNI Logo" style="height: 50px;" />
+              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto/f_auto/v1775685229/ISOLOGOTIPO_AYNI_FONDO_TRANSPARENTE_iwyuaw.png" alt="AYNI Logo" style="height: 50px;" />
             </div>
             <div style="padding: 40px 30px;">
               <h1 style="color: #40a8ab; font-size: 24px; margin-bottom: 20px;">¡Hola, ${userName}!</h1>
@@ -151,7 +151,7 @@ export class MailService {
         html: `
           <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
             <div style="background-color: #40a8ab; padding: 30px; text-align: center;">
-              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1775685229/ISOLOGOTIPO_AYNI_BLANCO_FONDO_TRANSPARENTE_lkwqog.png" alt="AYNI Logo" style="height: 50px;" />
+              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto/f_auto/v1775685229/ISOLOGOTIPO_AYNI_FONDO_TRANSPARENTE_iwyuaw.png" alt="AYNI Logo" style="height: 50px;" />
             </div>
             <div style="padding: 40px 30px;">
               <h1 style="color: #40a8ab; font-size: 24px; margin-bottom: 20px;">¡Gracias por sumarte!</h1>
@@ -224,6 +224,106 @@ export class MailService {
       return true;
     } catch (err) {
       this.logger.error(`Excepción enviando correo de contacto de ${email}:`, err);
+      return false;
+    }
+  }
+
+  /**
+   * Envia un correo de recibo/comprobante de transacción aprobada o declinada.
+   */
+  async sendPaymentReceiptEmail(
+    userEmail: string,
+    userName: string,
+    transactionData: {
+      status: 'approved' | 'declined';
+      amount?: string;
+      currency?: string;
+      approvalCode?: string;
+      oid?: string;
+      failReason?: string;
+    }
+  ) {
+    try {
+      const isApproved = transactionData.status === 'approved';
+      const subject = isApproved 
+        ? '✅ Comprobante de Donación Exitosa - AYNI'
+        : '❌ Actualización sobre tu intento de Donación - AYNI';
+      
+      const statusColor = isApproved ? '#10b981' : '#e11d48';
+      const titulo = isApproved ? '¡Donación Exitosa!' : 'Tu pago fue rechazado';
+      const descripcion = isApproved 
+        ? 'Queremos agradecerte por tu aporte. Tu donación ha sido procesada de forma segura y exitosa. A continuación te enviamos el comprobante de la transacción.'
+        : 'Te informamos que hubo un problema al procesar tu pago. Tu banco procesador o Fiserv declinaron la transacción, por lo que <strong>no se ha realizado ningún débito</strong> en tu cuenta.';
+
+      let detallesHtml = '';
+      if (isApproved && transactionData.amount) {
+        detallesHtml += `
+          <div style="margin-bottom: 10px;">
+            <strong>Monto:</strong> $${parseFloat(transactionData.amount).toLocaleString('es-AR')} ${transactionData.currency || 'ARS'}
+          </div>`;
+      }
+      if (transactionData.approvalCode) {
+        detallesHtml += `
+          <div style="margin-bottom: 10px;">
+            <strong>Código de Aprobación/Respuesta:</strong> ${transactionData.approvalCode}
+          </div>`;
+      }
+      if (transactionData.oid) {
+        detallesHtml += `
+          <div style="margin-bottom: 10px;">
+            <strong>Referencia (OID):</strong> <span style="font-size: 12px; color: #666;">${transactionData.oid}</span>
+          </div>`;
+      }
+      if (!isApproved && transactionData.failReason) {
+        detallesHtml += `
+          <div style="margin-bottom: 10px;">
+            <strong>Motivo reportado:</strong> ${transactionData.failReason}
+          </div>`;
+      }
+
+      const { data, error } = await this.resend.emails.send({
+        from: `${this.defaultSenderName} <${this.defaultSenderEmail}>`,
+        to: [userEmail],
+        subject: subject,
+        html: `
+          <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
+            <div style="background-color: ${statusColor}; padding: 30px; text-align: center;">
+              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto/f_auto/v1775685229/ISOLOGOTIPO_AYNI_FONDO_TRANSPARENTE_iwyuaw.png" alt="AYNI Logo" style="height: 50px;" />
+            </div>
+            <div style="padding: 40px 30px;">
+              <h1 style="color: ${statusColor}; font-size: 24px; margin-bottom: 20px;">${titulo}</h1>
+              <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                Hola, <strong>${userName}</strong>:
+              </p>
+              <p style="font-size: 15px; line-height: 1.6; margin-bottom: 30px;">
+                ${descripcion}
+              </p>
+
+              <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
+                <h3 style="margin-top: 0; color: #475569; font-size: 14px; text-transform: uppercase;">Detalles de la operación</h3>
+                ${detallesHtml}
+              </div>
+
+              ${isApproved 
+                ? '<p style="font-size: 14px; color: #10b981; font-weight: bold; text-align: center;">¡Tus beneficios exclusivos en Bonda ya están activos!</p>' 
+                : '<p style="font-size: 14px; color: #e11d48; text-align: center;">Por favor, verifica tus datos o intenta con otro medio de pago desde la plataforma.</p>'}
+            </div>
+            <div style="background-color: #f7f9fc; padding: 20px; text-align: center; color: #718096; font-size: 12px;">
+              <p style="margin: 0;">AYNI - Plataforma Fintech de Reciprocidad</p>
+            </div>
+          </div>
+        `,
+      });
+
+      if (error) {
+        this.logger.error(`Error enviando recibo de pago a ${userEmail}:`, error);
+        return false;
+      }
+
+      this.logger.log(`✅ Recibo de pago (${transactionData.status}) enviado a ${userEmail}. Job ID: ${data?.id}`);
+      return true;
+    } catch (err) {
+      this.logger.error(`Excepción enviando recibo a ${userEmail}:`, err);
       return false;
     }
   }

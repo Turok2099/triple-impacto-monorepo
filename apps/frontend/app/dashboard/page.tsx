@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { obtenerDashboard, DashboardUsuario } from "@/lib/dashboard";
@@ -58,6 +58,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [paginaActual, setPaginaActual] = useState(1);
+  const [inputPagina, setInputPagina] = useState("1");
   const [hayMasCupones, setHayMasCupones] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [cuponesRecibidos, setCuponesRecibidos] = useState<number>(0);
@@ -69,6 +70,8 @@ export default function DashboardPage() {
   const [fundacionLogoError, setFundacionLogoError] = useState<Record<string, boolean>>({});
   const CUPONES_POR_PAGINA = 10;
 
+  const initEmpezado = useRef(false);
+
   useEffect(() => {
     if (authLoading) return;
 
@@ -76,6 +79,9 @@ export default function DashboardPage() {
       router.push("/login");
       return;
     }
+
+    if (initEmpezado.current) return;
+    initEmpezado.current = true;
 
     // Cargar datos de forma secuencial: primero dashboard, luego el resto
     cargarTodoElDashboard();
@@ -87,7 +93,7 @@ export default function DashboardPage() {
 
     try {
       // 1. Cargar dashboard principal (crítico) - debe completarse sin errores
-      await cargarDashboard();
+      const initialSearch = await cargarDashboard();
       setDashboardCargado(true);
 
       // 2. Cargar datos secundarios en paralelo (no bloquean, no causan error)
@@ -95,9 +101,11 @@ export default function DashboardPage() {
         console.warn("Error al cargar categorías:", err);
       });
 
-      cargarCupones(1).catch((err) => {
-        console.warn("Error al cargar cupones:", err);
-      });
+      if (!initialSearch) {
+        cargarCupones(1).catch((err) => {
+          console.warn("Error al cargar cupones:", err);
+        });
+      }
 
       cargarCuponesRecibidos().catch((err) => {
         console.warn("Error al cargar cupones recibidos:", err);
@@ -147,20 +155,20 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    if (user && !busquedaActiva) {
+    if (user && !busquedaActiva && dashboardCargado) {
       cargarCupones(1);
     }
   }, [categoriaSeleccionada]);
 
   // Búsqueda con debounce
   useEffect(() => {
-    if (!user) return;
+    if (!user || !dashboardCargado) return;
 
     const timer = setTimeout(() => {
       if (busqueda) {
         // Buscar en el backend
         realizarBusqueda();
-      } else {
+      } else if (busquedaActiva) {
         // Volver a cargar cupones por categoría
         setBusquedaActiva(false);
         cargarCupones(1);
@@ -168,7 +176,7 @@ export default function DashboardPage() {
     }, 500); // Esperar 500ms después de que el usuario deje de escribir
 
     return () => clearTimeout(timer);
-  }, [busqueda]);
+  }, [busqueda, dashboardCargado]);
 
   const realizarBusqueda = async () => {
     setBusquedaActiva(true);
@@ -181,9 +189,43 @@ export default function DashboardPage() {
       throw new Error("No se encontró token de autenticación");
     }
 
+    let initialSearch = null;
+
     try {
       const data = await obtenerDashboard(token);
       setDashboard(data);
+      
+      // Chequear si venimos desde la Home (con parámetro de búsqueda)
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        const searchInput = params.get("busqueda");
+        
+        if (searchInput) {
+          initialSearch = searchInput;
+          const hasActiveSub = data.fundaciones?.some((f: any) => f.isActive);
+          
+          if (!hasActiveSub) {
+             setActiveTab("donar");
+             import("sweetalert2").then(Swal => {
+               Swal.default.fire({
+                 icon: "warning",
+                 title: "Suscripción Inactiva",
+                 text: "Para disfrutar de tus beneficios doná a alguna ONG",
+                 confirmButtonColor: "#40a8ab",
+                 confirmButtonText: "Entendido"
+               });
+             });
+          } else {
+             // Tiene suscripción, abrir el buscador con la marca
+             setBusqueda(searchInput);
+             setBusquedaActiva(true);
+          }
+          
+          // Limpiar la URL para evitar que se repita al recargar
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      }
+      return initialSearch;
     } catch (err: any) {
       // Si es error 401, redirigir a login
       if (err.message.includes("401") || err.message.includes("Unauthorized")) {
@@ -221,6 +263,7 @@ export default function DashboardPage() {
       setCupones(data);
       setTotalCuponesDisponibles(total);
       setPaginaActual(pagina);
+      setInputPagina(pagina.toString());
       setHayMasCupones((pagina * CUPONES_POR_PAGINA) < total);
     } catch (error) {
       console.error("Error al cargar cupones:", error);
@@ -261,7 +304,7 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#40a8ab] mx-auto mb-4"></div>
           <p className="text-gray-600">Cargando tu dashboard...</p>
         </div>
       </div>
@@ -280,7 +323,7 @@ export default function DashboardPage() {
             <p className="text-gray-600 mb-4">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
+              className="px-4 py-2 bg-[#40a8ab] text-white rounded-lg hover:bg-[#2c8184]"
             >
               Reintentar
             </button>
@@ -323,7 +366,7 @@ export default function DashboardPage() {
                 </span>
               ) : (
                 <span className="bg-slate-100 text-slate-500 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
-                  Inactivo
+                  Colaborador
                 </span>
               )}
             </div>
@@ -522,7 +565,7 @@ export default function DashboardPage() {
             ) : (
               <div className="col-span-full bg-white border border-teal-100 rounded-3xl p-10 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] text-center flex flex-col items-center justify-center">
                 <div className="bg-teal-50 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                  <Heart className="w-8 h-8 text-teal-500 fill-teal-100" />
+                  <Heart className="w-8 h-8 text-[#40a8ab] fill-teal-100" />
                 </div>
                 <h4 className="text-xl font-bold text-slate-800 mb-2">¡Aún no tenés fundaciones!</h4>
                 <p className="text-slate-600 text-sm mb-6 max-w-sm">
@@ -530,7 +573,7 @@ export default function DashboardPage() {
                 </p>
                 <a
                   href="/donar"
-                  className="inline-block px-8 py-3 bg-[#40a8ab] text-white rounded-xl shadow-lg shadow-teal-500/20 text-sm font-bold hover:bg-teal-700 hover:-translate-y-0.5 transition-all"
+                  className="inline-block px-8 py-3 bg-[#40a8ab] text-white rounded-xl shadow-lg shadow-teal-500/20 text-sm font-bold hover:bg-[#2c8184] hover:-translate-y-0.5 transition-all"
                 >
                   Hacer mi primera donación
                 </a>
@@ -579,7 +622,7 @@ export default function DashboardPage() {
 
           {/* Search Bar */}
           <div className="relative group">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#40a8ab] transition-colors">
               🔍
             </span>
             <input
@@ -600,7 +643,7 @@ export default function DashboardPage() {
                   <select
                     value={categoriaSeleccionada}
                     onChange={(e) => setCategoriaSeleccionada(e.target.value)}
-                    className="w-full bg-white border border-teal-100 rounded-xl py-3 pl-4 pr-10 appearance-none focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none font-bold text-slate-700 shadow-sm transition-all"
+                    className="w-full bg-white border border-teal-100 rounded-xl py-3 pl-4 pr-10 appearance-none focus:ring-2 focus:ring-[#40a8ab] focus:border-transparent outline-none font-bold text-slate-700 shadow-sm transition-all"
                   >
                     {categorias.map((categoria) => (
                       <option key={categoria.id} value={categoria.nombre}>
@@ -623,7 +666,7 @@ export default function DashboardPage() {
                       key={categoria.id}
                       onClick={() => setCategoriaSeleccionada(categoria.nombre)}
                       className={`flex items-center gap-2 whitespace-nowrap px-5 py-2.5 rounded-full font-bold text-sm transition-all hover:scale-110 ${categoriaSeleccionada === categoria.nombre
-                        ? "bg-teal-600 text-white shadow-md"
+                        ? "bg-[#40a8ab] text-white shadow-md"
                         : "bg-white text-slate-600 border border-teal-100 hover:border-teal-400 hover:shadow-md"
                         }`}
                     >
@@ -648,7 +691,7 @@ export default function DashboardPage() {
               </div>
               <button
                 onClick={() => setBusqueda("")}
-                className="text-teal-600 hover:text-teal-800 font-bold text-sm"
+                className="text-[#40a8ab] hover:text-teal-800 font-bold text-sm"
               >
                 Limpiar ✕
               </button>
@@ -758,7 +801,7 @@ export default function DashboardPage() {
                       ) : (
                         <button
                           onClick={() => setCuponSeleccionado(cupon)}
-                          className="mt-4 w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl transition-colors text-sm"
+                          className="mt-4 w-full py-2.5 bg-[#40a8ab] hover:bg-[#2c8184] text-white font-semibold rounded-xl transition-colors text-sm"
                         >
                           Obtener descuento
                         </button>
@@ -777,7 +820,7 @@ export default function DashboardPage() {
                     setBusqueda("");
                     setCategoriaSeleccionada("Todo");
                   }}
-                  className="mt-3 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-bold hover:bg-teal-700"
+                  className="mt-3 px-4 py-2 bg-[#40a8ab] text-white rounded-lg text-sm font-bold hover:bg-[#2c8184]"
                 >
                   Limpiar filtros
                 </button>
@@ -785,53 +828,114 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Navegación de Carrusel */}
-          {((hayMasCupones && !busqueda) ||
-            (busqueda && (hayMasCuponesBusqueda || paginaActual > 1))) &&
-            cuponesMostrados.length > 0 && (
-              <div className="flex justify-center items-center gap-4 mt-8">
-                {/* Botón Anterior */}
-                {paginaActual > 1 && (
-                  <button
-                    onClick={() => {
-                      cargarCupones(paginaActual - 1, busquedaActiva ? busqueda : undefined);
-                    }}
-                    className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-xl transition-colors flex items-center gap-2"
-                  >
-                    <span>←</span>
-                    Anterior
-                  </button>
-                )}
+          {/* Navegación de Paginación */}
+          {(hayMasCupones || paginaActual > 1) && cuponesMostrados.length > 0 && (
+            <div className="flex justify-center items-center gap-3 mt-10">
+              {/* Botón Anterior */}
+              <button
+                onClick={() => {
+                  cargarCupones(paginaActual - 1, busquedaActiva ? busqueda : undefined);
+                }}
+                disabled={paginaActual <= 1 || loadingMore}
+                className={`px-5 py-2.5 font-bold rounded-xl transition-all flex items-center gap-2 ${
+                  paginaActual <= 1 || loadingMore
+                    ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                    : "bg-white border border-teal-100 text-teal-700 hover:bg-teal-50 hover:border-teal-300 shadow-sm"
+                }`}
+              >
+                <span>←</span>
+                Anterior
+              </button>
 
-                {/* Indicador de página */}
-                <span className="text-gray-600 font-medium">
-                  Página {paginaActual} de {totalPaginas}
+              {/* Indicadores de página */}
+              <div className="hidden sm:flex items-center gap-2 mx-2">
+                <span className="text-sm font-semibold text-slate-500 flex items-center justify-center gap-2">
+                  Página 
+                  <input 
+                    type="number" 
+                    min={1} 
+                    max={totalPaginas} 
+                    value={inputPagina} 
+                    onChange={(e) => setInputPagina(e.target.value)}
+                    onBlur={() => {
+                      const val = parseInt(inputPagina);
+                      if (!isNaN(val) && val >= 1 && val <= totalPaginas && val !== paginaActual) {
+                         cargarCupones(val, busquedaActiva ? busqueda : undefined);
+                      } else {
+                         setInputPagina(paginaActual.toString());
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const val = parseInt(inputPagina);
+                        if (!isNaN(val) && val >= 1 && val <= totalPaginas && val !== paginaActual) {
+                           cargarCupones(val, busquedaActiva ? busqueda : undefined);
+                        } else {
+                           setInputPagina(paginaActual.toString());
+                        }
+                      }
+                    }}
+                    className="w-16 text-center text-teal-700 bg-teal-50 border border-teal-200 outline-none focus:ring-2 focus:ring-[#40a8ab] px-2 py-1 rounded-lg appearance-none font-bold transition-all"
+                  /> 
+                  de {totalPaginas}
                 </span>
-
-                {/* Botón Siguiente */}
-                {hayMasCupones && (
-                  <button
-                    onClick={() => {
-                      cargarCupones(paginaActual + 1, busquedaActiva ? busqueda : undefined);
-                    }}
-                    disabled={loadingMore}
-                    className="px-6 py-3 bg-teal-600 hover:bg-teal-700 disabled:bg-gray-400 text-white font-bold rounded-xl transition-colors flex items-center gap-2"
-                  >
-                    {loadingMore ? (
-                      <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                        Cargando...
-                      </>
-                    ) : (
-                      <>
-                        Siguiente
-                        <span>→</span>
-                      </>
-                    )}
-                  </button>
-                )}
               </div>
-            )}
+              <div className="flex sm:hidden items-center gap-2">
+                <input 
+                    type="number" 
+                    min={1} 
+                    max={totalPaginas} 
+                    value={inputPagina} 
+                    onChange={(e) => setInputPagina(e.target.value)}
+                    onBlur={() => {
+                      const val = parseInt(inputPagina);
+                      if (!isNaN(val) && val >= 1 && val <= totalPaginas && val !== paginaActual) {
+                         cargarCupones(val, busquedaActiva ? busqueda : undefined);
+                      } else {
+                         setInputPagina(paginaActual.toString());
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const val = parseInt(inputPagina);
+                        if (!isNaN(val) && val >= 1 && val <= totalPaginas && val !== paginaActual) {
+                           cargarCupones(val, busquedaActiva ? busqueda : undefined);
+                        } else {
+                           setInputPagina(paginaActual.toString());
+                        }
+                      }
+                    }}
+                    className="w-12 text-center text-xs font-bold text-slate-700 bg-slate-100 border border-slate-200 outline-none focus:ring-2 focus:ring-slate-400 px-1 py-1 rounded-lg appearance-none transition-all"
+                  />
+                  <span className="text-xs font-bold text-slate-500">/ {totalPaginas}</span>
+              </div>
+
+              {/* Botón Siguiente */}
+              <button
+                onClick={() => {
+                  cargarCupones(paginaActual + 1, busquedaActiva ? busqueda : undefined);
+                }}
+                disabled={!hayMasCupones || loadingMore}
+                className={`px-5 py-2.5 font-bold rounded-xl transition-all flex items-center gap-2 ${
+                  !hayMasCupones
+                    ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                    : "bg-[#40a8ab] text-white hover:bg-[#40a8ab] shadow-lg shadow-teal-500/20"
+                }`}
+              >
+                {loadingMore ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span className="hidden sm:inline">Cargando...</span>
+                  </>
+                ) : (
+                  <>
+                    Siguiente
+                    <span>→</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
               </>
             );
           })()}

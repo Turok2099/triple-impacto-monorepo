@@ -31,7 +31,7 @@ export default function OngNavbar() {
           {/* Logo / Nombre ONG */}
           <a
             href="#"
-            className="flex items-center gap-2 text-xl font-bold text-teal-700 hover:text-teal-600 transition-colors"
+            className="flex items-center gap-2 text-xl font-bold text-teal-700 hover:text-[#40a8ab] transition-colors"
           >
             <span className="w-8 h-8 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg flex items-center justify-center text-white text-sm font-bold">
               ONG
@@ -46,7 +46,7 @@ export default function OngNavbar() {
                 key={link.href}
                 href={link.href}
                 onClick={(e) => handleScrollTo(e, link.href)}
-                className="text-gray-600 hover:text-teal-600 font-medium transition-colors"
+                className="text-gray-600 hover:text-[#40a8ab] font-medium transition-colors"
               >
                 {link.label}
               </a>
@@ -62,7 +62,7 @@ export default function OngNavbar() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 text-gray-600 hover:text-teal-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded-lg"
+            className="md:hidden p-2 text-gray-600 hover:text-[#40a8ab] focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded-lg"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-expanded={isMobileMenuOpen}
             aria-label="Abrir menú de navegación"
@@ -101,7 +101,7 @@ export default function OngNavbar() {
                   key={link.href}
                   href={link.href}
                   onClick={(e) => handleScrollTo(e, link.href)}
-                  className="px-4 py-2 text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-lg font-medium transition-colors"
+                  className="px-4 py-2 text-gray-600 hover:text-[#40a8ab] hover:bg-teal-50 rounded-lg font-medium transition-colors"
                 >
                   {link.label}
                 </a>

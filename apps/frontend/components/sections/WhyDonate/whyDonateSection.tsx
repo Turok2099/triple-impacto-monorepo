@@ -253,7 +253,7 @@ export default function WhyDonateSection() {
             {/* Controles del Carrusel */}
             <button 
               onClick={scrollLeft}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 p-3 bg-white border-2 border-gray-100 rounded-full shadow-lg text-teal-600 hover:bg-teal-50 hover:scale-110 transition-all sm:-ml-6"
+              className="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 p-3 bg-white border-2 border-gray-100 rounded-full shadow-lg text-[#40a8ab] hover:bg-teal-50 hover:scale-110 transition-all sm:-ml-6"
               aria-label="Testimonio anterior"
             >
               <ChevronLeft className="w-6 h-6" />
@@ -261,7 +261,7 @@ export default function WhyDonateSection() {
 
             <button 
               onClick={scrollRight}
-              className="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 p-3 bg-white border-2 border-gray-100 rounded-full shadow-lg text-teal-600 hover:bg-teal-50 hover:scale-110 transition-all sm:-mr-6"
+              className="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 p-3 bg-white border-2 border-gray-100 rounded-full shadow-lg text-[#40a8ab] hover:bg-teal-50 hover:scale-110 transition-all sm:-mr-6"
               aria-label="Testimonio siguiente"
             >
               <ChevronRight className="w-6 h-6" />

@@ -52,7 +52,7 @@ export default function OngHowToHelp() {
                         Sumate
                     </span>
                     <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                        ¿Cómo podés <span className="text-teal-600">ayudar</span>?
+                        ¿Cómo podés <span className="text-[#40a8ab]">ayudar</span>?
                     </h2>
                     <p className="text-lg text-gray-600">
                         Hay muchas formas de sumarte a nuestra causa. Elegí la que mejor se

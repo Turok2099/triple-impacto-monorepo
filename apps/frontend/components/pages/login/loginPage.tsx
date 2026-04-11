@@ -104,8 +104,10 @@ export default function LoginPage() {
         localStorage.removeItem("remembered_email");
       }
 
-      // Redirigir al dashboard
-      window.location.href = "/dashboard";
+      // Redirigir al dashboard o página previa
+      const params = new URLSearchParams(window.location.search);
+      const redirectUrl = params.get("redirect") || "/dashboard";
+      window.location.href = redirectUrl;
     } catch (err: any) {
       setError(err.message || "Error al iniciar sesión. Verifica tus credenciales.");
       console.error("Error en login:", err);
@@ -181,11 +183,11 @@ export default function LoginPage() {
               <div className="flex items-start gap-4">
                 <div className="bg-teal-100/80 p-2 rounded-full shrink-0">
                   {successMsg.includes("etapa de verificación") || successMsg.includes("correo") ? (
-                    <Mail className="w-5 h-5 text-teal-600" />
+                    <Mail className="w-5 h-5 text-[#40a8ab]" />
                   ) : successMsg.includes("contraseña") ? (
-                    <KeyRound className="w-5 h-5 text-teal-600" />
+                    <KeyRound className="w-5 h-5 text-[#40a8ab]" />
                   ) : (
-                    <CheckCircle2 className="w-5 h-5 text-teal-600" />
+                    <CheckCircle2 className="w-5 h-5 text-[#40a8ab]" />
                   )}
                 </div>
                 <div className="pt-0.5">
@@ -264,7 +266,7 @@ export default function LoginPage() {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 text-teal-600 focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
+                  className="h-4 w-4 text-[#40a8ab] focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
                 />
                 <label
                   htmlFor="remember-me"
@@ -277,7 +279,7 @@ export default function LoginPage() {
               <div className="text-sm">
                 <a
                   href="/forgot-password"
-                  className="font-medium text-teal-600 hover:text-teal-500 transition-colors"
+                  className="font-medium text-[#40a8ab] hover:text-[#40a8ab] transition-colors"
                 >
                   ¿Olvidaste tu contraseña?
                 </a>
@@ -333,7 +335,7 @@ export default function LoginPage() {
             ¿No tenés cuenta?{" "}
             <a
               href="/registro"
-              className="font-semibold text-teal-600 hover:text-teal-500 transition-colors"
+              className="font-semibold text-[#40a8ab] hover:text-[#40a8ab] transition-colors"
             >
               Regístrate gratis
             </a>
@@ -347,19 +349,19 @@ export default function LoginPage() {
           </h3>
           <ul className="space-y-2 text-sm text-teal-800">
             <li className="flex items-start gap-2">
-              <span className="text-teal-600 shrink-0">✓</span>
+              <span className="text-[#40a8ab] shrink-0">✓</span>
               <span>Gestionar tus donaciones</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-teal-600 shrink-0">✓</span>
+              <span className="text-[#40a8ab] shrink-0">✓</span>
               <span>Acceder a tus cupones de descuento</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-teal-600 shrink-0">✓</span>
+              <span className="text-[#40a8ab] shrink-0">✓</span>
               <span>Ver el impacto de tus aportes</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-teal-600 shrink-0">✓</span>
+              <span className="text-[#40a8ab] shrink-0">✓</span>
               <span>Recibir beneficios exclusivos</span>
             </li>
           </ul>

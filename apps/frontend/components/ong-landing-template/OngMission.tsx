@@ -44,7 +44,7 @@ export default function OngMission() {
 
                         <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
                             Creemos en el poder de las{" "}
-                            <span className="text-teal-600">comunidades</span>
+                            <span className="text-[#40a8ab]">comunidades</span>
                         </h2>
 
                         <p className="text-lg text-gray-600 mb-8">

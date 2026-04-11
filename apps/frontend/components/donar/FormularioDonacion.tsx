@@ -20,6 +20,7 @@ interface FormularioDonacionProps {
 // Montos sugeridos predefinidos (mínimo: $5000 ARS)
 const MONTOS_SUGERIDOS = [5000, 10000, 15000];
 const MONTO_MINIMO = 5000;
+const MONTO_MAXIMO = 500000;
 
 export default function FormularioDonacion({
   onSubmit,
@@ -92,10 +93,16 @@ export default function FormularioDonacion({
     setUsarMontoCustom(true);
     setMontoSeleccionado(null);
 
-    // Validar monto mínimo en tiempo real
+    // Validar monto en tiempo real
     const monto = parseFloat(value);
-    if (!isNaN(monto) && monto > 0 && monto < MONTO_MINIMO) {
-      setError(`El monto mínimo para donar es ${formatearMonto(MONTO_MINIMO)}`);
+    if (!isNaN(monto) && monto > 0) {
+      if (monto < MONTO_MINIMO) {
+        setError(`El monto mínimo para donar es ${formatearMonto(MONTO_MINIMO)}`);
+      } else if (monto > MONTO_MAXIMO) {
+        setError(`El monto máximo permitido es ${formatearMonto(MONTO_MAXIMO)}`);
+      } else {
+        setError(null);
+      }
     } else {
       setError(null);
     }
@@ -110,9 +117,14 @@ export default function FormularioDonacion({
       ? parseFloat(montoCustom)
       : montoSeleccionado || 0;
 
-    // Validar monto mínimo global
+    // Validar límites globales de monto
     if (montoFinal < MONTO_MINIMO) {
       setError(`El monto mínimo para donar es ${formatearMonto(MONTO_MINIMO)}`);
+      return;
+    }
+    
+    if (montoFinal > MONTO_MAXIMO) {
+      setError(`El monto máximo permitido por transacción es ${formatearMonto(MONTO_MAXIMO)}`);
       return;
     }
 
@@ -135,7 +147,7 @@ export default function FormularioDonacion({
   if (authLoading) {
     return (
       <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500 mx-auto mb-4"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#40a8ab] mx-auto mb-4"></div>
         <p className="text-gray-600">Verificando sesión...</p>
       </div>
     );
@@ -149,7 +161,7 @@ export default function FormularioDonacion({
         </p>
         <a
           href="/login"
-          className="inline-block px-6 py-2 bg-[#40a8ab] text-white rounded-lg hover:bg-teal-600"
+          className="inline-block px-6 py-2 bg-[#40a8ab] text-white rounded-lg hover:bg-[#40a8ab]"
         >
           Iniciar Sesión
         </a>
@@ -167,7 +179,7 @@ export default function FormularioDonacion({
 
         {loadingOrgs ? (
           <div className="text-center py-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500 mx-auto"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#40a8ab] mx-auto"></div>
           </div>
         ) : errorOrgs ? (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -186,7 +198,7 @@ export default function FormularioDonacion({
             <select
               value={organizacionId}
               onChange={(e) => setOrganizacionId(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-gray-900 bg-white"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] text-gray-900 bg-white"
               required
             >
               <option value="" disabled>
@@ -214,7 +226,7 @@ export default function FormularioDonacion({
                       />
                     ) : (
                       <div
-                        className="w-full h-full flex items-center justify-center text-teal-600 text-4xl font-bold"
+                        className="w-full h-full flex items-center justify-center text-[#40a8ab] text-4xl font-bold"
                         aria-hidden
                       >
                         {organizacionSeleccionada.nombre.charAt(0)}
@@ -285,12 +297,13 @@ export default function FormularioDonacion({
               <input
                 type="number"
                 min={MONTO_MINIMO}
+                max={MONTO_MAXIMO}
                 step="1"
                 value={montoCustom}
                 onChange={(e) => handleMontoCustomChange(e.target.value)}
                 placeholder={MONTO_MINIMO.toString()}
                 autoFocus
-                className="w-full pl-8 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 border-teal-500 focus:ring-teal-500"
+                className="w-full pl-8 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 border-[#40a8ab] focus:ring-[#40a8ab]"
               />
             </div>
           </div>

@@ -6,6 +6,7 @@ import {
 import { FiservConnectService } from './fiserv-connect/fiserv-connect.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { BondaService } from './../bonda/bonda.service';
+import { MailService } from '../mail/mail.service';
 
 /**
  * Payload de la notificación servidor a servidor de Fiserv Connect.
@@ -25,6 +26,7 @@ export class FiservWebhookService {
     private readonly fiservConnect: FiservConnectService,
     private readonly supabase: SupabaseService,
     private readonly bonda: BondaService,
+    private readonly mailService: MailService,
   ) {}
 
   /**
@@ -153,9 +155,62 @@ export class FiservWebhookService {
       );
     }
 
+    // Obtener info del usuario para enviar el correo
+    const user = await this.supabase.findUserById(attempt.user_id);
+    if (user && user.email) {
+      this.mailService.sendPaymentReceiptEmail(user.email, user.nombre || 'Donante', {
+        status: 'approved',
+        amount: chargetotal || String(attempt.amount),
+        currency: currency || attempt.currency || 'ARS',
+        approvalCode: approvalCode,
+        oid: oid,
+      }).catch(err => {
+        this.logger.error(`Error enviando correo de éxito para oid=${oid}:`, err);
+      });
+    }
+
     this.logger.log(
       `Fiserv notification: pago completado user=${attempt.user_id} oid=${oid}`,
     );
+  }
+
+  /**
+   * Maneja el flujo de pagos declinados desde la redirección del frontend (o webhook si Fiserv lo envía).
+   * Marca el intento de pago como fallido y envía un correo informando el rechazo.
+   */
+  async handleDeclined(oid: string, failReason?: string, responseCode?: string): Promise<void> {
+    if (!oid) return;
+
+    const attempt = await this.supabase.getPaymentAttemptByOrderId(oid);
+    if (!attempt) {
+      this.logger.warn(`Fiserv declined: attempt no encontrado para oid=${oid}`);
+      return;
+    }
+
+    // Si ya está completado (ej: webhook llegó antes y fue éxito), no hacer nada
+    if (attempt.status === 'completed') {
+      this.logger.log(`Fiserv declined: ignorado porque la orden ${oid} ya está completada.`);
+      return;
+    }
+
+    // Marcar como failed si no lo estaba
+    if (attempt.status !== 'failed') {
+      await this.supabase.updatePaymentAttempt(attempt.id, { status: 'failed' });
+    }
+
+    this.logger.log(`Fiserv order ${oid} marcada como failed.`);
+
+    // Enviar correo de notificación de declinado
+    const user = await this.supabase.findUserById(attempt.user_id);
+    if (user && user.email) {
+      this.mailService.sendPaymentReceiptEmail(user.email, user.nombre || 'Donante', {
+        status: 'declined',
+        oid: oid,
+        failReason: failReason || responseCode || 'Rechazado por el procesador de pagos',
+      }).catch(err => {
+        this.logger.error(`Error enviando correo de rechazo para oid=${oid}:`, err);
+      });
+    }
   }
 
   private async getOrganizacionNombre(
@@ -213,7 +268,7 @@ export class FiservWebhookService {
       : this.generateAffiliateCode(user.email);
 
     try {
-      const res = await this.bonda.crearAfiliado(
+      let res = await this.bonda.crearAfiliado(
         {
           code,
           email: user.email,
@@ -221,11 +276,31 @@ export class FiservWebhookService {
           telefono: user.telefono ?? undefined,
           provincia: user.provincia ?? undefined,
           localidad: user.localidad ?? undefined,
-          // Bonda requiere DNI numérico estricto, sin caracteres especiales.
           dni: safeDni,
         },
         { organizacionId },
       );
+
+      if (
+        res?.success === false && 
+        res?.error?.detail?.email?.[0]?.includes('único')
+      ) {
+        // El email ya existe en otra cuenta de Bonda. Reintentamos con un sufijo seguro.
+        const fallbackEmail = user.email.replace('@', `+bonda${Date.now()}@`);
+        this.logger.warn(`Email ${user.email} en uso en Bonda. Reintentando con ${fallbackEmail}`);
+        res = await this.bonda.crearAfiliado(
+          {
+            code,
+            email: fallbackEmail,
+            nombre: user.nombre ?? undefined,
+            telefono: user.telefono ?? undefined,
+            provincia: user.provincia ?? undefined,
+            localidad: user.localidad ?? undefined,
+            dni: safeDni,
+          },
+          { organizacionId },
+        );
+      }
 
       if (res?.success && res?.data?.member?.code) {
         await this.supabase.upsertAffiliateForUser(
@@ -258,7 +333,7 @@ export class FiservWebhookService {
         }
       } else {
         this.logger.error(
-          `Fiserv webhook: Bonda retornó success: false al crear afiliado`,
+          `Fiserv webhook: Bonda retornó success: false al crear afiliado (sin resolución)`,
           res,
         );
       }

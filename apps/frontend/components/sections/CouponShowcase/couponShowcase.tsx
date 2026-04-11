@@ -23,7 +23,7 @@ export default function CouponShowcase() {
                 <div className="border-t-2 border-dashed border-gray-200 pt-4">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Tu donación:</span>
-                    <span className="font-bold text-teal-600">$10.000</span>
+                    <span className="font-bold text-[#40a8ab]">$10.000</span>
                   </div>
                   <div className="flex items-center justify-between text-sm mt-2">
                     <span className="text-gray-600">Tu ahorro:</span>

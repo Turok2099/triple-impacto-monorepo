@@ -7,6 +7,7 @@ export interface AdminUser {
   dni?: string;
   status: string; // 'ACTIVO', 'INACTIVO (Local)', 'SOFT_DELETE (Bonda)'
   is_active: boolean;
+  role?: string;
   usuarios_bonda_afiliados?: { affiliate_code: string; bonda_microsite_id: string; ong_name?: string; is_active?: boolean; }[];
   created_at: string;
 }
@@ -57,6 +58,20 @@ export const updateAdminUser = async (token: string, id: string, payload: any) =
   if (!res.ok) {
     const errorData = await res.json().catch(() => null);
     throw new Error(errorData?.message || 'Error actualizando usuario');
+  }
+  return await res.json();
+};
+
+export const toggleUserAdminRole = async (token: string, id: string, newRole: string) => {
+  const url = `${API_URL}/admin/users/${id}/role`;
+  const res = await fetch(url, {
+    method: 'PATCH',
+    headers: getHeaders(token),
+    body: JSON.stringify({ role: newRole })
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => null);
+    throw new Error(errorData?.message || 'Error actualizando rol de usuario');
   }
   return await res.json();
 };

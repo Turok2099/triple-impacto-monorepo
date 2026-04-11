@@ -14,10 +14,11 @@ export default function CuponCard({ cupon }: CuponCardProps) {
 
   const handleObtenerDescuento = (e: React.MouseEvent) => {
     e.stopPropagation();
+    const searchUrl = `/dashboard?busqueda=${encodeURIComponent(cupon.empresa.nombre)}`;
     if (isAuthenticated) {
-      router.push("/dashboard");
+      router.push(searchUrl);
     } else {
-      router.push("/register");
+      router.push(`/login?redirect=${encodeURIComponent(searchUrl)}`);
     }
   };
   const defaultImage =
@@ -108,7 +109,7 @@ export default function CuponCard({ cupon }: CuponCardProps) {
           <p className="text-sm text-gray-500 line-clamp-3 min-h-[3.6rem]">{descripcion}</p>
           <button 
             onClick={handleObtenerDescuento}
-            className="mt-4 w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl transition-colors text-sm"
+            className="mt-4 w-full py-2.5 bg-[#40a8ab] hover:bg-[#2c8184] text-white font-semibold rounded-xl transition-colors text-sm"
           >
             Obtener descuento
           </button>

@@ -98,7 +98,7 @@ export default function CuponDetalleModal({
           />
           {/* Descuento sobre la imagen (izquierda) */}
           <div className="absolute top-3 left-3">
-            <span className="bg-teal-500 text-white text-base font-black size-16 rounded-full shadow-md flex items-center justify-center text-center leading-tight">
+            <span className="bg-[#40a8ab] text-white text-base font-black size-16 rounded-full shadow-md flex items-center justify-center text-center leading-tight">
               {cupon.descuento}
             </span>
           </div>

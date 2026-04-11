@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Swal from 'sweetalert2';
-import { getAdminUsers, deleteAdminUser, AdminUser, createAdminUser, updateAdminUser, deleteAffiliation, getUserAdminPayments } from "@/lib/admin";
+import { getAdminUsers, deleteAdminUser, AdminUser, createAdminUser, updateAdminUser, deleteAffiliation, getUserAdminPayments, toggleUserAdminRole } from "@/lib/admin";
 import { useAuth } from "@/contexts/AuthContext";
-import { Users, MoreVertical, Edit2, Trash2, UserPlus, X, ShieldAlert, CheckCircle, XCircle, Receipt } from "lucide-react";
+import { Users, MoreVertical, Edit2, Trash2, UserPlus, X, ShieldAlert, Shield, CheckCircle, XCircle, Receipt } from "lucide-react";
 
 export default function SeccionAdmin() {
   const { user } = useAuth();
@@ -160,6 +160,50 @@ export default function SeccionAdmin() {
     }
   };
 
+  const handleToggleRole = async (userToToggle: AdminUser) => {
+    const isCurrentlyAdmin = userToToggle.role === 'admin' || userToToggle.role === 'superadmin';
+    const newRole = isCurrentlyAdmin ? 'user' : 'admin';
+    
+    if (userToToggle.id === user?.id) {
+      Swal.fire('Acción no permitida', 'No puedes alterar tus propios accesos.', 'warning');
+      return;
+    }
+    
+    const result = await Swal.fire({
+      title: isCurrentlyAdmin ? '¿Revocar privilegios?' : '¿Hacer Administrador?',
+      text: isCurrentlyAdmin 
+        ? `¿Seguro que deseas quitar el acceso de administrador a ${userToToggle.nombre}?` 
+        : `¿Seguro que deseas otorgar privilegios de administrador a ${userToToggle.nombre}? Podrá acceder a este panel.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: isCurrentlyAdmin ? '#ef4444' : '#059669',
+      cancelButtonColor: '#94a3b8',
+      confirmButtonText: isCurrentlyAdmin ? 'Sí, revocar' : 'Sí, hacer administrador',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const token = localStorage.getItem("auth_token") || "";
+      await toggleUserAdminRole(token, userToToggle.id, newRole);
+      Swal.fire({
+        title: '¡Roles Actualizados!',
+        text: `El usuario ahora tiene el rol: ${newRole}.`,
+        icon: 'success',
+        confirmButtonColor: '#059669'
+      });
+      fetchUsers();
+    } catch (err: any) {
+      Swal.fire({
+        title: 'Error',
+        text: "Error actualizando rol: " + err.message,
+        icon: 'error',
+        confirmButtonColor: '#059669'
+      });
+    }
+  };
+
   const openCreateModal = () => {
     setEditingUser(null);
     setFormData({ nombre: "", email: "", telefono: "", dni: "", bondaSlug: "ctfin" });
@@ -202,14 +246,14 @@ export default function SeccionAdmin() {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
-            <ShieldAlert className="w-8 h-8 text-emerald-600" />
+            <ShieldAlert className="w-8 h-8 text-[#40a8ab]" />
             Panel de Súper Administrador
           </h1>
           <p className="text-slate-500 mt-2">Gestiona {total} usuarios y su estado de sincronización con Bonda.</p>
         </div>
         <button
           onClick={openCreateModal}
-          className="mt-4 md:mt-0 flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold transition-all shadow-md hover:shadow-lg"
+          className="mt-4 md:mt-0 flex items-center gap-2 px-6 py-3 bg-[#40a8ab] hover:bg-[#2c8184] text-white rounded-xl font-semibold transition-all shadow-md hover:shadow-lg"
         >
           <UserPlus className="w-5 h-5" />
           Nuevo Usuario
@@ -218,7 +262,7 @@ export default function SeccionAdmin() {
 
       {loading ? (
         <div className="flex justify-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#40a8ab]"></div>
         </div>
       ) : error ? (
         <div className="bg-red-50 text-red-600 p-6 rounded-2xl border border-red-100 flex items-center gap-3">
@@ -247,7 +291,14 @@ export default function SeccionAdmin() {
                           {u.nombre.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <p className="font-semibold text-slate-900">{u.nombre}</p>
+                          <p className="font-semibold text-slate-900 flex items-center gap-2">
+                            {u.nombre}
+                            {(u.role === 'admin' || u.role === 'superadmin') && (
+                              <span title="Administrador" className="flex items-center">
+                                <Shield className="w-3.5 h-3.5 text-purple-600 fill-purple-600" />
+                              </span>
+                            )}
+                          </p>
                           <p className="text-xs text-slate-500">DNI: {u.dni || 'N/A'}</p>
                         </div>
                       </div>
@@ -293,6 +344,19 @@ export default function SeccionAdmin() {
                     </td>
                     <td className="py-4 px-6 text-right">
                       <div className="flex justify-end gap-2">
+                        {user?.role === 'superadmin' && u.id !== user?.id && (
+                           <button
+                             onClick={() => handleToggleRole(u)}
+                             className={`p-2 rounded-lg transition-colors ${
+                               u.role === 'admin' || u.role === 'superadmin' 
+                                 ? 'text-purple-600 hover:bg-purple-50' 
+                                 : 'text-slate-400 hover:text-purple-600 hover:bg-purple-50'
+                             }`}
+                             title={u.role === 'admin' || u.role === 'superadmin' ? "Revocar Admin" : "Hacer Admin"}
+                           >
+                             <Shield className="w-4 h-4" />
+                           </button>
+                        )}
                         <button
                           onClick={() => handleViewPayments(u)}
                           className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -302,7 +366,7 @@ export default function SeccionAdmin() {
                         </button>
                         <button
                           onClick={() => openEditModal(u)}
-                          className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                          className="p-2 text-slate-400 hover:text-[#40a8ab] hover:bg-emerald-50 rounded-lg transition-colors"
                           title="Editar usuario"
                         >
                           <Edit2 className="w-4 h-4" />
@@ -372,7 +436,7 @@ export default function SeccionAdmin() {
                 <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 px-4 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold rounded-xl transition-colors">
                   Cancelar
                 </button>
-                <button type="submit" disabled={submitting} className="flex-1 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white font-semibold rounded-xl shadow-lg shadow-emerald-200 transition-all flex justify-center items-center">
+                <button type="submit" disabled={submitting} className="flex-1 py-3 px-4 bg-[#40a8ab] hover:bg-[#2c8184] disabled:bg-emerald-400 text-white font-semibold rounded-xl shadow-lg shadow-emerald-200 transition-all flex justify-center items-center">
                   {submitting ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div> : 'Guardar Cambios'}
                 </button>
               </div>

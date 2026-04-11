@@ -470,6 +470,103 @@ export class SyncService {
   }
 
   /**
+   * Cron job: Suspender usuarios localmente y en Bonda según Regla del Mes
+   * Se ejecuta diariamente a las 2 AM Argentina (UTC-3)
+   */
+  @Cron('0 5 * * *', {
+    name: 'suspender_usuarios_expirados_mes',
+    timeZone: 'UTC',
+  })
+  async suspenderUsuariosExpirados() {
+    this.logger.log('⏰ Iniciando Suspensión de Usuarios Expirados (Regla de 1 Mes)');
+    try {
+      // 1. Obtener usuarios afiliados que figuran is_active=true
+      const { data: afiliados } = await this.supabaseService.getClient()
+        .from('usuarios_bonda_afiliados')
+        .select('user_id, bonda_microsite_id, affiliate_code, is_active')
+        .eq('is_active', true);
+
+      if (!afiliados || afiliados.length === 0) return;
+
+      let expirados = 0;
+      let fallos = 0;
+      const ahora = new Date();
+
+      for (const aff of afiliados) {
+        try {
+           // Obtener el último pago completado para el usuario/micrositio
+           // (El bonda_microsite_id se conecta con el organizacion_id en la tabla bonda_microsites)
+           const { data: microsite } = await this.supabaseService.from('bonda_microsites').select('organizacion_id, slug').eq('id', aff.bonda_microsite_id).maybeSingle();
+           
+           if (!microsite?.organizacion_id) continue;
+           
+           const { data: donacion } = await this.supabaseService.from('donaciones')
+             .select('created_at')
+             .eq('usuario_id', aff.user_id)
+             .eq('organizacion_id', microsite.organizacion_id)
+             .eq('estado', 'completada')
+             .order('created_at', { ascending: false })
+             .limit(1)
+             .maybeSingle();
+             
+           // Si no tiene pagos o su último pago expiró
+           let isExpired = true;
+           if (donacion?.created_at) {
+              const fechaUltimoPago = new Date(donacion.created_at);
+              const fechaVencimiento = new Date(fechaUltimoPago);
+              
+              const expectedMonth = fechaVencimiento.getMonth() + 1;
+              fechaVencimiento.setMonth(expectedMonth);
+              
+              // Ajuste en caso de saltar el mes
+              if (fechaVencimiento.getMonth() > expectedMonth % 12) {
+                fechaVencimiento.setDate(0); 
+              }
+              
+              fechaVencimiento.setHours(23, 59, 59, 999);
+              isExpired = ahora > fechaVencimiento;
+           }
+
+           if (isExpired) {
+              this.logger.log(`Usuario ${aff.user_id} expirado para ONG. Suspendiendo en Bonda...`);
+              
+              // Soft delete en Bonda
+              try {
+                await this.bondaService.eliminarAfiliado(aff.affiliate_code, { slug: microsite.slug });
+              } catch (bondaError: any) {
+                // Si retorna 404 o Not Found se asume que ya estaba borrado
+                if (!bondaError?.message?.includes('404') && !bondaError?.message?.includes('Not Found')) {
+                   this.logger.warn(`Aviso Bonda Delete: ${bondaError?.message}`);
+                }
+              }
+              
+              // Actualizar localmente a inactivo
+              await this.supabaseService.getClient().from('usuarios_bonda_afiliados')
+                 .update({ is_active: false })
+                 .eq('user_id', aff.user_id)
+                 .eq('bonda_microsite_id', aff.bonda_microsite_id);
+
+              await this.supabaseService.getClient().from('usuarios')
+                 .update({ is_active: false })
+                 .eq('id', aff.user_id);
+                 
+              expirados++;
+           }
+        } catch (e: any) {
+           this.logger.error(`Error procesando expiración para usuario ${aff.user_id}: ${e.message}`);
+           fallos++;
+        }
+        // Evitar rate-limit Bonda
+        await this.delay(100);
+      }
+
+      this.logger.log(`✅ Job Soft-Delete Expirados completado: ${expirados} suspendidos. Fallos: ${fallos}`);
+    } catch (e: any) {
+      this.logger.error('❌ Error general en job de suspensión de expirados:', e.message);
+    }
+  }
+
+  /**
    * Cron job: Reconciliar estados de usuarios (Supabase vs Bonda)
    * Se ejecuta diariamente a las 4 AM Argentina (UTC-3)
    */

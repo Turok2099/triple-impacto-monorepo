@@ -53,7 +53,7 @@ export default function OngFooter() {
                             <a
                                 key={social.name}
                                 href={social.href}
-                                className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-lg hover:bg-teal-600 transition-colors"
+                                className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-lg hover:bg-[#40a8ab] transition-colors"
                                 aria-label={social.name}
                             >
                                 {social.icon}

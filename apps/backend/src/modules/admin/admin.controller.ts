@@ -35,6 +35,12 @@ export class AdminController {
     return this.adminService.updateUser(adminId, userId, payload);
   }
 
+  @Patch('users/:id/role')
+  async updateUserRole(@Req() req: any, @Param('id') userId: string, @Body() payload: { role: string }) {
+    const adminId = req.user?.userId;
+    return this.adminService.updateUserRole(adminId, userId, payload.role);
+  }
+
   @Delete('users/:id')
   async deleteUser(@Req() req: any, @Param('id') userId: string) {
     const adminId = req.user?.userId;

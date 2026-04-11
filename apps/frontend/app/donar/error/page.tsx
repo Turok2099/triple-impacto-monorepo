@@ -56,28 +56,7 @@ function PagoErrorContent() {
 
           {/* Contenido */}
           <div className="p-8">
-            {/* Información técnica (si disponible) */}
-            {(failReason || responseCode || oid) && (
-              <div className="mb-8 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-                <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                  Registro Técnico
-                </h2>
-                <div className="space-y-2 text-sm text-slate-700">
-                  {oid && (
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium text-slate-500">Ref. Fiserv (OID)</span>
-                      <span className="font-mono text-xs max-w-[150px] truncate">{oid}</span>
-                    </div>
-                  )}
-                  {responseCode && (
-                    <div className="flex justify-between items-center mt-1">
-                      <span className="font-medium text-slate-500">Código interno</span>
-                      <span className="font-mono">{responseCode}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+            {/* El registro técnico (OID y código de error) ya fue notificado por correo, por lo que se omitió en esta interfaz visual para no confundir al usuario */}
 
             {/* Aviso central de seguridad */}
             <div className="bg-rose-50/50 border border-rose-100 rounded-xl p-5 mb-8 flex gap-3 text-sm text-rose-800">

@@ -66,12 +66,12 @@ export default function CouponCounter() {
             <div className="text-center lg:text-left">
               <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
                 Descubrí los más de{" "}
-                <span className="text-teal-600">10.000 cupones</span> que tenemos
+                <span className="text-[#40a8ab]">10.000 cupones</span> que tenemos
                 para ti
               </h3>
               <div className="flex items-center justify-center lg:justify-start gap-3 mb-6">
                 <div className="bg-white rounded-2xl shadow-xl px-8 py-6 inline-block">
-                  <div className="text-6xl sm:text-7xl font-bold text-teal-600">
+                  <div className="text-6xl sm:text-7xl font-bold text-[#40a8ab]">
                     +{contadorCupones.toLocaleString()}
                   </div>
                   <p className="text-gray-600 text-lg mt-2 font-semibold">
@@ -98,7 +98,7 @@ export default function CouponCounter() {
                 </div>
                 <Link
                   href="/registro"
-                  className="block w-full py-4 px-6 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl transition-all duration-300 text-center text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
+                  className="block w-full py-4 px-6 bg-[#40a8ab] hover:bg-[#2c8184] text-white font-bold rounded-xl transition-all duration-300 text-center text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
                   Donar ahora →
                 </Link>

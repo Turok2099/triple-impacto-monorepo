@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
@@ -191,29 +191,36 @@ export class SupabaseService implements OnModuleInit {
   }
 
   /**
-   * Obtener el rol de un usuario desde el sistema de Auth de Supabase.
-   */
+   * Obtener el rol de un usuario desde el sistema de Auth   */
   async getUserRole(userId: string): Promise<string> {
     try {
-      const { data, error } = await this.getClient().auth.admin.getUserById(userId);
-      if (!error && data?.user) {
-         return data.user.app_metadata?.role || 'user';
-      }
-
-      // Fallback: Si el usuario existe en BD pero no coincide su UUID en Auth,
-      // buscamos por su email.
-      const { data: localData } = await this.from('usuarios').select('email').eq('id', userId).single();
-      if (localData?.email) {
-          const { data: { users } } = await this.getClient().auth.admin.listUsers();
-          const authUser = users.find((u: any) => u.email === localData.email);
-          if (authUser) {
-             return authUser.app_metadata?.role || 'user';
-          }
+      const { data, error } = await this.from('usuarios').select('role').eq('id', userId).single();
+      if (!error && data?.role) {
+         return data.role;
       }
       return 'user';
     } catch (e) {
       return 'user';
     }
+  }
+
+  /**
+   * Actualizar el rol de usuario en DB local
+   */
+  async updateUserRole(localUserId: string, role: string) {
+    const { data, error } = await this.from('usuarios')
+      .update({ role })
+      .eq('id', localUserId)
+      .select()
+      .single();
+    
+    if (error) {
+      this.logger.error(`Error actualizando rol en DB local para UUID: ${localUserId}`, error);
+      throw new BadRequestException('Error actualizando rol en base de datos local');
+    }
+    
+    this.logger.log(`✅ Usuario local ${localUserId} fue promovido a rol: ${role}`);
+    return data;
   }
 
   // ========================================
@@ -936,7 +943,7 @@ export class SupabaseService implements OnModuleInit {
     // Agrupar por organizacion_id: sumar montos y conservar primera fecha y nombre
     const porOrg: Record<
       string,
-      { organizacion_nombre: string; created_at: string; totalDonado: number }
+      { organizacion_nombre: string; created_at: string; ultimo_pago_at: string; totalDonado: number }
     > = {};
     for (const dono of donaciones || []) {
       if (!dono.organizacion_id) continue;
@@ -945,8 +952,11 @@ export class SupabaseService implements OnModuleInit {
         porOrg[id] = {
           organizacion_nombre: dono.organizacion_nombre || 'ONG',
           created_at: dono.created_at,
+          ultimo_pago_at: dono.created_at,
           totalDonado: 0,
         };
+      } else {
+        porOrg[id].ultimo_pago_at = dono.created_at;
       }
       porOrg[id].totalDonado += Number(dono.monto ?? 0);
     }
@@ -964,13 +974,38 @@ export class SupabaseService implements OnModuleInit {
         .eq('bonda_microsite_id', microsite?.id)
         .maybeSingle();
 
+      // --- Cálculo Dinámico de Actividad (Regla del Mes) ---
+      let isActivoDinamico = false;
+      if (agg.ultimo_pago_at) {
+        const fechaUltimoPago = new Date(agg.ultimo_pago_at);
+        const fechaVencimiento = new Date(fechaUltimoPago);
+        
+        const expectedMonth = fechaVencimiento.getMonth() + 1;
+        fechaVencimiento.setMonth(expectedMonth);
+        
+        // Ajuste en caso de saltar el mes (ej. 31 Ene -> 3 Mar en vez de 28 Feb)
+        if (fechaVencimiento.getMonth() > expectedMonth % 12) {
+          fechaVencimiento.setDate(0); // Último día del mes esperado
+        }
+        
+        // Extender el vencimiento hasta el final del día (23:59:59.999)
+        fechaVencimiento.setHours(23, 59, 59, 999);
+        
+        const ahora = new Date();
+        isActivoDinamico = ahora <= fechaVencimiento;
+      }
+
+      // El usuario se reporta activo sólo si localmente lo marca la DB Y dinámicamente no ha expirado su mes.
+      const isActivoFinal = (afiliado ? afiliado.is_active : false) && isActivoDinamico;
+
       fundacionesUnicas.push({
         bonda_microsite_id: microsite?.id || organizacionId,
         micrositio_nombre: agg.organizacion_nombre,
         micrositio_slug: microsite?.slug || '',
         affiliate_code: afiliado?.affiliate_code || '',
-        is_active: afiliado ? afiliado.is_active : false,
+        is_active: isActivoFinal,
         created_at: agg.created_at,
+        ultimo_pago_at: agg.ultimo_pago_at,
         total_donado: agg.totalDonado,
       });
     }

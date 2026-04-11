@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { actualizarPerfil, cambiarContrasena } from '@/lib/dashboard';
@@ -175,7 +177,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user' }: Secci
             </div>
             <div>
               <p className="text-sm font-bold text-[#1A202C]">
-                {role === 'superadmin' ? 'Administrador' : isActive ? 'Colaborador' : 'Inactivo'}
+                {role === 'superadmin' ? 'Administrador' : 'Colaborador'}
               </p>
               <p className="text-[11px] text-slate-500">
                 {role === 'superadmin' ? 'Acceso total al sistema' : isActive ? 'Suscripción al día' : 'Sin pagos activos'}
@@ -362,6 +364,12 @@ export default function SeccionPerfil({ isActive = false, role = 'user' }: Secci
               )}
             </div>
 
+            <div className="flex justify-start text-xs pt-1 pb-3">
+              <Link href="/forgot-password" className="text-[#40a8ab] font-medium hover:underline hover:text-[#2c8184] transition-colors">
+                ¿Olvidaste tu contraseña? Recuperala aquí
+              </Link>
+            </div>
+
             <button
               onClick={handleCambiarContrasena}
               disabled={cambiandoPass}
@@ -371,41 +379,6 @@ export default function SeccionPerfil({ isActive = false, role = 'user' }: Secci
             </button>
           </div>
         )}
-      </section>
-
-      {/* Métodos de Pago */}
-      <section className="px-6 mb-8">
-        <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Métodos de Pago</h2>
-        <div className="space-y-3 mb-4">
-          <div className="flex items-center justify-between p-4 border border-slate-100 rounded-2xl bg-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)]">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-8 bg-slate-100 rounded flex items-center justify-center">
-                <CreditCard className="w-5 h-5 text-slate-500" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-[#1A202C]">Visa terminada en 4242</p>
-                <p className="text-[11px] text-slate-400 font-medium">Vence 12/26</p>
-              </div>
-            </div>
-            <button className="text-[#40a8ab] text-xs font-bold px-3 py-1 bg-[#40a8ab]/5 rounded-lg hover:bg-[#40a8ab]/10 transition-colors">
-              Editar
-            </button>
-          </div>
-        </div>
-        <button className="w-full border-2 border-dashed border-[#40a8ab]/30 text-[#40a8ab] font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 bg-[#40a8ab]/5 hover:bg-[#40a8ab]/10 transition-colors">
-          <PlusCircle className="w-5 h-5" />
-          Agregar Método de Pago
-        </button>
-      </section>
-
-      {/* Cerrar sesión */}
-      <section className="px-6">
-        <button
-          onClick={logout}
-          className="w-full border-2 border-red-200 text-red-600 font-bold py-3.5 rounded-xl hover:bg-red-50 transition-colors"
-        >
-          Cerrar Sesión
-        </button>
       </section>
     </div>
   );

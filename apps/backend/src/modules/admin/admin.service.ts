@@ -29,6 +29,7 @@ export class AdminService {
 
     const mappedUsers = users.map(u => ({
       ...u,
+      role: u.role || 'user',
       status: u.is_active ? 'ACTIVO' : 'INACTIVO (Local)',
       usuarios_bonda_afiliados: u.usuarios_bonda_afiliados?.map((a: any) => ({
          affiliate_code: a.affiliate_code,
@@ -136,6 +137,17 @@ export class AdminService {
      
      await this.logAudit(adminId, id, 'UPDATE_USER', 'SUCCESS');
      return updated;
+  }
+
+  async updateUserRole(adminId: string, id: string, role: string) {
+     if (!['superadmin', 'admin', 'user'].includes(role)) {
+       throw new BadRequestException('Rol no válido');
+     }
+     
+     await this.supabaseService.updateUserRole(id, role);
+     await this.logAudit(adminId, id, 'UPDATE_USER_ROLE', 'SUCCESS', { target_role: role });
+     
+     return { success: true, message: `Rol actualizado a ${role} correctamente` };
   }
 
   async deleteUser(adminId: string, id: string) {

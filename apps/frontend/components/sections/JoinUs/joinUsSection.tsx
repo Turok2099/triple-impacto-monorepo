@@ -22,7 +22,7 @@ export default function JoinUsSection() {
             <div className="w-14 h-14 bg-teal-100/50 rounded-2xl flex items-center justify-center mb-6 text-[#40a8ab] group-hover:scale-110 group-hover:bg-teal-100 transition-transform">
               <HeartHandshake className="w-7 h-7" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">Suma tu ONG</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">Sumá tu ONG</h3>
             <p className="text-gray-600 mb-8 leading-relaxed">
               Multiplicá el alcance de tu organización. Recibí donaciones recurrentes y formá parte de nuestra red de impacto validado.
             </p>

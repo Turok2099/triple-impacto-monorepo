@@ -67,7 +67,7 @@ export default function CouponCounter() {
               <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
                 Descubrí los más de{" "}
                 <span className="text-[#40a8ab]">10.000 cupones</span> que tenemos
-                para ti
+                para vos
               </h3>
               <div className="flex items-center justify-center lg:justify-start gap-3 mb-6">
                 <div className="bg-white rounded-2xl shadow-xl px-8 py-6 inline-block">

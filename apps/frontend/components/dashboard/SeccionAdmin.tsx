@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Swal from 'sweetalert2';
 import { getAdminUsers, deleteAdminUser, AdminUser, createAdminUser, updateAdminUser, deleteAffiliation, getUserAdminPayments, toggleUserAdminRole } from "@/lib/admin";
 import { useAuth } from "@/contexts/AuthContext";
-import { Users, MoreVertical, Edit2, Trash2, UserPlus, X, ShieldAlert, Shield, CheckCircle, XCircle, Receipt } from "lucide-react";
+import { Users, MoreVertical, Edit2, Trash2, UserPlus, X, ShieldAlert, Shield, CheckCircle, XCircle, Receipt, UserSearch, ArrowLeft, Mail, Phone, BookUser } from "lucide-react";
 
 export default function SeccionAdmin() {
   const { user } = useAuth();
@@ -12,6 +12,7 @@ export default function SeccionAdmin() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [total, setTotal] = useState(0);
+  const [selectedUserForDetails, setSelectedUserForDetails] = useState<AdminUser | null>(null);
   
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -241,6 +242,137 @@ export default function SeccionAdmin() {
     }
   };
 
+  if (selectedUserForDetails) {
+    const u = selectedUserForDetails;
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <button 
+          onClick={() => setSelectedUserForDetails(null)}
+          className="mb-8 flex items-center gap-2 text-slate-500 hover:text-[#40a8ab] transition-colors font-medium border border-transparent hover:border-[#40a8ab]/20 px-3 py-1.5 rounded-lg"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          Volver al panel principal
+        </button>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden p-8">
+          <div className="flex items-center gap-5 mb-8 pb-8 border-b border-slate-100">
+             <div className="size-20 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-3xl">
+                {u.nombre.charAt(0).toUpperCase()}
+             </div>
+             <div>
+                <h1 className="text-3xl font-bold text-slate-900">{u.nombre}</h1>
+                <p className="text-slate-500 flex items-center gap-2 mt-1">
+                  Rol: {u.role === 'admin' || u.role === 'superadmin' ? 'Administrador' : 'Usuario'} 
+                  {u.role === 'admin' || u.role === 'superadmin' ? <Shield className="w-4 h-4 text-purple-600 fill-purple-600" /> : null}
+                </p>
+             </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold text-slate-900 border-b border-slate-100 pb-2">Información de Contacto</h3>
+              
+              <div className="flex gap-4">
+                <div className="mt-1 bg-slate-50 p-2 rounded-lg text-slate-400">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-slate-500">Correo Electrónico</p>
+                  <p className="text-slate-900 font-medium">{u.email}</p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="mt-1 bg-slate-50 p-2 rounded-lg text-slate-400">
+                  <Phone className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-slate-500">Teléfono</p>
+                  <p className="text-slate-900 font-medium">{u.telefono || 'Sin teléfono'}</p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="mt-1 bg-slate-50 p-2 rounded-lg text-slate-400">
+                  <UserSearch className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-slate-500">DNI</p>
+                  <p className="text-slate-900 font-medium">{u.dni || 'Sin registrar'}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold text-slate-900 border-b border-slate-100 pb-2">Estado y Afiliaciones</h3>
+              
+              <div className="flex gap-4 items-center">
+                <div className="bg-slate-50 p-2 rounded-lg text-slate-400">
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
+                 <div>
+                  <p className="text-sm font-medium text-slate-500 mb-1">Estado de la cuenta local</p>
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                    u.status === 'ACTIVO' ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700'
+                  }`}>
+                    {u.status}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                 <p className="text-sm font-medium text-slate-500 mb-3">Afiliaciones en plataforma Bonda</p>
+                 {(u.usuarios_bonda_afiliados || []).length > 0 ? (
+                    <div className="flex flex-col gap-2">
+                      {(u.usuarios_bonda_afiliados || []).map((aff, i) => (
+                        <div key={i} className={`flex items-center justify-between p-3 rounded-xl border ${aff.is_active ? 'bg-slate-50 border-slate-200' : 'bg-red-50/50 border-red-100'}`}>
+                          <div className="flex items-center gap-3">
+                            {aff.is_active ? <CheckCircle className="w-5 h-5 text-emerald-500" /> : <XCircle className="w-5 h-5 text-red-400" />}
+                            <div>
+                              <p className={`font-medium ${aff.is_active ? 'text-slate-700' : 'text-slate-500 line-through'}`}>{aff.ong_name || 'Afiliación'}</p>
+                              <p className="text-xs text-slate-400">Cód: {aff.affiliate_code}</p>
+                            </div>
+                          </div>
+                          {aff.is_active && (
+                            <button 
+                              onClick={() => {
+                                handleDeleteAffiliate(u.id, aff.affiliate_code, aff.bonda_microsite_id);
+                                setSelectedUserForDetails(null);
+                              }}
+                              className="text-xs text-red-500 hover:text-white hover:bg-red-500 border border-red-200 rounded px-3 py-1.5 transition-all"
+                            >
+                              Desvincular
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                 ) : (
+                    <div className="p-4 bg-slate-50 border border-dashed border-slate-300 rounded-xl text-center">
+                      <span className="text-slate-400 text-sm">Sin afiliaciones registradas</span>
+                    </div>
+                 )}
+              </div>
+            </div>
+            
+            <div className="col-span-1 md:col-span-2 mt-4 pt-6 border-t border-slate-100 flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setSelectedUserForDetails(null);
+                  handleViewPayments(u);
+                }}
+                className="flex items-center gap-2 px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition-colors font-medium"
+              >
+                <Receipt className="w-5 h-5" />
+                Ver Historial de Pagos
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
@@ -276,7 +408,7 @@ export default function SeccionAdmin() {
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200">
                   <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider">Usuario</th>
-                  <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider">Contacto</th>
+                  <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider text-center">Datos del usuario</th>
                   <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider">Estado</th>
                   <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider">Afiliación Bonda</th>
                   <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Acciones</th>
@@ -303,9 +435,14 @@ export default function SeccionAdmin() {
                         </div>
                       </div>
                     </td>
-                    <td className="py-4 px-6">
-                      <p className="text-sm text-slate-700">{u.email}</p>
-                      <p className="text-xs text-slate-400">{u.telefono || 'Sin teléfono'}</p>
+                    <td className="py-4 px-6 text-center">
+                      <button
+                        onClick={() => setSelectedUserForDetails(u)}
+                        className="p-2 bg-slate-50 hover:bg-[#40a8ab]/10 text-slate-400 hover:text-[#40a8ab] rounded-lg transition-colors inline-flex items-center justify-center border border-slate-200 hover:border-[#40a8ab]/30"
+                        title="Ver datos del usuario"
+                      >
+                        <BookUser className="w-5 h-5" />
+                      </button>
                     </td>
                     <td className="py-4 px-6">
                       <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${

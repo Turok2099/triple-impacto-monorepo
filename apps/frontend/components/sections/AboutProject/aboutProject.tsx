@@ -5,7 +5,7 @@ export default function AboutProjectSection() {
     {
       icon: <HeartHandshake className="w-8 h-8 text-[#40a8ab]" />,
       title: "Reciprocidad (Ayni)",
-      description: "Inspirados en la filosofía andina, creemos que toda la ayuda que dás te tiene que volver multiplicada en beneficios para tu día a día."
+      description: "Inspirados en la filosofía ancestral andina, creemos que toda la ayuda que dás te tiene que volver multiplicada en beneficios para tu día a día."
     },
     {
       icon: <Ticket className="w-8 h-8 text-[#40a8ab]" />,

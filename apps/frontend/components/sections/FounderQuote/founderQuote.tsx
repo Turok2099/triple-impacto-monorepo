@@ -1,48 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-
 export default function FounderQuote() {
-  const [isVisible, setIsVisible] = useState(false);
-  const phraseRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (phraseRef.current) {
-      observer.observe(phraseRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <section className="relative py-16 sm:py-20 bg-gray-50 overflow-hidden">
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        {/* Frase Resaltada */}
-        <div
-          ref={phraseRef}
-          className={`max-w-4xl mx-auto text-center mb-40 mt-4 opacity-0 ${isVisible ? 'animate-slide-in-right' : ''}`}
-        >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight drop-shadow-sm cursor-default">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#40a8ab] to-teal-400">
-              AYNI.
-            </span>
-            {" "}
-            <span className="text-gray-800">
-              LO QUE DAS, VUELVE!
-            </span>
-          </h2>
-        </div>
 
         <div className="relative max-w-sm mx-auto mt-16 mb-8">
           <div className="rounded-2xl overflow-hidden shadow-xl bg-white">

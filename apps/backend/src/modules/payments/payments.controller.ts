@@ -104,10 +104,10 @@ export class PaymentsController {
     }
     body.storename = finalStoreId;
 
-    // ESTRATEGIA 3DS MIXTA / FULL AUTH POR DEFECTO PARA PRUEBAS
+    // ESTRATEGIA 3DS DATA ONLY POR REQUERIMIENTO CARTA FUNCIONAL FISERV
     if (!body.authenticateTransaction) {
       (body as any).authenticateTransaction = 'true';
-      (body as any).threeDSEmvCoMessageCategory = '01';
+      (body as any).threeDSEmvCoMessageCategory = '02';
     }
 
     // Generar registro inicial de la transacción (Estado 'pendiente')

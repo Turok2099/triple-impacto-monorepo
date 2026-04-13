@@ -61,15 +61,14 @@ export class FiservConnectService implements OnModuleInit {
   private config: ConnectConfig | null = null;
 
   onModuleInit() {
-    const url = process.env.FISERV_CONNECT_URL;
-    const storeId = process.env.FISERV_CONNECT_STORE_ID_1;
-    const sharedSecret = process.env.FISERV_CONNECT_SHARED_SECRET;
+    const url = process.env.FISERV_CONNECT_URL || 'https://www5.ipg-online.com/connect/gateway/processing';
+    const storeId = process.env.FISERV_CONNECT_STORE_ID_1 || '5927306113254'; // Club Triple Impacto by default
+    const sharedSecret = process.env.FISERV_CONNECT_SHARED_SECRET || 'Triple_2026';
 
     if (!url || !storeId || !sharedSecret) {
       this.logger.warn(
-        'Fiserv Connect: faltan FISERV_CONNECT_URL, FISERV_CONNECT_STORE_ID_1 o FISERV_CONNECT_SHARED_SECRET en .env',
+        'Fiserv Connect: faltan variables, usando defaults.',
       );
-      return;
     }
 
     this.config = {

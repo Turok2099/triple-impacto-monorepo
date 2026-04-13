@@ -58,4 +58,12 @@ export class CrearTransaccionDto {
   @IsString()
   @IsOptional()
   numberOfInstallments?: string;
+
+  @IsString()
+  @IsOptional()
+  authenticateTransaction?: string;
+
+  @IsString()
+  @IsOptional()
+  threeDSEmvCoMessageCategory?: string;
 }

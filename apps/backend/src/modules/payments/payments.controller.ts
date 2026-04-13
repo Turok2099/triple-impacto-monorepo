@@ -86,23 +86,35 @@ export class PaymentsController {
       );
     }
 
+    // ESTRATEGIA PILOTO PRODUCTIVO FISERV: Proxy según organización & Full Auth
+    let finalStoreId = body.storename || config.storeId;
     if (body.organizacion_id) {
       const org = await this.supabase.getOrganizacionById(body.organizacion_id);
-      if (
-        org?.monto_minimo != null &&
-        Number(body.amount) < Number(org.monto_minimo)
-      ) {
-        throw new BadRequestException(
-          `El monto mínimo para esta organización es ${org.monto_minimo}`,
-        );
+      if (org) {
+        if (Number(body.amount) < 10) {
+          throw new BadRequestException(`El monto mínimo de prueba es 10`);
+        }
+        const nombreLower = org.nombre?.toLowerCase() || '';
+        if (nombreLower.includes('plato')) {
+           finalStoreId = '5930714927880'; // Proyecto Plato
+        } else if (nombreLower.includes('biblioteca')) {
+           finalStoreId = '5927306113254'; // Club Triple Impacto (Proxy)
+        }
       }
+    }
+    body.storename = finalStoreId;
+
+    // ESTRATEGIA 3DS MIXTA / FULL AUTH POR DEFECTO PARA PRUEBAS
+    if (!body.authenticateTransaction) {
+      (body as any).authenticateTransaction = 'true';
+      (body as any).threeDSEmvCoMessageCategory = '01';
     }
 
     // Generar registro inicial de la transacción (Estado 'pendiente')
     await this.supabase.createPaymentAttempt({
       user_id: userId,
       order_id: orderId,
-      store_id: body.storename || config.storeId,
+      store_id: finalStoreId,
       amount: body.amount,
       currency,
       organizacion_id: body.organizacion_id,

@@ -17,9 +17,9 @@ interface FormularioDonacionProps {
   loading?: boolean;
 }
 
-// Montos sugeridos predefinidos (mínimo: $5000 ARS)
-const MONTOS_SUGERIDOS = [5000, 10000, 15000];
-const MONTO_MINIMO = 5000;
+// Montos sugeridos predefinidos para PILOTO PRODUCTIVO ($10 ARS)
+const MONTOS_SUGERIDOS = [10, 50, 100];
+const MONTO_MINIMO = 10;
 const MONTO_MAXIMO = 500000;
 
 export default function FormularioDonacion({
@@ -32,7 +32,7 @@ export default function FormularioDonacion({
   const [errorOrgs, setErrorOrgs] = useState<string | null>(null);
 
   const [montoSeleccionado, setMontoSeleccionado] = useState<number | null>(
-    5000
+    10
   );
   const [montoCustom, setMontoCustom] = useState("");
   const [usarMontoCustom, setUsarMontoCustom] = useState(false);
@@ -63,11 +63,19 @@ export default function FormularioDonacion({
       setLoadingOrgs(true);
       setErrorOrgs(null);
       const orgs = await obtenerOrganizaciones();
-      setOrganizaciones(orgs);
+      
+      // FILTRO TEMPORAL PILOTO FISERV CONNECT
+      // Solo dejamos entidades requeridas para la prueba proxy
+      const orgsFiltradas = orgs.filter(org => 
+        org.nombre.toLowerCase().includes('plato') || 
+        org.nombre.toLowerCase().includes('biblioteca')
+      );
+      
+      setOrganizaciones(orgsFiltradas);
 
       // Seleccionar la primera organización por defecto
-      if (orgs.length > 0) {
-        setOrganizacionId(orgs[0].id);
+      if (orgsFiltradas.length > 0) {
+        setOrganizacionId(orgsFiltradas[0].id);
       }
     } catch (err: any) {
       setErrorOrgs(err.message || "Error al cargar organizaciones");

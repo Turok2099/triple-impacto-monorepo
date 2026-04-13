@@ -107,7 +107,7 @@ export class PaymentsController {
     // ESTRATEGIA 3DS DATA ONLY POR REQUERIMIENTO CARTA FUNCIONAL FISERV
     if (!body.authenticateTransaction) {
       (body as any).authenticateTransaction = 'true';
-      (body as any).threeDSEmvCoMessageCategory = '02';
+      (body as any).threeDSEmvCoMessageCategory = '80';
     }
 
     // Generar registro inicial de la transacción (Estado 'pendiente')

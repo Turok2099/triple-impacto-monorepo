@@ -65,11 +65,14 @@ export default function FormularioDonacion({
       const orgs = await obtenerOrganizaciones();
       
       // FILTRO TEMPORAL PILOTO FISERV CONNECT
-      // Solo dejamos entidades requeridas para la prueba proxy
+      // Solo dejamos entidades requeridas para la prueba proxy y forzamos su exigencia de monto a 10
       const orgsFiltradas = orgs.filter(org => 
         org.nombre.toLowerCase().includes('plato') || 
         org.nombre.toLowerCase().includes('biblioteca')
-      );
+      ).map(org => ({
+        ...org,
+        monto_minimo: 10
+      }));
       
       setOrganizaciones(orgsFiltradas);
 

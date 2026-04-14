@@ -86,19 +86,14 @@ export class PaymentsController {
       );
     }
 
-    // ESTRATEGIA PILOTO PRODUCTIVO FISERV: Proxy según organización & Full Auth
+    // ESTRATEGIA PRODUCTIVO FISERV: Proxy según organización
     let finalStoreId = body.storename || config.storeId;
     if (body.organizacion_id) {
       const org = await this.supabase.getOrganizacionById(body.organizacion_id);
       if (org) {
-        if (Number(body.amount) < 10) {
-          throw new BadRequestException(`El monto mínimo de prueba es 10`);
-        }
         const nombreLower = org.nombre?.toLowerCase() || '';
         if (nombreLower.includes('plato')) {
-           finalStoreId = '5930714927880'; // Proyecto Plato
-        } else if (nombreLower.includes('biblioteca')) {
-           finalStoreId = '5927306113254'; // Club Triple Impacto (Proxy)
+           finalStoreId = '5930714927880'; // Store ID asociado a Proyecto Plato Lleno
         }
       }
     }

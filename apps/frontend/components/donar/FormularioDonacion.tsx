@@ -17,9 +17,9 @@ interface FormularioDonacionProps {
   loading?: boolean;
 }
 
-// Montos sugeridos predefinidos para PILOTO PRODUCTIVO ($10 ARS)
-const MONTOS_SUGERIDOS = [10, 50, 100];
-const MONTO_MINIMO = 10;
+// Montos sugeridos predefinidos
+const MONTOS_SUGERIDOS = [5000, 10000, 20000];
+const MONTO_MINIMO = 5000;
 const MONTO_MAXIMO = 500000;
 
 export default function FormularioDonacion({
@@ -32,7 +32,7 @@ export default function FormularioDonacion({
   const [errorOrgs, setErrorOrgs] = useState<string | null>(null);
 
   const [montoSeleccionado, setMontoSeleccionado] = useState<number | null>(
-    10
+    5000
   );
   const [montoCustom, setMontoCustom] = useState("");
   const [usarMontoCustom, setUsarMontoCustom] = useState(false);
@@ -63,16 +63,10 @@ export default function FormularioDonacion({
       setLoadingOrgs(true);
       setErrorOrgs(null);
       const orgs = await obtenerOrganizaciones();
-      
-      // FILTRO TEMPORAL PILOTO FISERV CONNECT
-      // Solo dejamos entidades requeridas para la prueba proxy y forzamos su exigencia de monto a 10
+      // DEJAMOS SOLO PROYECTO PLATO LLENO
       const orgsFiltradas = orgs.filter(org => 
-        org.nombre.toLowerCase().includes('plato') || 
-        org.nombre.toLowerCase().includes('biblioteca')
-      ).map(org => ({
-        ...org,
-        monto_minimo: 10
-      }));
+        org.nombre.toLowerCase().includes('plato')
+      );
       
       setOrganizaciones(orgsFiltradas);
 

@@ -148,13 +148,13 @@ export class FiservWebhookService {
       payment_status: approvalCode,
     });
 
-    // ESTRATEGIA PILOTO PRODUCTIVO FISERV: Bonda desactivado
-    // if (attempt.organizacion_id) {
-    //   await this.ensureBondaAffiliateForUserAndOrganisation(
-    //     attempt.user_id,
-    //     attempt.organizacion_id,
-    //   );
-    // }
+    // ESTRATEGIA PRODUCTIVO FISERV: Bonda Activado
+    if (attempt.organizacion_id) {
+      await this.ensureBondaAffiliateForUserAndOrganisation(
+        attempt.user_id,
+        attempt.organizacion_id,
+      );
+    }
 
     // Obtener info del usuario para enviar el correo
     const user = await this.supabase.findUserById(attempt.user_id);

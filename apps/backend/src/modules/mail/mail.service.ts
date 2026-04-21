@@ -199,10 +199,11 @@ export class MailService {
         subject: `Nuevo Mensaje de Contacto: ${asunto}`,
         html: `
           <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
-            <div style="background-color: #40a8ab; padding: 20px; text-align: center; color: white;">
-              <h2>Nuevo Mensaje de Contacto</h2>
+            <div style="background-color: #40a8ab; padding: 30px; text-align: center;">
+              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto/f_auto/v1775685229/ISOLOGOTIPO_AYNI_FONDO_TRANSPARENTE_iwyuaw.png" alt="AYNI Logo" style="height: 50px;" />
             </div>
-            <div style="padding: 30px;">
+            <div style="padding: 40px 30px;">
+              <h1 style="color: #40a8ab; font-size: 24px; margin-bottom: 20px;">Nuevo Mensaje de Contacto</h1>
               <p><strong>Nombre:</strong> ${nombre}</p>
               <p><strong>Email:</strong> ${email}</p>
               <p><strong>Teléfono:</strong> ${telefono || 'No proporcionado'}</p>
@@ -210,6 +211,9 @@ export class MailService {
               <hr style="border: 0; border-top: 1px solid #eaeaea; margin: 20px 0;" />
               <p><strong>Mensaje:</strong></p>
               <p style="white-space: pre-wrap;">${mensaje}</p>
+            </div>
+            <div style="background-color: #f7f9fc; padding: 20px; text-align: center; color: #718096; font-size: 12px;">
+              <p style="margin: 0;">AYNI - Plataforma Fintech de Reciprocidad</p>
             </div>
           </div>
         `,
@@ -249,7 +253,6 @@ export class MailService {
         ? '✅ Comprobante de Donación Exitosa - AYNI'
         : '❌ Actualización sobre tu intento de Donación - AYNI';
       
-      const statusColor = isApproved ? '#10b981' : '#e11d48';
       const titulo = isApproved ? '¡Donación Exitosa!' : 'Tu pago fue rechazado';
       const descripcion = isApproved 
         ? 'Queremos agradecerte por tu aporte. Tu donación ha sido procesada de forma segura y exitosa. A continuación te enviamos el comprobante de la transacción.'
@@ -265,7 +268,7 @@ export class MailService {
       if (transactionData.approvalCode) {
         detallesHtml += `
           <div style="margin-bottom: 10px;">
-            <strong>Código de Aprobación/Respuesta:</strong> ${transactionData.approvalCode}
+            <strong>Código de Aprobación:</strong> ${transactionData.approvalCode}
           </div>`;
       }
       if (transactionData.oid) {
@@ -287,11 +290,11 @@ export class MailService {
         subject: subject,
         html: `
           <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
-            <div style="background-color: ${statusColor}; padding: 30px; text-align: center;">
+            <div style="background-color: #40a8ab; padding: 30px; text-align: center;">
               <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto/f_auto/v1775685229/ISOLOGOTIPO_AYNI_FONDO_TRANSPARENTE_iwyuaw.png" alt="AYNI Logo" style="height: 50px;" />
             </div>
             <div style="padding: 40px 30px;">
-              <h1 style="color: ${statusColor}; font-size: 24px; margin-bottom: 20px;">${titulo}</h1>
+              <h1 style="color: #40a8ab; font-size: 24px; margin-bottom: 20px;">${titulo}</h1>
               <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
                 Hola, <strong>${userName}</strong>:
               </p>
@@ -300,13 +303,13 @@ export class MailService {
               </p>
 
               <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
-                <h3 style="margin-top: 0; color: #475569; font-size: 14px; text-transform: uppercase;">Detalles de la operación</h3>
+                <h3 style="margin-top: 0; color: #40a8ab; font-size: 14px; text-transform: uppercase;">Detalles de la operación</h3>
                 ${detallesHtml}
               </div>
 
               ${isApproved 
-                ? '<p style="font-size: 14px; color: #10b981; font-weight: bold; text-align: center;">¡Tus beneficios exclusivos en Bonda ya están activos!</p>' 
-                : '<p style="font-size: 14px; color: #e11d48; text-align: center;">Por favor, verifica tus datos o intenta con otro medio de pago desde la plataforma.</p>'}
+                ? '<p style="font-size: 15px; color: #40a8ab; font-weight: bold; text-align: center;">¡Tus beneficios exclusivos en la red AYNI ya están activos!</p>' 
+                : '<p style="font-size: 14px; color: #e11d48; text-align: center; font-weight: bold;">Por favor, verifica tus datos o intenta con otro medio de pago desde la plataforma.</p>'}
             </div>
             <div style="background-color: #f7f9fc; padding: 20px; text-align: center; color: #718096; font-size: 12px;">
               <p style="margin: 0;">AYNI - Plataforma Fintech de Reciprocidad</p>

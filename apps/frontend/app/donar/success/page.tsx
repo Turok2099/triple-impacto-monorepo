@@ -80,7 +80,7 @@ function PagoExitosoContent() {
                 <Gift className="w-5 h-5" /> Beneficios activados
               </h2>
               <div className="text-sm text-slate-700 space-y-2 font-medium">
-                <p>• Tu cuenta de Beneficios Bonda fue enlazada exitosamente</p>
+                <p>• Tu cuenta de beneficios en la red AYNI fue enlazada exitosamente</p>
                 <p>• Acceso full a catálogos en primeras marcas nacionales</p>
               </div>
             </div>

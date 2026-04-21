@@ -59,7 +59,7 @@ const mockBenefits: Benefit[] = [
     title: "Restaurantes Locales",
     category: "gastronomia",
     discount: 20,
-    description: "Descuento en más de 50 restaurantes de la red Bonda",
+    description: "Descuento en más de 50 restaurantes de la red AYNI",
     conditions: "No acumulable con otras promociones. Consumo mínimo $15.000",
     logo: "🍽️",
     popular: true,
@@ -153,7 +153,7 @@ export default function BondaBenefitsSection() {
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
-            Catálogo de Beneficios Bonda
+            Catálogo de Beneficios de la red AYNI
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Descuentos reales en servicios que usás todos los días. Cuanto más

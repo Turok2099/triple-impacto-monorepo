@@ -976,6 +976,7 @@ export class SupabaseService implements OnModuleInit {
 
       // --- Cálculo Dinámico de Actividad (Regla del Mes) ---
       let isActivoDinamico = false;
+      let fechaVencimientoObj: Date | null = null;
       if (agg.ultimo_pago_at) {
         const fechaUltimoPago = new Date(agg.ultimo_pago_at);
         const fechaVencimiento = new Date(fechaUltimoPago);
@@ -993,6 +994,7 @@ export class SupabaseService implements OnModuleInit {
         
         const ahora = new Date();
         isActivoDinamico = ahora <= fechaVencimiento;
+        fechaVencimientoObj = fechaVencimiento;
       }
 
       // El usuario se reporta activo sólo si localmente lo marca la DB Y dinámicamente no ha expirado su mes.
@@ -1006,6 +1008,7 @@ export class SupabaseService implements OnModuleInit {
         is_active: isActivoFinal,
         created_at: agg.created_at,
         ultimo_pago_at: agg.ultimo_pago_at,
+        fecha_vencimiento: fechaVencimientoObj?.toISOString() || null,
         total_donado: agg.totalDonado,
       });
     }

@@ -507,6 +507,7 @@ export class BondaController {
           slug: f.micrositio_slug,
           codigoAfiliado: f.affiliate_code,
           fechaAfiliacion: f.created_at,
+          fechaVencimiento: f.fecha_vencimiento,
           totalDonado: Number(f.total_donado ?? 0),
           isActive: f.is_active,
         })),

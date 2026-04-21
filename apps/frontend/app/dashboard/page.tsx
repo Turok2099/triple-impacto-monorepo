@@ -547,12 +547,24 @@ export default function DashboardPage() {
                     <h4 className="font-bold text-[#1A202C] text-sm text-center mt-3 line-clamp-3 leading-tight">
                       {fundacion.nombre}
                     </h4>
-                    <p className="text-[11px] text-slate-400 mt-1 mb-2">
+                    <p className="text-[11px] text-slate-400 mt-1 mb-2 text-center">
                       Desde{" "}
                       {new Date(fundacion.fechaAfiliacion).toLocaleDateString("es-AR", {
                         month: "short",
                         year: "numeric",
                       })}
+                      {fundacion.fechaVencimiento && (
+                        <>
+                          <br />
+                          <span className={isInactive ? 'text-red-500 font-medium' : 'text-[#40a8ab]'}>
+                            Vence: {new Date(fundacion.fechaVencimiento).toLocaleDateString("es-AR", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric"
+                            })}
+                          </span>
+                        </>
+                      )}
                     </p>
                   </div>
                   {/* Bloque donado destacado */}

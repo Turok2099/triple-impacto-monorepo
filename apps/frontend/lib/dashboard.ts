@@ -46,6 +46,7 @@ export interface FundacionUsuario {
   slug: string;
   codigoAfiliado: string;
   fechaAfiliacion: string;
+  fechaVencimiento?: string | null;
   totalDonado: number;
   isActive?: boolean;
 }

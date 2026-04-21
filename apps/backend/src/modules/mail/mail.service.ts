@@ -8,7 +8,7 @@ export class MailService {
   private resend: Resend;
   private readonly defaultSenderName = 'AYNI';
   // El dominio ayni.ar ya se encuentra habilitado y verificado en Resend.
-  private readonly defaultSenderEmail = 'contacto@ayni.ar';
+  private readonly defaultSenderEmail = 'contacto@send.ayni.ar';
 
   constructor(private readonly configService: ConfigService) {
     const rawEnv = process.env.RESEND_API_KEY;

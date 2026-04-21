@@ -431,7 +431,12 @@ export default function DashboardPage() {
       </header>
 
       {/* Secciones Perfil, Mis Cupones y Mis pagos */}
-      {activeTab === "perfil" && <SeccionPerfil />}
+      {activeTab === "perfil" && (
+        <SeccionPerfil 
+          isActive={dashboard.fundaciones?.some(f => f.isActive) || false} 
+          role={user?.role || 'user'} 
+        />
+      )}
       {activeTab === "cupones" && <SeccionMisCupones />}
       {activeTab === "pagos" && <SeccionMisPagos />}
       {activeTab === "admin" && <SeccionAdmin />}

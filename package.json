@@ -9,6 +9,9 @@
     "lint": "turbo run lint",
     "test": "turbo run test"
   },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Turok2099/triple-impacto-monorepo.git"

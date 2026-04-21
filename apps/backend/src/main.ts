@@ -25,7 +25,9 @@ async function bootstrap() {
       if (
         allowedOrigins.includes(origin) ||
         origin.endsWith('.vercel.app') ||
-        origin.endsWith('.tripleimpacto.site')
+        origin.endsWith('.tripleimpacto.site') ||
+        origin.endsWith('.ayni.ar') ||
+        origin === 'https://ayni.ar'
       ) {
         callback(null, true);
       } else {

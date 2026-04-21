@@ -7,8 +7,8 @@ export class MailService {
   private readonly logger = new Logger(MailService.name);
   private resend: Resend;
   private readonly defaultSenderName = 'AYNI';
-  // El dominio ya se encuentra habilitado en Resend.
-  private readonly defaultSenderEmail = 'hola@tripleimpacto.site';
+  // El dominio ayni.ar ya se encuentra habilitado y verificado en Resend.
+  private readonly defaultSenderEmail = 'contacto@ayni.ar';
 
   constructor(private readonly configService: ConfigService) {
     const rawEnv = process.env.RESEND_API_KEY;
@@ -194,7 +194,7 @@ export class MailService {
     try {
       const { data, error } = await this.resend.emails.send({
         from: `${this.defaultSenderName} <${this.defaultSenderEmail}>`,
-        to: ['jorge.castro.cruz@hotmail.com'],
+        to: ['contacto@ayni.ar'],
         replyTo: email,
         subject: `Nuevo Mensaje de Contacto: ${asunto}`,
         html: `

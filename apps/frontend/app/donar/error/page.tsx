@@ -82,7 +82,7 @@ function PagoErrorContent() {
 
             <div className="mt-6 flex flex-col items-center justify-center gap-1.5 text-xs text-slate-400">
               <Mail className="w-4 h-4 text-slate-400" />
-              <p>Si la falla persiste, reportala a <a href="mailto:soporte@tripleimpacto.site" className="font-semibold text-slate-500 hover:text-slate-700">soporte@tripleimpacto.site</a></p>
+              <p>Si la falla persiste, reportala a <a href="mailto:contacto@ayni.ar" className="font-semibold text-slate-500 hover:text-slate-700">contacto@ayni.ar</a></p>
             </div>
           </div>
         </div>

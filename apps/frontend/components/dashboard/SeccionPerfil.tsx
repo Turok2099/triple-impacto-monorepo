@@ -163,7 +163,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user' }: Secci
       {/* Badge de Título/Estado */}
       <section className="px-6 mb-8">
         <div className={`border rounded-2xl p-4 flex items-center justify-between ${
-          role === 'superadmin' 
+          role === 'admin' 
             ? 'bg-purple-100/50 border-purple-200' 
             : isActive 
               ? 'bg-[#40a8ab]/5 border-[#40a8ab]/10' 
@@ -171,16 +171,16 @@ export default function SeccionPerfil({ isActive = false, role = 'user' }: Secci
         }`}>
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-xl text-white ${
-              role === 'superadmin' ? 'bg-purple-600' : isActive ? 'bg-[#40a8ab]' : 'bg-slate-400'
+              role === 'admin' ? 'bg-purple-600' : isActive ? 'bg-[#40a8ab]' : 'bg-slate-400'
             }`}>
-              {role === 'superadmin' ? <Shield className="w-5 h-5" /> : isActive ? <CheckCircle className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
+              {role === 'admin' ? <Shield className="w-5 h-5" /> : isActive ? <CheckCircle className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
             </div>
             <div>
               <p className="text-sm font-bold text-[#1A202C]">
-                {role === 'superadmin' ? 'Administrador' : 'Colaborador'}
+                {role === 'admin' ? 'Administrador' : 'Colaborador'}
               </p>
               <p className="text-[11px] text-slate-500">
-                {role === 'superadmin' ? 'Acceso total al sistema' : isActive ? 'Suscripción al día' : 'Sin pagos activos'}
+                {role === 'admin' ? 'Acceso total al sistema' : isActive ? 'Suscripción al día' : 'Sin pagos activos'}
               </p>
             </div>
           </div>

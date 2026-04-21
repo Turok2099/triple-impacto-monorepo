@@ -162,7 +162,7 @@ export default function SeccionAdmin() {
   };
 
   const handleToggleRole = async (userToToggle: AdminUser) => {
-    const isCurrentlyAdmin = userToToggle.role === 'admin' || userToToggle.role === 'superadmin';
+    const isCurrentlyAdmin = userToToggle.role === 'admin';
     const newRole = isCurrentlyAdmin ? 'user' : 'admin';
     
     if (userToToggle.id === user?.id) {
@@ -262,8 +262,8 @@ export default function SeccionAdmin() {
              <div>
                 <h1 className="text-3xl font-bold text-slate-900">{u.nombre}</h1>
                 <p className="text-slate-500 flex items-center gap-2 mt-1">
-                  Rol: {u.role === 'admin' || u.role === 'superadmin' ? 'Administrador' : 'Usuario'} 
-                  {u.role === 'admin' || u.role === 'superadmin' ? <Shield className="w-4 h-4 text-purple-600 fill-purple-600" /> : null}
+                  Rol: {u.role === 'admin' ? 'Administrador' : 'Usuario'} 
+                  {u.role === 'admin' ? <Shield className="w-4 h-4 text-purple-600 fill-purple-600" /> : null}
                 </p>
              </div>
           </div>
@@ -425,7 +425,7 @@ export default function SeccionAdmin() {
                         <div>
                           <p className="font-semibold text-slate-900 flex items-center gap-2">
                             {u.nombre}
-                            {(u.role === 'admin' || u.role === 'superadmin') && (
+                            {u.role === 'admin' && (
                               <span title="Administrador" className="flex items-center">
                                 <Shield className="w-3.5 h-3.5 text-purple-600 fill-purple-600" />
                               </span>
@@ -481,15 +481,15 @@ export default function SeccionAdmin() {
                     </td>
                     <td className="py-4 px-6 text-right">
                       <div className="flex justify-end gap-2">
-                        {user?.role === 'superadmin' && u.id !== user?.id && (
+                        {user?.role === 'admin' && u.id !== user?.id && (
                            <button
                              onClick={() => handleToggleRole(u)}
                              className={`p-2 rounded-lg transition-colors ${
-                               u.role === 'admin' || u.role === 'superadmin' 
+                               u.role === 'admin' 
                                  ? 'text-purple-600 hover:bg-purple-50' 
                                  : 'text-slate-400 hover:text-purple-600 hover:bg-purple-50'
                              }`}
-                             title={u.role === 'admin' || u.role === 'superadmin' ? "Revocar Admin" : "Hacer Admin"}
+                             title={u.role === 'admin' ? "Revocar Admin" : "Hacer Admin"}
                            >
                              <Shield className="w-4 h-4" />
                            </button>

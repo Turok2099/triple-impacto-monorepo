@@ -138,20 +138,20 @@ export default function PerfilPage() {
         {/* Badge de Título/Estado */}
         <section className="px-6 mb-8">
           <div className={`border rounded-2xl p-4 flex items-center justify-between ${
-            user?.role === 'superadmin' ? 'bg-purple-100/50 border-purple-200' : 'bg-[#40a8ab]/5 border-[#40a8ab]/10'
+            user?.role === 'admin' ? 'bg-purple-100/50 border-purple-200' : 'bg-[#40a8ab]/5 border-[#40a8ab]/10'
           }`}>
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-xl text-white ${
-                user?.role === 'superadmin' ? 'bg-purple-600' : 'bg-[#40a8ab]'
+                user?.role === 'admin' ? 'bg-purple-600' : 'bg-[#40a8ab]'
               }`}>
-                {user?.role === 'superadmin' ? <Shield className="w-5 h-5" /> : <CheckCircle className="w-5 h-5" />}
+                {user?.role === 'admin' ? <Shield className="w-5 h-5" /> : <CheckCircle className="w-5 h-5" />}
               </div>
               <div>
                 <p className="text-sm font-bold text-[#1A202C]">
-                  {user?.role === 'superadmin' ? 'Administrador' : 'Miembro Activo'}
+                  {user?.role === 'admin' ? 'Administrador' : 'Miembro Activo'}
                 </p>
                 <p className="text-[11px] text-slate-500">
-                  {user?.role === 'superadmin' ? 'Acceso al panel' : `Miembro desde ${new Date().toLocaleDateString('es-AR', { month: 'short', year: 'numeric' })}`}
+                  {user?.role === 'admin' ? 'Acceso al panel' : `Miembro desde ${new Date().toLocaleDateString('es-AR', { month: 'short', year: 'numeric' })}`}
                 </p>
               </div>
             </div>

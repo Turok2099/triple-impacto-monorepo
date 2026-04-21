@@ -140,7 +140,7 @@ export class AdminService {
   }
 
   async updateUserRole(adminId: string, id: string, role: string) {
-     if (!['superadmin', 'admin', 'user'].includes(role)) {
+     if (!['admin', 'user'].includes(role)) {
        throw new BadRequestException('Rol no válido');
      }
      

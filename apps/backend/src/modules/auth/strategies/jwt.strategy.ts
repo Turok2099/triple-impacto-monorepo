@@ -29,7 +29,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       userId: payload.sub,
       email: payload.email,
       bondaCode: payload.bondaCode,
-      role: payload.app_metadata?.role || 'user',
+      role: user.role || payload.app_metadata?.role || 'user',
     };
   }
 }

@@ -6,7 +6,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('superadmin')
+@Roles('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
@@ -36,6 +36,7 @@ export class AdminController {
   }
 
   @Patch('users/:id/role')
+  @Roles('admin')
   async updateUserRole(@Req() req: any, @Param('id') userId: string, @Body() payload: { role: string }) {
     const adminId = req.user?.userId;
     return this.adminService.updateUserRole(adminId, userId, payload.role);

@@ -355,7 +355,7 @@ export default function DashboardPage() {
               <span className="font-bold text-xl text-[#1A202C] whitespace-nowrap">
                 ¡Hola, {dashboard.usuario.nombre.split(" ")[0]}!
               </span>
-              {user?.role === 'superadmin' ? (
+              {user?.role === 'admin' ? (
                 <span className="bg-purple-100 text-purple-700 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
                   <Shield className="w-3 h-3" />
                   Administrador
@@ -402,7 +402,7 @@ export default function DashboardPage() {
               <Receipt className="w-6 h-6" strokeWidth={2} />
               <span className={`text-xs ${activeTab === "pagos" ? "font-semibold" : "font-medium"}`}>Mis pagos</span>
             </button>
-            {user?.role === 'superadmin' && (
+            {user?.role === 'admin' && (
               <button
                 onClick={() => setActiveTab("admin")}
                 className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "admin" ? "text-[#40a8ab]" : "text-slate-400 hover:text-[#40a8ab]"}`}

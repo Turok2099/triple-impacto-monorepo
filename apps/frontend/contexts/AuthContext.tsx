@@ -11,7 +11,7 @@ interface User {
   dni?: string | null;
   provincia?: string | null;
   localidad?: string | null;
-  role?: string; // added to identify superadmin
+  role?: string;
 }
 
 const LOGOUT_DELAY_MS = 700;
@@ -73,6 +73,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
           const parsedUser = JSON.parse(userData);
           setUser(parsedUser);
+
+          // Sincronizar con el backend para actualizar rol (si cambió)
+          const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+          fetch(`${API_URL}/auth/profile`, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+          .then(res => res.ok ? res.json() : null)
+          .then(data => {
+            if (data?.user) {
+              const updatedUser = { ...parsedUser, ...data.user };
+              localStorage.setItem("user", JSON.stringify(updatedUser));
+              setUser(updatedUser);
+            }
+          })
+          .catch(err => console.error("Error al sincronizar perfil:", err));
+
         } catch (error) {
           console.error("Error parsing user data:", error);
           localStorage.removeItem("auth_token");

@@ -329,11 +329,28 @@ export class BondaController {
       throw new BadRequestException('Se requiere autenticación');
     }
 
-    // Solicitar el cupón a través del servicio
+    // Buscar el código de afiliado REAL en la base de datos
+    const micrositeRow = await this.supabase.getBondaMicrositeBySlug(solicitarDto.micrositioSlug);
+    if (!micrositeRow) {
+      throw new NotFoundException(`Micrositio no encontrado: ${solicitarDto.micrositioSlug}`);
+    }
+
+    const affiliateRow = await this.supabase.getAffiliateForUserAndMicrosite(
+      userId,
+      micrositeRow.id,
+    );
+
+    if (!affiliateRow || !affiliateRow.is_active) {
+      throw new NotFoundException('Afiliado no encontrado o inactivo para este micrositio');
+    }
+
+    const codigoAfiliadoReal = affiliateRow.affiliate_code;
+
+    // Solicitar el cupón a través del servicio usando el código real
     const cuponGuardado = await this.bondaService.solicitarCuponEspecifico(
       userId,
       solicitarDto.bondaCuponId,
-      solicitarDto.codigoAfiliado,
+      codigoAfiliadoReal,
       solicitarDto.micrositioSlug,
       solicitarDto.celular,
     );

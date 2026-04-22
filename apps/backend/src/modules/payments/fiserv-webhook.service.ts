@@ -264,43 +264,57 @@ export class FiservWebhookService {
       }
     }
 
-    const code = safeDni
+    const initialCode = safeDni
       ? String(safeDni)
       : this.generateAffiliateCode(user.email);
 
-    try {
-      let res = await this.bonda.crearAfiliado(
+    let activeEmail = user.email;
+    let activeCode = initialCode;
+    let activeDni = safeDni;
+
+    const attemptCreation = async (codeToTry: string, emailToTry: string, dniToTry?: number) => {
+      return this.bonda.crearAfiliado(
         {
-          code,
-          email: user.email,
+          code: codeToTry,
+          email: emailToTry,
           nombre: user.nombre ?? undefined,
           telefono: user.telefono ?? undefined,
           provincia: user.provincia ?? undefined,
           localidad: user.localidad ?? undefined,
-          dni: safeDni,
+          dni: dniToTry,
         },
         { organizacionId },
       );
+    };
 
+    try {
+      let res = await attemptCreation(activeCode, activeEmail, activeDni);
+
+      // Fallback 1: Email duplicado en Bonda
       if (
         res?.success === false && 
         res?.error?.detail?.email?.[0]?.includes('único')
       ) {
-        // El email ya existe en otra cuenta de Bonda. Reintentamos con un sufijo seguro.
-        const fallbackEmail = user.email.replace('@', `+bonda${Date.now()}@`);
-        this.logger.warn(`Email ${user.email} en uso en Bonda. Reintentando con ${fallbackEmail}`);
-        res = await this.bonda.crearAfiliado(
-          {
-            code,
-            email: fallbackEmail,
-            nombre: user.nombre ?? undefined,
-            telefono: user.telefono ?? undefined,
-            provincia: user.provincia ?? undefined,
-            localidad: user.localidad ?? undefined,
-            dni: safeDni,
-          },
-          { organizacionId },
-        );
+        activeEmail = user.email.replace('@', `+bonda${Date.now()}@`);
+        this.logger.warn(`Email ${user.email} en uso en Bonda. Reintentando con ${activeEmail}`);
+        res = await attemptCreation(activeCode, activeEmail, activeDni);
+      }
+
+      // Fallback 2: Código o DNI duplicado en Bonda
+      const isCodeDuplicated = 
+        res?.error?.detail?.code?.[0]?.includes('ya lo está utilizando') || 
+        res?.error?.detail?.code?.[0]?.includes('único') ||
+        (res?.error?.code === 'HttpPublicResponseException' && res?.error?.detail?.code?.[0]?.includes('ya lo está utilizando'));
+
+      const isDniDuplicated = 
+        res?.error?.detail?.dni?.[0]?.includes('ya lo está utilizando') || 
+        res?.error?.detail?.dni?.[0]?.includes('único');
+
+      if (res?.success === false && (isCodeDuplicated || isDniDuplicated)) {
+        this.logger.warn(`DNI o Código ${activeCode} ya en uso en Bonda. Aplicando fallback con código autogenerado.`);
+        activeCode = `AYNI_${activeCode}_${Date.now().toString().slice(-4)}`;
+        activeDni = undefined; // Quitamos el DNI para evitar la colisión estricta
+        res = await attemptCreation(activeCode, activeEmail, activeDni);
       }
 
       if (res?.success && res?.data?.member?.code) {
@@ -310,63 +324,19 @@ export class FiservWebhookService {
           res.data.member.code,
         );
         this.logger.log(
-          `Fiserv webhook: afiliado Bonda creado user=${userId} microsite=${microsite.slug} code=${res.data.member.code}`,
+          `Fiserv webhook: afiliado Bonda creado exitosamente user=${userId} microsite=${microsite.slug} code=${res.data.member.code}`,
         );
-      } else if (
-        res?.error?.code === 'HttpPublicResponseException' &&
-        res?.error?.detail?.code?.[0]?.includes('ya lo está utilizando')
-      ) {
-        // Verificar si el código (DNI) ya pertenece a OTRA cuenta en nuestra BD
-        const userWithCode = await this.supabase.findUserByBondaCode(code);
-        if (userWithCode && userWithCode.id !== userId) {
-          this.logger.warn(
-            `Fiserv webhook ALERTA DE SEGURIDAD: El usuario ${userId} intentó mapearse al afiliado Bonda ${code} que YA pertenece al usuario ${userWithCode.id}. Abortando vinculación.`,
-          );
-        } else {
-          this.logger.log(
-            `Fiserv webhook: afiliado Bonda ya existía en Bonda org=${organizacionId}. Vinculando user=${userId} code=${code}`,
-          );
-          await this.supabase.upsertAffiliateForUser(
-            userId,
-            microsite.id,
-            code,
-          );
-        }
       } else {
         this.logger.error(
-          `Fiserv webhook: Bonda retornó success: false al crear afiliado (sin resolución)`,
+          `Fiserv webhook: Bonda retornó success: false al crear afiliado luego de todos los fallbacks`,
           res,
         );
       }
     } catch (err: any) {
-      if (
-        err?.response?.data?.error?.code === 'HttpPublicResponseException' &&
-        err?.response?.data?.error?.detail?.code?.[0]?.includes(
-          'ya lo está utilizando',
-        )
-      ) {
-        // Verificar si el código (DNI) ya pertenece a OTRA cuenta en nuestra BD
-        const userWithCode = await this.supabase.findUserByBondaCode(code);
-        if (userWithCode && userWithCode.id !== userId) {
-          this.logger.warn(
-            `Fiserv webhook ALERTA DE SEGURIDAD: El usuario ${userId} intentó mapearse al afiliado Bonda ${code} que YA pertenece al usuario ${userWithCode.id}. Abortando vinculación.`,
-          );
-        } else {
-          this.logger.log(
-            `Fiserv webhook: afiliado Bonda ya existía en Bonda org=${organizacionId}. Vinculando user=${userId} code=${code}`,
-          );
-          await this.supabase.upsertAffiliateForUser(
-            userId,
-            microsite.id,
-            code,
-          );
-        }
-      } else {
-        this.logger.error(
-          `Fiserv webhook: excepción al crear afiliado Bonda user=${userId} org=${organizacionId}`,
-          err,
-        );
-      }
+      this.logger.error(
+        `Fiserv webhook: excepción no controlada al crear afiliado Bonda user=${userId} org=${organizacionId}`,
+        err,
+      );
     }
   }
 

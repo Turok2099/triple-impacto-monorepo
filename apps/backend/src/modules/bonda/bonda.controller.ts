@@ -329,29 +329,30 @@ export class BondaController {
       throw new BadRequestException('Se requiere autenticación');
     }
 
-    // Buscar el código de afiliado REAL en la base de datos
-    const micrositeRow = await this.supabase.getBondaMicrositeBySlug(solicitarDto.micrositioSlug);
-    if (!micrositeRow) {
-      throw new NotFoundException(`Micrositio no encontrado: ${solicitarDto.micrositioSlug}`);
+    // Obtener las fundaciones del usuario con su estado real calculado
+    const fundaciones = await this.supabase.getFundacionesUsuario(userId);
+    
+    // Buscar primero si el slug que manda el frontend está activo
+    let fundacionActiva = fundaciones.find(f => f.micrositio_slug === solicitarDto.micrositioSlug && f.is_active);
+
+    // Si no está activo o no existe, tomar CUALQUIER fundación que esté activa
+    if (!fundacionActiva) {
+      fundacionActiva = fundaciones.find(f => f.is_active);
     }
 
-    const affiliateRow = await this.supabase.getAffiliateForUserAndMicrosite(
-      userId,
-      micrositeRow.id,
-    );
-
-    if (!affiliateRow || !affiliateRow.is_active) {
-      throw new NotFoundException('Afiliado no encontrado o inactivo para este micrositio');
+    if (!fundacionActiva) {
+      throw new NotFoundException('Afiliado no encontrado o inactivo para solicitar cupones. Debes tener al menos una donación al día.');
     }
 
-    const codigoAfiliadoReal = affiliateRow.affiliate_code;
+    const codigoAfiliadoReal = fundacionActiva.affiliate_code;
+    const slugReal = fundacionActiva.micrositio_slug;
 
-    // Solicitar el cupón a través del servicio usando el código real
+    // Solicitar el cupón a través del servicio usando el código y slug reales activos
     const cuponGuardado = await this.bondaService.solicitarCuponEspecifico(
       userId,
       solicitarDto.bondaCuponId,
       codigoAfiliadoReal,
-      solicitarDto.micrositioSlug,
+      slugReal,
       solicitarDto.celular,
     );
 

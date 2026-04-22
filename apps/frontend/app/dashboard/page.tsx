@@ -518,63 +518,76 @@ export default function DashboardPage() {
                 return (
                 <div
                   key={fundacion.id}
-                  className={`bg-white border rounded-3xl overflow-hidden shadow-[0_4px_20px_-2px_rgba(0,0,0,0.06)] transition-shadow flex flex-col h-full relative ${isInactive ? 'border-slate-200 opacity-60 grayscale' : 'border-slate-100 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)]'}`}
+                  className={`group overflow-hidden rounded-3xl transition-all duration-300 flex flex-col h-full relative ${
+                    isInactive 
+                      ? 'bg-slate-50 border border-slate-200 grayscale opacity-75' 
+                      : 'bg-white border border-[#40a8ab]/20 shadow-[0_8px_30px_-4px_rgba(64,168,171,0.15)] hover:shadow-[0_12px_40px_-4px_rgba(64,168,171,0.25)] hover:-translate-y-1'
+                  }`}
                 >
+                  {/* Decorative Header Background */}
+                  <div className={`h-16 w-full absolute top-0 left-0 z-0 ${
+                    isInactive ? 'bg-slate-200' : 'bg-gradient-to-r from-[#40a8ab] to-[#2c8184]'
+                  }`} />
+
                   {isInactive && (
-                    <div className="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl z-20 shadow-sm flex items-center gap-1">
+                    <div className="absolute top-4 right-4 bg-red-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-full z-20 shadow-sm flex items-center gap-1.5">
                       <Shield className="w-3 h-3" />
                       Inactiva
                     </div>
                   )}
-                  {/* Bloque logo centrado (sin caja: solo logo visible) */}
-                  <div className="pt-6 pb-4 px-6 flex flex-col items-center flex-1">
-                    <div className="size-20 shrink-0 flex items-center justify-center overflow-hidden">
+
+                  <div className="pt-8 px-6 pb-4 flex flex-col items-center flex-1 relative z-10">
+                    {/* Logo container with white background and shadow to overlap the header */}
+                    <div className="size-[84px] bg-white rounded-2xl shadow-md border border-slate-100 p-2 flex items-center justify-center shrink-0 mb-4 transition-transform duration-300 group-hover:scale-105">
                       {useLogo && logoUrl ? (
                         <img
                           src={logoUrl}
-                          alt=""
-                          className="size-20 object-contain object-center"
+                          alt={fundacion.nombre}
+                          className="w-full h-full object-contain"
                           onError={() => setFundacionLogoError((prev) => ({ ...prev, [fundacion.id]: true }))}
                         />
                       ) : (
                         <div
-                          className="size-20 rounded-full bg-cover bg-center shrink-0"
+                          className="w-full h-full rounded-xl bg-cover bg-center shrink-0"
                           style={{ backgroundImage: initialsBg }}
                           aria-hidden
                         />
                       )}
                     </div>
-                    <h4 className="font-bold text-[#1A202C] text-sm text-center mt-3 line-clamp-3 leading-tight">
+                    
+                    <h4 className="font-bold text-[#1A202C] text-[15px] text-center line-clamp-2 leading-tight">
                       {fundacion.nombre}
                     </h4>
-                    <p className="text-[11px] text-slate-400 mt-1 mb-2 text-center">
-                      Desde{" "}
-                      {new Date(fundacion.fechaAfiliacion).toLocaleDateString("es-AR", {
-                        month: "short",
-                        year: "numeric",
-                      })}
+                    
+                    <div className="mt-3 flex flex-col items-center gap-1.5">
+                      <div className="bg-slate-100 rounded-full px-3 py-1 text-[10px] text-slate-500 font-semibold tracking-wide">
+                        Miembro desde {new Date(fundacion.fechaAfiliacion).toLocaleDateString("es-AR", { month: "short", year: "numeric" })}
+                      </div>
                       {fundacion.fechaVencimiento && (
-                        <>
-                          <br />
-                          <span className={isInactive ? 'text-red-500 font-medium' : 'text-[#40a8ab]'}>
-                            Vence: {new Date(fundacion.fechaVencimiento).toLocaleDateString("es-AR", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric"
-                            })}
-                          </span>
-                        </>
+                        <div className={`text-[11px] font-bold mt-1 ${isInactive ? 'text-red-500' : 'text-[#40a8ab]'}`}>
+                          Vence: {new Date(fundacion.fechaVencimiento).toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" })}
+                        </div>
                       )}
-                    </p>
+                    </div>
                   </div>
+
                   {/* Bloque donado destacado */}
-                  <div className="bg-[#40a8ab]/10 border-t border-[#40a8ab]/15 px-6 py-4 mt-auto">
-                    <p className="text-[10px] text-[#40a8ab] uppercase font-bold tracking-wider mb-0.5">
-                      Tu aporte
-                    </p>
-                    <p className="text-xl font-bold text-[#40a8ab]">
-                      ${totalFormateado}
-                    </p>
+                  <div className={`px-6 py-5 mt-auto border-t flex items-center justify-between ${
+                    isInactive ? 'bg-slate-100 border-slate-200' : 'bg-gradient-to-r from-[#40a8ab]/5 to-[#40a8ab]/10 border-[#40a8ab]/10'
+                  }`}>
+                    <div className="flex flex-col">
+                      <p className={`text-[10px] uppercase font-bold tracking-wider mb-0.5 ${isInactive ? 'text-slate-400' : 'text-[#40a8ab]'}`}>
+                        Tu aporte
+                      </p>
+                      <p className={`text-2xl font-black ${isInactive ? 'text-slate-500' : 'text-[#40a8ab]'}`}>
+                        ${totalFormateado}
+                      </p>
+                    </div>
+                    {!isInactive && (
+                      <div className="size-10 rounded-full bg-[#40a8ab]/10 flex items-center justify-center">
+                        <Heart className="w-5 h-5 text-[#40a8ab] fill-[#40a8ab]/20" />
+                      </div>
+                    )}
                   </div>
                 </div>
               );

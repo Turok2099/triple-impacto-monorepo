@@ -90,38 +90,26 @@ export class BondaController {
       throw new BadRequestException('Se requiere autenticación');
     }
 
-    if (!microsite && !organizacionId) {
-      throw new BadRequestException(
-        'Se requiere microsite (slug) u organizacion_id',
-      );
+    const fundaciones = await this.supabase.getFundacionesUsuario(userId);
+    let fundacionActiva: any = null;
+
+    if (microsite) {
+      fundacionActiva = fundaciones.find(f => f.micrositio_slug === microsite && f.is_active);
+    }
+    
+    if (!fundacionActiva) {
+      fundacionActiva = fundaciones.find(f => f.is_active);
     }
 
-    const micrositeRow = microsite
-      ? await this.supabase.getBondaMicrositeBySlug(microsite)
-      : await this.supabase.getBondaMicrositeByOrganizacionId(organizacionId!);
-
-    if (!micrositeRow) {
+    if (!fundacionActiva) {
       throw new NotFoundException(
-        microsite
-          ? `Micrositio no encontrado: ${microsite}`
-          : `Micrositio no encontrado para organizacion_id=${organizacionId}`,
-      );
-    }
-
-    const afiliado = await this.supabase.getAffiliateForUserAndMicrosite(
-      userId,
-      micrositeRow.id,
-    );
-
-    if (!afiliado || !afiliado.is_active) {
-      throw new NotFoundException(
-        'Complete una donación en esta ONG para acceder a cupones',
+        'Complete una donación en alguna ONG para acceder a cupones',
       );
     }
 
     const response = await this.bondaService.obtenerCupones(
-      afiliado.affiliate_code,
-      { slug: microsite ?? micrositeRow.slug, organizacionId },
+      fundacionActiva.affiliate_code,
+      { slug: fundacionActiva.micrositio_slug },
     );
 
     const hasPaid = await this.supabase.hasUserPaid(userId);
@@ -182,36 +170,26 @@ export class BondaController {
       throw new BadRequestException('Se requiere autenticación');
     }
 
-    if (!microsite && !organizacionId) {
-      throw new BadRequestException(
-        'Se requiere microsite (slug) u organizacion_id',
-      );
+    const fundaciones = await this.supabase.getFundacionesUsuario(userId);
+    let fundacionActiva: any = null;
+
+    if (microsite) {
+      fundacionActiva = fundaciones.find(f => f.micrositio_slug === microsite && f.is_active);
+    }
+    
+    if (!fundacionActiva) {
+      fundacionActiva = fundaciones.find(f => f.is_active);
     }
 
-    const micrositeRow = microsite
-      ? await this.supabase.getBondaMicrositeBySlug(microsite)
-      : await this.supabase.getBondaMicrositeByOrganizacionId(organizacionId!);
-
-    if (!micrositeRow) {
+    if (!fundacionActiva) {
       throw new NotFoundException(
-        `Micrositio no encontrado: ${microsite || organizacionId}`,
-      );
-    }
-
-    const affiliateRow = await this.supabase.getAffiliateBondaByUser(
-      userId,
-      micrositeRow.id,
-    );
-
-    if (!affiliateRow) {
-      throw new NotFoundException(
-        `No se encontró código de afiliado para este usuario en el micrositio: ${micrositeRow.nombre}`,
+        'Afiliado no encontrado o inactivo. Complete una donación para acceder.',
       );
     }
 
     return this.bondaService.obtenerCuponesRecibidos(
-      affiliateRow.affiliate_code,
-      { slug: microsite, organizacionId },
+      fundacionActiva.affiliate_code,
+      { slug: fundacionActiva.micrositio_slug },
     );
   }
 

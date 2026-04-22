@@ -38,10 +38,7 @@ export class BondaService {
     this.apiUrl = process.env.BONDA_API_URL || 'https://apiv1.cuponstar.com';
     this.apiKey = process.env.BONDA_API_KEY || '';
     this.micrositeId = process.env.BONDA_MICROSITE_ID || '';
-    this.useMocks =
-      !this.apiKey ||
-      !this.micrositeId ||
-      process.env.BONDA_USE_MOCKS === 'true';
+    this.useMocks = process.env.BONDA_USE_MOCKS === 'true';
 
     if (this.useMocks) {
       this.logger.warn(
@@ -103,7 +100,7 @@ export class BondaService {
     },
   ): Promise<CuponesResponseDto> {
     const config = await this.resolveConfig(options);
-    if (!config && this.useMocks) {
+    if (this.useMocks) {
       return this.getCuponesMock(codigoAfiliado);
     }
     if (!config) {
@@ -139,9 +136,12 @@ export class BondaService {
       );
 
       return this.transformBondaResponse(response.data);
-    } catch (error) {
-      this.logger.error('Error al obtener cupones de Bonda:', error.message);
-      throw new Error('Error al obtener cupones de Bonda');
+    } catch (error: any) {
+      this.logger.error(
+        `Error al obtener cupones de Bonda: ${error.message}`,
+        error.response?.data,
+      );
+      throw new Error(`Error al obtener cupones de Bonda: ${JSON.stringify(error.response?.data || error.message)}`);
     }
   }
 
@@ -185,9 +185,12 @@ export class BondaService {
     options?: BondaMicrositeOptions,
   ): Promise<CuponesResponseDto> {
     const config = await this.resolveConfig(options);
-    if (!config || this.useMocks) {
-      this.logger.warn('obtenerCuponesRecibidos: usando respuesta vacía');
+    if (this.useMocks) {
+      this.logger.warn('obtenerCuponesRecibidos: usando respuesta vacía (mock)');
       return { count: 0, cupones: [], next: null, previous: null };
+    }
+    if (!config) {
+      throw new Error('Se requiere microsite (slug) u organizacion_id');
     }
 
     const params = new URLSearchParams({
@@ -359,7 +362,7 @@ export class BondaService {
     options?: BondaMicrositeOptions,
   ): Promise<BondaAffiliateResponse> {
     const config = await this.resolveConfig(options);
-    if (!config && this.useMocks) {
+    if (this.useMocks) {
       return this.crearAfiliadoMock(affiliateData);
     }
     if (!config) {
@@ -408,7 +411,7 @@ export class BondaService {
     options?: BondaMicrositeOptions,
   ): Promise<BondaAffiliateResponse> {
     const config = await this.resolveConfig(options);
-    if (!config && this.useMocks) {
+    if (this.useMocks) {
       return this.actualizarAfiliadoMock(affiliateCode, updateData);
     }
     if (!config) {
@@ -455,7 +458,7 @@ export class BondaService {
     options?: BondaMicrositeOptions,
   ): Promise<BondaDeleteResponse> {
     const config = await this.resolveConfig(options);
-    if (!config && this.useMocks) {
+    if (this.useMocks) {
       return this.eliminarAfiliadoMock(affiliateCode);
     }
     if (!config) {
@@ -499,7 +502,7 @@ export class BondaService {
     options?: BondaMicrositeOptions,
   ): Promise<any> {
     const config = await this.resolveConfig(options);
-    if (!config && this.useMocks) {
+    if (this.useMocks) {
       return this.obtenerAfiliadoMock(affiliateCode);
     }
     if (!config) {
@@ -658,7 +661,7 @@ export class BondaService {
     codigoId: string;
   }> {
     const config = await this.resolveConfig(options);
-    if (!config || this.useMocks) {
+    if (this.useMocks) {
       this.logger.warn('solicitarCodigoCupon: usando mock');
       return {
         codigo: 'MOCK-' + bondaCuponId,
@@ -666,6 +669,9 @@ export class BondaService {
         textoSms: 'Texto SMS mock',
         codigoId: 'mock-id-' + Date.now(),
       };
+    }
+    if (!config) {
+      throw new Error('Se requiere microsite (slug) u organizacion_id');
     }
 
     // Crear form-data según especificación de Bonda

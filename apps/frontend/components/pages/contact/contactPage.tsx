@@ -194,7 +194,7 @@ export default function ContactPage() {
           {/* Formulario de contacto */}
           <div className="bg-white rounded-2xl shadow-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Envíanos un mensaje
+              Envianos un mensaje
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-6">

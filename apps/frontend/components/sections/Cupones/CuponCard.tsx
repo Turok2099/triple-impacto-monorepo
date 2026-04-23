@@ -43,9 +43,9 @@ export default function CuponCard({ cupon }: CuponCardProps) {
   return (
     <>
       {/* Mobile: card horizontal compacta (solo visible en móvil) */}
-      <div className="md:hidden bg-white rounded-2xl p-4 flex items-center justify-between shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-50">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="size-[4.5rem] shrink-0 overflow-hidden flex items-center justify-center">
+      <div className="md:hidden bg-white rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-2 shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-50">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+          <div className="size-[4rem] sm:size-[4.5rem] shrink-0 overflow-hidden flex items-center justify-center">
             <img
               src={logoEmpresa}
               alt=""
@@ -56,20 +56,20 @@ export default function CuponCard({ cupon }: CuponCardProps) {
               }}
             />
           </div>
-          <div className="min-w-0">
-            <p className="font-bold text-[#1A202C] text-sm leading-tight line-clamp-1">
+          <div className="min-w-0 pr-1">
+            <p className="font-bold text-[#1A202C] text-[13px] sm:text-sm leading-tight line-clamp-2">
               {cupon.descuento}
             </p>
-            <p className="text-[11px] text-slate-500 font-medium mt-0.5 line-clamp-1">
+            <p className="text-[11px] text-slate-500 font-medium mt-1 line-clamp-1">
               {cupon.empresa.nombre}
             </p>
           </div>
         </div>
         <button 
           onClick={handleObtenerDescuento}
-          className="bg-[#40a8ab] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg shadow-[#40a8ab]/20 active:scale-95 transition-transform shrink-0"
+          className="bg-[#40a8ab] text-white text-xs font-bold px-4 py-2 rounded-xl shadow-lg shadow-[#40a8ab]/20 active:scale-95 transition-transform shrink-0"
         >
-          Obtener descuento
+          Obtener
         </button>
       </div>
 

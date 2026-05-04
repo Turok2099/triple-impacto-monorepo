@@ -5,8 +5,15 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/'],
+      disallow: [
+        '/api/',
+        '/dashboard/',
+        '/login/',
+        '/registro/',
+        '/forgot-password/',
+        '/reset-password/'
+      ],
     },
-    sitemap: 'https://www.tripleimpacto.site/sitemap.xml',
+    sitemap: 'https://www.ayni.ar/sitemap.xml',
   };
 }

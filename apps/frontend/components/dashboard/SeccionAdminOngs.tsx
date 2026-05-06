@@ -367,7 +367,7 @@ export default function SeccionAdminOngs() {
                   <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="col-span-2">
                       <label className="block text-sm font-semibold text-emerald-900 mb-1">URL Completa del Micrositio Bonda</label>
-                      <input placeholder="ej: https://beneficios-mi-ong.bonda.com" value={formData.bonda_slug} onChange={e => setFormData({...formData, bonda_slug: e.target.value})} className="w-full px-4 py-2.5 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                      <input placeholder="ej: https://beneficios-mi-ong.bonda.com" value={formData.bonda_slug} onChange={e => setFormData({...formData, bonda_slug: e.target.value.trim().replace(/\/+$/, '')})} className="w-full px-4 py-2.5 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-emerald-900 mb-1">API Token (Afiliados/Cupones)</label>

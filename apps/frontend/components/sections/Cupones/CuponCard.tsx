@@ -3,6 +3,26 @@
 import { CuponDto } from "@/lib/types/cupon";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import Image, { ImageProps } from "next/image";
+
+interface ImageWithFallbackProps extends Omit<ImageProps, "src"> {
+  src: string;
+  fallbackSrc: string;
+}
+
+const ImageWithFallback = ({ src, fallbackSrc, alt, ...rest }: ImageWithFallbackProps) => {
+  const [imgSrc, setImgSrc] = useState(src);
+
+  return (
+    <Image
+      src={imgSrc}
+      alt={alt || ""}
+      onError={() => setImgSrc(fallbackSrc)}
+      {...rest}
+    />
+  );
+};
 
 interface CuponCardProps {
   cupon: CuponDto;
@@ -45,15 +65,14 @@ export default function CuponCard({ cupon }: CuponCardProps) {
       {/* Mobile: card horizontal compacta (solo visible en móvil) */}
       <div className="md:hidden bg-white rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-2 shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-50">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-          <div className="size-[4rem] sm:size-[4.5rem] shrink-0 overflow-hidden flex items-center justify-center">
-            <img
+          <div className="size-[4rem] sm:size-[4.5rem] shrink-0 overflow-hidden flex items-center justify-center relative">
+            <ImageWithFallback
               src={logoEmpresa}
+              fallbackSrc={defaultLogo}
               alt=""
-              className="w-full h-full object-contain scale-125"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = defaultLogo;
-              }}
+              fill
+              sizes="72px"
+              className="object-contain scale-125"
             />
           </div>
           <div className="min-w-0 pr-1">
@@ -76,29 +95,27 @@ export default function CuponCard({ cupon }: CuponCardProps) {
       {/* Desktop: card vertical (oculta en móvil) */}
       <div className="hidden md:block bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 relative">
         <div className="relative h-44 overflow-hidden bg-gray-100">
-          <img
+          <ImageWithFallback
             src={imagenPrincipal}
+            fallbackSrc={defaultImage}
             alt={cupon.nombre}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = defaultImage;
-            }}
+            fill
+            sizes="(max-width: 768px) 100vw, 400px"
+            className="object-cover"
           />
           <div className="absolute top-3 right-3 z-10 px-3 py-1.5 rounded-full bg-white text-black text-sm font-medium shadow-md">
             {cupon.empresa.nombre}
           </div>
         </div>
 
-        <div className="absolute left-1/2 top-[8rem] sm:top-[7rem] -translate-x-1/2 z-10 w-36 h-36 sm:w-[10.5rem] sm:h-[10.5rem] rounded-xl bg-white shadow-lg flex items-center justify-center p-1 ring-2 ring-white overflow-hidden">
-          <img
+        <div className="absolute left-1/2 top-[8rem] sm:top-[7rem] -translate-x-1/2 z-10 w-36 h-36 sm:w-[10.5rem] sm:h-[10.5rem] rounded-xl bg-white shadow-lg flex items-center justify-center p-1 ring-2 ring-white overflow-hidden relative">
+          <ImageWithFallback
             src={logoEmpresa}
+            fallbackSrc={defaultLogo}
             alt={cupon.empresa.nombre}
-            className="w-full h-full object-contain"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = defaultLogo;
-            }}
+            fill
+            sizes="168px"
+            className="object-contain p-2"
           />
         </div>
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 
 interface Cupon {
   id: string;
@@ -80,11 +81,13 @@ export default function CuponDisponibleCard({
     <div className="border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
       {/* Imagen */}
       {imagenUrl && (
-        <div className="mb-4">
-          <img
+        <div className="mb-4 relative h-40 w-full">
+          <Image
             src={imagenUrl}
             alt={cupon.nombre}
-            className="w-full h-40 object-cover rounded-lg"
+            fill
+            sizes="(max-width: 768px) 100vw, 400px"
+            className="object-cover rounded-lg"
           />
         </div>
       )}

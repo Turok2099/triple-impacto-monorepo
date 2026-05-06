@@ -321,21 +321,29 @@ export class FiservWebhookService {
         res = await attemptCreation(activeCode, activeEmail, activeDni);
       }
 
-      // Fallback 2: Código o DNI duplicado en Bonda
+      // Fallback 2: Código o DNI duplicado en Bonda (El usuario ya existe en esta ONG)
       const isCodeDuplicated = 
         res?.error?.detail?.code?.[0]?.includes('ya lo está utilizando') || 
+        res?.error?.detail?.code?.[0]?.includes('uso') ||
         res?.error?.detail?.code?.[0]?.includes('único') ||
         (res?.error?.code === 'HttpPublicResponseException' && res?.error?.detail?.code?.[0]?.includes('ya lo está utilizando'));
 
       const isDniDuplicated = 
         res?.error?.detail?.dni?.[0]?.includes('ya lo está utilizando') || 
+        res?.error?.detail?.dni?.[0]?.includes('uso') ||
         res?.error?.detail?.dni?.[0]?.includes('único');
 
       if (res?.success === false && (isCodeDuplicated || isDniDuplicated)) {
-        this.logger.warn(`DNI o Código ${activeCode} ya en uso en Bonda. Aplicando fallback con código autogenerado.`);
-        activeCode = `AYNI_${activeCode}_${Date.now().toString().slice(-4)}`;
-        activeDni = undefined; // Quitamos el DNI para evitar la colisión estricta
-        res = await attemptCreation(activeCode, activeEmail, activeDni);
+        this.logger.warn(`DNI o Código ${activeCode} ya en uso en Bonda. Se asume que el usuario ya estaba registrado y se procede a habilitarlo en nuestra base.`);
+        // En lugar de crear un usuario fantasma con sufijo, lo consideramos un éxito usando el código original
+        res = {
+          success: true,
+          data: {
+            member: {
+              code: activeCode
+            }
+          }
+        };
       }
 
       if (res?.success && res?.data?.member?.code) {

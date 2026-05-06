@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "@/components/sections/Navbar/navbar";
 import dynamic from "next/dynamic";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const Footer = dynamic(() => import("@/components/sections/Footer/footer"));
@@ -45,6 +46,7 @@ export default function RootLayout({
           <WhatsAppButton />
           <FloatingDonateButton />
         </AuthProvider>
+        <SpeedInsights />
       </body>
     </html>
   );

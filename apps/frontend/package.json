@@ -12,6 +12,8 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
+    "@next/bundle-analyzer": "^16.2.4",
+    "@vercel/speed-insights": "^2.0.0",
     "critters": "^0.0.23",
     "lucide-react": "^0.562.0",
     "next": "^16.2.4",
@@ -28,12 +30,5 @@
     "eslint-config-next": "^16.2.4",
     "tailwindcss": "^4",
     "typescript": "^5"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead",
-    "not ie 11",
-    "not op_mini all"
-  ]
+  }
 }

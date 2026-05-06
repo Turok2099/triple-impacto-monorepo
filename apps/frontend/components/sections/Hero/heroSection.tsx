@@ -6,13 +6,13 @@ export default function HeroSection() {
       {/* Imagen de fondo */}
       <div className="absolute inset-0">
         <Image
-          src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1768268779/Fondo_hero_yzustd.png"
+          src="https://res.cloudinary.com/dxbtafe9u/image/upload/f_auto,q_auto,w_1920/v1768268779/Fondo_hero_yzustd.png"
           alt="AYNI Hero Background"
           fill
           priority
           fetchPriority="high"
+          unoptimized
           className="object-cover object-center"
-          quality={85}
         />
       </div>
 

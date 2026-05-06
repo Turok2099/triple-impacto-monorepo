@@ -64,4 +64,6 @@ export interface BuildPaymentParamsInput {
   authenticateTransaction?: string;
   /** Para Data Only 3DS: categoría de mensaje EMVCo */
   threeDSEmvCoMessageCategory?: string;
+  /** Secreto compartido específico para esta tienda (sobrescribe default) */
+  sharedSecret?: string;
 }

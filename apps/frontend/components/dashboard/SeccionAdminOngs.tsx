@@ -1,0 +1,417 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Swal from "sweetalert2";
+import { getOrganizaciones, createOrganizacion, updateOrganizacion, deleteOrganizacion, uploadLogo, Ong } from "@/lib/admin-ongs";
+import { Plus, Edit2, Trash2, X, Building2, Link as LinkIcon, DollarSign, ShieldAlert, Key, Upload, Eye, EyeOff } from "lucide-react";
+
+export default function SeccionAdminOngs() {
+  const [ongs, setOngs] = useState<Ong[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingOng, setEditingOng] = useState<Ong | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [showSecrets, setShowSecrets] = useState(false);
+
+  const [formData, setFormData] = useState({
+    nombre: "",
+    descripcion: "",
+    logo_url: "",
+    email: "",
+    telefono: "",
+    website_url: "",
+    monto_minimo: 5000,
+    activa: true,
+    fiserv_store_id: "",
+    fiserv_shared_secret: "",
+    bonda_slug: "",
+    bonda_api_token: "",
+    bonda_api_token_nominas: "",
+    bonda_microsite_id: ""
+  });
+
+  useEffect(() => {
+    fetchOngs();
+  }, []);
+
+  const fetchOngs = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("auth_token") || "";
+      const data = await getOrganizaciones(token);
+      setOngs(data);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeactivate = async (id: string, name: string) => {
+    const result = await Swal.fire({
+      title: "¿Desactivar ONG?",
+      text: `¿Seguro que deseas dar de baja a ${name}? Ya no aparecerá para donaciones.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#94a3b8",
+      confirmButtonText: "Sí, desactivar",
+      cancelButtonText: "Cancelar"
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const token = localStorage.getItem("auth_token") || "";
+      await deleteOrganizacion(token, id);
+      Swal.fire("¡Desactivada!", "La ONG ha sido ocultada del sitio.", "success");
+      fetchOngs();
+    } catch (err: any) {
+      Swal.fire("Error", "Error al desactivar: " + err.message, "error");
+    }
+  };
+
+  const handleToggleStatus = async (ong: Ong) => {
+    try {
+      const token = localStorage.getItem("auth_token") || "";
+      const newStatus = !ong.activa;
+      
+      // Actualización optimista de UI
+      setOngs(ongs.map(o => o.id === ong.id ? { ...o, activa: newStatus } : o));
+      
+      await updateOrganizacion(token, ong.id, { activa: newStatus });
+    } catch (err: any) {
+      Swal.fire("Error", "No se pudo cambiar el estado: " + err.message, "error");
+      fetchOngs(); // revertir si falla
+    }
+  };
+
+  const openCreateModal = () => {
+    setEditingOng(null);
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setShowSecrets(false);
+    setFormData({
+      nombre: "", descripcion: "", logo_url: "", email: "", telefono: "", website_url: "",
+      monto_minimo: 5000,
+      activa: true, fiserv_store_id: "", fiserv_shared_secret: "", bonda_slug: "", bonda_api_token: "",
+      bonda_api_token_nominas: "", bonda_microsite_id: ""
+    });
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (ong: Ong) => {
+    setEditingOng(ong);
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    const bonda = ong.bonda_microsites && ong.bonda_microsites.length > 0 ? ong.bonda_microsites[0] : null;
+
+    setShowSecrets(false);
+    setFormData({
+      nombre: ong.nombre,
+      descripcion: ong.descripcion || "",
+      logo_url: ong.logo_url || "",
+      email: ong.email || "",
+      telefono: ong.telefono || "",
+      website_url: ong.website_url || "",
+      monto_minimo: ong.monto_minimo || 5000,
+      activa: ong.activa,
+      fiserv_store_id: ong.fiserv_store_id || "",
+      fiserv_shared_secret: ong.fiserv_shared_secret || "",
+      bonda_slug: bonda?.slug || "",
+      bonda_api_token: bonda?.api_token || "",
+      bonda_api_token_nominas: bonda?.api_token_nominas || "",
+      bonda_microsite_id: bonda?.microsite_id || ""
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      const token = localStorage.getItem("auth_token") || "";
+      
+      let finalLogoUrl = formData.logo_url;
+      if (selectedFile) {
+        // Mostrar alerta de que estamos subiendo
+        Swal.fire({
+          title: 'Subiendo imagen...',
+          text: 'Por favor espera',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+        finalLogoUrl = await uploadLogo(token, selectedFile);
+      }
+      
+      const payload = { ...formData, logo_url: finalLogoUrl };
+
+      if (editingOng) {
+        await updateOrganizacion(token, editingOng.id, payload);
+        Swal.fire("¡Actualizada!", "La ONG fue modificada con éxito.", "success");
+      } else {
+        await createOrganizacion(token, payload);
+        Swal.fire("¡Creada!", "La ONG fue añadida al sistema.", "success");
+      }
+      setIsModalOpen(false);
+      fetchOngs();
+    } catch (err: any) {
+      Swal.fire("Error", err.message, "error");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#40a8ab]"></div></div>;
+  }
+
+  if (error) {
+    return <div className="bg-red-50 text-red-600 p-6 rounded-2xl border border-red-100 flex items-center gap-3"><ShieldAlert className="w-6 h-6" /><span>Error cargando ONGs: {error}</span></div>;
+  }
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+        <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+          <Building2 className="w-6 h-6 text-[#40a8ab]" /> Gestor de ONGs y Fundaciones
+        </h2>
+        <button onClick={openCreateModal} className="flex items-center gap-2 px-4 py-2 bg-[#40a8ab] hover:bg-[#2c8184] text-white rounded-xl font-semibold transition-all">
+          <Plus className="w-4 h-4" /> Nueva ONG
+        </button>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-slate-50 border-b border-slate-200">
+              <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider">Fundación</th>
+              <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider">Integraciones</th>
+              <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider">Estado</th>
+              <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {ongs.map((ong) => {
+              const bonda = ong.bonda_microsites && ong.bonda_microsites.length > 0 ? ong.bonda_microsites[0] : null;
+              return (
+                <tr key={ong.id} className="hover:bg-slate-50/50 transition-colors">
+                  <td className="py-4 px-6">
+                    <div className="flex items-center gap-3">
+                      <div className="size-10 rounded-xl bg-slate-100 overflow-hidden shrink-0 flex items-center justify-center">
+                        {ong.logo_url ? <img src={ong.logo_url} alt="" className="w-full h-full object-contain" /> : <Building2 className="w-5 h-5 text-slate-400" />}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-slate-900">{ong.nombre}</p>
+                        <p className="text-xs text-slate-500 line-clamp-1 max-w-[200px]">{ong.descripcion || "Sin descripción"}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-4 px-6">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-1 text-xs">
+                        {ong.fiserv_store_id ? <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-medium">Fiserv OK</span> : <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded">Fiserv Genérico</span>}
+                      </div>
+                      <div className="flex items-center gap-1 text-xs">
+                        {bonda ? <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded font-medium">Bonda: {bonda.slug}</span> : <span className="bg-red-50 text-red-500 px-2 py-0.5 rounded">Sin Bonda</span>}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-4 px-6">
+                    <button 
+                      onClick={() => handleToggleStatus(ong)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#40a8ab] focus:ring-offset-2 ${ong.activa ? 'bg-[#40a8ab]' : 'bg-slate-200'}`}
+                      role="switch"
+                      aria-checked={ong.activa}
+                    >
+                      <span className="sr-only">Habilitar ONG</span>
+                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${ong.activa ? 'translate-x-6' : 'translate-x-1'}`} />
+                    </button>
+                    <span className={`ml-2 text-xs font-medium ${ong.activa ? 'text-[#40a8ab]' : 'text-slate-400'}`}>
+                      {ong.activa ? 'Activa' : 'Inactiva'}
+                    </span>
+                  </td>
+                  <td className="py-4 px-6 text-right">
+                    <div className="flex justify-end gap-2">
+                      <button onClick={() => openEditModal(ong)} className="p-2 text-slate-400 hover:text-[#40a8ab] hover:bg-emerald-50 rounded-lg transition-colors" title="Editar ONG">
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 py-6 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto">
+            <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+              <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-[#40a8ab]" />
+                {editingOng ? "Editar ONG" : "Nueva ONG"}
+              </h2>
+              <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200 transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="p-6 overflow-y-auto max-h-[75vh]">
+              <div className="space-y-8">
+                
+                {/* 1. Datos Generales */}
+                <section>
+                  <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2"><Building2 className="w-5 h-5 text-slate-400"/> Información Pública</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="col-span-2">
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">Nombre de la ONG *</label>
+                      <input required value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">Propósito / Descripción Breve</label>
+                      <textarea rows={3} value={formData.descripcion} onChange={e => setFormData({...formData, descripcion: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none resize-none" />
+                    </div>
+                    
+                    <h4 className="col-span-2 text-sm font-bold text-slate-700 mt-2 mb-1">Información de Contacto</h4>
+                    
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">Email de Contacto</label>
+                      <input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">Teléfono</label>
+                      <input type="text" value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">Sitio Web</label>
+                      <input type="url" placeholder="https://..." value={formData.website_url} onChange={e => setFormData({...formData, website_url: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                    </div>
+
+                    <h4 className="col-span-2 text-sm font-bold text-slate-700 mt-2 mb-1">Recursos Visuales</h4>
+
+                    <div className="col-span-2">
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">Logo de la Organización (JPG/PNG)</label>
+                      <div className="flex items-start gap-4">
+                        <div className="size-20 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 shrink-0 flex items-center justify-center">
+                          {previewUrl ? (
+                            <img src={previewUrl} alt="Preview" className="w-full h-full object-contain" />
+                          ) : formData.logo_url ? (
+                            <img src={formData.logo_url} alt="Logo actual" className="w-full h-full object-contain" />
+                          ) : (
+                            <Building2 className="w-8 h-8 text-slate-300" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <label className="flex items-center justify-center w-full px-4 py-3 bg-white border-2 border-dashed border-emerald-200 rounded-xl cursor-pointer hover:bg-emerald-50 hover:border-emerald-400 transition-colors">
+                            <div className="flex items-center gap-2 text-emerald-600 font-medium">
+                              <Upload className="w-5 h-5" />
+                              <span>{selectedFile ? selectedFile.name : 'Seleccionar archivo...'}</span>
+                            </div>
+                            <input type="file" className="hidden" accept="image/png, image/jpeg, image/jpg" onChange={handleFileChange} />
+                          </label>
+                          <p className="text-xs text-slate-400 mt-2">La imagen se subirá automáticamente a Supabase al guardar.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* 2. Donaciones Fiserv */}
+                <section>
+                  <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2"><DollarSign className="w-5 h-5 text-slate-400"/> Pagos y Fiserv</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                     <div className="col-span-2">
+                        <label className="block text-sm font-semibold text-slate-700 mb-1">Monto Mínimo (ARS)</label>
+                        <input type="number" min="0" value={formData.monto_minimo} onChange={e => setFormData({...formData, monto_minimo: Number(e.target.value)})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                     </div>
+                  </div>
+                  <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-blue-900 mb-1">Fiserv Store ID</label>
+                      <input placeholder="Ej. 5930714927880" value={formData.fiserv_store_id} onChange={e => setFormData({...formData, fiserv_store_id: e.target.value})} className="w-full px-4 py-2.5 rounded-lg border border-blue-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-blue-900 mb-1">Fiserv Shared Secret</label>
+                      <div className="relative">
+                        <input placeholder="Opcional si usa el default" type={showSecrets ? "text" : "password"} value={formData.fiserv_shared_secret} onChange={e => setFormData({...formData, fiserv_shared_secret: e.target.value})} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-blue-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" />
+                        <button type="button" onClick={() => setShowSecrets(!showSecrets)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
+                          {showSecrets ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+                    <p className="col-span-full text-xs text-blue-600">Deja vacío el Shared Secret si esta ONG utiliza la configuración global de entorno.</p>
+                  </div>
+                </section>
+
+                {/* 3. Integración Bonda */}
+                <section>
+                  <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2"><Key className="w-5 h-5 text-slate-400"/> Beneficios Bonda</h3>
+                  <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="col-span-2">
+                      <label className="block text-sm font-semibold text-emerald-900 mb-1">Slug / URL del Micrositio Bonda</label>
+                      <input placeholder="ej: beneficios-mi-ong (lo que va al final de la URL)" value={formData.bonda_slug} onChange={e => setFormData({...formData, bonda_slug: e.target.value})} className="w-full px-4 py-2.5 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-emerald-900 mb-1">API Token (Afiliados/Cupones)</label>
+                      <div className="relative">
+                        <input type={showSecrets ? "text" : "password"} placeholder="JWT o Token" value={formData.bonda_api_token} onChange={e => setFormData({...formData, bonda_api_token: e.target.value})} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none font-mono text-sm" />
+                        <button type="button" onClick={() => setShowSecrets(!showSecrets)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
+                          {showSecrets ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-emerald-900 mb-1">API Token (Nóminas)</label>
+                      <div className="relative">
+                        <input type={showSecrets ? "text" : "password"} placeholder="JWT Nóminas" value={formData.bonda_api_token_nominas} onChange={e => setFormData({...formData, bonda_api_token_nominas: e.target.value})} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none font-mono text-sm" />
+                        <button type="button" onClick={() => setShowSecrets(!showSecrets)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
+                          {showSecrets ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-sm font-semibold text-emerald-900 mb-1">Bonda Microsite ID (Legacy)</label>
+                      <input placeholder="ID numérico si aplica" value={formData.bonda_microsite_id} onChange={e => setFormData({...formData, bonda_microsite_id: e.target.value})} className="w-full px-4 py-2.5 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none font-mono text-sm" />
+                    </div>
+                  </div>
+                </section>
+
+                <div className="flex items-center gap-3 bg-slate-50 p-4 rounded-xl">
+                  <input type="checkbox" id="activa" checked={formData.activa} onChange={e => setFormData({...formData, activa: e.target.checked})} className="w-5 h-5 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500" />
+                  <label htmlFor="activa" className="font-semibold text-slate-700">ONG Activa (Visible en la plataforma para recibir donaciones)</label>
+                </div>
+              </div>
+              
+              <div className="mt-8 flex gap-3 pt-6 border-t border-slate-100">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 px-4 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold rounded-xl transition-colors">
+                  Cancelar
+                </button>
+                <button type="submit" disabled={submitting} className="flex-1 py-3 px-4 bg-[#40a8ab] hover:bg-[#2c8184] disabled:bg-emerald-400 text-white font-semibold rounded-xl shadow-lg shadow-emerald-200 transition-all flex justify-center items-center">
+                  {submitting ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div> : 'Guardar Organización'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

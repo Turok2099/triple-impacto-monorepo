@@ -10,7 +10,6 @@ import {
   validarMonto,
   type Organizacion,
 } from "@/lib/payments";
-import { getOrganizationLogoUrl } from "@/lib/organization-logos";
 
 interface FormularioDonacionProps {
   onSubmit: (monto: number, organizacionId?: string) => void;
@@ -43,6 +42,25 @@ export default function FormularioDonacion({
     (org) => org.id === organizacionId
   );
 
+  const montoMinimoActual = organizacionSeleccionada?.monto_minimo && organizacionSeleccionada.monto_minimo > 0 
+    ? organizacionSeleccionada.monto_minimo 
+    : MONTO_MINIMO;
+
+  const montosSugeridosActuales = [
+    montoMinimoActual,
+    MONTOS_SUGERIDOS[1],
+    MONTOS_SUGERIDOS[2],
+  ];
+
+  // Actualizar monto seleccionado si cambia la organización y el monto actual queda por debajo del mínimo
+  useEffect(() => {
+    if (montoSeleccionado !== null && !usarMontoCustom) {
+      if (montoSeleccionado < montoMinimoActual) {
+        setMontoSeleccionado(montoMinimoActual);
+      }
+    }
+  }, [organizacionId, montoMinimoActual, montoSeleccionado, usarMontoCustom]);
+
   // DEBUG: Verificar estado de autenticación
   useEffect(() => {
     console.log("🔐 Estado Auth:", {
@@ -63,16 +81,11 @@ export default function FormularioDonacion({
       setLoadingOrgs(true);
       setErrorOrgs(null);
       const orgs = await obtenerOrganizaciones();
-      // DEJAMOS SOLO PROYECTO PLATO LLENO
-      const orgsFiltradas = orgs.filter(org => 
-        org.nombre.toLowerCase().includes('plato')
-      );
-      
-      setOrganizaciones(orgsFiltradas);
+      setOrganizaciones(orgs);
 
       // Seleccionar la primera organización por defecto
-      if (orgsFiltradas.length > 0) {
-        setOrganizacionId(orgsFiltradas[0].id);
+      if (orgs.length > 0) {
+        setOrganizacionId(orgs[0].id);
       }
     } catch (err: any) {
       setErrorOrgs(err.message || "Error al cargar organizaciones");
@@ -83,8 +96,8 @@ export default function FormularioDonacion({
 
   const handleMontoSugeridoClick = (monto: number) => {
     // Validar monto mínimo
-    if (monto < MONTO_MINIMO) {
-      setError(`El monto mínimo para donar es ${formatearMonto(MONTO_MINIMO)}`);
+    if (monto < montoMinimoActual) {
+      setError(`El monto mínimo para donar es ${formatearMonto(montoMinimoActual)}`);
       return;
     }
     setMontoSeleccionado(monto);
@@ -101,8 +114,8 @@ export default function FormularioDonacion({
     // Validar monto en tiempo real
     const monto = parseFloat(value);
     if (!isNaN(monto) && monto > 0) {
-      if (monto < MONTO_MINIMO) {
-        setError(`El monto mínimo para donar es ${formatearMonto(MONTO_MINIMO)}`);
+      if (monto < montoMinimoActual) {
+        setError(`El monto mínimo para donar es ${formatearMonto(montoMinimoActual)}`);
       } else if (monto > MONTO_MAXIMO) {
         setError(`El monto máximo permitido es ${formatearMonto(MONTO_MAXIMO)}`);
       } else {
@@ -123,8 +136,8 @@ export default function FormularioDonacion({
       : montoSeleccionado || 0;
 
     // Validar límites globales de monto
-    if (montoFinal < MONTO_MINIMO) {
-      setError(`El monto mínimo para donar es ${formatearMonto(MONTO_MINIMO)}`);
+    if (montoFinal < montoMinimoActual) {
+      setError(`El monto mínimo para donar es ${formatearMonto(montoMinimoActual)}`);
       return;
     }
     
@@ -218,16 +231,15 @@ export default function FormularioDonacion({
 
             {/* Información de la organización seleccionada */}
             {organizacionSeleccionada && (() => {
-              const logoUrl = getOrganizationLogoUrl(organizacionSeleccionada.nombre);
+              const logoUrl = organizacionSeleccionada.logo_url;
               return (
                 <div className="mt-4 p-5 bg-white border border-slate-200 shadow-sm rounded-xl flex flex-col md:flex-row items-center gap-5 text-center md:text-left transition-all">
                   <div className="relative w-36 h-36 overflow-hidden shrink-0 flex items-center justify-center">
                     {logoUrl ? (
-                      <Image
+                      <img
                         src={logoUrl}
                         alt={organizacionSeleccionada.nombre}
-                        fill
-                        className="object-contain object-center"
+                        className="w-full h-full object-contain object-center"
                       />
                     ) : (
                       <div
@@ -263,7 +275,7 @@ export default function FormularioDonacion({
 
         {/* Montos sugeridos */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-          {MONTOS_SUGERIDOS.map((monto) => (
+          {montosSugeridosActuales.map((monto) => (
             <button
               key={monto}
               type="button"
@@ -301,12 +313,12 @@ export default function FormularioDonacion({
               </span>
               <input
                 type="number"
-                min={MONTO_MINIMO}
+                min={montoMinimoActual}
                 max={MONTO_MAXIMO}
                 step="1"
                 value={montoCustom}
                 onChange={(e) => handleMontoCustomChange(e.target.value)}
-                placeholder={MONTO_MINIMO.toString()}
+                placeholder={montoMinimoActual.toString()}
                 autoFocus
                 className="w-full pl-8 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 border-[#40a8ab] focus:ring-[#40a8ab]"
               />
@@ -314,14 +326,7 @@ export default function FormularioDonacion({
           </div>
         )}
 
-        {/* Mostrar monto mínimo de organización si es mayor */}
-        {organizacionSeleccionada?.monto_minimo &&
-          organizacionSeleccionada.monto_minimo > MONTO_MINIMO && (
-            <p className="text-sm text-orange-600 font-medium mt-1">
-              * Esta organización requiere un monto mínimo explícito de{" "}
-              {formatearMonto(organizacionSeleccionada.monto_minimo)}
-            </p>
-          )}
+        {/* Mostrar monto mínimo de organización si es mayor (ya está manejado dinámicamente) */}
       </div>
 
       {/* Error */}

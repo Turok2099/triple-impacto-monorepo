@@ -88,6 +88,15 @@ export class FiservWebhookService {
       notificationHash,
     });
 
+    // ESTRATEGIA PRODUCTIVO FISERV: Fetch shared_secret dinámico
+    let sharedSecret = config.sharedSecret;
+    if (attempt.organizacion_id) {
+      const org = await this.supabase.getOrganizacionById(attempt.organizacion_id);
+      if (org && org.fiserv_shared_secret) {
+        sharedSecret = org.fiserv_shared_secret as string;
+      }
+    }
+
     // Fiserv devuelve el chargetotal con comas en vez de puntos a veces (ej. "5000,00"), validemos con el formato sin adaptar para el hash.
     // Usamos validateResponseHash ya que Fiserv envía response_hash en webhook también
     const hashValid = validateNotificationHash(
@@ -97,7 +106,7 @@ export class FiservWebhookService {
       storename,
       approvalCode,
       notificationHash,
-      config.sharedSecret,
+      sharedSecret,
     );
 
     // Fallback: Si no pasa con Notification Hash, prueba con formato Response Hash
@@ -108,7 +117,7 @@ export class FiservWebhookService {
       txndatetime,
       storename,
       notificationHash,
-      config.sharedSecret,
+      sharedSecret,
     );
 
     if (!hashValid && !hashValidFallback) {

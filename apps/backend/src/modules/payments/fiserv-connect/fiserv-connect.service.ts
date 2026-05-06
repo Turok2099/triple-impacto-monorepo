@@ -150,7 +150,7 @@ export class FiservConnectService implements OnModuleInit {
 
     const hashExtended = createExtendedHash(
       params,
-      this.config.sharedSecret,
+      input.sharedSecret || this.config.sharedSecret,
       'sha256',
     );
     params.hashExtended = hashExtended;

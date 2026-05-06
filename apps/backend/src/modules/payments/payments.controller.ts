@@ -86,15 +86,15 @@ export class PaymentsController {
       );
     }
 
-    // ESTRATEGIA PRODUCTIVO FISERV: Proxy según organización
+    // ESTRATEGIA PRODUCTIVO FISERV: Proxy según organización dinámico
     let finalStoreId = body.storename || config.storeId;
+    let finalSharedSecret = config.sharedSecret;
+    
     if (body.organizacion_id) {
       const org = await this.supabase.getOrganizacionById(body.organizacion_id);
       if (org) {
-        const nombreLower = org.nombre?.toLowerCase() || '';
-        if (nombreLower.includes('plato')) {
-           finalStoreId = '5930714927880'; // Store ID asociado a Proyecto Plato Lleno
-        }
+        if (org.fiserv_store_id) finalStoreId = org.fiserv_store_id as string;
+        if (org.fiserv_shared_secret) finalSharedSecret = org.fiserv_shared_secret as string;
       }
     }
     body.storename = finalStoreId;
@@ -124,6 +124,7 @@ export class PaymentsController {
       oid: orderId,
       merchantTransactionId: orderId,
       storename: body.storename,
+      sharedSecret: finalSharedSecret,
       txntype: body.txntype,
       numberOfInstallments: body.numberOfInstallments,
       referencedMerchantTransactionId: (body as any)

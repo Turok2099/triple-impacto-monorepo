@@ -216,4 +216,171 @@ export class AdminService {
     });
     if (error) this.logger.warn('WARNING: audit_logs table missing or failed insertion - ' + error.message);
   }
+
+  // ==========================================
+  // ONGs / ORGANIZACIONES
+  // ==========================================
+
+  async uploadLogo(file: any) {
+    const client = this.supabaseService.getClient();
+    // Normalize filename
+    const ext = file.originalname.split('.').pop() || 'png';
+    const cleanName = file.originalname.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+    const fileName = `logo-${Date.now()}-${cleanName}.${ext}`;
+    
+    const { data, error } = await client.storage
+      .from('ong-logos')
+      .upload(fileName, file.buffer, {
+        contentType: file.mimetype,
+        upsert: true
+      });
+
+    if (error) {
+      throw new InternalServerErrorException('Error uploading to Supabase: ' + error.message);
+    }
+
+    const { data: publicUrlData } = client.storage
+      .from('ong-logos')
+      .getPublicUrl(fileName);
+
+    return { url: publicUrlData.publicUrl };
+  }
+
+  async getOrganizaciones() {
+    const { data, error } = await this.supabaseService.getClient()
+      .from('organizaciones')
+      .select('*, bonda_microsites(*)')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      this.logger.error('Error fetching organizaciones:', error);
+      throw new InternalServerErrorException('Error al obtener ONGs');
+    }
+    return data;
+  }
+
+  async createOrganizacion(adminId: string, payload: any) {
+    const client = this.supabaseService.getClient();
+
+    // 1. Crear Organización
+    const { data: org, error: orgError } = await client
+      .from('organizaciones')
+      .insert({
+        nombre: payload.nombre,
+        descripcion: payload.descripcion,
+        logo_url: payload.logo_url,
+        website_url: payload.website_url,
+        email: payload.email,
+        telefono: payload.telefono,
+        direccion: payload.direccion,
+        monto_minimo: payload.monto_minimo,
+        activa: payload.activa ?? true,
+        verificada: payload.verificada ?? false,
+        fiserv_store_id: payload.fiserv_store_id,
+        fiserv_shared_secret: payload.fiserv_shared_secret
+      })
+      .select()
+      .single();
+
+    if (orgError) {
+      throw new BadRequestException('Error al crear la organización local: ' + orgError.message);
+    }
+
+    // 2. Crear Micrositio Bonda (opcional pero esperado)
+    if (payload.bonda_slug && payload.bonda_api_token) {
+      const { error: bondaError } = await client
+        .from('bonda_microsites')
+        .insert({
+          organizacion_id: org.id,
+          nombre: payload.nombre,
+          slug: payload.bonda_slug,
+          api_token: payload.bonda_api_token,
+          api_token_nominas: payload.bonda_api_token_nominas,
+          microsite_id: payload.bonda_microsite_id,
+          activo: true
+        });
+        
+      if (bondaError) {
+        this.logger.error('Error insertando Bonda microsite:', bondaError);
+      }
+    }
+
+    await this.logAudit(adminId, org.id, 'CREATE_ORG', 'SUCCESS');
+    return org;
+  }
+
+  async updateOrganizacion(adminId: string, id: string, payload: any) {
+    const client = this.supabaseService.getClient();
+
+    const { data: org, error: orgError } = await client
+      .from('organizaciones')
+      .update({
+        nombre: payload.nombre,
+        descripcion: payload.descripcion,
+        logo_url: payload.logo_url,
+        website_url: payload.website_url,
+        email: payload.email,
+        telefono: payload.telefono,
+        direccion: payload.direccion,
+        monto_minimo: payload.monto_minimo,
+        activa: payload.activa,
+        verificada: payload.verificada,
+        fiserv_store_id: payload.fiserv_store_id,
+        fiserv_shared_secret: payload.fiserv_shared_secret,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (orgError) {
+      throw new BadRequestException('Error al actualizar organización: ' + orgError.message);
+    }
+
+    // Actualizar Bonda Microsite asociado si se pasaron datos
+    if (payload.bonda_slug || payload.bonda_api_token) {
+      const bondaData: any = {};
+      if (payload.bonda_slug) bondaData.slug = payload.bonda_slug;
+      if (payload.bonda_api_token) bondaData.api_token = payload.bonda_api_token;
+      if (payload.bonda_api_token_nominas !== undefined) bondaData.api_token_nominas = payload.bonda_api_token_nominas;
+      if (payload.bonda_microsite_id) bondaData.microsite_id = payload.bonda_microsite_id;
+
+      // Buscar si existe
+      const { data: existingBonda } = await client.from('bonda_microsites').select('id').eq('organizacion_id', id).maybeSingle();
+      
+      if (existingBonda) {
+        await client.from('bonda_microsites').update(bondaData).eq('id', existingBonda.id);
+      } else {
+        await client.from('bonda_microsites').insert({
+          organizacion_id: id,
+          nombre: payload.nombre,
+          activo: true,
+          ...bondaData
+        });
+      }
+    }
+
+    await this.logAudit(adminId, id, 'UPDATE_ORG', 'SUCCESS');
+    return org;
+  }
+
+  async deleteOrganizacion(adminId: string, id: string) {
+    const client = this.supabaseService.getClient();
+    
+    // Solo borrado lógico (desactivar) por seguridad
+    const { error } = await client
+      .from('organizaciones')
+      .update({ activa: false, updated_at: new Date().toISOString() })
+      .eq('id', id);
+
+    if (error) {
+      throw new InternalServerErrorException('Error al desactivar la organización');
+    }
+    
+    // Desactivar el micrositio de bonda asociado
+    await client.from('bonda_microsites').update({ activo: false }).eq('organizacion_id', id);
+
+    await this.logAudit(adminId, id, 'DELETE_ORG', 'SUCCESS');
+    return { success: true, message: 'Organización desactivada correctamente' };
+  }
 }

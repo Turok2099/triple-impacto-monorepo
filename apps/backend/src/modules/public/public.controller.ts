@@ -43,7 +43,6 @@ export interface OrganizacionPublicDto {
   telefono: string | null;
   direccion: string | null;
   monto_minimo: number | null;
-  monto_sugerido: number | null;
   activa: boolean;
   verificada: boolean;
   created_at: string;

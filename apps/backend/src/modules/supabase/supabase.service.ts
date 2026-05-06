@@ -482,13 +482,12 @@ export class SupabaseService implements OnModuleInit {
   }
 
   /**
-   * Obtener una organización por ID (incluye monto_minimo, monto_sugerido).
+   * Obtener una organización por ID (incluye monto_minimo).
    */
   async getOrganizacionById(organizacionId: string): Promise<{
     id: string;
     nombre: string;
     monto_minimo: number | null;
-    monto_sugerido: number | null;
     [key: string]: unknown;
   } | null> {
     const { data, error } = await this.from('organizaciones')
@@ -504,66 +503,65 @@ export class SupabaseService implements OnModuleInit {
   }
 
   /**
-   * Obtener organizaciones activas (incluye monto_minimo, monto_sugerido).
+   * Obtener organizaciones activas (incluye monto_minimo y su integración Bonda si existe).
    */
   async getOrganizacionesActivas() {
-    // Obtener organizaciones con micrositios de Bonda activos
-    // Esto muestra las ONGs que tienen APIs de Bonda configuradas
-    const { data, error } = await this.from('bonda_microsites')
+    // Obtener organizaciones activas directamente de la tabla organizaciones, 
+    // y traer sus micrositios de Bonda si tienen
+    const { data, error } = await this.from('organizaciones')
       .select(
         `
         id,
         nombre,
-        slug,
-        organizacion_id,
-        organizaciones (
+        descripcion,
+        logo_url,
+        website_url,
+        email,
+        telefono,
+        direccion,
+        monto_minimo,
+        verificada,
+        activa,
+        created_at,
+        updated_at,
+        bonda_microsites (
           id,
-          nombre,
-          descripcion,
-          logo_url,
-          website_url,
-          email,
-          telefono,
-          direccion,
-          monto_minimo,
-          monto_sugerido,
-          verificada,
-          created_at,
-          updated_at
+          slug,
+          activo
         )
       `,
       )
-      .eq('activo', true)
+      .eq('activa', true)
       .order('nombre', { ascending: true });
 
     if (error) {
-      this.logger.error('Error al obtener organizaciones con Bonda:', error);
+      this.logger.error('Error al obtener organizaciones activas:', error);
       throw error;
     }
 
-    // Mapear los datos para retornar en el formato esperado
-    return data.map((microsite: any) => {
-      // Type assertion para el JOIN (Supabase retorna objeto, no array)
-      const org = microsite.organizaciones;
+    // Mapear los datos para retornar en el formato esperado por el frontend
+    return data.map((org: any) => {
+      // Buscar si tiene una integración de Bonda activa
+      const bonda = Array.isArray(org.bonda_microsites) 
+        ? org.bonda_microsites.find((m: any) => m.activo) 
+        : org.bonda_microsites?.activo ? org.bonda_microsites : null;
 
       return {
-        id: microsite.organizacion_id || microsite.id,
-        bonda_microsite_id: microsite.id,
-        nombre: org?.nombre || microsite.nombre,
-        descripcion:
-          org?.descripcion || `Micrositio Bonda: ${microsite.nombre}`,
-        logo_url: org?.logo_url || null,
-        website_url: org?.website_url || null,
-        email: org?.email || null,
-        telefono: org?.telefono || null,
-        direccion: org?.direccion || null,
-        monto_minimo: org?.monto_minimo || 5000,
-        monto_sugerido: org?.monto_sugerido || 10000,
-        slug: microsite.slug,
+        id: org.id,
+        bonda_microsite_id: bonda?.id || null,
+        nombre: org.nombre,
+        descripcion: org.descripcion,
+        logo_url: org.logo_url || null,
+        website_url: org.website_url || null,
+        email: org.email || null,
+        telefono: org.telefono || null,
+        direccion: org.direccion || null,
+        monto_minimo: org.monto_minimo || 5000,
+        slug: bonda?.slug || null,
         activa: true,
-        verificada: org?.verificada || false,
-        created_at: org?.created_at || new Date().toISOString(),
-        updated_at: org?.updated_at || new Date().toISOString(),
+        verificada: org.verificada || false,
+        created_at: org.created_at || new Date().toISOString(),
+        updated_at: org.updated_at || new Date().toISOString(),
       };
     });
   }

@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import Swal from 'sweetalert2';
 import { getAdminUsers, deleteAdminUser, AdminUser, createAdminUser, updateAdminUser, deleteAffiliation, getUserAdminPayments, toggleUserAdminRole } from "@/lib/admin";
 import { useAuth } from "@/contexts/AuthContext";
-import { Users, MoreVertical, Edit2, Trash2, UserPlus, X, ShieldAlert, Shield, CheckCircle, XCircle, Receipt, UserSearch, ArrowLeft, Mail, Phone, BookUser } from "lucide-react";
+import { Users, MoreVertical, Edit2, Trash2, UserPlus, X, ShieldAlert, Shield, CheckCircle, XCircle, Receipt, UserSearch, ArrowLeft, Mail, Phone, BookUser, Building2 } from "lucide-react";
+import SeccionAdminOngs from "./SeccionAdminOngs";
 
 export default function SeccionAdmin() {
   const { user } = useAuth();
@@ -242,6 +243,8 @@ export default function SeccionAdmin() {
     }
   };
 
+  const [adminTab, setAdminTab] = useState<"usuarios" | "ongs">("ongs"); // Default to ONGs as it's the new feature
+
   if (selectedUserForDetails) {
     const u = selectedUserForDetails;
     return (
@@ -254,6 +257,7 @@ export default function SeccionAdmin() {
           Volver al panel principal
         </button>
 
+        {/* ... user details code remains unchanged ... */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden p-8">
           <div className="flex items-center gap-5 mb-8 pb-8 border-b border-slate-100">
              <div className="size-20 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-3xl">
@@ -381,16 +385,44 @@ export default function SeccionAdmin() {
             <ShieldAlert className="w-8 h-8 text-[#40a8ab]" />
             Panel de Súper Administrador
           </h1>
-          <p className="text-slate-500 mt-2">Gestiona {total} usuarios y su estado de sincronización con Bonda.</p>
+          <p className="text-slate-500 mt-2">Gestiona usuarios, ONGs y accesos al sistema.</p>
         </div>
+      </div>
+
+      <div className="flex gap-4 mb-8 border-b border-slate-200">
         <button
-          onClick={openCreateModal}
-          className="mt-4 md:mt-0 flex items-center gap-2 px-6 py-3 bg-[#40a8ab] hover:bg-[#2c8184] text-white rounded-xl font-semibold transition-all shadow-md hover:shadow-lg"
+          onClick={() => setAdminTab("ongs")}
+          className={`pb-4 px-2 font-semibold text-sm flex items-center gap-2 border-b-2 transition-colors ${
+            adminTab === "ongs" ? "border-[#40a8ab] text-[#40a8ab]" : "border-transparent text-slate-500 hover:text-slate-700"
+          }`}
         >
-          <UserPlus className="w-5 h-5" />
-          Nuevo Usuario
+          <Building2 className="w-4 h-4" />
+          Fundaciones / ONGs
+        </button>
+        <button
+          onClick={() => setAdminTab("usuarios")}
+          className={`pb-4 px-2 font-semibold text-sm flex items-center gap-2 border-b-2 transition-colors ${
+            adminTab === "usuarios" ? "border-[#40a8ab] text-[#40a8ab]" : "border-transparent text-slate-500 hover:text-slate-700"
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          Usuarios Registrados
         </button>
       </div>
+
+      {adminTab === "ongs" ? (
+        <SeccionAdminOngs />
+      ) : (
+        <>
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={openCreateModal}
+              className="flex items-center gap-2 px-6 py-3 bg-[#40a8ab] hover:bg-[#2c8184] text-white rounded-xl font-semibold transition-all shadow-md hover:shadow-lg"
+            >
+              <UserPlus className="w-5 h-5" />
+              Nuevo Usuario
+            </button>
+          </div>
 
       {loading ? (
         <div className="flex justify-center py-20">
@@ -527,72 +559,74 @@ export default function SeccionAdmin() {
         </div>
       )}
 
-      {/* Modal Creación/Edición */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-slate-900/40 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-              <h2 className="text-xl font-bold text-slate-800">
-                {editingUser ? "Editar Usuario" : "Nuevo Usuario"}
-              </h2>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200 transition-colors">
-                <X className="w-5 h-5" />
-              </button>
+          {/* Modal Creación/Edición */}
+          {isModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-slate-900/40 backdrop-blur-sm">
+              <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                  <h2 className="text-xl font-bold text-slate-800">
+                    {editingUser ? "Editar Usuario" : "Nuevo Usuario"}
+                  </h2>
+                  <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200 transition-colors">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                
+                <form onSubmit={handleSubmit} className="p-6">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">Nombre Completo</label>
+                      <input required value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">Email</label>
+                      <input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1 flex items-center gap-2">
+                           DNI 
+                           {editingUser && <span className="text-[10px] font-normal text-slate-400 font-mono">(Solo lectura)</span>}
+                        </label>
+                        <input 
+                          required 
+                          value={formData.dni} 
+                          onChange={e => setFormData({...formData, dni: e.target.value})} 
+                          disabled={!!editingUser}
+                          className={`w-full px-4 py-2.5 rounded-xl border transition-all outline-none ${
+                            editingUser
+                              ? 'bg-slate-100 text-slate-500 border-slate-200 cursor-not-allowed border-dashed'
+                              : 'bg-white border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500'
+                          }`} 
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1">Teléfono</label>
+                        <input value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" />
+                      </div>
+                    </div>
+                    {!editingUser && (
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1">Organización / Slug Bonda</label>
+                        <input value={formData.bondaSlug} onChange={e => setFormData({...formData, bondaSlug: e.target.value})} className="w-full px-4 py-2.5 bg-slate-50 text-slate-600 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none transition-all" />
+                        <p className="text-[11px] text-slate-400 mt-1">Por defecto: "ctfin"</p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="mt-8 flex gap-3">
+                    <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 px-4 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold rounded-xl transition-colors">
+                      Cancelar
+                    </button>
+                    <button type="submit" disabled={submitting} className="flex-1 py-3 px-4 bg-[#40a8ab] hover:bg-[#2c8184] disabled:bg-emerald-400 text-white font-semibold rounded-xl shadow-lg shadow-emerald-200 transition-all flex justify-center items-center">
+                      {submitting ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div> : 'Guardar Cambios'}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
-            
-            <form onSubmit={handleSubmit} className="p-6">
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">Nombre Completo</label>
-                  <input required value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">Email</label>
-                  <input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1 flex items-center gap-2">
-                       DNI 
-                       {editingUser && <span className="text-[10px] font-normal text-slate-400 font-mono">(Solo lectura)</span>}
-                    </label>
-                    <input 
-                      required 
-                      value={formData.dni} 
-                      onChange={e => setFormData({...formData, dni: e.target.value})} 
-                      disabled={!!editingUser}
-                      className={`w-full px-4 py-2.5 rounded-xl border transition-all outline-none ${
-                        editingUser
-                          ? 'bg-slate-100 text-slate-500 border-slate-200 cursor-not-allowed border-dashed'
-                          : 'bg-white border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500'
-                      }`} 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1">Teléfono</label>
-                    <input value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all" />
-                  </div>
-                </div>
-                {!editingUser && (
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1">Organización / Slug Bonda</label>
-                    <input value={formData.bondaSlug} onChange={e => setFormData({...formData, bondaSlug: e.target.value})} className="w-full px-4 py-2.5 bg-slate-50 text-slate-600 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none transition-all" />
-                    <p className="text-[11px] text-slate-400 mt-1">Por defecto: "ctfin"</p>
-                  </div>
-                )}
-              </div>
-              
-              <div className="mt-8 flex gap-3">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 px-4 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold rounded-xl transition-colors">
-                  Cancelar
-                </button>
-                <button type="submit" disabled={submitting} className="flex-1 py-3 px-4 bg-[#40a8ab] hover:bg-[#2c8184] disabled:bg-emerald-400 text-white font-semibold rounded-xl shadow-lg shadow-emerald-200 transition-all flex justify-center items-center">
-                  {submitting ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div> : 'Guardar Cambios'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+          )}
+        </>
       )}
     </div>
   );

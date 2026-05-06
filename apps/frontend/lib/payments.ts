@@ -29,8 +29,11 @@ export interface Organizacion {
   descripcion?: string;
   logo_url?: string;
   website_url?: string;
+  email?: string;
+  telefono?: string;
+  direccion?: string;
+  slug?: string;
   monto_minimo?: number;
-  monto_sugerido?: number;
   activa: boolean;
 }
 

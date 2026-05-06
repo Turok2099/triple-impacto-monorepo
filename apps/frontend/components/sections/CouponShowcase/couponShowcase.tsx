@@ -60,6 +60,22 @@ export default function CouponShowcase() {
             </div>
           </div>
         </div>
+        <style jsx>{`
+          @keyframes float {
+            0%, 100% {
+              transform: translateY(0px);
+            }
+            50% {
+              transform: translateY(-20px);
+            }
+          }
+          .animate-float {
+            animation: float 3s ease-in-out infinite;
+          }
+          .animation-delay-2000 {
+            animation-delay: 2s;
+          }
+        `}</style>
       </div>
     </section>
   );

@@ -156,6 +156,18 @@ export default function FAQSection() {
             Ir al formulario de contacto
           </a>
         </div>
+        <style jsx>{`
+          @keyframes slideInUp {
+            from {
+              opacity: 0;
+              transform: translateY(30px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}</style>
       </div>
     </section>
   );

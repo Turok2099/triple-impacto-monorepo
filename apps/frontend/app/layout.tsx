@@ -32,6 +32,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
+      <head>
+        <link rel="preconnect" href="https://cuponstar-ar.s3.amazonaws.com" />
+        <link rel="preconnect" href="https://backend-production-83f0.up.railway.app" />
+        <link rel="preconnect" href="https://faibhrhrassmrokvzqeu.supabase.co" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

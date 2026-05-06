@@ -71,6 +71,18 @@ export class FiservWebhookService {
       return;
     }
 
+    const statusStr = str(body.status);
+    
+    // Si la transacción fue declinada o cancelada, el approval_code empieza con N o ?, o el status es FAILED/DECLINED
+    const isApproved = approvalCode.startsWith('Y') || statusStr === 'APPROVED';
+    
+    if (!isApproved) {
+      this.logger.warn(`Fiserv notification: pago declinado o cancelado (approvalCode=${approvalCode}, status=${statusStr}).`);
+      const failReason = str(body.fail_reason) || str(body.failReason) || approvalCode;
+      await this.handleDeclined(oid, failReason);
+      return;
+    }
+
     if (!notificationHash) {
       this.logger.warn(
         'Fiserv notification: sin response_hash o notification_hash en el body',

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Heart, X, ExternalLink, Mail, Globe, Phone, MapPin } from "lucide-react";
 import { obtenerOrganizaciones, type Organizacion } from "@/lib/payments";
 
@@ -136,9 +137,9 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                 className="bg-white rounded-2xl p-4 flex items-center justify-between shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-50 cursor-pointer hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center gap-4 min-w-0 pointer-events-none">
-                  <div className="size-16 rounded-full bg-transparent shrink-0 overflow-hidden flex items-center justify-center p-1">
+                  <div className="size-16 rounded-full bg-transparent shrink-0 overflow-hidden flex items-center justify-center p-1 relative">
                     {logoUrl ? (
-                      <img src={logoUrl} alt={org.nombre} className="w-full h-full object-contain" />
+                      <Image src={logoUrl} alt={org.nombre} fill sizes="64px" className="object-contain p-1" />
                     ) : (
                       <span className="w-full h-full flex items-center justify-center text-lg font-bold text-[#40a8ab]">
                         {org.nombre.charAt(0)}
@@ -179,9 +180,9 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                 className="group bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300 flex flex-col items-center cursor-pointer"
               >
                 <div className="p-8 pb-4 flex flex-col items-center grow text-center pointer-events-none">
-                  <div className="h-28 w-full bg-transparent mb-6 shrink-0 overflow-hidden flex items-center justify-center p-2">
+                  <div className="h-28 w-full bg-transparent mb-6 shrink-0 overflow-hidden flex items-center justify-center p-2 relative">
                     {logoUrl ? (
-                      <img src={logoUrl} alt={org.nombre} className="w-full h-full object-contain" />
+                      <Image src={logoUrl} alt={org.nombre} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-contain p-2" />
                     ) : (
                       <span className="w-full h-full flex items-center justify-center text-2xl font-bold text-[#40a8ab]">
                         {org.nombre.charAt(0)}
@@ -230,11 +231,11 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
 
             <div className="p-8 md:p-10">
               <div className="flex flex-col sm:flex-row items-center gap-6 mb-8 text-center sm:text-left">
-                <div className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center shrink-0 p-3 shadow-md border border-slate-100">
+                <div className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center shrink-0 p-3 shadow-md border border-slate-100 relative overflow-hidden">
                   {(() => {
                     const logoUrl = selectedOrg.logo_url;
                     return logoUrl ? (
-                      <img src={logoUrl} alt={selectedOrg.nombre} className="w-full h-full object-contain" />
+                      <Image src={logoUrl} alt={selectedOrg.nombre} fill sizes="96px" className="object-contain p-3" />
                     ) : (
                       <span className="text-4xl font-bold text-[#40a8ab]">{selectedOrg.nombre.charAt(0)}</span>
                     );

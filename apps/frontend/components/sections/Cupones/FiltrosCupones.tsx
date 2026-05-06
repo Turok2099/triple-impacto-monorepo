@@ -102,6 +102,22 @@ export default function FiltrosCupones({
           })}
         </div>
       </div>
+      <style jsx>{`
+        .scrollbar-thin::-webkit-scrollbar {
+          height: 8px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-track {
+          background: #d1fae5;
+          border-radius: 10px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+          background: #10b981;
+          border-radius: 10px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+          background: #059669;
+        }
+      `}</style>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { obtenerCuponesPublicos } from "@/lib/bonda";
 
@@ -134,14 +135,13 @@ export default function SponsorsSection() {
                   justifyContent: "center",
                 }}
               >
-                <img
+                <Image
                   src={sponsor.logo}
                   alt={sponsor.name}
+                  fill
+                  sizes="(max-width: 768px) 50vw, 20vw"
                   className="object-contain"
-                  style={{
-                    maxWidth: "130%",
-                    maxHeight: "130%",
-                  }}
+                  style={{ transform: "scale(1.3)" }}
                   title={sponsor.name}
                 />
               </div>

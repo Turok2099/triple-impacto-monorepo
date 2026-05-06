@@ -1,14 +1,19 @@
+import Image from "next/image";
+
 export default function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
       {/* Imagen de fondo */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage:
-            "url(https://res.cloudinary.com/dxbtafe9u/image/upload/v1768268779/Fondo_hero_yzustd.png)",
-        }}
-      />
+      <div className="absolute inset-0">
+        <Image
+          src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1768268779/Fondo_hero_yzustd.png"
+          alt="AYNI Hero Background"
+          fill
+          priority
+          className="object-cover object-center"
+          quality={85}
+        />
+      </div>
 
       {/* Overlay oscuro para mejor legibilidad del texto */}
       <div className="absolute inset-0 bg-black/50" />

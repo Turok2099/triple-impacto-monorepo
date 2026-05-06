@@ -137,34 +137,40 @@ export default function WhyDonateSection() {
     if (isHovered) return;
 
     const intervalId = setInterval(() => {
-      if (carouselRef.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
-        // Si llegamos al final, volvemos al principio suavemente
-        if (scrollLeft + clientWidth >= scrollWidth - 10) {
-          carouselRef.current.scrollTo({ left: 0, behavior: "smooth" });
-        } else {
-          // Sino, pasamos a la siguiente tarjeta (aproximadamente el ancho de una tarjeta)
-          const scrollAmount = clientWidth > 768 ? clientWidth / 3 : clientWidth;
-          carouselRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+      requestAnimationFrame(() => {
+        if (carouselRef.current) {
+          const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
+          // Si llegamos al final, volvemos al principio suavemente
+          if (scrollLeft + clientWidth >= scrollWidth - 10) {
+            carouselRef.current.scrollTo({ left: 0, behavior: "smooth" });
+          } else {
+            // Sino, pasamos a la siguiente tarjeta (aproximadamente el ancho de una tarjeta)
+            const scrollAmount = clientWidth > 768 ? clientWidth / 3 : clientWidth;
+            carouselRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+          }
         }
-      }
+      });
     }, 4500);
 
     return () => clearInterval(intervalId);
   }, [isHovered]);
 
-  const scrollLeft = () => {
-    if (carouselRef.current) {
-      const scrollAmount = carouselRef.current.clientWidth > 768 ? carouselRef.current.clientWidth / 3 : carouselRef.current.clientWidth;
-      carouselRef.current.scrollBy({ left: -scrollAmount, behavior: "smooth" });
-    }
+  const scrollLeftClick = () => {
+    requestAnimationFrame(() => {
+      if (carouselRef.current) {
+        const scrollAmount = carouselRef.current.clientWidth > 768 ? carouselRef.current.clientWidth / 3 : carouselRef.current.clientWidth;
+        carouselRef.current.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+      }
+    });
   };
 
-  const scrollRight = () => {
-    if (carouselRef.current) {
-      const scrollAmount = carouselRef.current.clientWidth > 768 ? carouselRef.current.clientWidth / 3 : carouselRef.current.clientWidth;
-      carouselRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
-    }
+  const scrollRightClick = () => {
+    requestAnimationFrame(() => {
+      if (carouselRef.current) {
+        const scrollAmount = carouselRef.current.clientWidth > 768 ? carouselRef.current.clientWidth / 3 : carouselRef.current.clientWidth;
+        carouselRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+      }
+    });
   };
 
   return (
@@ -252,7 +258,7 @@ export default function WhyDonateSection() {
             
             {/* Controles del Carrusel */}
             <button 
-              onClick={scrollLeft}
+              onClick={scrollLeftClick}
               className="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 p-3 bg-white border-2 border-gray-100 rounded-full shadow-lg text-[#40a8ab] hover:bg-teal-50 hover:scale-110 transition-all sm:-ml-6"
               aria-label="Testimonio anterior"
             >
@@ -260,7 +266,7 @@ export default function WhyDonateSection() {
             </button>
 
             <button 
-              onClick={scrollRight}
+              onClick={scrollRightClick}
               className="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 p-3 bg-white border-2 border-gray-100 rounded-full shadow-lg text-[#40a8ab] hover:bg-teal-50 hover:scale-110 transition-all sm:-mr-6"
               aria-label="Testimonio siguiente"
             >
@@ -323,6 +329,16 @@ export default function WhyDonateSection() {
             <style jsx>{`
               .hide-scrollbar::-webkit-scrollbar {
                 display: none;
+              }
+              @keyframes slideInUp {
+                from {
+                  opacity: 0;
+                  transform: translateY(30px);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateY(0);
+                }
               }
             `}</style>
           </div>

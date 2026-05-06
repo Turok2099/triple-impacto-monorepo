@@ -10,6 +10,7 @@ export default function HeroSection() {
           alt="AYNI Hero Background"
           fill
           priority
+          fetchPriority="high"
           className="object-cover object-center"
           quality={85}
         />

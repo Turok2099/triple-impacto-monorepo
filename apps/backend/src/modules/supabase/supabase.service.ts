@@ -581,12 +581,13 @@ export class SupabaseService implements OnModuleInit {
     api_token: string;
     api_token_nominas: string | null;
     microsite_id: string | null;
+    landing_url: string | null;
     organizacion_id: string | null;
     activo: boolean;
   } | null> {
     const { data, error } = await this.from('bonda_microsites')
       .select(
-        'id, slug, nombre, api_token, api_token_nominas, microsite_id, organizacion_id, activo',
+        'id, slug, nombre, api_token, api_token_nominas, microsite_id, landing_url, organizacion_id, activo',
       )
       .eq('slug', slug)
       .eq('activo', true)
@@ -610,12 +611,13 @@ export class SupabaseService implements OnModuleInit {
     api_token: string;
     api_token_nominas: string | null;
     microsite_id: string | null;
+    landing_url: string | null;
     organizacion_id: string | null;
     activo: boolean;
   } | null> {
     const { data, error } = await this.from('bonda_microsites')
       .select(
-        'id, slug, nombre, api_token, api_token_nominas, microsite_id, organizacion_id, activo',
+        'id, slug, nombre, api_token, api_token_nominas, microsite_id, landing_url, organizacion_id, activo',
       )
       .eq('organizacion_id', organizacionId)
       .eq('activo', true)
@@ -644,12 +646,13 @@ export class SupabaseService implements OnModuleInit {
     api_token: string;
     api_token_nominas: string | null;
     microsite_id: string | null;
+    landing_url: string | null;
     organizacion_id: string | null;
     last_synced_at: string | null;
   } | null> {
     const { data, error } = await this.from('bonda_microsites')
       .select(
-        'id, slug, nombre, api_token, api_token_nominas, microsite_id, organizacion_id, last_synced_at',
+        'id, slug, nombre, api_token, api_token_nominas, microsite_id, landing_url, organizacion_id, last_synced_at',
       )
       .eq('activo', true)
       .order('last_synced_at', { ascending: true, nullsFirst: true })

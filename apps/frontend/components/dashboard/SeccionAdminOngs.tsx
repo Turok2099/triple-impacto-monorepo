@@ -32,7 +32,8 @@ export default function SeccionAdminOngs() {
     bonda_slug: "",
     bonda_api_token: "",
     bonda_api_token_nominas: "",
-    bonda_microsite_id: ""
+    bonda_microsite_id: "",
+    bonda_landing_url: ""
   });
 
   useEffect(() => {
@@ -100,7 +101,7 @@ export default function SeccionAdminOngs() {
       nombre: "", descripcion: "", logo_url: "", email: "", telefono: "", website_url: "",
       monto_minimo: 5000,
       activa: true, fiserv_store_id: "", fiserv_shared_secret: "", bonda_slug: "", bonda_api_token: "",
-      bonda_api_token_nominas: "", bonda_microsite_id: ""
+      bonda_api_token_nominas: "", bonda_microsite_id: "", bonda_landing_url: ""
     });
     setIsModalOpen(true);
   };
@@ -126,7 +127,8 @@ export default function SeccionAdminOngs() {
       bonda_slug: bonda?.slug || "",
       bonda_api_token: bonda?.api_token || "",
       bonda_api_token_nominas: bonda?.api_token_nominas || "",
-      bonda_microsite_id: bonda?.microsite_id || ""
+      bonda_microsite_id: bonda?.microsite_id || "",
+      bonda_landing_url: bonda?.landing_url || ""
     });
     setIsModalOpen(true);
   };
@@ -366,8 +368,12 @@ export default function SeccionAdminOngs() {
                   <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2"><Key className="w-5 h-5 text-slate-400"/> Beneficios Bonda</h3>
                   <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="col-span-2">
-                      <label className="block text-sm font-semibold text-emerald-900 mb-1">URL Completa del Micrositio Bonda</label>
-                      <input placeholder="ej: https://beneficios-mi-ong.bonda.com" value={formData.bonda_slug} onChange={e => setFormData({...formData, bonda_slug: e.target.value.trim().replace(/\/+$/, '')})} className="w-full px-4 py-2.5 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                      <label className="block text-sm font-semibold text-emerald-900 mb-1">Slug del Micrositio Bonda</label>
+                      <input placeholder="ej: beneficios-mi-ong" value={formData.bonda_slug} onChange={e => setFormData({...formData, bonda_slug: e.target.value.trim().replace(/\/+$/, '')})} className="w-full px-4 py-2.5 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-sm font-semibold text-emerald-900 mb-1">URL de Landing Bonda (Incluyendo tokens)</label>
+                      <input placeholder="ej: https://beneficios.bonda.com?t=..." value={formData.bonda_landing_url} onChange={e => setFormData({...formData, bonda_landing_url: e.target.value.trim()})} className="w-full px-4 py-2.5 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-emerald-900 mb-1">API Token (Afiliados/Cupones)</label>

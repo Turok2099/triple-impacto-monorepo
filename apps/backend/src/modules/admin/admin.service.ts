@@ -297,6 +297,7 @@ export class AdminService {
           api_token: payload.bonda_api_token,
           api_token_nominas: payload.bonda_api_token_nominas,
           microsite_id: payload.bonda_microsite_id,
+          landing_url: payload.bonda_landing_url,
           activo: true
         });
         
@@ -344,6 +345,7 @@ export class AdminService {
       if (payload.bonda_api_token) bondaData.api_token = payload.bonda_api_token;
       if (payload.bonda_api_token_nominas !== undefined) bondaData.api_token_nominas = payload.bonda_api_token_nominas;
       if (payload.bonda_microsite_id) bondaData.microsite_id = payload.bonda_microsite_id;
+      if (payload.bonda_landing_url) bondaData.landing_url = payload.bonda_landing_url;
 
       // Buscar si existe
       const { data: existingBonda } = await client.from('bonda_microsites').select('id').eq('organizacion_id', id).maybeSingle();

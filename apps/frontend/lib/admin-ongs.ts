@@ -5,6 +5,7 @@ export interface BondaMicrosite {
   api_token: string;
   api_token_nominas: string | null;
   microsite_id: string | null;
+  landing_url: string | null;
   organizacion_id: string;
   activo: boolean;
 }

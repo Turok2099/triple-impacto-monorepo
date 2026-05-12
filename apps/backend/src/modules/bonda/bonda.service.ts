@@ -117,7 +117,7 @@ export class BondaService {
         key: config.api_token,
         micrositio_id: config.microsite_id,
         codigo_afiliado: codigoAfiliado,
-        subcategories: options?.subcategories ?? true, // Retornar subcategorías por defecto
+        subcategories: options?.subcategories ?? false, // Retornar categorías raíz por defecto
       };
 
       // Agregar filtros opcionales

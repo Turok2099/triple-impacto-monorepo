@@ -107,30 +107,6 @@ export class PublicController {
     ];
   }
 
-  /** Lista exacta de filtros a mostrar (mismo orden que web Bonda). Se mapean a IDs de la API. */
-  private readonly FILTROS_LABELS = [
-    'Compras',
-    'Gastronomía',
-    'Indumentaria, Calzado y Moda',
-    'Educación',
-    'Servicios',
-    'Turismo',
-    'Gimnasios y Deportes',
-    'Belleza y Salud',
-    'Entretenimientos',
-    'Motos',
-    'Teatros',
-    'Autos',
-    'Cines',
-    'Inmobiliarias',
-    'Inmuebles',
-  ] as const;
-
-  /** Aliases para matchear nombres que Bonda puede devolver con otro texto. */
-  private readonly FILTROS_ALIASES: Record<string, string[]> = {
-    'Indumentaria, Calzado y Moda': ['Indumentaria y Moda', 'Indumentaria'],
-  };
-
   /** Normaliza nombre para comparar con respuestas de Bonda (minúsculas, sin acentos, trim). */
   private normalizarNombre(n: string): string {
     return (n || '')
@@ -141,30 +117,9 @@ export class PublicController {
   }
 
   /**
-   * Categorías para el filtro: misma lista que web Bonda, con IDs del endpoint Categorias.
+   * Categorías para el filtro: dinámicas desde Bonda (Root categories).
    * GET /api/public/categorias-bonda
-   * Se obtienen categorías/subcategorías de Bonda y se mapean a estos labels; el filtro
-   * de cupones usa el param "categoria" (Integer) según la API "Listado de cupones filtrados".
    */
-  /** Lista completa de subcategorías para el filtro (IDs compatibles con Bonda). */
-  private readonly CATEGORIAS_FALLBACK = [
-    { id: 0, nombre: 'Todo' },
-    { id: 13, nombre: 'Compras' },
-    { id: 12, nombre: 'Gastronomía' },
-    { id: 6, nombre: 'Indumentaria, Calzado y Moda' },
-    { id: 14, nombre: 'Educación' },
-    { id: 8, nombre: 'Servicios' },
-    { id: 11, nombre: 'Turismo' },
-    { id: 16, nombre: 'Gimnasios y Deportes' },
-    { id: 7, nombre: 'Belleza y Salud' },
-    { id: 17, nombre: 'Entretenimientos' },
-    { id: 18, nombre: 'Motos' },
-    { id: 19, nombre: 'Teatros' },
-    { id: 20, nombre: 'Autos' },
-    { id: 21, nombre: 'Cines' },
-    { id: 22, nombre: 'Inmobiliarias' },
-    { id: 23, nombre: 'Inmuebles' },
-  ];
 
   @Get('categorias-bonda')
   async getCategoriasBonda(): Promise<
@@ -172,34 +127,31 @@ export class PublicController {
   > {
     const todo = { id: 0, nombre: 'Todo' };
     try {
+      // Pedimos las categorías a Bonda (por defecto root si no enviamos subcategories o enviamos false)
       const bondaCategorias = await this.bondaService.obtenerCategorias({
         slug: this.PUBLIC_BOT_CONFIG.masterSlug,
       });
-      const normalizedBonda = new Map<string, number>();
-      for (const c of bondaCategorias) {
-        const key = this.normalizarNombre(c.nombre);
-        if (!normalizedBonda.has(key)) normalizedBonda.set(key, c.id);
-      }
-      const result: { id: number; nombre: string }[] = [todo];
-      for (const label of this.FILTROS_LABELS) {
-        const keys = [
-          this.normalizarNombre(label),
-          ...(this.FILTROS_ALIASES[label] || []).map((a) =>
-            this.normalizarNombre(a),
-          ),
-        ];
-        let id: number | undefined;
-        for (const key of keys) {
-          id = normalizedBonda.get(key);
-          if (id != null) break;
-        }
-        if (id != null) result.push({ id, nombre: label });
-      }
-      // Si Bonda no devolvió coincidencias, devolver siempre la lista completa para que el filtro sea usable
-      if (result.length <= 1) return this.CATEGORIAS_FALLBACK;
-      return result;
+
+      // Filtramos solo las categorías padre (root) para mantener el dashboard limpio
+      // y que coincida con el catálogo que ahora bajamos sin subcategorías.
+      const rootCategories = bondaCategorias
+        .filter(c => !c.parent_id)
+        .map(c => ({
+          id: c.id,
+          nombre: c.nombre
+        }));
+
+      return [todo, ...rootCategories];
     } catch (error) {
-      return this.CATEGORIAS_FALLBACK;
+      this.logger.error('Error al obtener categorías dinámicas:', error.message);
+      // Fallback mínimo si falla la API
+      return [
+        todo,
+        { id: 13, nombre: 'Compras' },
+        { id: 12, nombre: 'Gastronomía' },
+        { id: 11, nombre: 'Turismo' },
+        { id: 17, nombre: 'Entretenimientos' },
+      ];
     }
   }
 

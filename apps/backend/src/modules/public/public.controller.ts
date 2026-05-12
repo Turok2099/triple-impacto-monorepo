@@ -126,14 +126,30 @@ export class PublicController {
     { id: number; nombre: string; parent_id?: number | null }[]
   > {
     const todo = { id: 0, nombre: 'Todo' };
+    
     try {
-      // Pedimos las categorías a Bonda (por defecto root si no enviamos subcategories o enviamos false)
+      // 1. Intentar extraer categorías dinámicamente desde el catálogo en caché (lo más fiable)
+      if (this.catalogCache && this.catalogCache.data.length > 0) {
+        const uniqueCategories = Array.from(
+          new Set(this.catalogCache.data.map(c => c.categoria_principal))
+        )
+        .filter(Boolean)
+        .sort()
+        .map((nombre, index) => ({
+          id: index + 1000, // IDs temporales para el front
+          nombre: nombre as string
+        }));
+
+        if (uniqueCategories.length > 0) {
+          return [todo, ...uniqueCategories];
+        }
+      }
+
+      // 2. Si no hay caché, intentar con la API de Bonda (Root categories)
       const bondaCategorias = await this.bondaService.obtenerCategorias({
         slug: this.PUBLIC_BOT_CONFIG.masterSlug,
       });
 
-      // Filtramos solo las categorías padre (root) para mantener el dashboard limpio
-      // y que coincida con el catálogo que ahora bajamos sin subcategorías.
       const rootCategories = bondaCategorias
         .filter(c => !c.parent_id)
         .map(c => ({
@@ -141,16 +157,24 @@ export class PublicController {
           nombre: c.nombre
         }));
 
-      return [todo, ...rootCategories];
-    } catch (error) {
-      this.logger.error('Error al obtener categorías dinámicas:', error.message);
-      // Fallback mínimo si falla la API
+      if (rootCategories.length > 0) {
+        return [todo, ...rootCategories];
+      }
+
+      // 3. Fallback final
       return [
         todo,
         { id: 13, nombre: 'Compras' },
         { id: 12, nombre: 'Gastronomía' },
         { id: 11, nombre: 'Turismo' },
         { id: 17, nombre: 'Entretenimientos' },
+      ];
+    } catch (error) {
+      this.logger.error('Error al obtener categorías:', error.message);
+      return [
+        todo,
+        { id: 13, nombre: 'Compras' },
+        { id: 12, nombre: 'Gastronomía' },
       ];
     }
   }

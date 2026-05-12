@@ -94,4 +94,40 @@ export class AdminController {
     const adminId = req.user?.userId;
     return this.adminService.deleteOrganizacion(adminId, id);
   }
+
+  // ==========================================
+  // BANNERS
+  // ==========================================
+
+  @Get('banners')
+  async getBanners() {
+    return this.adminService.getBanners();
+  }
+
+  @Post('banners/upload')
+  @UseInterceptors(require('@nestjs/platform-express').FileInterceptor('file'))
+  async uploadBannerImage(@UploadedFile() file: any) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+    return this.adminService.uploadBannerImage(file);
+  }
+
+  @Post('banners')
+  async createBanner(@Req() req: any, @Body() payload: any) {
+    const adminId = req.user?.userId;
+    return this.adminService.createBanner(adminId, payload);
+  }
+
+  @Patch('banners/:id')
+  async updateBanner(@Req() req: any, @Param('id') id: string, @Body() payload: any) {
+    const adminId = req.user?.userId;
+    return this.adminService.updateBanner(adminId, id, payload);
+  }
+
+  @Delete('banners/:id')
+  async deleteBanner(@Req() req: any, @Param('id') id: string) {
+    const adminId = req.user?.userId;
+    return this.adminService.deleteBanner(adminId, id);
+  }
 }

@@ -309,6 +309,25 @@ export class PublicController {
   }
 
   /**
+   * Obtiene los banners activos para el carrusel de la home.
+   * GET /api/public/banners
+   */
+  @Get('banners')
+  async getBanners(): Promise<any[]> {
+    const { data, error } = await this.supabase.getClient()
+      .from('banners')
+      .select('id, title, image_url, link_url, order')
+      .eq('is_active', true)
+      .order('order', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching public banners:', error);
+      return [];
+    }
+    return data || [];
+  }
+
+  /**
    * Trigger manual para sincronizar cupones de Bonda a public_coupons.
    * Requiere un secret para evitar abusos.
    * POST /api/public/sync-cupones?secret=TU_SECRET

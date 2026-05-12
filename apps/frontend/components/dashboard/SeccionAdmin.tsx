@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 import Swal from 'sweetalert2';
 import { getAdminUsers, deleteAdminUser, AdminUser, createAdminUser, updateAdminUser, deleteAffiliation, getUserAdminPayments, toggleUserAdminRole } from "@/lib/admin";
 import { useAuth } from "@/contexts/AuthContext";
-import { Users, MoreVertical, Edit2, Trash2, UserPlus, X, ShieldAlert, Shield, CheckCircle, XCircle, Receipt, UserSearch, ArrowLeft, Mail, Phone, BookUser, Building2 } from "lucide-react";
+import { Users, MoreVertical, Edit2, Trash2, UserPlus, X, ShieldAlert, Shield, CheckCircle, XCircle, Receipt, UserSearch, ArrowLeft, Mail, Phone, BookUser, Building2, Image as ImageIcon } from "lucide-react";
 import SeccionAdminOngs from "./SeccionAdminOngs";
+import SeccionAdminBanners from "./SeccionAdminBanners";
 
 export default function SeccionAdmin() {
   const { user } = useAuth();
@@ -243,7 +244,7 @@ export default function SeccionAdmin() {
     }
   };
 
-  const [adminTab, setAdminTab] = useState<"usuarios" | "ongs">("ongs"); // Default to ONGs as it's the new feature
+  const [adminTab, setAdminTab] = useState<"usuarios" | "ongs" | "banners">("ongs"); // Default to ONGs as it's the new feature
 
   if (selectedUserForDetails) {
     const u = selectedUserForDetails;
@@ -408,10 +409,21 @@ export default function SeccionAdmin() {
           <Users className="w-4 h-4" />
           Usuarios Registrados
         </button>
+        <button
+          onClick={() => setAdminTab("banners")}
+          className={`pb-4 px-2 font-semibold text-sm flex items-center gap-2 border-b-2 transition-colors ${
+            adminTab === "banners" ? "border-[#40a8ab] text-[#40a8ab]" : "border-transparent text-slate-500 hover:text-slate-700"
+          }`}
+        >
+          <ImageIcon className="w-4 h-4" />
+          Banners Home
+        </button>
       </div>
 
       {adminTab === "ongs" ? (
         <SeccionAdminOngs />
+      ) : adminTab === "banners" ? (
+        <SeccionAdminBanners />
       ) : (
         <>
           <div className="flex justify-end mb-4">

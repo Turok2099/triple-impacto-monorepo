@@ -108,3 +108,74 @@ export const getUserAdminPayments = async (token: string, userId: string) => {
   }
   return await res.json();
 };
+
+// ==========================================
+// BANNERS
+// ==========================================
+
+export interface Banner {
+  id: string;
+  title: string;
+  image_url: string;
+  link_url?: string;
+  is_active: boolean;
+  order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export const getAdminBanners = async (token: string): Promise<Banner[]> => {
+  const url = `${API_URL}/admin/banners`;
+  const res = await fetch(url, { headers: getHeaders(token) });
+  if (!res.ok) throw new Error('Error recuperando banners');
+  return await res.json();
+};
+
+export const uploadBannerImage = async (token: string, file: File) => {
+  const url = `${API_URL}/admin/banners/upload`;
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`
+      // 'Content-Type': 'multipart/form-data' is handled by the browser
+    },
+    body: formData
+  });
+  if (!res.ok) throw new Error('Error subiendo imagen de banner');
+  return await res.json();
+};
+
+export const createBanner = async (token: string, payload: Partial<Banner>) => {
+  const url = `${API_URL}/admin/banners`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: getHeaders(token),
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) throw new Error('Error creando banner');
+  return await res.json();
+};
+
+export const updateBanner = async (token: string, id: string, payload: Partial<Banner>) => {
+  const url = `${API_URL}/admin/banners/${id}`;
+  const res = await fetch(url, {
+    method: 'PATCH',
+    headers: getHeaders(token),
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) throw new Error('Error actualizando banner');
+  return await res.json();
+};
+
+export const deleteBanner = async (token: string, id: string) => {
+  const url = `${API_URL}/admin/banners/${id}`;
+  const res = await fetch(url, {
+    method: 'DELETE',
+    headers: getHeaders(token)
+  });
+  if (!res.ok) throw new Error('Error eliminando banner');
+  return await res.json();
+};

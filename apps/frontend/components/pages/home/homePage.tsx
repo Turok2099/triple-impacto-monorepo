@@ -10,19 +10,21 @@ import SponsorsSection from "@/components/sections/Sponsors/sponsorsSection";
 import WhyDonateSection from "@/components/sections/WhyDonate/whyDonateSection";
 import JoinUsSection from "@/components/sections/JoinUs/joinUsSection";
 import AboutProjectSection from "@/components/sections/AboutProject/aboutProject";
+import HomeBannersCarousel from "@/components/sections/HomeBanners/homeBannersCarousel";
 
 export default function HomePage() {
   return (
     <div>
       <HeroSection />
+      <HomeBannersCarousel />
       <AboutProjectSection />
-      <FounderQuote />
       <HowItWorksSection />
       <CuponesShowcase />
       <CouponCounter />
       <SponsorsSection />
       <PartnersSection />
       <JoinUsSection />
+      <FounderQuote />
       <WhyDonateSection />
       <CTASection />
       <FAQCTASection />

@@ -383,4 +383,107 @@ export class AdminService {
     await this.logAudit(adminId, id, 'DELETE_ORG', 'SUCCESS');
     return { success: true, message: 'Organización desactivada correctamente' };
   }
+
+  // ==========================================
+  // BANNERS
+  // ==========================================
+
+  async getBanners() {
+    const { data, error } = await this.supabaseService.getClient()
+      .from('banners')
+      .select('*')
+      .order('order', { ascending: true });
+
+    if (error) {
+      this.logger.error('Error fetching banners:', error);
+      throw new InternalServerErrorException('Error al obtener banners');
+    }
+    return data;
+  }
+
+  async uploadBannerImage(file: any) {
+    const client = this.supabaseService.getClient();
+    const ext = file.originalname.split('.').pop() || 'png';
+    const cleanName = file.originalname.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+    const fileName = `banner-${Date.now()}-${cleanName}.${ext}`;
+    
+    // Using 'home-banners' bucket. Note: This bucket must exist in Supabase
+    const { data, error } = await client.storage
+      .from('home-banners')
+      .upload(fileName, file.buffer, {
+        contentType: file.mimetype,
+        upsert: true
+      });
+
+    if (error) {
+      // Fallback to 'ong-logos' if 'home-banners' doesn't exist, or just throw error
+      // For now, let's throw error so the user knows they need to create the bucket
+      this.logger.error('Error uploading banner to home-banners bucket:', error);
+      throw new InternalServerErrorException('Error uploading to Supabase bucket "home-banners". Asegúrate de que el bucket exista.');
+    }
+
+    const { data: publicUrlData } = client.storage
+      .from('home-banners')
+      .getPublicUrl(fileName);
+
+    return { url: publicUrlData.publicUrl };
+  }
+
+  async createBanner(adminId: string, payload: any) {
+    const { data, error } = await this.supabaseService.getClient()
+      .from('banners')
+      .insert({
+        title: payload.title,
+        image_url: payload.image_url,
+        link_url: payload.link_url,
+        is_active: payload.is_active ?? true,
+        order: payload.order ?? 0
+      })
+      .select()
+      .single();
+
+    if (error) {
+      throw new BadRequestException('Error al crear el banner: ' + error.message);
+    }
+
+    await this.logAudit(adminId, data.id, 'CREATE_BANNER', 'SUCCESS');
+    return data;
+  }
+
+  async updateBanner(adminId: string, id: string, payload: any) {
+    const { data, error } = await this.supabaseService.getClient()
+      .from('banners')
+      .update({
+        title: payload.title,
+        image_url: payload.image_url,
+        link_url: payload.link_url,
+        is_active: payload.is_active,
+        order: payload.order,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      throw new BadRequestException('Error al actualizar banner: ' + error.message);
+    }
+
+    await this.logAudit(adminId, id, 'UPDATE_BANNER', 'SUCCESS');
+    return data;
+  }
+
+  async deleteBanner(adminId: string, id: string) {
+    const { error } = await this.supabaseService.getClient()
+      .from('banners')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      throw new InternalServerErrorException('Error al eliminar el banner');
+    }
+
+    await this.logAudit(adminId, id, 'DELETE_BANNER', 'SUCCESS');
+    return { success: true };
+  }
 }

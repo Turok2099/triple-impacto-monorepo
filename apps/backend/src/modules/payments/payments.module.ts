@@ -5,9 +5,10 @@ import { AuthModule } from '../auth/auth.module';
 import { PaymentsController } from './payments.controller';
 import { FiservWebhookService } from './fiserv-webhook.service';
 import { MailModule } from '../mail/mail.module';
+import { FiservRestModule } from './fiserv-rest/fiserv-rest.module';
 
 @Module({
-  imports: [FiservConnectModule, BondaModule, AuthModule, MailModule],
+  imports: [FiservConnectModule, BondaModule, AuthModule, MailModule, FiservRestModule],
   controllers: [PaymentsController],
   providers: [FiservWebhookService],
 })

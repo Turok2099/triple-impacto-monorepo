@@ -28,4 +28,8 @@ export default () => ({
   resend: {
     apiKey: process.env.RESEND_API_KEY || '',
   },
+  fiserv: {
+    apiKey: process.env.FISERV_API_KEY || '',
+    apiSecret: process.env.FISERV_API_SECRET || '',
+  },
 });

@@ -170,7 +170,7 @@ export class PublicController {
     const todo = { id: 0, nombre: 'Todo' };
     try {
       const bondaCategorias = await this.bondaService.obtenerCategorias({
-        slug: this.FUNDACION_PADRES_CONFIG.slug,
+        slug: this.PUBLIC_BOT_CONFIG.masterSlug,
       });
       const normalizedBonda = new Map<string, number>();
       for (const c of bondaCategorias) {

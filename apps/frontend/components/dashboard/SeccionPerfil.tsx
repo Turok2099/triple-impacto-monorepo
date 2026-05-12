@@ -18,7 +18,11 @@ import {
   CheckCircle2,
   XCircle,
   Shield,
+  Ticket,
+  Heart,
 } from 'lucide-react';
+import { getOrganizationLogoUrl } from '@/lib/organization-logos';
+import { DashboardUsuario } from '@/lib/dashboard';
 
 const PROVINCIAS = [
   'Buenos Aires', 'CABA', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba',
@@ -31,9 +35,10 @@ const PROVINCIAS = [
 interface SeccionPerfilProps {
   isActive?: boolean;
   role?: string;
+  dashboard?: DashboardUsuario | null;
 }
 
-export default function SeccionPerfil({ isActive = false, role = 'user' }: SeccionPerfilProps) {
+export default function SeccionPerfil({ isActive = false, role = 'user', dashboard }: SeccionPerfilProps) {
   const { user, logout } = useAuth();
 
   // Toast flotante
@@ -43,6 +48,8 @@ export default function SeccionPerfil({ isActive = false, role = 'user' }: Secci
     setToast({ tipo, texto });
     setTimeout(() => setToast(null), 3500);
   };
+
+  const [fundacionLogoError, setFundacionLogoError] = useState<Record<string, boolean>>({});
 
   // Datos de perfil
   const [nombre, setNombre] = useState('');
@@ -139,8 +146,131 @@ export default function SeccionPerfil({ isActive = false, role = 'user' }: Secci
         </div>
       )}
 
+      {/* Impact Summary */}
+      {dashboard && (
+        <section className="px-6 pt-8">
+          <h2 className="text-[#1A202C] font-bold text-xl mb-4">
+            Resumen de Impacto
+          </h2>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="bg-white p-4 rounded-2xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-slate-50 flex flex-col items-center gap-2 text-center">
+              <Ticket className="w-8 h-8 text-[#40a8ab]" strokeWidth={1.5} />
+              <p className="text-[10px] font-semibold text-[#718096] uppercase tracking-tight">
+                Cupones Activos
+              </p>
+              <p className="text-2xl font-bold text-[#40a8ab]">
+                {dashboard.estadisticas?.cuponesActivos || 0}
+              </p>
+            </div>
+            <div className="bg-white p-4 rounded-2xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-slate-50 flex flex-col items-center gap-2 text-center">
+              <CheckCircle2
+                className="w-8 h-8 text-[#40a8ab]"
+                strokeWidth={1.5}
+              />
+              <p className="text-[10px] font-semibold text-[#718096] uppercase tracking-tight">
+                Cupones Usados
+              </p>
+              <p className="text-2xl font-bold text-[#40a8ab]">
+                {dashboard.estadisticas?.cuponesUsados || 0}
+              </p>
+            </div>
+            <div className="bg-white p-4 rounded-2xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-slate-50 flex flex-col items-center gap-2 text-center">
+              <Heart className="w-8 h-8 text-[#40a8ab]" strokeWidth={1.5} />
+              <p className="text-[10px] font-semibold text-[#718096] uppercase tracking-tight">
+                Total Donado
+              </p>
+              <p className="text-2xl font-bold text-[#40a8ab]">
+                ${dashboard.estadisticas?.totalDonado?.toLocaleString("es-AR") || "0"}
+              </p>
+            </div>
+          </div>
+          <p className="mt-4 text-[12px] text-slate-400 font-medium">
+            Último cupón solicitado:{" "}
+            <span className="text-slate-600">
+              {dashboard.estadisticas?.ultimoCuponSolicitado
+                ? new Date(dashboard.estadisticas.ultimoCuponSolicitado).toLocaleDateString("es-AR", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })
+                : "Nunca"}
+            </span>
+          </p>
+        </section>
+      )}
+
+      {/* My Foundations */}
+      {dashboard && (
+        <section className="px-6 py-8">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-[#1A202C]">
+              Mis Fundaciones
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {dashboard.fundaciones && dashboard.fundaciones.length > 0 ? (
+              dashboard.fundaciones.map((fundacion) => {
+                const logoUrl = getOrganizationLogoUrl(fundacion.nombre, fundacion.slug);
+                const useLogo = !!logoUrl && !fundacionLogoError[fundacion.id];
+                const initialsBg = `url(https://ui-avatars.com/api/?name=${encodeURIComponent(fundacion.nombre)}&background=16a459&color=fff&size=128)`;
+                const totalDonado = fundacion.totalDonado ?? 0;
+                const totalFormateado = totalDonado.toLocaleString("es-AR");
+                const isInactive = fundacion.isActive === false;
+                
+                return (
+                  <div
+                    key={fundacion.id}
+                    className={`group overflow-hidden rounded-3xl transition-all duration-300 flex flex-col relative ${
+                      isInactive 
+                        ? 'bg-slate-50 border border-slate-200 grayscale opacity-75' 
+                        : 'bg-white border border-[#40a8ab]/20 shadow-md hover:shadow-lg transition-all'
+                    }`}
+                  >
+                    <div className={`h-12 w-full absolute top-0 left-0 z-0 ${
+                      isInactive ? 'bg-slate-200' : 'bg-gradient-to-r from-[#40a8ab] to-[#2c8184]'
+                    }`} />
+
+                    <div className="pt-6 px-4 pb-4 flex flex-col items-center relative z-10">
+                      <div className="size-16 bg-white rounded-xl shadow-sm border border-slate-100 p-2 flex items-center justify-center mb-3">
+                        {useLogo && logoUrl ? (
+                          <img
+                            src={logoUrl}
+                            alt={fundacion.nombre}
+                            className="w-full h-full object-contain"
+                            onError={() => setFundacionLogoError((prev) => ({ ...prev, [fundacion.id]: true }))}
+                          />
+                        ) : (
+                          <div
+                            className="w-full h-full rounded-lg bg-cover bg-center"
+                            style={{ backgroundImage: initialsBg }}
+                          />
+                        )}
+                      </div>
+                      
+                      <h4 className="font-bold text-[#1A202C] text-sm text-center line-clamp-1">
+                        {fundacion.nombre}
+                      </h4>
+                      
+                      <div className="mt-2 text-[10px] text-slate-500 font-semibold uppercase tracking-wider">
+                        ${totalFormateado} aportados
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="col-span-full py-8 text-center bg-slate-50 rounded-3xl border border-dashed border-slate-200">
+                <p className="text-slate-500 text-sm">No tienes fundaciones activas aún.</p>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      <div className="h-px bg-slate-100 mx-6 mb-8" />
+
       {/* Header */}
-      <header className="px-6 pt-8 pb-4">
+      <header className="px-6 pb-4">
         <h1 className="text-2xl font-bold text-[#1A202C]">Configuración de Perfil</h1>
       </header>
 

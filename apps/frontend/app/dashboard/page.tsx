@@ -41,6 +41,8 @@ import {
   Shirt,
   Car,
   Receipt,
+  Search,
+  X,
 } from "lucide-react";
 
 type ActiveTab = "inicio" | "perfil" | "cupones" | "pagos" | "admin" | "donar";
@@ -379,7 +381,7 @@ export default function DashboardPage() {
               className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "inicio" ? "text-[#40a8ab]" : "text-slate-400 hover:text-[#40a8ab]"}`}
             >
               <LayoutGrid className="w-6 h-6" strokeWidth={2} />
-              <span className={`text-xs ${activeTab === "inicio" ? "font-semibold" : "font-medium"}`}>Inicio</span>
+              <span className={`text-xs ${activeTab === "inicio" ? "font-semibold" : "font-medium"}`}>Cuponera</span>
             </button>
             <button
               onClick={() => setActiveTab("perfil")}
@@ -434,7 +436,8 @@ export default function DashboardPage() {
       {activeTab === "perfil" && (
         <SeccionPerfil 
           isActive={dashboard.fundaciones?.some(f => f.isActive) || false} 
-          role={user?.role || 'user'} 
+          role={user?.role || 'user'}
+          dashboard={dashboard}
         />
       )}
       {activeTab === "cupones" && <SeccionMisCupones />}
@@ -443,175 +446,6 @@ export default function DashboardPage() {
       {activeTab === "donar" && <SeccionDonacion />}
 
       <main className={`max-w-7xl mx-auto px-6 py-6 space-y-6 ${activeTab !== "inicio" ? "hidden" : ""}`}>
-        {/* Impact Summary */}
-        <section>
-          <h2 className="text-[#1A202C] font-bold text-xl mb-4">
-            Resumen de Impacto
-          </h2>
-          <div className="grid grid-cols-3 gap-3">
-            <div className="bg-white p-4 rounded-2xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-slate-50 flex flex-col items-center gap-2">
-              <Ticket className="w-8 h-8 text-[#40a8ab]" strokeWidth={1.5} />
-              <p className="text-[10px] font-semibold text-[#718096] uppercase tracking-tight text-center">
-                Cupones Activos
-              </p>
-              <p className="text-2xl font-bold text-[#40a8ab]">
-                {dashboard.estadisticas?.cuponesActivos || 0}
-              </p>
-            </div>
-            <div className="bg-white p-4 rounded-2xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-slate-50 flex flex-col items-center gap-2">
-              <CheckCircle2
-                className="w-8 h-8 text-[#40a8ab]"
-                strokeWidth={1.5}
-              />
-              <p className="text-[10px] font-semibold text-[#718096] uppercase tracking-tight text-center">
-                Cupones Usados
-              </p>
-              <p className="text-2xl font-bold text-[#40a8ab]">
-                {dashboard.estadisticas?.cuponesUsados || 0}
-              </p>
-            </div>
-            <div className="bg-white p-4 rounded-2xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-slate-50 flex flex-col items-center gap-2">
-              <Heart className="w-8 h-8 text-[#40a8ab]" strokeWidth={1.5} />
-              <p className="text-[10px] font-semibold text-[#718096] uppercase tracking-tight text-center">
-                Total Donado
-              </p>
-              <p className="text-2xl font-bold text-[#40a8ab]">
-                $
-                {dashboard.estadisticas?.totalDonado?.toLocaleString("es-AR") ||
-                  "0"}
-              </p>
-            </div>
-          </div>
-          <p className="mt-4 text-[12px] text-slate-400 font-medium">
-            Último cupón solicitado:{" "}
-            <span className="text-slate-600">
-              {dashboard.estadisticas?.ultimoCuponSolicitado
-                ? new Date(
-                  dashboard.estadisticas.ultimoCuponSolicitado,
-                ).toLocaleDateString("es-AR", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })
-                : "Nunca"}
-            </span>
-          </p>
-        </section>
-
-        {/* My Foundations */}
-        <section className="py-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-bold text-[#1A202C]">
-              Mis Fundaciones
-            </h3>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-4">
-            {dashboard.fundaciones && dashboard.fundaciones.length > 0 ? (
-              dashboard.fundaciones.map((fundacion) => {
-                const logoUrl = getOrganizationLogoUrl(fundacion.nombre, fundacion.slug);
-                const useLogo = !!logoUrl && !fundacionLogoError[fundacion.id];
-                const initialsBg = `url(https://ui-avatars.com/api/?name=${encodeURIComponent(fundacion.nombre)}&background=16a459&color=fff&size=128)`;
-                const totalDonado = fundacion.totalDonado ?? 0;
-                const totalFormateado = totalDonado.toLocaleString("es-AR");
-                const isInactive = fundacion.isActive === false;
-                
-                return (
-                <div
-                  key={fundacion.id}
-                  className={`group overflow-hidden rounded-3xl transition-all duration-300 flex flex-col h-full relative ${
-                    isInactive 
-                      ? 'bg-slate-50 border border-slate-200 grayscale opacity-75' 
-                      : 'bg-white border border-[#40a8ab]/20 shadow-[0_8px_30px_-4px_rgba(64,168,171,0.15)] hover:shadow-[0_12px_40px_-4px_rgba(64,168,171,0.25)] hover:-translate-y-1'
-                  }`}
-                >
-                  {/* Decorative Header Background */}
-                  <div className={`h-16 w-full absolute top-0 left-0 z-0 ${
-                    isInactive ? 'bg-slate-200' : 'bg-gradient-to-r from-[#40a8ab] to-[#2c8184]'
-                  }`} />
-
-                  {isInactive && (
-                    <div className="absolute top-4 right-4 bg-red-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-full z-20 shadow-sm flex items-center gap-1.5">
-                      <Shield className="w-3 h-3" />
-                      Inactiva
-                    </div>
-                  )}
-
-                  <div className="pt-8 px-6 pb-4 flex flex-col items-center flex-1 relative z-10">
-                    {/* Logo container with white background and shadow to overlap the header */}
-                    <div className="size-[84px] bg-white rounded-2xl shadow-md border border-slate-100 p-2 flex items-center justify-center shrink-0 mb-4 transition-transform duration-300 group-hover:scale-105">
-                      {useLogo && logoUrl ? (
-                        <img
-                          src={logoUrl}
-                          alt={fundacion.nombre}
-                          className="w-full h-full object-contain"
-                          onError={() => setFundacionLogoError((prev) => ({ ...prev, [fundacion.id]: true }))}
-                        />
-                      ) : (
-                        <div
-                          className="w-full h-full rounded-xl bg-cover bg-center shrink-0"
-                          style={{ backgroundImage: initialsBg }}
-                          aria-hidden
-                        />
-                      )}
-                    </div>
-                    
-                    <h4 className="font-bold text-[#1A202C] text-[15px] text-center line-clamp-2 leading-tight">
-                      {fundacion.nombre}
-                    </h4>
-                    
-                    <div className="mt-3 flex flex-col items-center gap-1.5">
-                      <div className="bg-slate-100 rounded-full px-3 py-1 text-[10px] text-slate-500 font-semibold tracking-wide">
-                        Miembro desde {new Date(fundacion.fechaAfiliacion).toLocaleDateString("es-AR", { month: "short", year: "numeric" })}
-                      </div>
-                      {fundacion.fechaVencimiento && (
-                        <div className={`text-[11px] font-bold mt-1 ${isInactive ? 'text-red-500' : 'text-[#40a8ab]'}`}>
-                          Vence: {new Date(fundacion.fechaVencimiento).toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" })}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Bloque donado destacado */}
-                  <div className={`px-6 py-5 mt-auto border-t flex items-center justify-between ${
-                    isInactive ? 'bg-slate-100 border-slate-200' : 'bg-gradient-to-r from-[#40a8ab]/5 to-[#40a8ab]/10 border-[#40a8ab]/10'
-                  }`}>
-                    <div className="flex flex-col">
-                      <p className={`text-[10px] uppercase font-bold tracking-wider mb-0.5 ${isInactive ? 'text-slate-400' : 'text-[#40a8ab]'}`}>
-                        Tu aporte
-                      </p>
-                      <p className={`text-2xl font-black ${isInactive ? 'text-slate-500' : 'text-[#40a8ab]'}`}>
-                        ${totalFormateado}
-                      </p>
-                    </div>
-                    {!isInactive && (
-                      <div className="size-10 rounded-full bg-[#40a8ab]/10 flex items-center justify-center">
-                        <Heart className="w-5 h-5 text-[#40a8ab] fill-[#40a8ab]/20" />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-              })
-            ) : (
-              <div className="col-span-full bg-white border border-teal-100 rounded-3xl p-10 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] text-center flex flex-col items-center justify-center">
-                <div className="bg-teal-50 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                  <Heart className="w-8 h-8 text-[#40a8ab] fill-teal-100" />
-                </div>
-                <h4 className="text-xl font-bold text-slate-800 mb-2">¡Aún no tenés fundaciones!</h4>
-                <p className="text-slate-600 text-sm mb-6 max-w-sm">
-                  Todavía no hiciste ninguna donación. Sumate hoy a nuestra red, bancá una buena causa y destrabá todos los beneficios.
-                </p>
-                <a
-                  href="/donar"
-                  className="inline-block px-8 py-3 bg-[#40a8ab] text-white rounded-xl shadow-lg shadow-teal-500/20 text-sm font-bold hover:bg-[#2c8184] hover:-translate-y-0.5 transition-all"
-                >
-                  Hacer mi primera donación
-                </a>
-              </div>
-            )}
-          </div>
-        </section>
-
         {/* Exclusive Benefits Section */}
         <section className="space-y-6">
           {(() => {
@@ -650,18 +484,27 @@ export default function DashboardPage() {
             </span>
           </div>
 
-          {/* Search Bar */}
-          <div className="relative group">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#40a8ab] transition-colors">
-              🔍
-            </span>
+          {/* Search Bar Redesign */}
+          <div className="relative group max-w-2xl mx-auto w-full">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#40a8ab] transition-colors pointer-events-none">
+              <Search className="w-5 h-5" strokeWidth={2.5} />
+            </div>
             <input
-              className="w-full bg-white border border-teal-100 rounded-xl py-3 pl-10 pr-4 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all"
-              placeholder="Buscar marcas y cupones..."
+              className="w-full bg-white border border-slate-200 rounded-2xl py-4 pl-12 pr-12 focus:ring-4 focus:ring-[#40a8ab]/10 focus:border-[#40a8ab] outline-none transition-all shadow-sm text-slate-700 font-medium placeholder:text-slate-400"
+              placeholder="¿Qué marca o descuento buscás hoy?"
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
             />
+            {busqueda && (
+              <button
+                onClick={() => setBusqueda("")}
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+                title="Limpiar búsqueda"
+              >
+                <X className="w-4 h-4" strokeWidth={3} />
+              </button>
+            )}
           </div>
 
           {/* Filter Bar / Dropdown - Deshabilitado durante búsqueda */}
@@ -709,24 +552,6 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Indicador de búsqueda activa */}
-          {busquedaActiva && busqueda && (
-            <div className="bg-teal-100 border border-teal-200 rounded-xl px-4 py-3 flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <span className="text-teal-700 font-bold">🔍 Buscando:</span>
-                <span className="text-gray-700">"{busqueda}"</span>
-                <span className="text-gray-500 text-sm">
-                  ({totalCuponesDisponibles} resultados)
-                </span>
-              </div>
-              <button
-                onClick={() => setBusqueda("")}
-                className="text-[#40a8ab] hover:text-teal-800 font-bold text-sm"
-              >
-                Limpiar ✕
-              </button>
-            </div>
-          )}
 
           {/* Coupon Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-6">

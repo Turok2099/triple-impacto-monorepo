@@ -8,6 +8,7 @@ import {
   Headers,
   Body,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
@@ -50,6 +51,8 @@ export interface OrganizacionPublicDto {
 
 @Controller('public')
 export class PublicController {
+  private readonly logger = new Logger(PublicController.name);
+
   // Configuración del Bot Público (Opción 3)
   private readonly PUBLIC_BOT_CONFIG: {
     dni: string;
@@ -233,15 +236,39 @@ export class PublicController {
         cuponesBase = this.catalogCache.data;
       } else {
         // 2. Si no hay caché, solicitar a Bonda usando el Bot de Servicio
-        const response = await this.bondaService.obtenerCupones(
-          this.PUBLIC_BOT_CONFIG.dni,
-          {
-            slug: this.PUBLIC_BOT_CONFIG.masterSlug,
-          },
-        );
+        // Iteramos por las páginas para obtener el catálogo completo (Bonda entrega de a 15)
+        this.logger.log('🔄 Iniciando carga completa del catálogo de Bonda (Proxy)...');
+        let page = 1;
+        let hasMore = true;
+        const allFetched: any[] = [];
 
-        if (response && response.cupones) {
-          cuponesBase = response.cupones.map((c: any) => ({
+        while (hasMore && page <= 150) { // Límite de seguridad de 150 páginas (~2250 cupones)
+          const response = await this.bondaService.obtenerCupones(
+            this.PUBLIC_BOT_CONFIG.dni,
+            {
+              slug: this.PUBLIC_BOT_CONFIG.masterSlug,
+              page: page,
+            },
+          );
+
+          if (response && response.cupones && response.cupones.length > 0) {
+            allFetched.push(...response.cupones);
+            this.logger.debug(`📄 Cargada página ${page} (${response.cupones.length} cupones)`);
+            
+            // Si hay menos de 15, es la última página. 
+            // O si no hay 'next' en la respuesta original (aunque BondaService oculta el raw)
+            if (response.cupones.length < 15) {
+              hasMore = false;
+            } else {
+              page++;
+            }
+          } else {
+            hasMore = false;
+          }
+        }
+
+        if (allFetched.length > 0) {
+          cuponesBase = allFetched.map((c: any) => ({
             id: c.id.toString(),
             nombre: c.nombre,
             descuento: c.descuento,
@@ -252,7 +279,7 @@ export class PublicController {
             imagen_url: c.imagenes?.principal?.['280x190'] || c.imagenes?.principal?.original || null,
             logo_empresa: c.empresa?.logoThumbnail?.['90x90'] || null,
             categoria_principal: c.categorias?.[0]?.nombre || null,
-            fecha_vencimiento: c.fechaVencimiento || null,
+            fecha_vencimiento: c.fecha_vencimiento || c.fechaVencimiento || null,
           }));
 
           // Actualizar caché
@@ -260,6 +287,7 @@ export class PublicController {
             data: cuponesBase,
             timestamp: now,
           };
+          this.logger.log(`✅ Catálogo de Bonda cargado en caché: ${cuponesBase.length} cupones.`);
         }
       }
 

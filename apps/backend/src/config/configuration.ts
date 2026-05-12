@@ -18,6 +18,10 @@ export default () => ({
     apiKey: process.env.BONDA_API_KEY || '',
     micrositeId: process.env.BONDA_MICROSITE_ID || '',
     useMocks: process.env.BONDA_USE_MOCKS === 'true' || false,
+    publicBot: {
+      dni: process.env.BONDA_PUBLIC_BOT_DNI || '',
+      masterSlug: process.env.BONDA_PUBLIC_MASTER_SLUG || '',
+    },
   },
 
   supabase: {

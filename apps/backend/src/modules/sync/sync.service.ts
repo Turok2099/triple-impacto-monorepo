@@ -433,10 +433,10 @@ export class SyncService {
    *
    * Cron expression: '0 6 * * *' (A las 6:00 AM UTC todos los días)
    */
-  @Cron('0 6 * * *', {
-    name: 'sincronizar_cupones_diario',
-    timeZone: 'UTC',
-  })
+  // @Cron('0 6 * * *', {
+  //   name: 'sincronizar_cupones_diario',
+  //   timeZone: 'UTC',
+  // })
   async sincronizacionAutomaticaDiaria() {
     this.logger.log(
       '⏰ Cron job iniciado: Sincronización diaria de cupones (3 AM Argentina)',

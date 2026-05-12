@@ -3,7 +3,6 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PublicController } from './public.controller';
-import { SyncCuponesService } from './sync-cupones.service';
 import { BondaModule } from '../bonda/bonda.module';
 import { SupabaseModule } from '../supabase/supabase.module';
 import { SyncModule } from '../sync/sync.module';
@@ -26,6 +25,6 @@ import { MailModule } from '../mail/mail.module';
     }),
   ],
   controllers: [PublicController],
-  providers: [SyncCuponesService],
+  providers: [],
 })
 export class PublicModule {}

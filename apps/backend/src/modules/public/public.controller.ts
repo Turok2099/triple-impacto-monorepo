@@ -12,7 +12,6 @@ import {
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { SupabaseService } from '../supabase/supabase.service';
-import { SyncCuponesService } from './sync-cupones.service';
 import { SyncService } from '../sync/sync.service';
 import { ConfigService } from '@nestjs/config';
 import { BondaService } from '../bonda/bonda.service';
@@ -51,41 +50,37 @@ export interface OrganizacionPublicDto {
 
 @Controller('public')
 export class PublicController {
-  // Configuración de Fundación Padres desde variables de entorno (seguro)
-  private readonly FUNDACION_PADRES_CONFIG: {
-    slug: string;
-    micrositeId: string;
-    apiToken: string;
-    codigoAfiliado: string;
+  // Configuración del Bot Público (Opción 3)
+  private readonly PUBLIC_BOT_CONFIG: {
+    dni: string;
+    masterSlug: string;
   };
+
+  // Simple caché en memoria para el catálogo público
+  private catalogCache: {
+    data: any;
+    timestamp: number;
+  } | null = null;
+  private readonly CACHE_TTL = 6 * 60 * 60 * 1000; // 6 horas en ms
 
   constructor(
     private readonly supabase: SupabaseService,
-    private readonly syncCuponesService: SyncCuponesService,
     private readonly syncService: SyncService,
     private readonly configService: ConfigService,
     private readonly bondaService: BondaService,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
   ) {
-    // Inicializar configuración de Fundación Padres desde variables de entorno
-    this.FUNDACION_PADRES_CONFIG = {
-      slug:
-        this.configService.get<string>('BONDA_MICROSITE_SLUG') ||
-        'beneficios-fundacion-padres',
-      micrositeId: this.configService.get<string>('BONDA_MICROSITE_ID') || '',
-      apiToken: this.configService.get<string>('BONDA_API_KEY') || '',
-      codigoAfiliado:
-        this.configService.get<string>('BONDA_CODIGO_AFILIADO') || '',
+    // Inicializar configuración del Bot desde variables de entorno
+    this.PUBLIC_BOT_CONFIG = {
+      dni: this.configService.get<string>('bonda.publicBot.dni') || '10101010',
+      masterSlug: this.configService.get<string>('bonda.publicBot.masterSlug') || 'https://clubplatolleno.bonda.com',
     };
 
-    // Validar que las credenciales de Bonda estén configuradas
-    if (
-      !this.FUNDACION_PADRES_CONFIG.apiToken ||
-      !this.FUNDACION_PADRES_CONFIG.micrositeId
-    ) {
+    // Validar que el DNI del Bot esté configurado
+    if (!this.PUBLIC_BOT_CONFIG.dni) {
       console.warn(
-        '⚠️ ADVERTENCIA: Credenciales de Bonda no configuradas en variables de entorno',
+        '⚠️ ADVERTENCIA: DNI del Bot de Bonda no configurado en variables de entorno',
       );
     }
   }
@@ -228,73 +223,90 @@ export class PublicController {
     @Query('limite') limite?: string,
     @Query('offset') offset?: string,
     @Query('deduplicate') deduplicate?: string,
-    @Headers('authorization') authorization?: string,
   ): Promise<any> {
     try {
-      // Intentar extraer userId del token (opcional)
-      let micrositeIds: string[] | undefined = undefined;
+      const now = Date.now();
+      let cuponesBase: any[] = [];
 
-      if (authorization?.startsWith('Bearer ')) {
-        try {
-          const token = authorization.substring(7);
-          const payload = this.jwtService.verify(token);
-          const userId = payload.userId;
+      // 1. Verificar si tenemos el catálogo en caché y es válido
+      if (this.catalogCache && (now - this.catalogCache.timestamp < this.CACHE_TTL)) {
+        cuponesBase = this.catalogCache.data;
+      } else {
+        // 2. Si no hay caché, solicitar a Bonda usando el Bot de Servicio
+        const response = await this.bondaService.obtenerCupones(
+          this.PUBLIC_BOT_CONFIG.dni,
+          {
+            slug: this.PUBLIC_BOT_CONFIG.masterSlug,
+          },
+        );
 
-          if (userId) {
-            // Obtener micrositios del usuario basado en sus donaciones
-            micrositeIds = await this.supabase.getMicrositiosUsuario(userId);
-          }
-        } catch (error) {
-          // Token inválido o expirado, continuar sin filtrar por micrositios
-          console.warn(
-            'Token JWT inválido o expirado, mostrando todos los cupones',
-          );
+        if (response && response.cupones) {
+          cuponesBase = response.cupones.map((c: any) => ({
+            id: c.id.toString(),
+            nombre: c.nombre,
+            descuento: c.descuento,
+            descripcion: c.descripcionBreve ?? null,
+            empresa: {
+              nombre: c.empresa?.nombre,
+            },
+            imagen_url: c.imagenes?.principal?.['280x190'] || c.imagenes?.principal?.original || null,
+            logo_empresa: c.empresa?.logoThumbnail?.['90x90'] || null,
+            categoria_principal: c.categorias?.[0]?.nombre || null,
+            fecha_vencimiento: c.fechaVencimiento || null,
+          }));
+
+          // Actualizar caché
+          this.catalogCache = {
+            data: cuponesBase,
+            timestamp: now,
+          };
         }
       }
 
-      // Obtener cupones desde Supabase (sin filtro de ONG, catálogo global)
-      const resultado = await this.supabase.getPublicCouponsV2({
-        categoria: categoria && categoria !== 'Todo' ? categoria : undefined,
-        busqueda,
-        limite: limite ? parseInt(limite, 10) : undefined,
-        offset: offset ? parseInt(offset, 10) : undefined,
-        soloActivos: true,
-      });
+      // 3. Aplicar filtros locales sobre los datos obtenidos
+      let cuponesFiltrados = [...cuponesBase];
 
-      // Transformar a formato compatible con el frontend actual
-      const cuponesTransformados = resultado.cupones.map((cupon: any) => ({
-        id: cupon.bonda_cupon_id,
-        nombre: cupon.nombre,
-        descuento: cupon.descuento,
-        descripcion: cupon.descripcion_breve ?? null,
-        empresa: {
-          nombre: cupon.empresa_nombre,
-        },
-        imagen_url:
-          cupon.imagen_principal_url || cupon.imagen_thumbnail_url || null,
-        logo_empresa: cupon.empresa_logo_url || null,
-        categoria_principal: cupon.categoria_principal || null,
-        fecha_vencimiento: cupon.fecha_vencimiento || null,
-      }));
+      if (categoria && categoria !== 'Todo') {
+        const catNormalizada = this.normalizarNombre(categoria);
+        cuponesFiltrados = cuponesFiltrados.filter(c => 
+          this.normalizarNombre(c.categoria_principal) === catNormalizada
+        );
+      }
 
-      // Deduplicación opcional por MARCA (por defecto true para home)
-      const shouldDeduplicate = deduplicate !== 'false'; // Por defecto true
-      const cuponesFinal = shouldDeduplicate
-        ? Array.from(
-            new Map(
-              cuponesTransformados.map((c) => [c.empresa.nombre, c]),
-            ).values(),
-          )
-        : cuponesTransformados;
+      if (busqueda) {
+        const busqNormalizada = this.normalizarNombre(busqueda);
+        cuponesFiltrados = cuponesFiltrados.filter(c => 
+          this.normalizarNombre(c.nombre).includes(busqNormalizada) || 
+          this.normalizarNombre(c.empresa.nombre).includes(busqNormalizada)
+        );
+      }
+
+      // 4. Deduplicación por MARCA (por defecto true para home)
+      const shouldDeduplicate = deduplicate !== 'false';
+      if (shouldDeduplicate) {
+        const seen = new Set();
+        cuponesFiltrados = cuponesFiltrados.filter(c => {
+          if (seen.has(c.empresa.nombre)) return false;
+          seen.add(c.empresa.nombre);
+          return true;
+        });
+      }
+
+      // 5. Paginación manual sobre el set de datos
+      const limitVal = limite ? parseInt(limite, 10) : 20;
+      const offsetVal = offset ? parseInt(offset, 10) : 0;
+      const paginados = cuponesFiltrados.slice(offsetVal, offsetVal + limitVal);
 
       return {
-        count: cuponesFinal.length,
-        cupones: cuponesFinal,
-        total_disponible: resultado.total,
-        sincronizado_desde: 'supabase',
+        count: paginados.length,
+        cupones: paginados,
+        total_disponible: cuponesFiltrados.length,
+        sincronizado_desde: 'bonda-proxy-cache',
         deduplicated: shouldDeduplicate,
+        cached_at: new Date(this.catalogCache?.timestamp || now).toISOString(),
       };
     } catch (error) {
+      console.error('Error in getCuponesDesdeBonda (Proxy):', error);
       throw error;
     }
   }

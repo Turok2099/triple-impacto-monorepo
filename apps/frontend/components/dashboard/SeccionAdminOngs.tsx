@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { getOrganizaciones, createOrganizacion, updateOrganizacion, deleteOrganizacion, uploadLogo, Ong } from "@/lib/admin-ongs";
+import { getOrganizaciones, createOrganizacion, updateOrganizacion, deleteOrganizacion, uploadLogo, Ong, permanentDeleteOrganizacion } from "@/lib/admin-ongs";
 import { Plus, Edit2, Trash2, X, Building2, Link as LinkIcon, DollarSign, ShieldAlert, Key, Upload, Eye, EyeOff } from "lucide-react";
 
 export default function SeccionAdminOngs() {
@@ -32,8 +32,7 @@ export default function SeccionAdminOngs() {
     bonda_slug: "",
     bonda_api_token: "",
     bonda_api_token_nominas: "",
-    bonda_microsite_id: "",
-    bonda_landing_url: ""
+    bonda_microsite_id: ""
   });
 
   useEffect(() => {
@@ -77,14 +76,38 @@ export default function SeccionAdminOngs() {
     }
   };
 
+  const handlePermanentDelete = async (id: string, name: string) => {
+    const result = await Swal.fire({
+      title: "¿Eliminar permanentemente?",
+      html: `¿Seguro que deseas eliminar <b>completamente</b> a ${name} de la base de datos?<br><br><b>¡Esta acción NO se puede deshacer!</b>`,
+      icon: "error",
+      showCancelButton: true,
+      confirmButtonColor: "#dc2626",
+      cancelButtonColor: "#94a3b8",
+      confirmButtonText: "Sí, eliminar definitivamente",
+      cancelButtonText: "Cancelar"
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const token = localStorage.getItem("auth_token") || "";
+      await permanentDeleteOrganizacion(token, id);
+      Swal.fire("¡Eliminada!", "La ONG ha sido borrada completamente del sistema.", "success");
+      fetchOngs();
+    } catch (err: any) {
+      Swal.fire("Error", "Error al eliminar: " + err.message, "error");
+    }
+  };
+
   const handleToggleStatus = async (ong: Ong) => {
     try {
       const token = localStorage.getItem("auth_token") || "";
       const newStatus = !ong.activa;
-      
+
       // Actualización optimista de UI
       setOngs(ongs.map(o => o.id === ong.id ? { ...o, activa: newStatus } : o));
-      
+
       await updateOrganizacion(token, ong.id, { activa: newStatus });
     } catch (err: any) {
       Swal.fire("Error", "No se pudo cambiar el estado: " + err.message, "error");
@@ -101,7 +124,7 @@ export default function SeccionAdminOngs() {
       nombre: "", descripcion: "", logo_url: "", email: "", telefono: "", website_url: "",
       monto_minimo: 5000,
       activa: true, fiserv_store_id: "", fiserv_shared_secret: "", bonda_slug: "", bonda_api_token: "",
-      bonda_api_token_nominas: "", bonda_microsite_id: "", bonda_landing_url: ""
+      bonda_api_token_nominas: "", bonda_microsite_id: ""
     });
     setIsModalOpen(true);
   };
@@ -127,8 +150,7 @@ export default function SeccionAdminOngs() {
       bonda_slug: bonda?.slug || "",
       bonda_api_token: bonda?.api_token || "",
       bonda_api_token_nominas: bonda?.api_token_nominas || "",
-      bonda_microsite_id: bonda?.microsite_id || "",
-      bonda_landing_url: bonda?.landing_url || ""
+      bonda_microsite_id: bonda?.microsite_id || ""
     });
     setIsModalOpen(true);
   };
@@ -147,7 +169,7 @@ export default function SeccionAdminOngs() {
     setSubmitting(true);
     try {
       const token = localStorage.getItem("auth_token") || "";
-      
+
       let finalLogoUrl = formData.logo_url;
       if (selectedFile) {
         // Mostrar alerta de que estamos subiendo
@@ -161,7 +183,7 @@ export default function SeccionAdminOngs() {
         });
         finalLogoUrl = await uploadLogo(token, selectedFile);
       }
-      
+
       const payload = { ...formData, logo_url: finalLogoUrl };
 
       if (editingOng) {
@@ -236,7 +258,7 @@ export default function SeccionAdminOngs() {
                     </div>
                   </td>
                   <td className="py-4 px-6">
-                    <button 
+                    <button
                       onClick={() => handleToggleStatus(ong)}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#40a8ab] focus:ring-offset-2 ${ong.activa ? 'bg-[#40a8ab]' : 'bg-slate-200'}`}
                       role="switch"
@@ -253,6 +275,9 @@ export default function SeccionAdminOngs() {
                     <div className="flex justify-end gap-2">
                       <button onClick={() => openEditModal(ong)} className="p-2 text-slate-400 hover:text-[#40a8ab] hover:bg-emerald-50 rounded-lg transition-colors" title="Editar ONG">
                         <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => handlePermanentDelete(ong.id, ong.nombre)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Eliminar ONG permanentemente">
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
@@ -275,36 +300,36 @@ export default function SeccionAdminOngs() {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="p-6 overflow-y-auto max-h-[75vh]">
               <div className="space-y-8">
-                
+
                 {/* 1. Datos Generales */}
                 <section>
-                  <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2"><Building2 className="w-5 h-5 text-slate-400"/> Información Pública</h3>
+                  <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2"><Building2 className="w-5 h-5 text-slate-400" /> Información Pública</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="col-span-2">
                       <label className="block text-sm font-semibold text-slate-700 mb-1">Nombre de la ONG *</label>
-                      <input required value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                      <input required value={formData.nombre} onChange={e => setFormData({ ...formData, nombre: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
                     </div>
                     <div className="col-span-2">
                       <label className="block text-sm font-semibold text-slate-700 mb-1">Propósito / Descripción Breve</label>
-                      <textarea rows={3} value={formData.descripcion} onChange={e => setFormData({...formData, descripcion: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none resize-none" />
+                      <textarea rows={3} value={formData.descripcion} onChange={e => setFormData({ ...formData, descripcion: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none resize-none" />
                     </div>
-                    
+
                     <h4 className="col-span-2 text-sm font-bold text-slate-700 mt-2 mb-1">Información de Contacto</h4>
-                    
+
                     <div>
                       <label className="block text-sm font-semibold text-slate-700 mb-1">Email de Contacto</label>
-                      <input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                      <input type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-slate-700 mb-1">Teléfono</label>
-                      <input type="text" value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                      <input type="text" value={formData.telefono} onChange={e => setFormData({ ...formData, telefono: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
                     </div>
                     <div className="col-span-2">
                       <label className="block text-sm font-semibold text-slate-700 mb-1">Sitio Web</label>
-                      <input type="url" placeholder="https://..." value={formData.website_url} onChange={e => setFormData({...formData, website_url: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                      <input type="url" placeholder="https://..." value={formData.website_url} onChange={e => setFormData({ ...formData, website_url: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
                     </div>
 
                     <h4 className="col-span-2 text-sm font-bold text-slate-700 mt-2 mb-1">Recursos Visuales</h4>
@@ -338,74 +363,71 @@ export default function SeccionAdminOngs() {
 
                 {/* 2. Donaciones Fiserv */}
                 <section>
-                  <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2"><DollarSign className="w-5 h-5 text-slate-400"/> Pagos y Fiserv</h3>
+                  <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2"><DollarSign className="w-5 h-5 text-slate-400" /> Pagos y Fiserv</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                     <div className="col-span-2">
-                        <label className="block text-sm font-semibold text-slate-700 mb-1">Monto Mínimo (ARS)</label>
-                        <input type="number" min="0" value={formData.monto_minimo} onChange={e => setFormData({...formData, monto_minimo: Number(e.target.value)})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
-                     </div>
+                    <div className="col-span-2">
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">Monto Mínimo (ARS)</label>
+                      <input type="number" min="0" value={formData.monto_minimo} onChange={e => setFormData({ ...formData, monto_minimo: Number(e.target.value) })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                    </div>
                   </div>
                   <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-semibold text-blue-900 mb-1">Fiserv Store ID</label>
-                      <input placeholder="Ej. 5930714927880" value={formData.fiserv_store_id} onChange={e => setFormData({...formData, fiserv_store_id: e.target.value})} className="w-full px-4 py-2.5 rounded-lg border border-blue-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" />
+                      <input placeholder="Sin información" autoComplete="off" value={formData.fiserv_store_id} onChange={e => setFormData({ ...formData, fiserv_store_id: e.target.value })} className="w-full px-4 py-2.5 rounded-lg border border-blue-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-blue-900 mb-1">Fiserv Shared Secret</label>
                       <div className="relative">
-                        <input placeholder="Opcional si usa el default" type={showSecrets ? "text" : "password"} value={formData.fiserv_shared_secret} onChange={e => setFormData({...formData, fiserv_shared_secret: e.target.value})} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-blue-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" />
+                        <input placeholder="Sin información" autoComplete="new-password" type={showSecrets ? "text" : "password"} value={formData.fiserv_shared_secret} onChange={e => setFormData({ ...formData, fiserv_shared_secret: e.target.value })} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-blue-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" />
                         <button type="button" onClick={() => setShowSecrets(!showSecrets)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
                           {showSecrets ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
-                    <p className="col-span-full text-xs text-blue-600">Deja vacío el Shared Secret si esta ONG utiliza la configuración global de entorno.</p>
                   </div>
                 </section>
 
                 {/* 3. Integración Bonda */}
                 <section>
-                  <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2"><Key className="w-5 h-5 text-slate-400"/> Beneficios Bonda</h3>
+                  <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2"><Key className="w-5 h-5 text-slate-400" /> Beneficios Bonda</h3>
                   <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="col-span-2">
-                      <label className="block text-sm font-semibold text-emerald-900 mb-1">Slug del Micrositio Bonda</label>
-                      <input placeholder="ej: beneficios-mi-ong" value={formData.bonda_slug} onChange={e => setFormData({...formData, bonda_slug: e.target.value.trim().replace(/\/+$/, '')})} className="w-full px-4 py-2.5 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
-                    </div>
-                    <div className="col-span-2">
-                      <label className="block text-sm font-semibold text-emerald-900 mb-1">URL de Landing Bonda (Incluyendo tokens)</label>
-                      <input placeholder="ej: https://beneficios.bonda.com?t=..." value={formData.bonda_landing_url} onChange={e => setFormData({...formData, bonda_landing_url: e.target.value.trim()})} className="w-full px-4 py-2.5 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                      <label className="block text-sm font-semibold text-emerald-900 mb-1">URL ONG + BONDA</label>
+                      <input placeholder="ej: https://beneficios-mi-ong.bonda.com" value={formData.bonda_slug} onChange={e => setFormData({ ...formData, bonda_slug: e.target.value.trim().replace(/\/+$/, '') })} className="w-full px-4 py-2.5 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-emerald-900 mb-1">API Token (Afiliados/Cupones)</label>
+                      <label className="block text-sm font-semibold text-emerald-900 mb-1">API Key de Cupones</label>
+                      <p className="text-xs text-emerald-600 mb-2">Usada para consultar el catálogo de beneficios.</p>
                       <div className="relative">
-                        <input type={showSecrets ? "text" : "password"} placeholder="JWT o Token" value={formData.bonda_api_token} onChange={e => setFormData({...formData, bonda_api_token: e.target.value})} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none font-mono text-sm" />
+                        <input type={showSecrets ? "text" : "password"} placeholder="Token API Cupones" value={formData.bonda_api_token} onChange={e => setFormData({ ...formData, bonda_api_token: e.target.value })} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none font-mono text-sm" />
                         <button type="button" onClick={() => setShowSecrets(!showSecrets)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
                           {showSecrets ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-emerald-900 mb-1">API Token (Nóminas)</label>
+                      <label className="block text-sm font-semibold text-emerald-900 mb-1">API Key de Nóminas (Afiliados)</label>
+                      <p className="text-xs text-emerald-600 mb-2">Usada para crear/eliminar afiliados desde nuestro sistema.</p>
                       <div className="relative">
-                        <input type={showSecrets ? "text" : "password"} placeholder="JWT Nóminas" value={formData.bonda_api_token_nominas} onChange={e => setFormData({...formData, bonda_api_token_nominas: e.target.value})} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none font-mono text-sm" />
+                        <input type={showSecrets ? "text" : "password"} placeholder="Token API Nóminas" value={formData.bonda_api_token_nominas} onChange={e => setFormData({ ...formData, bonda_api_token_nominas: e.target.value })} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none font-mono text-sm" />
                         <button type="button" onClick={() => setShowSecrets(!showSecrets)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
                           {showSecrets ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
                     <div className="col-span-2">
-                      <label className="block text-sm font-semibold text-emerald-900 mb-1">Bonda Microsite ID (Legacy)</label>
-                      <input placeholder="ID numérico si aplica" value={formData.bonda_microsite_id} onChange={e => setFormData({...formData, bonda_microsite_id: e.target.value})} className="w-full px-4 py-2.5 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none font-mono text-sm" />
+                      <label className="block text-sm font-semibold text-emerald-900 mb-1">Bonda Microsite ID</label>
+                      <input placeholder="ID numérico si aplica" value={formData.bonda_microsite_id} onChange={e => setFormData({ ...formData, bonda_microsite_id: e.target.value })} className="w-full px-4 py-2.5 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none font-mono text-sm" />
                     </div>
                   </div>
                 </section>
 
                 <div className="flex items-center gap-3 bg-slate-50 p-4 rounded-xl">
-                  <input type="checkbox" id="activa" checked={formData.activa} onChange={e => setFormData({...formData, activa: e.target.checked})} className="w-5 h-5 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500" />
+                  <input type="checkbox" id="activa" checked={formData.activa} onChange={e => setFormData({ ...formData, activa: e.target.checked })} className="w-5 h-5 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500" />
                   <label htmlFor="activa" className="font-semibold text-slate-700">ONG Activa (Visible en la plataforma para recibir donaciones)</label>
                 </div>
               </div>
-              
+
               <div className="mt-8 flex gap-3 pt-6 border-t border-slate-100">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 px-4 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold rounded-xl transition-colors">
                   Cancelar

@@ -63,6 +63,11 @@ const nextConfig: NextConfig = {
         hostname: "cuponstar-ar.s3.amazonaws.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "via.placeholder.com",
+        pathname: "/**",
+      },
     ],
   },
   async headers() {

@@ -95,6 +95,12 @@ export class AdminController {
     return this.adminService.deleteOrganizacion(adminId, id);
   }
 
+  @Delete('organizaciones/:id/permanent')
+  async permanentDeleteOrganizacion(@Req() req: any, @Param('id') id: string) {
+    const adminId = req.user?.userId;
+    return this.adminService.permanentDeleteOrganizacion(adminId, id);
+  }
+
   // ==========================================
   // BANNERS
   // ==========================================

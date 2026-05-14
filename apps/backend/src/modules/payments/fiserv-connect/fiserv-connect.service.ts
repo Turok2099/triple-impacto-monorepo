@@ -98,9 +98,16 @@ export class FiservConnectService implements OnModuleInit {
   ): ConnectPaymentParams | null {
     if (!this.config) {
       this.logger.warn(
-        'Fiserv Connect: no configurado, no se pueden generar params.',
+        'Fiserv Connect: no configurado globalmente, no se pueden generar params.',
       );
       return null;
+    }
+
+    if (!input.storename || !input.sharedSecret) {
+      this.logger.error(
+        'Fiserv Connect: La ONG no tiene configurado un Store ID o Shared Secret. Las credenciales globales están deshabilitadas.',
+      );
+      throw new Error('La organización no tiene credenciales de pago configuradas.');
     }
 
     const txndatetime = getTxndatetime();
@@ -113,7 +120,7 @@ export class FiservConnectService implements OnModuleInit {
       txndatetime,
       hash_algorithm: 'HMACSHA256',
       mode: 'payonly',
-      storename: input.storename || this.config.storeId,
+      storename: input.storename,
       chargetotal,
       currency,
       responseFailURL: input.responseFailURL,
@@ -150,7 +157,7 @@ export class FiservConnectService implements OnModuleInit {
 
     const hashExtended = createExtendedHash(
       params,
-      input.sharedSecret || this.config.sharedSecret,
+      input.sharedSecret,
       'sha256',
     );
     params.hashExtended = hashExtended;

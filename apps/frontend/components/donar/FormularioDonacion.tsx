@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Gift, Lock, CreditCard } from "lucide-react";
+import Swal from "sweetalert2";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   obtenerOrganizaciones,
@@ -154,6 +155,17 @@ export default function FormularioDonacion({
 
     if (errorMonto) {
       setError(errorMonto);
+      return;
+    }
+
+    // Validar configuración Fiserv
+    if (organizacionSeleccionada && organizacionSeleccionada.has_fiserv_config === false) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Aún no disponible para donación',
+        text: 'Esta organización está completando su configuración de pagos.',
+        confirmButtonColor: '#40a8ab',
+      });
       return;
     }
 

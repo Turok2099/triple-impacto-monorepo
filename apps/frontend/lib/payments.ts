@@ -35,6 +35,7 @@ export interface Organizacion {
   slug?: string;
   monto_minimo?: number;
   activa: boolean;
+  has_fiserv_config?: boolean;
 }
 
 // ============================================

@@ -5,7 +5,6 @@ export interface BondaMicrosite {
   api_token: string;
   api_token_nominas: string | null;
   microsite_id: string | null;
-  landing_url: string | null;
   organizacion_id: string;
   activo: boolean;
 }
@@ -100,5 +99,16 @@ export async function deleteOrganizacion(token: string, id: string): Promise<voi
   if (!res.ok) {
     const error = await res.json();
     throw new Error(error.message || 'Error deleting ONG');
+  }
+}
+
+export async function permanentDeleteOrganizacion(token: string, id: string): Promise<void> {
+  const res = await fetch(`${API_URL}/admin/organizaciones/${id}/permanent`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.message || 'Error permanently deleting ONG');
   }
 }

@@ -522,6 +522,8 @@ export class SupabaseService implements OnModuleInit {
         monto_minimo,
         verificada,
         activa,
+        fiserv_store_id,
+        fiserv_shared_secret,
         created_at,
         updated_at,
         bonda_microsites (
@@ -546,6 +548,8 @@ export class SupabaseService implements OnModuleInit {
         ? org.bonda_microsites.find((m: any) => m.activo) 
         : org.bonda_microsites?.activo ? org.bonda_microsites : null;
 
+      const has_fiserv_config = !!org.fiserv_store_id && !!org.fiserv_shared_secret;
+
       return {
         id: org.id,
         bonda_microsite_id: bonda?.id || null,
@@ -558,6 +562,7 @@ export class SupabaseService implements OnModuleInit {
         direccion: org.direccion || null,
         monto_minimo: org.monto_minimo || 5000,
         slug: bonda?.slug || null,
+        has_fiserv_config,
         activa: true,
         verificada: org.verificada || false,
         created_at: org.created_at || new Date().toISOString(),
@@ -581,13 +586,12 @@ export class SupabaseService implements OnModuleInit {
     api_token: string;
     api_token_nominas: string | null;
     microsite_id: string | null;
-    landing_url: string | null;
     organizacion_id: string | null;
     activo: boolean;
   } | null> {
     const { data, error } = await this.from('bonda_microsites')
       .select(
-        'id, slug, nombre, api_token, api_token_nominas, microsite_id, landing_url, organizacion_id, activo',
+        'id, slug, nombre, api_token, api_token_nominas, microsite_id, organizacion_id, activo',
       )
       .eq('slug', slug)
       .eq('activo', true)
@@ -611,13 +615,12 @@ export class SupabaseService implements OnModuleInit {
     api_token: string;
     api_token_nominas: string | null;
     microsite_id: string | null;
-    landing_url: string | null;
     organizacion_id: string | null;
     activo: boolean;
   } | null> {
     const { data, error } = await this.from('bonda_microsites')
       .select(
-        'id, slug, nombre, api_token, api_token_nominas, microsite_id, landing_url, organizacion_id, activo',
+        'id, slug, nombre, api_token, api_token_nominas, microsite_id, organizacion_id, activo',
       )
       .eq('organizacion_id', organizacionId)
       .eq('activo', true)
@@ -646,13 +649,12 @@ export class SupabaseService implements OnModuleInit {
     api_token: string;
     api_token_nominas: string | null;
     microsite_id: string | null;
-    landing_url: string | null;
     organizacion_id: string | null;
     last_synced_at: string | null;
   } | null> {
     const { data, error } = await this.from('bonda_microsites')
       .select(
-        'id, slug, nombre, api_token, api_token_nominas, microsite_id, landing_url, organizacion_id, last_synced_at',
+        'id, slug, nombre, api_token, api_token_nominas, microsite_id, organizacion_id, last_synced_at',
       )
       .eq('activo', true)
       .order('last_synced_at', { ascending: true, nullsFirst: true })

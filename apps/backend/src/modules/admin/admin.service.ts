@@ -297,7 +297,6 @@ export class AdminService {
           api_token: payload.bonda_api_token,
           api_token_nominas: payload.bonda_api_token_nominas,
           microsite_id: payload.bonda_microsite_id,
-          landing_url: payload.bonda_landing_url,
           activo: true
         });
         
@@ -345,7 +344,6 @@ export class AdminService {
       if (payload.bonda_api_token) bondaData.api_token = payload.bonda_api_token;
       if (payload.bonda_api_token_nominas !== undefined) bondaData.api_token_nominas = payload.bonda_api_token_nominas;
       if (payload.bonda_microsite_id) bondaData.microsite_id = payload.bonda_microsite_id;
-      if (payload.bonda_landing_url) bondaData.landing_url = payload.bonda_landing_url;
 
       // Buscar si existe
       const { data: existingBonda } = await client.from('bonda_microsites').select('id').eq('organizacion_id', id).maybeSingle();
@@ -384,6 +382,26 @@ export class AdminService {
 
     await this.logAudit(adminId, id, 'DELETE_ORG', 'SUCCESS');
     return { success: true, message: 'Organización desactivada correctamente' };
+  }
+
+  async permanentDeleteOrganizacion(adminId: string, id: string) {
+    const client = this.supabaseService.getClient();
+    
+    // Eliminar el micrositio de bonda asociado primero por las claves foraneas
+    await client.from('bonda_microsites').delete().eq('organizacion_id', id);
+
+    // Eliminar la organización
+    const { error } = await client
+      .from('organizaciones')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      throw new InternalServerErrorException('Error al eliminar la organización de forma permanente');
+    }
+
+    await this.logAudit(adminId, id, 'DELETE_ORG_PERMANENT', 'SUCCESS');
+    return { success: true, message: 'Organización eliminada permanentemente' };
   }
 
   // ==========================================

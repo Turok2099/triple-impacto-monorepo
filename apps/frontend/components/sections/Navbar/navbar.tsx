@@ -52,7 +52,7 @@ export default function Navbar() {
               className="flex items-center group transition-transform hover:scale-110"
             >
               <Image
-                src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto/f_auto/v1775685229/ISOLOGOTIPO_AYNI_VERDE_FONDO_TRANSPARENTE_lx4yvh.png"
+                src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto,f_auto,w_200,c_limit/v1775685229/ISOLOGOTIPO_AYNI_VERDE_FONDO_TRANSPARENTE_lx4yvh.png"
                 alt="AYNI"
                 width={140}
                 height={46}

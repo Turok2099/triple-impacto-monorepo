@@ -102,7 +102,7 @@ export default function Footer() {
             <div className="flex items-center gap-3 mb-4">
               <Link href="/">
                 <Image
-                  src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1775685229/ISOLOGOTIPO_AYNI_FONDO_TRANSPARENTE_iwyuaw.png"
+                  src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto,f_auto,w_200,c_limit/v1775685229/ISOLOGOTIPO_AYNI_FONDO_TRANSPARENTE_iwyuaw.png"
                   alt="AYNI"
                   width={140}
                   height={50}

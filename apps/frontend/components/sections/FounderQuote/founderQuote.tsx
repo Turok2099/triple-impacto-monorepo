@@ -13,7 +13,7 @@ export default function FounderQuote() {
             <div className="absolute -mt-20 w-full flex justify-center">
               <div className="h-32 w-32">
                 <Image
-                  src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1768272488/FOTO_MARIANO_LEGUIZAMON_2024_sxo0vt.jpg"
+                  src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto,f_auto,w_300,c_limit/v1768272488/FOTO_MARIANO_LEGUIZAMON_2024_sxo0vt.jpg"
                   alt="Mariano Leguizamón"
                   width={128}
                   height={128}

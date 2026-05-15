@@ -20,6 +20,7 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
   // Estado para el modal
   const [selectedOrg, setSelectedOrg] = useState<Organizacion | null>(null);
 
+  // Carga inicial de organizaciones
   useEffect(() => {
     let cancelled = false;
     obtenerOrganizaciones()
@@ -33,7 +34,13 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
         if (!cancelled) setLoading(false);
       });
 
-    // Control del scroll cuando el modal está abierto
+    return () => { 
+      cancelled = true; 
+    };
+  }, []);
+
+  // Control del scroll cuando el modal está abierto
+  useEffect(() => {
     if (selectedOrg) {
       document.body.style.overflow = "hidden";
     } else {
@@ -41,7 +48,6 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
     }
 
     return () => { 
-      cancelled = true; 
       document.body.style.overflow = "auto";
     };
   }, [selectedOrg]);

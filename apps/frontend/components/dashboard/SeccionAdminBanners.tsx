@@ -62,17 +62,63 @@ export default function SeccionAdminBanners() {
     setIsModalOpen(true);
   };
 
+  const compressImage = (file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxWidth = 1200;
+
+          if (width > maxWidth) {
+            height = (maxWidth / width) * height;
+            width = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", {
+                type: 'image/webp',
+                lastModified: Date.now(),
+              });
+              resolve(compressedFile);
+            } else {
+              reject(new Error('Error al procesar imagen'));
+            }
+          }, 'image/webp', 0.8);
+        };
+        img.onerror = (err) => reject(err);
+      };
+      reader.onerror = (err) => reject(err);
+    });
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
       setUploading(true);
+      
+      // Optimizar imagen antes de subir
+      const optimizedFile = await compressImage(file);
+      
       const token = localStorage.getItem("auth_token") || "";
-      const res = await uploadBannerImage(token, file);
+      const res = await uploadBannerImage(token, optimizedFile);
       setFormData({ ...formData, image_url: res.url });
       Swal.fire({
-        title: 'Imagen subida',
+        title: 'Imagen optimizada y subida',
+        text: 'Se ha convertido a WebP para mejor rendimiento',
         icon: 'success',
         toast: true,
         position: 'top-end',
@@ -80,7 +126,8 @@ export default function SeccionAdminBanners() {
         showConfirmButton: false
       });
     } catch (err: any) {
-      Swal.fire('Error', 'No se pudo subir la imagen. Verifica que el bucket "home-banners" exista en Supabase.', 'error');
+      console.error(err);
+      Swal.fire('Error', 'No se pudo subir la imagen optimizada.', 'error');
     } finally {
       setUploading(false);
     }

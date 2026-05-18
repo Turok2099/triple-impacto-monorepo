@@ -6,9 +6,10 @@ import { CreditCard, Calendar, Lock, User, CheckCircle2, AlertCircle, ArrowRight
 interface PaymentFormRestProps {
   onSuccess?: (data: any) => void;
   onError?: (error: any) => void;
+  initialAmount?: number;
 }
 
-export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestProps) {
+export default function PaymentFormRest({ onSuccess, onError, initialAmount }: PaymentFormRestProps) {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -19,7 +20,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
     expiryMonth: '',
     expiryYear: '',
     securityCode: '',
-    amount: '100.00',
+    amount: initialAmount ? initialAmount.toFixed(2) : '100.00',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -119,38 +120,42 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Store ID */}
-        <div className="space-y-1.5">
-          <label className="text-sm font-semibold text-slate-700 ml-1">Tienda a Probar (Store ID)</label>
-          <div className="relative">
-            <select
-              name="storeId"
-              value={formData.storeId}
-              onChange={handleChange}
-              className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none text-slate-800 font-medium appearance-none"
-              required
-            >
-              <option value="5926012005">5926012005 - Tienda 05 (Mastercard/Void)</option>
-              <option value="5926012006">5926012006 - Tienda 06 (Visa/Return)</option>
-            </select>
+        {/* Monto de Prueba (Oculto o bloqueado si viene como prop) */}
+        {!initialAmount && (
+          <div className="space-y-1.5">
+            <label className="text-sm font-semibold text-slate-700 ml-1">Monto de Donación (ARS)</label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
+              <input
+                type="number"
+                name="amount"
+                value={formData.amount}
+                onChange={handleChange}
+                className="w-full pl-8 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none text-slate-800 font-medium"
+                required
+              />
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Monto de Prueba */}
-        <div className="space-y-1.5">
-          <label className="text-sm font-semibold text-slate-700 ml-1">Monto de Donación (ARS)</label>
-          <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
-            <input
-              type="number"
-              name="amount"
-              value={formData.amount}
-              onChange={handleChange}
-              className="w-full pl-8 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none text-slate-800 font-medium"
-              required
-            />
-          </div>
-        </div>
+        {/* Store ID (Solo visible si no es flujo real) */}
+        {!initialAmount && (
+           <div className="space-y-1.5">
+           <label className="text-sm font-semibold text-slate-700 ml-1">Tienda a Probar (Store ID)</label>
+           <div className="relative">
+             <select
+               name="storeId"
+               value={formData.storeId}
+               onChange={handleChange}
+               className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none text-slate-800 font-medium appearance-none"
+               required
+             >
+               <option value="5926012005">5926012005 - Tienda 05 (Mastercard/Void)</option>
+               <option value="5926012006">5926012006 - Tienda 06 (Visa/Return)</option>
+             </select>
+           </div>
+         </div>
+        )}
 
         {/* Nombre del Titular */}
         <div className="space-y-1.5">

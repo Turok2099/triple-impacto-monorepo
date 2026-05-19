@@ -19,11 +19,11 @@ export class FiservRestService {
    * @param payload Cuerpo de la petición (JSON string)
    */
   private getHeaders(payload: string) {
-    const apiKey = this.configService.get<string>('fiserv.apiKey');
-    const apiSecret = this.configService.get<string>('fiserv.apiSecret');
+    const apiKey = this.configService.get<string>('fiserv.apiKey') || process.env.FISERV_API_KEY;
+    const apiSecret = this.configService.get<string>('fiserv.apiSecret') || process.env.FISERV_API_SECRET;
 
     if (!apiKey || !apiSecret) {
-      throw new Error('Fiserv API credentials (apiKey or apiSecret) are not configured');
+      throw new Error(`Fiserv API credentials (apiKey or apiSecret) are not configured. Verifica que existan en el Backend de Railway.`);
     }
 
     const clientRequestId = uuidv4();

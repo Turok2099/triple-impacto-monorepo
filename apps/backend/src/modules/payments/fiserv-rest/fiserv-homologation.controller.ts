@@ -51,7 +51,8 @@ export class FiservHomologationController {
           order: { orderId: saleOrderId },
           authenticationRequest: {
             authenticationType: 'Secure3DAuthenticationRequest',
-            termURL: 'https://tripleimpacto.com'
+            methodNotificationURL: 'https://tripleimpacto.site',
+            termURL: 'https://tripleimpacto.site'
           }
         };
         const saleResult = await this.fiservRestService.makeRequest('POST', '/payments', salePayload);

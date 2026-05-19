@@ -104,11 +104,11 @@ export class FiservHomologationController {
             const postAuthPayload = {
               requestType: 'PostAuthTransaction',
               storeId,
-              transactionAmount: { total: '10.00', currency: 'ARS' },
-              order: { orderId: postAuthOrderId }
+              transactionAmount: { total: '100.00', currency: 'ARS' },
+              order: { orderId: preAuthOrderId }
             };
             postAuthResult = await this.fiservRestService.makeRequest('POST', `/payments/${preAuthResult.ipgTransactionId}`, postAuthPayload);
-            results.push({ step: '3. PostAuth', status: 'SUCCESS', data: postAuthResult, orderId: postAuthOrderId });
+            results.push({ step: '3. PostAuth', status: 'SUCCESS', data: postAuthResult, orderId: preAuthOrderId });
           } catch (e: any) {
             results.push({ step: '3. PostAuth', status: 'ERROR', error: e.response?.data || e.message });
           }

@@ -43,60 +43,91 @@ export class FiservHomologationController {
         // --- MATRIZ MASTERCARD ---
         // 2. SALE con Token + Data Only
         const saleOrderId = `MC-SALE-${uuidv4().substring(0, 6)}`;
-        const salePayload = {
-          requestType: 'PaymentTokenSaleTransaction',
-          storeId,
-          transactionAmount: { total: '10.00', currency: 'ARS' },
-          paymentMethod: { paymentToken: { value: tokenValue } },
-          order: { orderId: saleOrderId },
-          authenticationRequest: {
-            authenticationType: 'Secure3DAuthenticationRequest',
-            methodNotificationURL: 'https://tripleimpacto.site',
-            termURL: 'https://tripleimpacto.site'
-          }
-        };
-        const saleResult = await this.fiservRestService.makeRequest('POST', '/payments', salePayload);
-        results.push({ step: '2. SALE + Data Only', status: 'SUCCESS', data: saleResult, orderId: saleOrderId });
+        let saleResult: any;
+        try {
+          const salePayload = {
+            requestType: 'PaymentTokenSaleTransaction',
+            storeId,
+            transactionAmount: { total: '10.00', currency: 'ARS' },
+            paymentMethod: { paymentToken: { value: tokenValue } },
+            order: { orderId: saleOrderId },
+            authenticationRequest: {
+              authenticationType: 'Secure3DAuthenticationRequest',
+              methodNotificationURL: 'https://tripleimpacto.site',
+              termURL: 'https://tripleimpacto.site'
+            }
+          };
+          saleResult = await this.fiservRestService.makeRequest('POST', '/payments', salePayload);
+          results.push({ step: '2. SALE + Data Only', status: 'SUCCESS', data: saleResult, orderId: saleOrderId });
+        } catch (e: any) {
+          results.push({ step: '2. SALE + Data Only', status: 'ERROR', error: e.response?.data || e.message });
+          return { success: false, partialResults: results, error: 'Fallo en SALE' };
+        }
 
         // 3. VOID del SALE
-        const voidPayload = { requestType: 'VoidTransaction', storeId };
-        const voidResult = await this.fiservRestService.makeRequest('POST', `/payments/${saleResult.ipgTransactionId}`, voidPayload);
-        results.push({ step: '3. VOID', status: 'SUCCESS', data: voidResult });
+        if (saleResult?.ipgTransactionId) {
+          try {
+            const voidPayload = { requestType: 'VoidTransaction', storeId };
+            const voidResult = await this.fiservRestService.makeRequest('POST', `/payments/${saleResult.ipgTransactionId}`, voidPayload);
+            results.push({ step: '3. VOID', status: 'SUCCESS', data: voidResult });
+          } catch (e: any) {
+            results.push({ step: '3. VOID', status: 'ERROR', error: e.response?.data || e.message });
+            // Continuamos aunque falle el void para no perder los datos
+          }
+        }
 
       } else if (cardType === 'visa') {
         // --- MATRIZ VISA ---
         // 2. PreAuth con Token (3 Cuotas)
         const preAuthOrderId = `VISA-PRE-${uuidv4().substring(0, 6)}`;
-        const preAuthPayload = {
-          requestType: 'PaymentTokenPreAuthTransaction',
-          storeId,
-          transactionAmount: { total: '10.00', currency: 'ARS' },
-          paymentMethod: { paymentToken: { value: tokenValue } },
-          order: { orderId: preAuthOrderId, installmentOptions: { numberOfInstallments: 3 } }
-        };
-        const preAuthResult = await this.fiservRestService.makeRequest('POST', '/payments', preAuthPayload);
-        results.push({ step: '2. PreAuth (Cuotas)', status: 'SUCCESS', data: preAuthResult, orderId: preAuthOrderId });
+        let preAuthResult: any;
+        try {
+          const preAuthPayload = {
+            requestType: 'PaymentTokenPreAuthTransaction',
+            storeId,
+            transactionAmount: { total: '10.00', currency: 'ARS' },
+            paymentMethod: { paymentToken: { value: tokenValue } },
+            order: { orderId: preAuthOrderId, installmentOptions: { numberOfInstallments: 3 } }
+          };
+          preAuthResult = await this.fiservRestService.makeRequest('POST', '/payments', preAuthPayload);
+          results.push({ step: '2. PreAuth (Cuotas)', status: 'SUCCESS', data: preAuthResult, orderId: preAuthOrderId });
+        } catch (e: any) {
+           results.push({ step: '2. PreAuth (Cuotas)', status: 'ERROR', error: e.response?.data || e.message });
+           return { success: false, partialResults: results, error: 'Fallo en PreAuth' };
+        }
 
         // 3. PostAuth (Captura)
-        const postAuthOrderId = `VISA-POST-${uuidv4().substring(0, 6)}`;
-        const postAuthPayload = {
-          requestType: 'PostAuthTransaction',
-          storeId,
-          transactionAmount: { total: '10.00', currency: 'ARS' },
-          order: { orderId: postAuthOrderId }
-        };
-        // Para capturar usamos el endpoint payments/{ipgTransactionId}
-        const postAuthResult = await this.fiservRestService.makeRequest('POST', `/payments/${preAuthResult.ipgTransactionId}`, postAuthPayload);
-        results.push({ step: '3. PostAuth', status: 'SUCCESS', data: postAuthResult, orderId: postAuthOrderId });
+        let postAuthResult: any;
+        if (preAuthResult?.ipgTransactionId) {
+          try {
+            const postAuthOrderId = `VISA-POST-${uuidv4().substring(0, 6)}`;
+            const postAuthPayload = {
+              requestType: 'PostAuthTransaction',
+              storeId,
+              transactionAmount: { total: '10.00', currency: 'ARS' },
+              order: { orderId: postAuthOrderId }
+            };
+            postAuthResult = await this.fiservRestService.makeRequest('POST', `/payments/${preAuthResult.ipgTransactionId}`, postAuthPayload);
+            results.push({ step: '3. PostAuth', status: 'SUCCESS', data: postAuthResult, orderId: postAuthOrderId });
+          } catch (e: any) {
+            results.push({ step: '3. PostAuth', status: 'ERROR', error: e.response?.data || e.message });
+          }
+        }
 
         // 4. Return (Devolución) de la captura
-        const returnPayload = {
-          requestType: 'ReturnTransaction',
-          storeId,
-          transactionAmount: { total: '10.00', currency: 'ARS' }
-        };
-        const returnResult = await this.fiservRestService.makeRequest('POST', `/payments/${postAuthResult.ipgTransactionId}`, returnPayload);
-        results.push({ step: '4. RETURN', status: 'SUCCESS', data: returnResult });
+        if (postAuthResult?.ipgTransactionId) {
+          try {
+            const returnPayload = {
+              requestType: 'ReturnTransaction',
+              storeId,
+              transactionAmount: { total: '10.00', currency: 'ARS' }
+            };
+            const returnResult = await this.fiservRestService.makeRequest('POST', `/payments/${postAuthResult.ipgTransactionId}`, returnPayload);
+            results.push({ step: '4. RETURN', status: 'SUCCESS', data: returnResult });
+          } catch (e: any) {
+            results.push({ step: '4. RETURN', status: 'ERROR', error: e.response?.data || e.message });
+          }
+        }
       }
 
       return { success: true, results };

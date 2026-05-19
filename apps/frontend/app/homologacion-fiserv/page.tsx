@@ -66,7 +66,10 @@ export default function HomologacionFiservPage() {
 
       const data = await response.json();
       if (!response.ok || !data.success) {
-        throw new Error(data.error?.message || data.message || 'Error desconocido ejecutando la matriz');
+        const errorMsg = data.error 
+          ? (typeof data.error === 'string' ? data.error : JSON.stringify(data.error)) 
+          : data.message || 'Error desconocido';
+        throw new Error(`Error de Fiserv: ${errorMsg}`);
       }
 
       setResult(data);

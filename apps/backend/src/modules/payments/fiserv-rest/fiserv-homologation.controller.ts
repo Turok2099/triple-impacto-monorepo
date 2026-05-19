@@ -120,7 +120,7 @@ export class FiservHomologationController {
             const returnPayload = {
               requestType: 'ReturnTransaction',
               storeId,
-              transactionAmount: { total: '10.00', currency: 'ARS' }
+              transactionAmount: { total: '100.00', currency: 'ARS' }
             };
             const returnResult = await this.fiservRestService.makeRequest('POST', `/payments/${postAuthResult.ipgTransactionId}`, returnPayload);
             results.push({ step: '4. RETURN', status: 'SUCCESS', data: returnResult });

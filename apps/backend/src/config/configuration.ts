@@ -35,5 +35,6 @@ export default () => ({
   fiserv: {
     apiKey: process.env.FISERV_API_KEY || '',
     apiSecret: process.env.FISERV_API_SECRET || '',
+    baseUrl: process.env.FISERV_BASE_URL || 'https://cert.api.firstdata.com/gateway/v2',
   },
 });

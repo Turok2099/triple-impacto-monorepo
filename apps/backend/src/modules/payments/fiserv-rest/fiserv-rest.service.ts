@@ -8,7 +8,6 @@ import { SupabaseService } from '../../supabase/supabase.service';
 @Injectable()
 export class FiservRestService {
   private readonly logger = new Logger(FiservRestService.name);
-  private readonly baseUrl = 'https://cert.api.firstdata.com/gateway/v2';
 
   constructor(
     private readonly configService: ConfigService,
@@ -47,10 +46,32 @@ export class FiservRestService {
   }
 
   /**
+   * Ejecuta una petición directa (útil para la matriz de homologación)
+   */
+  async makeRequest(method: 'POST' | 'GET', path: string, payload: any = null) {
+    const baseUrl = this.configService.get<string>('fiserv.baseUrl');
+    const url = `${baseUrl}${path}`;
+    const payloadString = payload ? JSON.stringify(payload) : '';
+    const headers = this.getHeaders(payloadString);
+
+    try {
+      const config: any = { method, url, headers };
+      if (payload) config.data = payload;
+      
+      const response = await axios(config);
+      return response.data;
+    } catch (error: any) {
+      this.logger.error(`Error en makeRequest ${path}:`, error.response?.data || error.message);
+      throw error.response?.data || error;
+    }
+  }
+
+  /**
    * Procesa una verificación de tarjeta para obtener un token (Flujo No-PCI)
    */
   async processFirstPayment(userId: string, paymentData: any) {
-    const endpoint = `${this.baseUrl}/payments`;
+    const baseUrl = this.configService.get<string>('fiserv.baseUrl');
+    const endpoint = `${baseUrl}/payments`;
     const storeId = paymentData.storeId || '5926012006';
 
     // Construir el payload para verificación de tarjeta (Monto $0)
@@ -128,7 +149,8 @@ export class FiservRestService {
       throw new Error('Método de pago no encontrado o no pertenece al usuario');
     }
 
-    const endpoint = `${this.baseUrl}/payments`;
+    const baseUrl = this.configService.get<string>('fiserv.baseUrl');
+    const endpoint = `${baseUrl}/payments`;
     
     // Payload para REPEAT usando el token
     const payload = {
@@ -178,7 +200,8 @@ export class FiservRestService {
     // Si el ID empieza con ORD-, es un OrderID, de lo contrario es un TransactionID
     const isOrder = id.startsWith('ORD-');
     const path = isOrder ? 'orders' : 'payments';
-    const endpoint = `${this.baseUrl}/${path}/${id}`;
+    const baseUrl = this.configService.get<string>('fiserv.baseUrl');
+    const endpoint = `${baseUrl}/${path}/${id}`;
     
     const payload = {
       requestType: 'VoidTransaction',
@@ -204,7 +227,8 @@ export class FiservRestService {
   async returnTransaction(id: string, storeId: string, amount: number) {
     const isOrder = id.startsWith('ORD-');
     const path = isOrder ? 'orders' : 'payments';
-    const endpoint = `${this.baseUrl}/${path}/${id}`;
+    const baseUrl = this.configService.get<string>('fiserv.baseUrl');
+    const endpoint = `${baseUrl}/${path}/${id}`;
     
     const payload = {
       requestType: 'ReturnTransaction',

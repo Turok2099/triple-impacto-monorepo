@@ -23,7 +23,7 @@ export class FiservRestService {
     const apiSecret = this.configService.get<string>('fiserv.apiSecret') || process.env.FISERV_API_SECRET;
 
     if (!apiKey || !apiSecret) {
-      throw new Error(`Fiserv API credentials (apiKey or apiSecret) are not configured. Verifica que existan en el Backend de Railway.`);
+      throw new Error(`Fiserv API credentials missing. ENV: KEY_TYPE=${typeof process.env.FISERV_API_KEY}, SECRET_TYPE=${typeof process.env.FISERV_API_SECRET}. Config: KEY=${typeof this.configService.get('fiserv.apiKey')}`);
     }
 
     const clientRequestId = uuidv4();

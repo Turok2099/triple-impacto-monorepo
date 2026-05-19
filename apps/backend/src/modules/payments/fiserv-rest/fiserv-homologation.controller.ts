@@ -48,7 +48,7 @@ export class FiservHomologationController {
           const salePayload = {
             requestType: 'PaymentTokenSaleTransaction',
             storeId,
-            transactionAmount: { total: '10.00', currency: 'ARS' },
+            transactionAmount: { total: '1500.00', currency: 'ARS' },
             paymentMethod: { paymentToken: { value: tokenValue } },
             order: { orderId: saleOrderId },
             authenticationRequest: {
@@ -85,7 +85,7 @@ export class FiservHomologationController {
           const preAuthPayload = {
             requestType: 'PaymentTokenPreAuthTransaction',
             storeId,
-            transactionAmount: { total: '10.00', currency: 'ARS' },
+            transactionAmount: { total: '1500.00', currency: 'ARS' },
             paymentMethod: { paymentToken: { value: tokenValue } },
             order: { orderId: preAuthOrderId, installmentOptions: { numberOfInstallments: 3 } }
           };

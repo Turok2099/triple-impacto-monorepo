@@ -13,13 +13,13 @@ export default function DonarPage() {
   const { user, handleSessionExpired } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Nuevo estado para guardar los datos antes de elegir el método de pago
   const [donationData, setDonationData] = useState<{
     monto: number;
     organizacionId?: string;
   } | null>(null);
-  
+
   // Estado para el método elegido
   const [paymentMethod, setPaymentMethod] = useState<'rest' | 'connect' | null>(null);
 
@@ -45,7 +45,7 @@ export default function DonarPage() {
   // 2. Segundo paso: El usuario elige Connect
   const procesarConnect = async () => {
     if (!donationData) return;
-    
+
     const token = localStorage.getItem("auth_token");
     if (!token) return;
 
@@ -146,13 +146,13 @@ export default function DonarPage() {
           {/* Flujo: 2. Selección de Método de Pago */}
           {donationData && !paymentMethod && !transaccionCreada && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <button 
+              <button
                 onClick={() => setDonationData(null)}
                 className="flex items-center gap-2 text-slate-500 hover:text-slate-700 mb-6 font-medium transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" /> Volver atrás
               </button>
-              
+
               <div className="text-center mb-8">
                 <h3 className="text-2xl font-bold text-slate-800">¿Cómo preferís pagar?</h3>
                 <p className="text-slate-500 mt-2">Seleccioná tu método de pago preferido para completar la donación de ${donationData.monto}</p>
@@ -160,7 +160,7 @@ export default function DonarPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Opción REST API */}
-                <button 
+                <button
                   onClick={() => setPaymentMethod('rest')}
                   className="group relative bg-white border-2 border-slate-200 hover:border-indigo-500 rounded-2xl p-6 text-left transition-all hover:shadow-xl hover:shadow-indigo-100 flex flex-col items-start gap-4"
                 >
@@ -178,7 +178,7 @@ export default function DonarPage() {
                 </button>
 
                 {/* Opción Connect */}
-                <button 
+                <button
                   onClick={() => procesarConnect()}
                   disabled={loading}
                   className="group relative bg-white border-2 border-slate-200 hover:border-teal-500 rounded-2xl p-6 text-left transition-all hover:shadow-xl hover:shadow-teal-100 flex flex-col items-start gap-4 disabled:opacity-70 disabled:cursor-not-allowed"
@@ -204,14 +204,14 @@ export default function DonarPage() {
           {/* Flujo: 3A. Formulario REST */}
           {paymentMethod === 'rest' && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-               <button 
+              <button
                 onClick={() => setPaymentMethod(null)}
                 className="flex items-center gap-2 text-slate-500 hover:text-slate-700 mb-6 font-medium transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" /> Volver a métodos de pago
               </button>
               {/* Le pasamos el monto para que el formulario lo tenga, más adelante lo adaptaremos para crear la transacción real */}
-              <PaymentFormRest 
+              <PaymentFormRest
                 initialAmount={donationData?.monto}
                 onSuccess={(data) => console.log('Éxito REST', data)}
                 onError={(err) => setError('Error en pago REST: ' + (err.message || 'Desconocido'))}
@@ -223,3 +223,5 @@ export default function DonarPage() {
     </div>
   );
 }
+
+

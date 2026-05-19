@@ -108,7 +108,15 @@ export class FiservHomologationController {
 
       return { success: true, results };
     } catch (error: any) {
-      const errorDetail = error.response?.data || error.message || String(error);
+      let errorDetail = error.message || String(error);
+      if (error.response?.data) {
+        try {
+          errorDetail = JSON.stringify(error.response.data, null, 2);
+        } catch (e) {
+          errorDetail = String(error.response.data);
+        }
+      }
+      
       return { 
         success: false, 
         error: errorDetail, 

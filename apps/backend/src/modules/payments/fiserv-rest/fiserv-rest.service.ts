@@ -23,8 +23,7 @@ export class FiservRestService {
     const apiSecret = this.configService.get<string>('fiserv.apiSecret') || process.env.FISERV_API_SECRET;
 
     if (!apiKey || !apiSecret) {
-      const fiservKeys = Object.keys(process.env).filter(k => k.toUpperCase().includes('FISERV')).join(', ');
-      throw new Error(`Fiserv credentials missing. Encontradas en process.env: [${fiservKeys}]`);
+      throw new Error(`Fiserv API credentials (apiKey or apiSecret) are not configured.`);
     }
 
     const clientRequestId = uuidv4();
@@ -50,7 +49,7 @@ export class FiservRestService {
    * Ejecuta una petición directa (útil para la matriz de homologación)
    */
   async makeRequest(method: 'POST' | 'GET', path: string, payload: any = null) {
-    const baseUrl = this.configService.get<string>('fiserv.baseUrl');
+    const baseUrl = this.configService.get<string>('fiserv.baseUrl') || process.env.FISERV_BASE_URL;
     const url = `${baseUrl}${path}`;
     const payloadString = payload ? JSON.stringify(payload) : '';
     const headers = this.getHeaders(payloadString);

@@ -60,7 +60,7 @@ export class FiservHomologationController {
 
         // 3. VOID del SALE
         const voidPayload = { requestType: 'VoidTransaction', storeId };
-        const voidResult = await this.fiservRestService.makeRequest('POST', `/orders/${saleOrderId}`, voidPayload);
+        const voidResult = await this.fiservRestService.makeRequest('POST', `/payments/${saleResult.ipgTransactionId}`, voidPayload);
         results.push({ step: '3. VOID', status: 'SUCCESS', data: voidResult });
 
       } else if (cardType === 'visa') {
@@ -85,8 +85,8 @@ export class FiservHomologationController {
           transactionAmount: { total: '10.00', currency: 'ARS' },
           order: { orderId: postAuthOrderId }
         };
-        // Para capturar usamos el endpoint orders/{orderId} apuntando a la PreAuth
-        const postAuthResult = await this.fiservRestService.makeRequest('POST', `/orders/${preAuthOrderId}`, postAuthPayload);
+        // Para capturar usamos el endpoint payments/{ipgTransactionId}
+        const postAuthResult = await this.fiservRestService.makeRequest('POST', `/payments/${preAuthResult.ipgTransactionId}`, postAuthPayload);
         results.push({ step: '3. PostAuth', status: 'SUCCESS', data: postAuthResult, orderId: postAuthOrderId });
 
         // 4. Return (Devolución) de la captura
@@ -95,7 +95,7 @@ export class FiservHomologationController {
           storeId,
           transactionAmount: { total: '10.00', currency: 'ARS' }
         };
-        const returnResult = await this.fiservRestService.makeRequest('POST', `/orders/${postAuthOrderId}`, returnPayload);
+        const returnResult = await this.fiservRestService.makeRequest('POST', `/payments/${postAuthResult.ipgTransactionId}`, returnPayload);
         results.push({ step: '4. RETURN', status: 'SUCCESS', data: returnResult });
       }
 

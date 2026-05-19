@@ -107,8 +107,13 @@ export class FiservHomologationController {
       }
 
       return { success: true, results };
-    } catch (error) {
-      return { success: false, error: error, partialResults: results };
+    } catch (error: any) {
+      const errorDetail = error.response?.data || error.message || String(error);
+      return { 
+        success: false, 
+        error: errorDetail, 
+        partialResults: results 
+      };
     }
   }
 }

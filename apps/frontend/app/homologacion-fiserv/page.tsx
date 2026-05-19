@@ -71,15 +71,20 @@ export default function HomologacionFiservPage() {
            throw new Error(`Fallo de red o del servidor. Código HTTP: ${response.status}`);
         }
         const errorMsg = data.error 
-          ? (typeof data.error === 'string' ? data.error : JSON.stringify(data.error)) 
+          ? (typeof data.error === 'string' ? data.error : JSON.stringify(data.error, null, 2)) 
           : data.message || 'Error en la respuesta del backend';
-        throw new Error(`Detalle del error: ${errorMsg}`);
+          
+        let stepsInfo = '';
+        if (data.partialResults && data.partialResults.length > 0) {
+          stepsInfo = `\n\nPasos completados exitosamente:\n${data.partialResults.map((r:any) => `- ${r.step}`).join('\n')}`;
+        }
+        throw new Error(`Detalle del error:\n${errorMsg}${stepsInfo}`);
       }
 
       setResult(data);
     } catch (err: any) {
       console.error(err);
-      setError(`[ERROR] ${err.message || 'Error de conexión (posible CORS o caída de red)'}`);
+      setError(`[ERROR] ${err.message || 'Error de conexión'}`);
     } finally {
       setLoading(false);
     }

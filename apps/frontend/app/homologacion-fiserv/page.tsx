@@ -204,9 +204,16 @@ export default function HomologacionFiservPage() {
               </h3>
               <div className="space-y-4">
                 {result.results.map((r: any, idx: number) => (
-                  <div key={idx} className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-1">
+                  <div key={idx} className={`bg-white p-4 rounded-xl border shadow-sm flex flex-col gap-1 ${r.status === 'ERROR' ? 'border-red-200' : 'border-slate-100'}`}>
                     <span className="text-sm font-bold text-slate-700">{r.step}</span>
-                    <span className="text-xs text-slate-500">Status: {r.data.transactionStatus}</span>
+                    <span className={`text-xs ${r.status === 'ERROR' ? 'text-red-500' : 'text-slate-500'}`}>
+                      Status: {r.data?.transactionStatus || r.status}
+                    </span>
+                    {r.error && (
+                      <pre className="text-xs text-red-600 bg-red-50 p-2 rounded mt-1 overflow-auto">
+                        {typeof r.error === 'string' ? r.error : JSON.stringify(r.error, null, 2)}
+                      </pre>
+                    )}
                     {r.orderId && (
                       <div className="mt-2 bg-slate-100 px-3 py-2 rounded-lg flex justify-between items-center">
                         <span className="text-xs font-mono text-slate-600">Order ID:</span>

@@ -23,7 +23,8 @@ export class FiservRestService {
     const apiSecret = this.configService.get<string>('fiserv.apiSecret') || process.env.FISERV_API_SECRET;
 
     if (!apiKey || !apiSecret) {
-      throw new Error(`Fiserv API credentials missing. ENV: KEY_TYPE=${typeof process.env.FISERV_API_KEY}, SECRET_TYPE=${typeof process.env.FISERV_API_SECRET}. Config: KEY=${typeof this.configService.get('fiserv.apiKey')}`);
+      const fiservKeys = Object.keys(process.env).filter(k => k.toUpperCase().includes('FISERV')).join(', ');
+      throw new Error(`Fiserv credentials missing. Encontradas en process.env: [${fiservKeys}]`);
     }
 
     const clientRequestId = uuidv4();

@@ -64,17 +64,22 @@ export default function HomologacionFiservPage() {
         body: JSON.stringify(payload)
       });
 
-      const data = await response.json();
-      if (!response.ok || !data.success) {
+      const data = await response.json().catch(() => null);
+      
+      if (!response.ok || !data || !data.success) {
+        if (!data) {
+           throw new Error(`Fallo de red o del servidor. Código HTTP: ${response.status}`);
+        }
         const errorMsg = data.error 
           ? (typeof data.error === 'string' ? data.error : JSON.stringify(data.error)) 
-          : data.message || 'Error desconocido';
-        throw new Error(`Error de Fiserv: ${errorMsg}`);
+          : data.message || 'Error en la respuesta del backend';
+        throw new Error(`Detalle del error: ${errorMsg}`);
       }
 
       setResult(data);
     } catch (err: any) {
-      setError(err.message || 'Error de conexión');
+      console.error(err);
+      setError(`[ERROR] ${err.message || 'Error de conexión (posible CORS o caída de red)'}`);
     } finally {
       setLoading(false);
     }

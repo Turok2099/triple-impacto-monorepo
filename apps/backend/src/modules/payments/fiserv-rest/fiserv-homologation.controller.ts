@@ -24,20 +24,18 @@ export class FiservHomologationController {
     try {
       // --- PASO 1: TOKENIZAR LA TARJETA ---
       const tokenPayload = {
-        requestType: 'PaymentCardVerificationTransaction',
+        requestType: 'PaymentCardPaymentTokenizationRequest',
         storeId,
-        paymentMethod: {
-          paymentCard: {
-            number: cardNumber,
-            securityCode,
-            expiryDate: { month: expiryMonth, year: expiryYear },
-            cardholderName: cardholderName || 'Test Fiserv',
-          },
+        paymentCard: {
+          number: cardNumber,
+          securityCode,
+          expiryDate: { month: expiryMonth, year: expiryYear },
+          cardholderName: cardholderName || 'Test Fiserv',
         },
         createToken: { reusable: true }
       };
 
-      const tokenResult = await this.fiservRestService.makeRequest('POST', '/payments', tokenPayload);
+      const tokenResult = await this.fiservRestService.makeRequest('POST', '/payment-tokens', tokenPayload);
       tokenValue = tokenResult.paymentToken?.value || tokenResult.ipgTransactionId;
       results.push({ step: '1. Tokenization', status: 'SUCCESS', data: tokenResult });
 

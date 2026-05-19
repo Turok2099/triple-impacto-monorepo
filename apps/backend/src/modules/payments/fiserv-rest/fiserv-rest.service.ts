@@ -56,7 +56,7 @@ export class FiservRestService {
 
     try {
       const config: any = { method, url, headers };
-      if (payload) config.data = payload;
+      if (payload) config.data = payloadString;
       
       const response = await axios(config);
       return response.data;

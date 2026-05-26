@@ -9,7 +9,7 @@ interface PaymentFormRestProps {
   onError?: (error: any) => void;
 }
 
-const MONTOS_SUGERIDOS = [1000, 5000, 10000];
+const MONTOS_SUGERIDOS = [5000, 10000, 15000];
 const MONTO_MINIMO = 10;
 const MONTO_MAXIMO = 20000;
 
@@ -20,7 +20,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
   const [errorOrgs, setErrorOrgs] = useState<string | null>(null);
   const [organizacionId, setOrganizacionId] = useState<string>("");
   
-  const [montoSeleccionado, setMontoSeleccionado] = useState<number | null>(1000);
+  const [montoSeleccionado, setMontoSeleccionado] = useState<number | null>(5000);
   const [montoCustom, setMontoCustom] = useState("");
   const [usarMontoCustom, setUsarMontoCustom] = useState(false);
 
@@ -38,27 +38,12 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
   });
 
   const organizacionSeleccionada = organizaciones.find(org => org.id === organizacionId);
-  const montoMinimoActual = organizacionSeleccionada?.monto_minimo && organizacionSeleccionada.monto_minimo > 0 
-    ? organizacionSeleccionada.monto_minimo 
-    : MONTO_MINIMO;
-
-  const montosSugeridosActuales = [
-    montoMinimoActual,
-    MONTOS_SUGERIDOS[1],
-    MONTOS_SUGERIDOS[2],
-  ];
+  const montoMinimoActual = MONTO_MINIMO;
+  const montosSugeridosActuales = MONTOS_SUGERIDOS;
 
   useEffect(() => {
     cargarOrganizaciones();
   }, []);
-
-  useEffect(() => {
-    if (montoSeleccionado !== null && !usarMontoCustom) {
-      if (montoSeleccionado < montoMinimoActual) {
-        setMontoSeleccionado(montoMinimoActual);
-      }
-    }
-  }, [organizacionId, montoMinimoActual, montoSeleccionado, usarMontoCustom]);
 
   const cargarOrganizaciones = async () => {
     try {
@@ -147,7 +132,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
       setStatus('error');
       return;
     }
-    const errorMontoOrg = validarMonto(montoFinal, organizacionSeleccionada?.monto_minimo);
+    const errorMontoOrg = validarMonto(montoFinal, MONTO_MINIMO);
     if (errorMontoOrg) {
       setErrorMessage(errorMontoOrg);
       setStatus('error');

@@ -18,7 +18,7 @@ interface FormularioDonacionProps {
 }
 
 // Montos sugeridos predefinidos
-const MONTOS_SUGERIDOS = [1000, 5000, 10000];
+const MONTOS_SUGERIDOS = [5000, 10000, 15000];
 const MONTO_MINIMO = 10;
 const MONTO_MAXIMO = 20000;
 
@@ -32,7 +32,7 @@ export default function FormularioDonacion({
   const [errorOrgs, setErrorOrgs] = useState<string | null>(null);
 
   const [montoSeleccionado, setMontoSeleccionado] = useState<number | null>(
-    1000
+    5000
   );
   const [montoCustom, setMontoCustom] = useState("");
   const [usarMontoCustom, setUsarMontoCustom] = useState(false);
@@ -43,24 +43,8 @@ export default function FormularioDonacion({
     (org) => org.id === organizacionId
   );
 
-  const montoMinimoActual = organizacionSeleccionada?.monto_minimo && organizacionSeleccionada.monto_minimo > 0 
-    ? organizacionSeleccionada.monto_minimo 
-    : MONTO_MINIMO;
-
-  const montosSugeridosActuales = [
-    montoMinimoActual,
-    MONTOS_SUGERIDOS[1],
-    MONTOS_SUGERIDOS[2],
-  ];
-
-  // Actualizar monto seleccionado si cambia la organización y el monto actual queda por debajo del mínimo
-  useEffect(() => {
-    if (montoSeleccionado !== null && !usarMontoCustom) {
-      if (montoSeleccionado < montoMinimoActual) {
-        setMontoSeleccionado(montoMinimoActual);
-      }
-    }
-  }, [organizacionId, montoMinimoActual, montoSeleccionado, usarMontoCustom]);
+  const montoMinimoActual = MONTO_MINIMO;
+  const montosSugeridosActuales = MONTOS_SUGERIDOS;
 
   // DEBUG: Verificar estado de autenticación
   useEffect(() => {
@@ -150,7 +134,7 @@ export default function FormularioDonacion({
     // Validar monto mínimo de la organización (si es mayor)
     const errorMonto = validarMonto(
       montoFinal,
-      organizacionSeleccionada?.monto_minimo
+      MONTO_MINIMO
     );
 
     if (errorMonto) {

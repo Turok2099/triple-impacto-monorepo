@@ -218,10 +218,10 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
 
   return (
     <div className="max-w-2xl w-full mx-auto bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm">
-      <div className="bg-slate-900 p-8 text-center flex flex-col items-center">
-        <Lock className="w-8 h-8 text-white/80 mb-3" />
+      <div className="bg-[#40a8ab] p-8 text-center flex flex-col items-center">
+        <Lock className="w-8 h-8 text-white/90 mb-3" />
         <h2 className="text-2xl font-bold text-white mb-2">Pago Seguro</h2>
-        <p className="text-slate-400 text-sm">
+        <p className="text-teal-50 text-sm">
           Completa los datos de tu donación y tu tarjeta.
         </p>
       </div>

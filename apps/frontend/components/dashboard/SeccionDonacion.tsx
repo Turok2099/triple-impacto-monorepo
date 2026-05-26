@@ -160,31 +160,16 @@ export default function SeccionDonacion() {
           </div>
         )}
 
-        {/* Flujo 3: REST Step 1 (Monto + Org) */}
-        {paymentMethod === 'rest' && !donationData && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+        {/* Flujo 3: REST unificado (ONG + Monto + Tarjeta) */}
+        {paymentMethod === 'rest' && (
+          <div className="animate-in fade-in slide-in-from-right-4 duration-500">
             <button
               onClick={() => setPaymentMethod(null)}
               className="flex items-center gap-2 text-slate-500 hover:text-slate-700 mb-6 font-medium transition-colors"
             >
               <ArrowLeft className="w-4 h-4" /> Cambiar método de pago
             </button>
-            <FormularioDonacion onSubmit={(monto, orgId) => setDonationData({ monto, organizacionId: orgId })} loading={loading} />
-          </div>
-        )}
-
-        {/* Flujo 4: REST Step 2 (Tarjeta) */}
-        {paymentMethod === 'rest' && donationData && (
-          <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-            <button
-              onClick={() => setDonationData(null)}
-              className="flex items-center gap-2 text-slate-500 hover:text-slate-700 mb-6 font-medium transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" /> Cambiar monto
-            </button>
             <PaymentFormRest
-              initialAmount={donationData.monto}
-              organizacionId={donationData.organizacionId}
               onSuccess={(data) => console.log('Éxito REST', data)}
               onError={(err) => setError('Error en pago REST: ' + (err.message || 'Desconocido'))}
             />

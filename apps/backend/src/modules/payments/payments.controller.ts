@@ -89,15 +89,18 @@ export class PaymentsController {
     }
 
     // ESTRATEGIA PRODUCTIVO FISERV: Proxy según organización dinámico
-    let finalStoreId = body.storename || config.storeId;
-    let finalSharedSecret = config.sharedSecret;
+    let finalStoreId: string;
+    let finalSharedSecret: string;
     
     if (body.organizacion_id) {
       const org = await this.supabase.getOrganizacionById(body.organizacion_id);
-      if (org) {
-        if (org.fiserv_store_id) finalStoreId = org.fiserv_store_id as string;
-        if (org.fiserv_shared_secret) finalSharedSecret = org.fiserv_shared_secret as string;
+      if (!org || !org.fiserv_store_id || (org.fiserv_store_id as string).trim() === '') {
+        throw new BadRequestException('La organización seleccionada no tiene configuración de pagos habilitada.');
       }
+      finalStoreId = org.fiserv_store_id as string;
+      finalSharedSecret = org.fiserv_shared_secret as string;
+    } else {
+      throw new BadRequestException('Se requiere seleccionar una organización.');
     }
     body.storename = finalStoreId;
 
@@ -166,12 +169,16 @@ export class PaymentsController {
     const userId = req.user?.userId;
     if (!userId) throw new BadRequestException('Se requiere autenticación');
 
-    const config = this.fiservConnect.getConfig();
-    let finalStoreId = body.storeId || config?.storeId;
+    let finalStoreId: string;
     
     if (body.organizacion_id) {
       const org = await this.supabase.getOrganizacionById(body.organizacion_id);
-      if (org && org.fiserv_store_id) finalStoreId = org.fiserv_store_id as string;
+      if (!org || !org.fiserv_store_id || (org.fiserv_store_id as string).trim() === '') {
+        throw new BadRequestException('La organización seleccionada no tiene configuración de pagos habilitada.');
+      }
+      finalStoreId = org.fiserv_store_id as string;
+    } else {
+      throw new BadRequestException('Se requiere seleccionar una organización.');
     }
     
     // Asignar el store id resuelto al body para que fiservRestService lo use

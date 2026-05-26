@@ -542,7 +542,7 @@ export class SupabaseService implements OnModuleInit {
     }
 
     // Mapear los datos para retornar en el formato esperado por el frontend
-    return data.map((org: any) => {
+    const organizacionesMapeadas = data.map((org: any) => {
       // Buscar si tiene una integración de Bonda activa
       const bonda = Array.isArray(org.bonda_microsites) 
         ? org.bonda_microsites.find((m: any) => m.activo) 
@@ -569,6 +569,9 @@ export class SupabaseService implements OnModuleInit {
         updated_at: org.updated_at || new Date().toISOString(),
       };
     });
+
+    // REQUERIMIENTO: Solo retornar organizaciones que tengan store_id configurado (e.g. Plato Lleno por ahora)
+    return organizacionesMapeadas.filter(org => org.has_fiserv_config);
   }
 
   // ========================================

@@ -185,7 +185,6 @@ export default function DonarPage() {
               </button>
               <PaymentFormRest
                 onSuccess={(data) => console.log('Éxito REST', data)}
-                onError={(err) => setError('Error en pago REST: ' + (err.message || 'Desconocido'))}
               />
             </div>
           )}

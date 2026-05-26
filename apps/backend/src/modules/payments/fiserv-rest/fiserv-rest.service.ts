@@ -149,7 +149,7 @@ export class FiservRestService {
       requestType: 'PaymentCardSaleTransaction',
       storeId: storeId,
       transactionAmount: {
-        total: paymentData.amount.toString(),
+        total: Number(paymentData.amount).toFixed(2),
         currency: paymentData.currency || 'ARS',
       },
       paymentMethod: {
@@ -232,7 +232,7 @@ export class FiservRestService {
       requestType: 'PaymentTokenSaleTransaction',
       storeId: storeId,
       transactionAmount: {
-        total: amount.toString(),
+        total: Number(amount).toFixed(2),
         currency: 'ARS',
       },
       paymentMethod: {

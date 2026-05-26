@@ -16,6 +16,7 @@ import { FiservConnectService } from './fiserv-connect/fiserv-connect.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CrearTransaccionDto } from './dto/crear-transaccion.dto';
+import { FiservRestService } from './fiserv-rest/fiserv-rest.service';
 
 /** Respuesta de crear-transaccion: params para el form POST a Fiserv + URL del gateway */
 export interface CrearTransaccionResponseDto {
@@ -40,7 +41,7 @@ export class PaymentsController {
     private readonly fiservWebhook: FiservWebhookService,
     private readonly fiservConnect: FiservConnectService,
     private readonly supabase: SupabaseService,
-    private readonly fiservRest: import('./fiserv-rest/fiserv-rest.service').FiservRestService,
+    private readonly fiservRest: FiservRestService,
   ) {}
 
   /**

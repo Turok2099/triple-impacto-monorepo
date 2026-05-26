@@ -1,45 +1,42 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CreditCard, Calendar, Lock, User, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
+import { CreditCard, Lock, User, CheckCircle2, AlertCircle, Loader2, ArrowRight } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 interface PaymentFormRestProps {
   onSuccess?: (data: any) => void;
   onError?: (error: any) => void;
   initialAmount?: number;
+  organizacionId?: string;
 }
 
-export default function PaymentFormRest({ onSuccess, onError, initialAmount }: PaymentFormRestProps) {
+export default function PaymentFormRest({ onSuccess, onError, initialAmount, organizacionId }: PaymentFormRestProps) {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  
   const [formData, setFormData] = useState({
-    storeId: '5926012006',
     cardNumber: '',
     cardholderName: '',
     expiryMonth: '',
     expiryYear: '',
     securityCode: '',
-    amount: initialAmount ? initialAmount.toFixed(2) : '100.00',
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
-    // Formatear número de tarjeta
+    // Formatear número de tarjeta (quitar espacios para guardar)
     if (name === 'cardNumber') {
       const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-      const matches = v.match(/\d{4,16}/g);
-      const match = matches && matches[0] || '';
-      const parts: string[] = [];
-      for (let i = 0, len = match.length; i < len; i += 4) {
-        parts.push(match.substring(i, i + 4));
-      }
-      if (parts.length) {
-        setFormData(prev => ({ ...prev, [name]: parts.join(' ') }));
-      } else {
-        setFormData(prev => ({ ...prev, [name]: v }));
-      }
+      const parts = v.match(/.{1,4}/g);
+      setFormData(prev => ({ ...prev, [name]: parts ? parts.join(' ') : v }));
+      return;
+    }
+
+    if (name === 'expiryMonth' || name === 'expiryYear' || name === 'securityCode') {
+      setFormData(prev => ({ ...prev, [name]: value.replace(/[^0-9]/g, '') }));
       return;
     }
 
@@ -48,6 +45,20 @@ export default function PaymentFormRest({ onSuccess, onError, initialAmount }: P
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const rawCardNumber = formData.cardNumber.replace(/\s+/g, '');
+    if (!rawCardNumber || !formData.expiryMonth || !formData.expiryYear || !formData.securityCode || !formData.cardholderName) {
+      setErrorMessage('Por favor, completa todos los datos de la tarjeta.');
+      setStatus('error');
+      return;
+    }
+
+    if (!initialAmount) {
+      setErrorMessage('Monto no definido. Vuelve al paso anterior.');
+      setStatus('error');
+      return;
+    }
+
     setLoading(true);
     setStatus('idle');
     setErrorMessage('');
@@ -56,27 +67,35 @@ export default function PaymentFormRest({ onSuccess, onError, initialAmount }: P
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
       const token = localStorage.getItem('auth_token');
 
-      const response = await fetch(`${apiUrl}/test/fiserv-rest/pay-first`, {
+      const payload = {
+        cardNumber: rawCardNumber,
+        expiryMonth: formData.expiryMonth,
+        expiryYear: formData.expiryYear,
+        securityCode: formData.securityCode,
+        cardholderName: formData.cardholderName,
+        amount: initialAmount,
+        currency: 'ARS',
+        organizacion_id: organizacionId,
+      };
+
+      const response = await fetch(`${apiUrl}/payments/fiserv/rest-sale`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': token ? `Bearer ${token}` : '',
         },
-        body: JSON.stringify({
-          ...formData,
-          cardNumber: formData.cardNumber.replace(/\s/g, ''),
-          amount: parseFloat(formData.amount),
-        }),
+        body: JSON.stringify(payload),
       });
 
       const result = await response.json();
 
-      if (result.transactionStatus === 'APPROVED') {
+      if (response.ok && result.success && result.result?.transactionStatus === 'APPROVED') {
         setStatus('success');
         if (onSuccess) onSuccess(result);
       } else {
         setStatus('error');
-        setErrorMessage(result.processor?.responseMessage || result.error?.message || 'Error en el procesamiento del pago');
+        const errStr = result.message || result.error || 'Error en el procesamiento del pago';
+        setErrorMessage(typeof errStr === 'string' ? errStr : JSON.stringify(errStr));
         if (onError) onError(result);
       }
     } catch (error: any) {
@@ -89,182 +108,134 @@ export default function PaymentFormRest({ onSuccess, onError, initialAmount }: P
 
   if (status === 'success') {
     return (
-      <div className="bg-white rounded-3xl shadow-xl p-8 text-center border border-emerald-100 max-w-md mx-auto">
+      <div className="bg-white rounded-3xl p-8 text-center border border-emerald-100 max-w-2xl mx-auto shadow-sm">
         <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6">
           <CheckCircle2 className="w-10 h-10 text-emerald-500" />
         </div>
         <h2 className="text-2xl font-bold text-slate-800 mb-2">¡Pago Aprobado!</h2>
         <p className="text-slate-500 mb-8">
-          Tu suscripción ha sido activada correctamente mediante Fiserv REST API. El token ha sido archivado de forma segura.
+          Tu donación ha sido procesada correctamente y ya estás dado de alta en Bonda para disfrutar de tus beneficios.
         </p>
         <button 
-          onClick={() => setStatus('idle')}
-          className="w-full py-4 bg-slate-900 text-white rounded-2xl font-semibold hover:bg-slate-800 transition-all flex items-center justify-center gap-2"
+          onClick={() => window.location.href = '/dashboard'}
+          className="w-full py-4 bg-[#40a8ab] text-white rounded-2xl font-semibold hover:bg-teal-600 transition-all flex items-center justify-center gap-2"
         >
-          Realizar otra prueba <ArrowRight className="w-4 h-4" />
+          Ir a mis beneficios <ArrowRight className="w-4 h-4" />
         </button>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md mx-auto border border-slate-100">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center">
-          <Lock className="w-6 h-6 text-indigo-600" />
-        </div>
-        <div>
-          <h2 className="text-xl font-bold text-slate-800">Checkout Seguro</h2>
-          <p className="text-sm text-slate-500">Pruebas Fiserv REST API</p>
-        </div>
+    <div className="max-w-2xl w-full mx-auto bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm">
+      <div className="bg-slate-900 p-8 text-center flex flex-col items-center">
+        <Lock className="w-8 h-8 text-white/80 mb-3" />
+        <h2 className="text-2xl font-bold text-white mb-2">Pago Seguro</h2>
+        <p className="text-slate-400 text-sm">
+          Completa los datos de tu tarjeta para procesar tu donación de ${initialAmount}.
+        </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Monto de Prueba (Oculto o bloqueado si viene como prop) */}
-        {!initialAmount && (
-          <div className="space-y-1.5">
-            <label className="text-sm font-semibold text-slate-700 ml-1">Monto de Donación (ARS)</label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
-              <input
-                type="number"
-                name="amount"
-                value={formData.amount}
-                onChange={handleChange}
-                className="w-full pl-8 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none text-slate-800 font-medium"
-                required
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Store ID (Solo visible si no es flujo real) */}
-        {!initialAmount && (
-           <div className="space-y-1.5">
-           <label className="text-sm font-semibold text-slate-700 ml-1">Tienda a Probar (Store ID)</label>
-           <div className="relative">
-             <select
-               name="storeId"
-               value={formData.storeId}
-               onChange={handleChange}
-               className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none text-slate-800 font-medium appearance-none"
-               required
-             >
-               <option value="5926012005">5926012005 - Tienda 05 (Mastercard/Void)</option>
-               <option value="5926012006">5926012006 - Tienda 06 (Visa/Return)</option>
-             </select>
-           </div>
-         </div>
-        )}
-
-        {/* Nombre del Titular */}
-        <div className="space-y-1.5">
-          <label className="text-sm font-semibold text-slate-700 ml-1">Titular de la Tarjeta</label>
-          <div className="relative">
-            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-            <input
-              type="text"
-              name="cardholderName"
-              placeholder="Como aparece en la tarjeta"
-              value={formData.cardholderName}
-              onChange={handleChange}
-              className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none text-slate-800"
-              required
-            />
-          </div>
-        </div>
-
-        {/* Número de Tarjeta */}
-        <div className="space-y-1.5">
-          <label className="text-sm font-semibold text-slate-700 ml-1">Número de Tarjeta</label>
-          <div className="relative">
-            <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-            <input
-              type="text"
-              name="cardNumber"
-              placeholder="0000 0000 0000 0000"
-              maxLength={19}
-              value={formData.cardNumber}
-              onChange={handleChange}
-              className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none text-slate-800 font-mono"
-              required
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          {/* Vencimiento */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-semibold text-slate-700 ml-1">Vencimiento</label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                name="expiryMonth"
-                placeholder="MM"
-                maxLength={2}
-                value={formData.expiryMonth}
-                onChange={handleChange}
-                className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none text-center text-slate-800"
-                required
-              />
-              <input
-                type="text"
-                name="expiryYear"
-                placeholder="AA"
-                maxLength={2}
-                value={formData.expiryYear}
-                onChange={handleChange}
-                className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none text-center text-slate-800"
-                required
-              />
-            </div>
-          </div>
-
-          {/* CVV */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-semibold text-slate-700 ml-1">CVV</label>
-            <div className="relative">
-              <input
-                type="password"
-                name="securityCode"
-                placeholder="123"
-                maxLength={4}
-                value={formData.securityCode}
-                onChange={handleChange}
-                className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none text-center text-slate-800"
-                required
-              />
-            </div>
-          </div>
-        </div>
-
+      <div className="p-8">
         {status === 'error' && (
-          <div className="flex gap-2 p-4 bg-red-50 text-red-600 rounded-2xl text-sm items-start">
-            <AlertCircle className="w-5 h-5 flex-shrink-0" />
-            <p className="font-medium">{errorMessage}</p>
+          <div className="mb-6 bg-red-50 text-red-700 p-4 rounded-xl border border-red-100 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+            <p className="font-medium text-sm">{errorMessage}</p>
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        >
-          {loading ? (
-            <>
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              Procesando...
-            </>
-          ) : (
-            'Pagar y Activar Suscripción'
-          )}
-        </button>
-      </form>
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 gap-6 mb-8">
+            <div className="space-y-1.5">
+              <label className="text-sm font-semibold text-slate-700 ml-1">Número de Tarjeta</label>
+              <div className="relative">
+                <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  type="text"
+                  name="cardNumber"
+                  value={formData.cardNumber}
+                  onChange={handleChange}
+                  placeholder="0000 0000 0000 0000"
+                  maxLength={19}
+                  className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
+                  required
+                />
+              </div>
+            </div>
 
-      <div className="mt-8 flex items-center justify-center gap-6 opacity-40 grayscale">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-4" />
-        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-6" />
-        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="Fiserv" className="h-4" />
+            <div className="space-y-1.5">
+              <label className="text-sm font-semibold text-slate-700 ml-1">Titular de la Tarjeta</label>
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  type="text"
+                  name="cardholderName"
+                  value={formData.cardholderName}
+                  onChange={handleChange}
+                  placeholder="Como aparece en la tarjeta"
+                  className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-slate-700 ml-1">Mes</label>
+                <input
+                  type="text"
+                  name="expiryMonth"
+                  value={formData.expiryMonth}
+                  onChange={handleChange}
+                  placeholder="MM"
+                  maxLength={2}
+                  className="w-full px-4 py-3.5 bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-slate-700 ml-1">Año</label>
+                <input
+                  type="text"
+                  name="expiryYear"
+                  value={formData.expiryYear}
+                  onChange={handleChange}
+                  placeholder="YY"
+                  maxLength={2}
+                  className="w-full px-4 py-3.5 bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-slate-700 ml-1">CVV</label>
+                <input
+                  type="password"
+                  name="securityCode"
+                  value={formData.securityCode}
+                  onChange={handleChange}
+                  placeholder="123"
+                  maxLength={4}
+                  className="w-full px-4 py-3.5 bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#40a8ab] hover:bg-teal-600 disabled:opacity-50 text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-teal-600/20"
+          >
+            {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Lock className="w-5 h-5" />}
+            <span>{loading ? 'Procesando...' : `Confirmar Donación de $${initialAmount}`}</span>
+          </button>
+        </form>
+
+        <div className="mt-8 flex items-center justify-center gap-6 opacity-40 grayscale">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-4" />
+          <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-6" />
+        </div>
       </div>
     </div>
   );

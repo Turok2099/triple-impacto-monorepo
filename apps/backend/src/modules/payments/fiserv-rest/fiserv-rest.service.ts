@@ -134,6 +134,81 @@ export class FiservRestService {
   }
 
   /**
+   * Procesa un cobro directo (Sale) y opcionalmente tokeniza la tarjeta (Flujo REST normal)
+   */
+  async processSalePayment(userId: string, paymentData: any) {
+    const baseUrl = this.configService.get<string>('fiserv.baseUrl');
+    const endpoint = `${baseUrl}/payments`;
+    // Si no se envía storeId, usamos el predeterminado
+    const storeId = paymentData.storeId || this.configService.get<string>('fiserv.storeId') || process.env.FISERV_STORE_MAIN || '5927306113254';
+
+    const orderId = paymentData.orderId || `REST-SALE-${uuidv4().substring(0, 6)}`;
+
+    // Construir el payload para Sale con tarjeta de crédito
+    const payload = {
+      requestType: 'PaymentCardSaleTransaction',
+      storeId: storeId,
+      transactionAmount: {
+        total: paymentData.amount.toString(),
+        currency: paymentData.currency || 'ARS',
+      },
+      paymentMethod: {
+        paymentCard: {
+          number: paymentData.cardNumber,
+          securityCode: paymentData.securityCode,
+          expiryDate: {
+            month: paymentData.expiryMonth,
+            year: paymentData.expiryYear,
+          },
+          cardholderName: paymentData.cardholderName,
+        },
+      },
+      order: {
+        orderId: orderId,
+      },
+      // Habilitar tokenización (Card on File) si así se desea
+      createToken: {
+        reusable: true,
+      },
+    };
+
+    const payloadString = JSON.stringify(payload);
+    const headers = this.getHeaders(payloadString);
+
+    try {
+      this.logger.log(`Enviando SALE a Fiserv para usuario ${userId} en tienda ${storeId}`);
+      const response = await axios.post(endpoint, payload, { headers });
+      
+      const result = response.data;
+
+      // Si el pago es aprobado, guardamos el token
+      if (result.transactionStatus === 'APPROVED' && result.paymentToken) {
+        const tokenValue = result.paymentToken.value;
+        
+        await this.supabaseService.from('user_payment_methods').insert({
+          user_id: userId,
+          fiserv_token: tokenValue,
+          scheme_transaction_id: result.schemeTransactionId || null,
+          card_brand: result.paymentMethodDetails?.paymentCard?.brand,
+          last_4: result.paymentMethodDetails?.paymentCard?.last4,
+          exp_month: paymentData.expiryMonth,
+          exp_year: paymentData.expiryYear,
+          cardholder_name: paymentData.cardholderName,
+          is_active: true,
+        });
+
+        this.logger.log(`✅ Pago exitoso y token guardado para usuario ${userId}`);
+      }
+
+      // Devolvemos tanto el resultado de Fiserv como el orderId original para poder validarlo luego
+      return { ...result, orderId };
+    } catch (error: any) {
+      this.logger.error('Error en pago directo Fiserv REST:', error.response?.data || error.message);
+      throw error.response?.data || error;
+    }
+  }
+
+  /**
    * Procesa un pago recurrente (REPEAT) usando un token guardado
    */
   async processRecurringPayment(userId: string, paymentMethodId: string, amount: number, storeId: string = '5926012006') {

@@ -18,9 +18,9 @@ interface FormularioDonacionProps {
 }
 
 // Montos sugeridos predefinidos
-const MONTOS_SUGERIDOS = [5000, 10000, 20000];
-const MONTO_MINIMO = 5000;
-const MONTO_MAXIMO = 500000;
+const MONTOS_SUGERIDOS = [1000, 5000, 10000];
+const MONTO_MINIMO = 10;
+const MONTO_MAXIMO = 20000;
 
 export default function FormularioDonacion({
   onSubmit,
@@ -32,7 +32,7 @@ export default function FormularioDonacion({
   const [errorOrgs, setErrorOrgs] = useState<string | null>(null);
 
   const [montoSeleccionado, setMontoSeleccionado] = useState<number | null>(
-    5000
+    1000
   );
   const [montoCustom, setMontoCustom] = useState("");
   const [usarMontoCustom, setUsarMontoCustom] = useState(false);

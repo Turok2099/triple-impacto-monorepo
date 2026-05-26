@@ -213,6 +213,7 @@ export default function DonarPage() {
               {/* Le pasamos el monto para que el formulario lo tenga, más adelante lo adaptaremos para crear la transacción real */}
               <PaymentFormRest
                 initialAmount={donationData?.monto}
+                organizacionId={donationData?.organizacionId}
                 onSuccess={(data) => console.log('Éxito REST', data)}
                 onError={(err) => setError('Error en pago REST: ' + (err.message || 'Desconocido'))}
               />

@@ -40,6 +40,7 @@ export class PaymentsController {
     private readonly fiservWebhook: FiservWebhookService,
     private readonly fiservConnect: FiservConnectService,
     private readonly supabase: SupabaseService,
+    private readonly fiservRest: import('./fiserv-rest/fiserv-rest.service').FiservRestService,
   ) {}
 
   /**
@@ -147,6 +148,101 @@ export class PaymentsController {
       gatewayUrl,
       formParams: formParams as Record<string, string>,
     };
+  }
+
+  /**
+   * Endpoint de pago REST síncrono.
+   * Realiza el cobro de la tarjeta (Sale), tokeniza y en caso de éxito:
+   * 1. Registra la donación.
+   * 2. Afilia al usuario a Bonda.
+   */
+  @Post('rest-sale')
+  @UseGuards(JwtAuthGuard)
+  async restSale(
+    @Body() body: any,
+    @Req() req: Request & { user?: { userId: string } },
+  ) {
+    const userId = req.user?.userId;
+    if (!userId) throw new BadRequestException('Se requiere autenticación');
+
+    const config = this.fiservConnect.getConfig();
+    let finalStoreId = body.storeId || config?.storeId;
+    
+    if (body.organizacion_id) {
+      const org = await this.supabase.getOrganizacionById(body.organizacion_id);
+      if (org && org.fiserv_store_id) finalStoreId = org.fiserv_store_id as string;
+    }
+    
+    // Asignar el store id resuelto al body para que fiservRestService lo use
+    body.storeId = finalStoreId;
+
+    const orderId = randomUUID();
+    body.orderId = orderId;
+
+    try {
+      // Registrar intento de pago (pendiente)
+      const attempt = await this.supabase.createPaymentAttempt({
+        user_id: userId,
+        order_id: orderId,
+        store_id: finalStoreId || '5927306113254', // fallback
+        amount: body.amount,
+        currency: body.currency || 'ARS',
+        organizacion_id: body.organizacion_id,
+      });
+
+      // Procesar pago en Fiserv REST
+      const result = await this.fiservRest.processSalePayment(userId, body);
+
+      if (result.transactionStatus === 'APPROVED') {
+        // Actualizar intento de pago a completado
+        await this.supabase.updatePaymentAttempt(attempt.id, {
+          status: 'completed',
+          fiserv_raw_response: result as Record<string, unknown>,
+        });
+
+        // Registrar la donación exitosa
+        const { data: orgData } = await this.supabase
+          .from('organizaciones')
+          .select('nombre')
+          .eq('id', body.organizacion_id)
+          .maybeSingle();
+
+        await this.supabase.createDonacion({
+          usuario_id: userId,
+          monto: parseFloat(body.amount),
+          moneda: body.currency || 'ARS',
+          metodo_pago: 'fiserv-rest',
+          organizacion_id: body.organizacion_id,
+          organizacion_nombre: orgData?.nombre,
+          estado: 'completada',
+          payment_id: result.ipgTransactionId || undefined,
+          payment_status: result.transactionStatus,
+        });
+
+        // Afiliar a Bonda si aplica
+        if (body.organizacion_id) {
+          await this.fiservWebhook.ensureBondaAffiliateForUserAndOrganisation(
+            userId,
+            body.organizacion_id,
+          );
+        }
+
+        return { success: true, result };
+      } else {
+        // El pago no fue aprobado (declinado)
+        await this.supabase.updatePaymentAttempt(attempt.id, {
+          status: 'failed',
+          fiserv_raw_response: result as Record<string, unknown>,
+        });
+        
+        throw new BadRequestException(
+          result.processor?.responseMessage || result.error?.message || 'Pago rechazado por el procesador'
+        );
+      }
+    } catch (error: any) {
+      this.logger.error('Error en rest-sale:', error);
+      throw new BadRequestException(error.message || error);
+    }
   }
 
   @Post('notification')

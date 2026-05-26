@@ -249,7 +249,7 @@ export class FiservWebhookService {
   /**
    * Crea el afiliado en Bonda para (user, micrositio de la ONG) si aún no existe.
    */
-  private async ensureBondaAffiliateForUserAndOrganisation(
+  public async ensureBondaAffiliateForUserAndOrganisation(
     userId: string,
     organizacionId: string,
   ): Promise<void> {

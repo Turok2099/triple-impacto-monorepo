@@ -505,7 +505,7 @@ export class SupabaseService implements OnModuleInit {
   /**
    * Obtener organizaciones activas (incluye monto_minimo y su integración Bonda si existe).
    */
-  async getOrganizacionesActivas() {
+  async getOrganizacionesActivas(requireFiserv: boolean = false) {
     // Obtener organizaciones activas directamente de la tabla organizaciones, 
     // y traer sus micrositios de Bonda si tienen
     const { data, error } = await this.from('organizaciones')
@@ -522,6 +522,7 @@ export class SupabaseService implements OnModuleInit {
         monto_minimo,
         verificada,
         activa,
+        fiserv_activo,
         fiserv_store_id,
         fiserv_shared_secret,
         created_at,
@@ -548,7 +549,7 @@ export class SupabaseService implements OnModuleInit {
         ? org.bonda_microsites.find((m: any) => m.activo) 
         : org.bonda_microsites?.activo ? org.bonda_microsites : null;
 
-      const has_fiserv_config = !!org.fiserv_store_id && !!org.fiserv_shared_secret;
+      const has_fiserv_config = !!org.fiserv_activo && !!org.fiserv_store_id && !!org.fiserv_shared_secret;
 
       return {
         id: org.id,
@@ -570,8 +571,13 @@ export class SupabaseService implements OnModuleInit {
       };
     });
 
-    // REQUERIMIENTO: Solo retornar organizaciones que tengan store_id configurado (e.g. Plato Lleno por ahora)
-    return organizacionesMapeadas.filter(org => org.has_fiserv_config);
+    // REQUERIMIENTO: Si requireFiserv es true, devolver solo aquellas con fiserv_activo configurado y activado.
+    if (requireFiserv) {
+      return organizacionesMapeadas.filter(org => org.has_fiserv_config);
+    }
+    
+    // Si no requiere Fiserv, devuelve todas las organizaciones mapeadas
+    return organizacionesMapeadas;
   }
 
   // ========================================

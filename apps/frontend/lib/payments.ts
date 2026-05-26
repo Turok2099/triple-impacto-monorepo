@@ -76,7 +76,7 @@ export async function crearTransaccion(
  * No requiere autenticación (es información pública)
  */
 export async function obtenerOrganizaciones(): Promise<Organizacion[]> {
-  const response = await fetch(`${API_URL}/public/organizaciones`);
+  const response = await fetch(`${API_URL}/public/organizaciones?forPayment=true`);
 
   if (!response.ok) {
     throw new Error('Error al obtener organizaciones');

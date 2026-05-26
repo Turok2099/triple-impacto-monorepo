@@ -276,6 +276,7 @@ export class AdminService {
         monto_minimo: payload.monto_minimo,
         activa: payload.activa ?? true,
         verificada: payload.verificada ?? false,
+        fiserv_activo: payload.fiserv_activo ?? false,
         fiserv_store_id: payload.fiserv_store_id,
         fiserv_shared_secret: payload.fiserv_shared_secret
       })
@@ -325,6 +326,7 @@ export class AdminService {
         monto_minimo: payload.monto_minimo,
         activa: payload.activa,
         verificada: payload.verificada,
+        fiserv_activo: payload.fiserv_activo,
         fiserv_store_id: payload.fiserv_store_id,
         fiserv_shared_secret: payload.fiserv_shared_secret,
         updated_at: new Date().toISOString()

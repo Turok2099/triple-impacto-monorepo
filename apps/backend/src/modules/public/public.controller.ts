@@ -320,8 +320,9 @@ export class PublicController {
    * Para que el front obtenga montos por ONG (donaciones).
    */
   @Get('organizaciones')
-  async getOrganizaciones(): Promise<OrganizacionPublicDto[]> {
-    return this.supabase.getOrganizacionesActivas();
+  async getOrganizaciones(@Query('forPayment') forPayment?: string): Promise<OrganizacionPublicDto[]> {
+    const requireFiserv = forPayment === 'true';
+    return this.supabase.getOrganizacionesActivas(requireFiserv);
   }
 
   /**

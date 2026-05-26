@@ -21,6 +21,7 @@ export interface Ong {
   monto_minimo: number | null;
   activa: boolean;
   verificada: boolean;
+  fiserv_activo: boolean;
   fiserv_store_id: string | null;
   fiserv_shared_secret: string | null;
   bonda_microsites?: BondaMicrosite[];

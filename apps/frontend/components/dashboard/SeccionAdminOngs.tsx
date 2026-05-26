@@ -27,6 +27,7 @@ export default function SeccionAdminOngs() {
     website_url: "",
     monto_minimo: 5000,
     activa: true,
+    fiserv_activo: false,
     fiserv_store_id: "",
     fiserv_shared_secret: "",
     bonda_slug: "",
@@ -115,6 +116,21 @@ export default function SeccionAdminOngs() {
     }
   };
 
+  const handleToggleFiservStatus = async (ong: Ong) => {
+    try {
+      const token = localStorage.getItem("auth_token") || "";
+      const newStatus = !ong.fiserv_activo;
+
+      // Actualización optimista de UI
+      setOngs(ongs.map(o => o.id === ong.id ? { ...o, fiserv_activo: newStatus } : o));
+
+      await updateOrganizacion(token, ong.id, { fiserv_activo: newStatus });
+    } catch (err: any) {
+      Swal.fire("Error", "No se pudo cambiar el estado Fiserv: " + err.message, "error");
+      fetchOngs(); // revertir si falla
+    }
+  };
+
   const openCreateModal = () => {
     setEditingOng(null);
     setSelectedFile(null);
@@ -123,7 +139,7 @@ export default function SeccionAdminOngs() {
     setFormData({
       nombre: "", descripcion: "", logo_url: "", email: "", telefono: "", website_url: "",
       monto_minimo: 5000,
-      activa: true, fiserv_store_id: "", fiserv_shared_secret: "", bonda_slug: "", bonda_api_token: "",
+      activa: true, fiserv_activo: false, fiserv_store_id: "", fiserv_shared_secret: "", bonda_slug: "", bonda_api_token: "",
       bonda_api_token_nominas: "", bonda_microsite_id: ""
     });
     setIsModalOpen(true);
@@ -145,6 +161,7 @@ export default function SeccionAdminOngs() {
       website_url: ong.website_url || "",
       monto_minimo: ong.monto_minimo || 5000,
       activa: ong.activa,
+      fiserv_activo: ong.fiserv_activo || false,
       fiserv_store_id: ong.fiserv_store_id || "",
       fiserv_shared_secret: ong.fiserv_shared_secret || "",
       bonda_slug: bonda?.slug || "",
@@ -227,7 +244,7 @@ export default function SeccionAdminOngs() {
             <tr className="bg-slate-50 border-b border-slate-200">
               <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider">Fundación</th>
               <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider">Integraciones</th>
-              <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider">Estado</th>
+              <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider">Estados</th>
               <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Acciones</th>
             </tr>
           </thead>
@@ -258,18 +275,37 @@ export default function SeccionAdminOngs() {
                     </div>
                   </td>
                   <td className="py-4 px-6">
-                    <button
-                      onClick={() => handleToggleStatus(ong)}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#40a8ab] focus:ring-offset-2 ${ong.activa ? 'bg-[#40a8ab]' : 'bg-slate-200'}`}
-                      role="switch"
-                      aria-checked={ong.activa}
-                    >
-                      <span className="sr-only">Habilitar ONG</span>
-                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${ong.activa ? 'translate-x-6' : 'translate-x-1'}`} />
-                    </button>
-                    <span className={`ml-2 text-xs font-medium ${ong.activa ? 'text-[#40a8ab]' : 'text-slate-400'}`}>
-                      {ong.activa ? 'Activa' : 'Inactiva'}
-                    </span>
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <span className={`text-xs font-medium w-16 ${ong.activa ? 'text-[#40a8ab]' : 'text-slate-400'}`}>
+                          General
+                        </span>
+                        <button
+                          onClick={() => handleToggleStatus(ong)}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#40a8ab] focus:ring-offset-2 ${ong.activa ? 'bg-[#40a8ab]' : 'bg-slate-200'}`}
+                          role="switch"
+                          aria-checked={ong.activa}
+                        >
+                          <span className="sr-only">Habilitar ONG</span>
+                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${ong.activa ? 'translate-x-6' : 'translate-x-1'}`} />
+                        </button>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <span className={`text-xs font-medium w-16 ${ong.fiserv_activo ? 'text-blue-600' : 'text-slate-400'}`}>
+                          Fiserv
+                        </span>
+                        <button
+                          onClick={() => handleToggleFiservStatus(ong)}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${ong.fiserv_activo ? 'bg-blue-500' : 'bg-slate-200'}`}
+                          role="switch"
+                          aria-checked={ong.fiserv_activo}
+                        >
+                          <span className="sr-only">Habilitar Fiserv</span>
+                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${ong.fiserv_activo ? 'translate-x-6' : 'translate-x-1'}`} />
+                        </button>
+                      </div>
+                    </div>
                   </td>
                   <td className="py-4 px-6 text-right">
                     <div className="flex justify-end gap-2">
@@ -422,9 +458,15 @@ export default function SeccionAdminOngs() {
                   </div>
                 </section>
 
-                <div className="flex items-center gap-3 bg-slate-50 p-4 rounded-xl">
-                  <input type="checkbox" id="activa" checked={formData.activa} onChange={e => setFormData({ ...formData, activa: e.target.checked })} className="w-5 h-5 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500" />
-                  <label htmlFor="activa" className="font-semibold text-slate-700">ONG Activa (Visible en la plataforma para recibir donaciones)</label>
+                <div className="flex flex-col gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <input type="checkbox" id="activa" checked={formData.activa} onChange={e => setFormData({ ...formData, activa: e.target.checked })} className="w-5 h-5 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500" />
+                    <label htmlFor="activa" className="font-semibold text-slate-700">ONG Activa (Visible en la sección pública /ongs)</label>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <input type="checkbox" id="fiserv_activo" checked={formData.fiserv_activo} onChange={e => setFormData({ ...formData, fiserv_activo: e.target.checked })} className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                    <label htmlFor="fiserv_activo" className="font-semibold text-slate-700">Fiserv Activo (Habilita la ONG en el formulario de pago, requiere store id)</label>
+                  </div>
                 </div>
               </div>
 

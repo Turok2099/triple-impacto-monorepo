@@ -65,7 +65,7 @@ export default function FormularioDonacion({
     try {
       setLoadingOrgs(true);
       setErrorOrgs(null);
-      const orgs = await obtenerOrganizaciones();
+      const orgs = await obtenerOrganizaciones(true);
       setOrganizaciones(orgs);
 
       // Seleccionar la primera organización por defecto

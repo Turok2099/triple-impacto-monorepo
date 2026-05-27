@@ -49,7 +49,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
     try {
       setLoadingOrgs(true);
       setErrorOrgs(null);
-      const orgs = await obtenerOrganizaciones();
+      const orgs = await obtenerOrganizaciones(true);
       setOrganizaciones(orgs);
       if (orgs.length > 0) {
         setOrganizacionId(orgs[0].id);

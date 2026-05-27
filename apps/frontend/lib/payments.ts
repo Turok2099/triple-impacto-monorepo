@@ -75,8 +75,9 @@ export async function crearTransaccion(
  * Obtiene la lista de organizaciones activas para seleccionar al donar
  * No requiere autenticación (es información pública)
  */
-export async function obtenerOrganizaciones(): Promise<Organizacion[]> {
-  const response = await fetch(`${API_URL}/public/organizaciones?forPayment=true`);
+export async function obtenerOrganizaciones(forPayment: boolean = false): Promise<Organizacion[]> {
+  const url = forPayment ? `${API_URL}/public/organizaciones?forPayment=true` : `${API_URL}/public/organizaciones`;
+  const response = await fetch(url);
 
   if (!response.ok) {
     throw new Error('Error al obtener organizaciones');

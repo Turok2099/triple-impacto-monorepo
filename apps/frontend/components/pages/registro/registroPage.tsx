@@ -138,7 +138,10 @@ export default function RegisterPage() {
 
       // Redirigir al login después de 3 segundos para que puedan validar su correo
       setTimeout(() => {
-        window.location.href = "/login?check_email=true";
+        const params = new URLSearchParams(window.location.search);
+        const redirectUrl = params.get("redirect");
+        const redirectParam = redirectUrl ? `&redirect=${encodeURIComponent(redirectUrl)}` : "";
+        window.location.href = `/login?check_email=true${redirectParam}`;
       }, 3000);
     } catch (err: any) {
       setError(err.message || "Error al crear la cuenta. Por favor, intenta nuevamente.");
@@ -511,7 +514,13 @@ export default function RegisterPage() {
           <p className="text-sm text-gray-600">
             ¿Ya tenés cuenta?{" "}
             <a
-              href="/login"
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                const params = new URLSearchParams(window.location.search);
+                const redirectUrl = params.get("redirect");
+                window.location.href = redirectUrl ? `/login?redirect=${encodeURIComponent(redirectUrl)}` : "/login";
+              }}
               className="font-semibold text-[#40a8ab] hover:text-[#40a8ab] transition-colors"
             >
               Iniciá sesión

@@ -329,12 +329,17 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Sign up link */}
         <div className="text-center">
           <p className="text-sm text-gray-600">
             ¿No tenés cuenta?{" "}
             <a
-              href="/registro"
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                const params = new URLSearchParams(window.location.search);
+                const redirectUrl = params.get("redirect");
+                window.location.href = redirectUrl ? `/registro?redirect=${encodeURIComponent(redirectUrl)}` : "/registro";
+              }}
               className="font-semibold text-[#40a8ab] hover:text-[#40a8ab] transition-colors"
             >
               Regístrate gratis

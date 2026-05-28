@@ -10,7 +10,7 @@ interface PaymentFormRestProps {
 }
 
 const MONTOS_SUGERIDOS = [5000, 10000, 15000];
-const MONTO_MINIMO = 10;
+const MONTO_MINIMO = 500;
 const MONTO_MAXIMO = 20000;
 
 export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestProps) {

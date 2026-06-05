@@ -147,6 +147,16 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
       return;
     }
 
+    // Formatear datos de la tarjeta para cumplir estrictamente con Fiserv
+    const formattedMonth = formData.expiryMonth.padStart(2, '0');
+    const formattedYear = formData.expiryYear.length === 4 ? formData.expiryYear.slice(-2) : formData.expiryYear.padStart(2, '0');
+
+    if (formData.securityCode.length < 3 || formData.securityCode.length > 4) {
+      setErrorMessage('El código de seguridad (CVV) debe tener 3 o 4 dígitos.');
+      setStatus('error');
+      return;
+    }
+
     setLoading(true);
     setStatus('idle');
     setErrorMessage('');
@@ -157,8 +167,8 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
 
       const payload = {
         cardNumber: rawCardNumber,
-        expiryMonth: formData.expiryMonth,
-        expiryYear: formData.expiryYear,
+        expiryMonth: formattedMonth,
+        expiryYear: formattedYear,
         securityCode: formData.securityCode,
         cardholderName: formData.cardholderName,
         amount: montoFinal,
@@ -354,6 +364,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
                   name="expiryMonth"
                   value={formData.expiryMonth}
                   onChange={handleChange}
+                  onBlur={() => setFormData(prev => ({ ...prev, expiryMonth: prev.expiryMonth ? prev.expiryMonth.padStart(2, '0') : '' }))}
                   placeholder="Mes (MM)"
                   maxLength={2}
                   className="w-full px-4 py-3.5 bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
@@ -364,8 +375,9 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
                   name="expiryYear"
                   value={formData.expiryYear}
                   onChange={handleChange}
+                  onBlur={() => setFormData(prev => ({ ...prev, expiryYear: prev.expiryYear.length === 4 ? prev.expiryYear.slice(-2) : prev.expiryYear.padStart(2, '0') }))}
                   placeholder="Año (YY)"
-                  maxLength={2}
+                  maxLength={4}
                   className="w-full px-4 py-3.5 bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
                   required
                 />

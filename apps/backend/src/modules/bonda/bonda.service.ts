@@ -38,7 +38,7 @@ export class BondaService {
     this.apiUrl = process.env.BONDA_API_URL || 'https://apiv1.cuponstar.com';
     this.apiKey = process.env.BONDA_API_KEY || '';
     this.micrositeId = process.env.BONDA_MICROSITE_ID || '';
-    this.useMocks = process.env.BONDA_USE_MOCKS === 'true';
+    this.useMocks = false; // Forzado a false para asegurar la creación real en Bonda (ignorando BONDA_USE_MOCKS de Railway)
 
     if (this.useMocks) {
       this.logger.warn(

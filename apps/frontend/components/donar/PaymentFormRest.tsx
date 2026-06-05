@@ -102,7 +102,12 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
     }
 
     if (name === 'expiryMonth' || name === 'expiryYear' || name === 'securityCode') {
-      setFormData(prev => ({ ...prev, [name]: value.replace(/[^0-9]/g, '') }));
+      let clean = value.replace(/[^0-9]/g, '');
+      if (name === 'expiryMonth') clean = clean.slice(0, 2);
+      if (name === 'expiryYear') clean = clean.slice(0, 4);
+      if (name === 'securityCode') clean = clean.slice(0, 4);
+      
+      setFormData(prev => ({ ...prev, [name]: clean }));
       return;
     }
 
@@ -368,7 +373,6 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
                   onChange={handleChange}
                   onBlur={() => setFormData(prev => ({ ...prev, expiryMonth: prev.expiryMonth ? prev.expiryMonth.padStart(2, '0') : '' }))}
                   placeholder="Mes (MM)"
-                  maxLength={2}
                   className="w-full px-4 py-3.5 bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
                   required
                 />
@@ -380,7 +384,6 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
                   onChange={handleChange}
                   onBlur={() => setFormData(prev => ({ ...prev, expiryYear: prev.expiryYear.length === 4 ? prev.expiryYear.slice(-2) : prev.expiryYear.padStart(2, '0') }))}
                   placeholder="Año (YY)"
-                  maxLength={4}
                   className="w-full px-4 py-3.5 bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
                   required
                 />
@@ -391,7 +394,6 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
                   value={formData.securityCode}
                   onChange={handleChange}
                   placeholder="CVV"
-                  maxLength={4}
                   className="w-full px-4 py-3.5 bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
                   required
                 />

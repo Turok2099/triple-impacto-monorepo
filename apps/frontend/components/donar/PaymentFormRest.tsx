@@ -335,6 +335,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
                 <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
                   type="text"
+                  inputMode="numeric"
                   name="cardNumber"
                   value={formData.cardNumber}
                   onChange={handleChange}
@@ -361,6 +362,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
               <div className="grid grid-cols-3 gap-4">
                 <input
                   type="text"
+                  inputMode="numeric"
                   name="expiryMonth"
                   value={formData.expiryMonth}
                   onChange={handleChange}
@@ -372,6 +374,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
                 />
                 <input
                   type="text"
+                  inputMode="numeric"
                   name="expiryYear"
                   value={formData.expiryYear}
                   onChange={handleChange}
@@ -382,7 +385,8 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
                   required
                 />
                 <input
-                  type="password"
+                  type="text"
+                  inputMode="numeric"
                   name="securityCode"
                   value={formData.securityCode}
                   onChange={handleChange}

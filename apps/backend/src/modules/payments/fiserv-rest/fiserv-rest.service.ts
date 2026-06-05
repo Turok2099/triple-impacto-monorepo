@@ -176,6 +176,8 @@ export class FiservRestService {
     const headers = this.getHeaders(payloadString);
 
     try {
+      this.logger.debug(`[DEBUG-FISERV] Datos recibidos en rest-sale - month: "${paymentData.expiryMonth}", year: "${paymentData.expiryYear}", CVV_length: ${paymentData.securityCode ? paymentData.securityCode.toString().length : 0}`);
+      
       this.logger.log(`Enviando SALE a Fiserv para usuario ${userId} en tienda ${storeId}`);
       const response = await axios.post(endpoint, payload, { headers });
       

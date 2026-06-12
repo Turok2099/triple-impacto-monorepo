@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import PaymentFormExclusive from "@/components/donar/PaymentFormExclusive";
-import { Loader2, AlertTriangle, ArrowLeft } from "lucide-react";
+import { Loader2, AlertTriangle, ArrowLeft, LogIn, User } from "lucide-react";
 import { type Organizacion } from "@/lib/payments";
 
 export default function DonarExclusivePage() {
@@ -18,16 +18,12 @@ export default function DonarExclusivePage() {
   const [organizacion, setOrganizacion] = useState<Organizacion | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // 1. Validar autenticación y redireccionar
+  // 1. Validar autenticación (no redireccionar automáticamente)
   useEffect(() => {
     if (!authLoading) {
-      if (!isAuthenticated) {
-        router.push(`/login?redirect=/donar/${ongSlug}`);
-      } else {
-        setCheckingAuth(false);
-      }
+      setCheckingAuth(false);
     }
-  }, [authLoading, isAuthenticated, router, ongSlug]);
+  }, [authLoading]);
 
   // 2. Cargar datos de la ONG por su slug
   useEffect(() => {
@@ -94,10 +90,63 @@ export default function DonarExclusivePage() {
     );
   }
 
+  // Si no está autenticado, mostrar la pantalla de selección con las 2 opciones claras
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-blue-50 flex flex-col items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-slate-100 text-center shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+          {organizacion.logo_url && (
+            <div className="w-24 h-24 mx-auto mb-6 rounded-2xl overflow-hidden border border-slate-100 shadow-md flex items-center justify-center bg-white p-2">
+              <img src={organizacion.logo_url} alt={organizacion.nombre} className="max-w-full max-h-full object-contain" />
+            </div>
+          )}
+          <h2 className="text-2xl font-extrabold text-slate-800 mb-2">
+            Aportar a {organizacion.nombre}
+          </h2>
+          <p className="text-slate-500 text-sm mb-8">
+            Para realizar tu donación de forma segura, seleccioná una de las siguientes opciones:
+          </p>
+          
+          <div className="space-y-4">
+            <button
+              onClick={() => router.push(`/login?redirect=/donar/${ongSlug}`)}
+              className="w-full py-4 px-6 bg-[#40a8ab] text-white rounded-2xl font-bold hover:bg-[#348e91] hover:scale-[1.01] active:scale-[0.99] transition-all shadow-md flex items-center justify-between gap-4 group"
+            >
+              <div className="flex items-center gap-3 text-left">
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <LogIn className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold">Tengo cuenta y quiero aportar</span>
+                  <span className="text-[11px] text-teal-50 font-normal">Iniciar sesión y donar</span>
+                </div>
+              </div>
+            </button>
+
+            <button
+              onClick={() => router.push(`/registro?redirect=/donar/${ongSlug}`)}
+              className="w-full py-4 px-6 bg-white border-2 border-slate-200 text-slate-700 rounded-2xl font-bold hover:bg-slate-50 hover:border-slate-300 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-between gap-4 group"
+            >
+              <div className="flex items-center gap-3 text-left">
+                <div className="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-slate-200/70 transition-colors flex items-center justify-center">
+                  <User className="w-5 h-5 text-slate-500" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-slate-800">Donaré por primera vez</span>
+                  <span className="text-[11px] text-slate-400 font-normal">Crear una cuenta nueva</span>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Si está autenticado, mostrar el formulario de donación exclusivo
   return (
     <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
-        {/* Formulario de donación exclusivo */}
         <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-350">
           <PaymentFormExclusive
             organizacion={organizacion}

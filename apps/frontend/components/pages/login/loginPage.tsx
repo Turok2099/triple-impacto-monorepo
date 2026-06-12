@@ -136,9 +136,6 @@ export default function LoginPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             Bienvenido de nuevo
           </h2>
-          <p className="text-gray-600">
-            Ingresá a tu cuenta de AYNI
-          </p>
         </div>
 
         {/* Formulario */}
@@ -344,30 +341,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Benefits reminder */}
-        <div className="bg-teal-50 rounded-2xl p-6 border border-teal-100">
-          <h3 className="text-sm font-semibold text-teal-900 mb-3">
-            Al iniciar sesión podés:
-          </h3>
-          <ul className="space-y-2 text-sm text-teal-800">
-            <li className="flex items-start gap-2">
-              <span className="text-[#40a8ab] shrink-0">✓</span>
-              <span>Gestionar tus donaciones</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-[#40a8ab] shrink-0">✓</span>
-              <span>Acceder a tus cupones de descuento</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-[#40a8ab] shrink-0">✓</span>
-              <span>Ver el impacto de tus aportes</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-[#40a8ab] shrink-0">✓</span>
-              <span>Recibir beneficios exclusivos</span>
-            </li>
-          </ul>
-        </div>
+
 
 
       </div>

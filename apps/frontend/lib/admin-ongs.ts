@@ -114,3 +114,21 @@ export async function permanentDeleteOrganizacion(token: string, id: string): Pr
     throw new Error(error.message || 'Error permanently deleting ONG');
   }
 }
+
+export async function bulkUploadUsers(token: string, file: File): Promise<any> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await fetch(`${API_URL}/admin/users/bulk-upload`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.message || 'Error uploading users file');
+  }
+
+  return res.json();
+}

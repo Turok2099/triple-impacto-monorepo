@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards, Req, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards, Req, UseInterceptors, UploadedFile, BadRequestException, Res } from '@nestjs/common';
+import type { Response } from 'express';
 import { AdminService } from './admin.service';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -57,6 +58,24 @@ export class AdminController {
   ) {
     const adminId = req.user?.userId;
     return this.adminService.deleteAffiliate(adminId, userId, bondaCode, micrositeId);
+  }
+
+  @Get('users/bulk-upload-template')
+  async downloadBulkUploadTemplate(@Res() res: Response) {
+    const buffer = await this.adminService.generateBulkUploadTemplate();
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=plantilla_usuarios_bonda.xlsx');
+    res.send(buffer);
+  }
+
+  @Post('users/bulk-upload')
+  @UseInterceptors(require('@nestjs/platform-express').FileInterceptor('file'))
+  async bulkUploadUsers(@Req() req: any, @UploadedFile() file: any) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+    const adminId = req.user?.userId;
+    return this.adminService.processBulkUpload(adminId, file.buffer);
   }
 
   // ==========================================

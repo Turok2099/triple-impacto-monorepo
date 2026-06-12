@@ -510,4 +510,211 @@ export class AdminService {
     await this.logAudit(adminId, id, 'DELETE_BANNER', 'SUCCESS');
     return { success: true };
   }
+
+  // ==========================================
+  // BULK UPLOAD EXCEL
+  // ==========================================
+
+  async generateBulkUploadTemplate() {
+    const ExcelJS = require('exceljs');
+    const { data: ongs } = await this.supabaseService.getClient()
+      .from('organizaciones')
+      .select('nombre')
+      .eq('activa', true)
+      .order('nombre');
+
+    const ongNames = (ongs || []).map(o => o.nombre);
+
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet('Usuarios');
+    
+    // Configurar columnas
+    sheet.columns = [
+      { header: 'nombre', key: 'nombre', width: 20 },
+      { header: 'apellido', key: 'apellido', width: 20 },
+      { header: 'email', key: 'email', width: 30 },
+      { header: 'dni', key: 'dni', width: 15 },
+      { header: 'ong', key: 'ong', width: 30 },
+      { header: 'telefono', key: 'telefono', width: 15 }
+    ];
+
+    // Dar algo de estilo al header
+    sheet.getRow(1).font = { bold: true };
+    sheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF40A8AB' } };
+    sheet.getRow(1).font.color = { argb: 'FFFFFFFF' };
+
+    // Hoja oculta para lista de ONGs
+    if (ongNames.length > 0) {
+      const listSheet = workbook.addWorksheet('ONGs', { state: 'hidden' });
+      ongNames.forEach((name: string, i: number) => {
+        listSheet.getCell(`A${i + 1}`).value = name;
+      });
+
+      // Añadir validación de datos en la columna 'ong' (E)
+      // Desde la fila 2 hasta la 1000
+      for (let i = 2; i <= 1000; i++) {
+         sheet.getCell(`E${i}`).dataValidation = {
+           type: 'list',
+           allowBlank: true,
+           formulae: [`ONGs!$A$1:$A$${ongNames.length}`],
+           showErrorMessage: true,
+           errorTitle: 'ONG Inválida',
+           error: 'Por favor selecciona una ONG válida de la lista.'
+         };
+      }
+    }
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return buffer;
+  }
+
+  async processBulkUpload(adminId: string, fileBuffer: Buffer) {
+    const ExcelJS = require('exceljs');
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(fileBuffer);
+    const sheet = workbook.getWorksheet(1);
+
+    if (!sheet) {
+      throw new BadRequestException('El archivo Excel no tiene hojas válidas');
+    }
+
+    const headers: string[] = [];
+    const rows: any[] = [];
+
+    sheet.eachRow((row: any, rowNumber: number) => {
+      if (rowNumber === 1) {
+         row.eachCell((cell: any, colNumber: number) => {
+            headers[colNumber] = cell.value?.toString().toLowerCase().trim();
+         });
+      } else {
+         const rowData: any = {};
+         row.eachCell({ includeEmpty: false }, (cell: any, colNumber: number) => {
+            const header = headers[colNumber];
+            if (header) {
+               rowData[header] = cell.value?.toString().trim();
+            }
+         });
+         if (rowData.email || rowData.dni) {
+           rows.push(rowData);
+         }
+      }
+    });
+
+    if (rows.length === 0) {
+       throw new BadRequestException('El archivo no contiene datos de usuarios');
+    }
+
+    // Procesar asíncronamente
+    this.processUsersAsync(adminId, rows).catch(e => this.logger.error('Background bulk upload error', e));
+
+    return { 
+      success: true, 
+      message: `Archivo recibido correctamente. Se procesarán ${rows.length} usuarios en segundo plano.` 
+    };
+  }
+
+  private async processUsersAsync(adminId: string, rows: any[]) {
+    try {
+      const client = this.supabaseService.getClient();
+      const { data: ongs } = await client.from('organizaciones').select('id, nombre');
+
+      const ongMap = new Map();
+      if (ongs) {
+        for (const ong of ongs) {
+          ongMap.set(ong.nombre.trim().toLowerCase(), ong.id);
+        }
+      }
+
+      let successCount = 0;
+      let errorCount = 0;
+      const errors: any[] = [];
+
+      for (const row of rows) {
+         try {
+            const { nombre, apellido, email, dni, ong, telefono } = row;
+
+            if (!email || !dni || !nombre || !apellido || !ong) {
+               throw new Error('Faltan campos obligatorios en la fila');
+            }
+
+            const ongNameLower = ong.toLowerCase();
+            const orgId = ongMap.get(ongNameLower);
+
+            if (!orgId) {
+               throw new Error(`La ONG "${ong}" no fue encontrada.`);
+            }
+
+            // Verificar si usuario ya existe
+            let userId;
+            const { data: existingUser } = await client.from('usuarios').select('id').eq('email', email).maybeSingle();
+
+            if (existingUser) {
+               userId = existingUser.id;
+               // Opcional: actualizar el DNI u otros datos si se quiere
+            } else {
+               const { data: newUser, error: createError } = await client.from('usuarios').insert({
+                  nombre: `${nombre} ${apellido}`.trim(),
+                  email: email.toLowerCase(),
+                  dni,
+                  telefono,
+                  is_active: true
+               }).select('id').single();
+               
+               if (createError) throw new Error('Error local: ' + createError.message);
+               userId = newUser.id;
+            }
+
+            // Bonda Integración
+            const { data: bondaMicrosite } = await client.from('bonda_microsites')
+               .select('*')
+               .eq('organizacion_id', orgId)
+               .maybeSingle();
+
+            if (bondaMicrosite && bondaMicrosite.api_token_nominas) {
+               const payload = {
+                  code: dni,
+                  email,
+                  nombre,
+                  apellido,
+                  telefono,
+                  send_welcome_email: true
+               };
+               
+               try {
+                 const res = await this.bondaService.crearAfiliado(payload, { organizacionId: orgId });
+                 if ((res as any)?.error && (res as any).error.code !== 'HttpPublicResponseException') {
+                    this.logger.warn(`Bonda bulk upload issue for ${email}:`, res);
+                 }
+               } catch (bondaError: any) {
+                 this.logger.error(`Bonda error in bulk upload for ${email}`, bondaError.message);
+               }
+
+               await client.from('usuarios_bonda_afiliados').upsert({
+                  user_id: userId,
+                  bonda_microsite_id: bondaMicrosite.id,
+                  affiliate_code: dni,
+                  is_active: true
+               }, { onConflict: 'user_id, bonda_microsite_id' });
+            }
+
+            successCount++;
+         } catch (error: any) {
+            errorCount++;
+            errors.push({ rowData: row, error: error.message });
+         }
+      }
+
+      await this.logAudit(adminId, 'BULK_UPLOAD', 'BULK_UPLOAD_COMPLETED', 'SUCCESS', {
+         successCount,
+         errorCount,
+         errors
+      });
+      
+      this.logger.log(`Bulk upload finished: ${successCount} success, ${errorCount} errors`);
+
+    } catch (e: any) {
+      this.logger.error('Fatal error in processUsersAsync:', e);
+      await this.logAudit(adminId, 'BULK_UPLOAD', 'BULK_UPLOAD_FAILED', 'ERROR', { error: e.message });
+    }
+  }
 }

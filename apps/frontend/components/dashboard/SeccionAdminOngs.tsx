@@ -263,7 +263,20 @@ export default function SeccionAdminOngs() {
                       </div>
                       <div>
                         <p className="font-semibold text-slate-900">{ong.nombre}</p>
-                        <p className="text-xs text-slate-500 line-clamp-1 max-w-[200px]">{ong.descripcion || "Sin descripción"}</p>
+                        <p className="text-xs text-slate-500 line-clamp-1 max-w-[200px] mb-1">{ong.descripcion || "Sin descripción"}</p>
+                        {ong.slug && (
+                          <div className="flex items-center gap-1 text-[11px] text-[#40a8ab] font-bold">
+                            <LinkIcon className="w-3 h-3" />
+                            <a
+                              href={`/donar/${ong.slug}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:underline"
+                            >
+                              /donar/{ong.slug}
+                            </a>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </td>
@@ -373,7 +386,16 @@ export default function SeccionAdminOngs() {
                     <div className="col-span-2">
                       <label className="block text-sm font-semibold text-slate-700 mb-1">Slug de Donación Exclusivo (amigable)</label>
                       <input placeholder="ej: fundacion-padres (dejar vacío para deshabilitar exclusive link)" value={formData.slug} onChange={e => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, '') })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
-                      <p className="text-[11px] text-slate-400 mt-1">Si se define, la URL exclusiva será /donar/nombre-slug</p>
+                      <p className="text-[11px] text-slate-400 mt-1">
+                        Si se define, la URL exclusiva será:{" "}
+                        {formData.slug ? (
+                          <span className="font-bold text-[#40a8ab]">
+                            /donar/{formData.slug}
+                          </span>
+                        ) : (
+                          <span className="italic">/donar/nombre-slug</span>
+                        )}
+                      </p>
                     </div>
 
                     <h4 className="col-span-2 text-sm font-bold text-slate-700 mt-2 mb-1">Recursos Visuales</h4>

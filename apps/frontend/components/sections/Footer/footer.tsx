@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const Tiktok = ({ className }: { className?: string }) => (
   <svg
@@ -25,12 +26,16 @@ const Tiktok = ({ className }: { className?: string }) => (
 );
 
 export default function Footer() {
+  const pathname = usePathname();
+  const isDonarSlugPage = pathname?.startsWith("/donar/") && !["/donar/success", "/donar/error", "/donar"].includes(pathname);
   const currentYear = new Date().getFullYear();
 
   // Newsletter State
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<{ type: "success" | "error" | null; message: string }>({ type: null, message: "" });
+
+  if (isDonarSlugPage) return null;
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();

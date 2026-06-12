@@ -25,6 +25,7 @@ export default function SeccionAdminOngs() {
     email: "",
     telefono: "",
     website_url: "",
+    slug: "",
     monto_minimo: 5000,
     activa: true,
     fiserv_activo: false,
@@ -138,6 +139,7 @@ export default function SeccionAdminOngs() {
     setShowSecrets(false);
     setFormData({
       nombre: "", descripcion: "", logo_url: "", email: "", telefono: "", website_url: "",
+      slug: "",
       monto_minimo: 5000,
       activa: true, fiserv_activo: false, fiserv_store_id: "", fiserv_shared_secret: "", bonda_slug: "", bonda_api_token: "",
       bonda_api_token_nominas: "", bonda_microsite_id: ""
@@ -159,6 +161,7 @@ export default function SeccionAdminOngs() {
       email: ong.email || "",
       telefono: ong.telefono || "",
       website_url: ong.website_url || "",
+      slug: ong.slug || "",
       monto_minimo: ong.monto_minimo || 5000,
       activa: ong.activa,
       fiserv_activo: ong.fiserv_activo || false,
@@ -366,6 +369,11 @@ export default function SeccionAdminOngs() {
                     <div className="col-span-2">
                       <label className="block text-sm font-semibold text-slate-700 mb-1">Sitio Web</label>
                       <input type="url" placeholder="https://..." value={formData.website_url} onChange={e => setFormData({ ...formData, website_url: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">Slug de Donación Exclusivo (amigable)</label>
+                      <input placeholder="ej: fundacion-padres (dejar vacío para deshabilitar exclusive link)" value={formData.slug} onChange={e => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, '') })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                      <p className="text-[11px] text-slate-400 mt-1">Si se define, la URL exclusiva será /donar/nombre-slug</p>
                     </div>
 
                     <h4 className="col-span-2 text-sm font-bold text-slate-700 mt-2 mb-1">Recursos Visuales</h4>

@@ -2,10 +2,16 @@
 
 import { memo } from "react";
 import { MessageCircle } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export default memo(function WhatsAppButton() {
+  const pathname = usePathname();
   const whatsappNumber = "5491156393261"; // +54 11 5639-3261
   const whatsappURL = `https://wa.me/${whatsappNumber}`;
+
+  const isDonarSlugPage = pathname?.startsWith("/donar/") && !["/donar/success", "/donar/error", "/donar"].includes(pathname);
+
+  if (isDonarSlugPage) return null;
 
   return (
     <a

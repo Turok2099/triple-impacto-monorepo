@@ -6,7 +6,12 @@ import { usePathname } from "next/navigation";
 export default memo(function FloatingDonateButton() {
   const pathname = usePathname();
 
-  if (pathname?.startsWith("/dashboard")) return null;
+  if (
+    pathname?.startsWith("/dashboard") ||
+    (pathname?.startsWith("/donar/") && !["/donar/success", "/donar/error", "/donar"].includes(pathname))
+  ) {
+    return null;
+  }
 
   return (
     <>

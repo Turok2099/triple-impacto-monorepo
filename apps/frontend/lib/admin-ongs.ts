@@ -24,6 +24,7 @@ export interface Ong {
   fiserv_activo: boolean;
   fiserv_store_id: string | null;
   fiserv_shared_secret: string | null;
+  slug: string | null;
   bonda_microsites?: BondaMicrosite[];
   created_at: string;
 }

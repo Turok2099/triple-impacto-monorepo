@@ -503,6 +503,74 @@ export class SupabaseService implements OnModuleInit {
   }
 
   /**
+   * Obtener una organización por Slug amigable (activa).
+   */
+  async getOrganizacionBySlug(slug: string) {
+    const { data, error } = await this.from('organizaciones')
+      .select(
+        `
+        id,
+        nombre,
+        descripcion,
+        logo_url,
+        website_url,
+        email,
+        telefono,
+        direccion,
+        monto_minimo,
+        verificada,
+        activa,
+        fiserv_activo,
+        fiserv_store_id,
+        fiserv_shared_secret,
+        slug,
+        created_at,
+        updated_at,
+        bonda_microsites (
+          id,
+          slug,
+          activo
+        )
+      `
+      )
+      .eq('slug', slug)
+      .eq('activa', true)
+      .maybeSingle();
+
+    if (error) {
+      this.logger.error('Error al obtener organizacion por slug:', error);
+      throw error;
+    }
+
+    if (!data) return null;
+
+    const bonda = Array.isArray(data.bonda_microsites)
+      ? data.bonda_microsites.find((m: any) => m.activo)
+      : (data.bonda_microsites as any)?.activo ? data.bonda_microsites : null;
+
+    const has_fiserv_config = !!data.fiserv_activo && !!data.fiserv_store_id && !!data.fiserv_shared_secret;
+
+    return {
+      id: data.id,
+      bonda_microsite_id: (bonda as any)?.id || null,
+      nombre: data.nombre,
+      descripcion: data.descripcion,
+      logo_url: data.logo_url || null,
+      website_url: data.website_url || null,
+      email: data.email || null,
+      telefono: data.telefono || null,
+      direccion: data.direccion || null,
+      monto_minimo: data.monto_minimo || 5000,
+      slug: data.slug || (bonda as any)?.slug || null,
+      has_fiserv_config,
+      activa: true,
+      verificada: data.verificada || false,
+      created_at: data.created_at || new Date().toISOString(),
+      updated_at: data.updated_at || new Date().toISOString(),
+    };
+  }
+
+  /**
    * Obtener organizaciones activas (incluye monto_minimo y su integración Bonda si existe).
    */
   async getOrganizacionesActivas(requireFiserv: boolean = false) {
@@ -525,6 +593,7 @@ export class SupabaseService implements OnModuleInit {
         fiserv_activo,
         fiserv_store_id,
         fiserv_shared_secret,
+        slug,
         created_at,
         updated_at,
         bonda_microsites (
@@ -562,7 +631,7 @@ export class SupabaseService implements OnModuleInit {
         telefono: org.telefono || null,
         direccion: org.direccion || null,
         monto_minimo: org.monto_minimo || 5000,
-        slug: bonda?.slug || null,
+        slug: org.slug || bonda?.slug || null,
         has_fiserv_config,
         activa: true,
         verificada: org.verificada || false,

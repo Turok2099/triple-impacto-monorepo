@@ -74,3 +74,6 @@ RESULTADO-*.md
 USUARIOS-PRUEBA-*.md
 RESUMEN-*.md
 INTEGRACION-*.md
+
+# Scripts temporales de consulta y testing
+scripts/consultar-total-cupones.ts

@@ -3,11 +3,13 @@ import {
   Get,
   Post,
   Query,
+  Param,
   UnauthorizedException,
   Req,
   Headers,
   Body,
   BadRequestException,
+  NotFoundException,
   Logger,
 } from '@nestjs/common';
 import { Request } from 'express';
@@ -323,6 +325,19 @@ export class PublicController {
   async getOrganizaciones(@Query('forPayment') forPayment?: string): Promise<OrganizacionPublicDto[]> {
     const requireFiserv = forPayment === 'true';
     return this.supabase.getOrganizacionesActivas(requireFiserv);
+  }
+
+  /**
+   * Obtiene los detalles de una organización activa dado su slug.
+   * GET /api/public/organizaciones/slug/:slug
+   */
+  @Get('organizaciones/slug/:slug')
+  async getOrganizacionBySlug(@Param('slug') slug: string) {
+    const org = await this.supabase.getOrganizacionBySlug(slug);
+    if (!org) {
+      throw new NotFoundException(`Organización con slug "${slug}" no encontrada`);
+    }
+    return org;
   }
 
   /**

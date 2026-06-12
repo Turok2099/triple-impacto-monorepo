@@ -278,7 +278,8 @@ export class AdminService {
         verificada: payload.verificada ?? false,
         fiserv_activo: payload.fiserv_activo ?? false,
         fiserv_store_id: payload.fiserv_store_id,
-        fiserv_shared_secret: payload.fiserv_shared_secret
+        fiserv_shared_secret: payload.fiserv_shared_secret,
+        slug: payload.slug || null
       })
       .select()
       .single();
@@ -329,6 +330,7 @@ export class AdminService {
         fiserv_activo: payload.fiserv_activo,
         fiserv_store_id: payload.fiserv_store_id,
         fiserv_shared_secret: payload.fiserv_shared_secret,
+        slug: payload.slug || null,
         updated_at: new Date().toISOString()
       })
       .eq('id', id)

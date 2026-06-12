@@ -15,18 +15,10 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
-  const [sessionExpiredMsg, setSessionExpiredMsg] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
 
-  // Verificar si la sesión expiró o si venimos de algún proceso de Auth
+  // Verificar si venimos de algún proceso de Auth
   useEffect(() => {
-    // 1. Sesión Expirada
-    const expired = sessionStorage.getItem("session_expired");
-    if (expired === "true") {
-      setSessionExpiredMsg(true);
-      sessionStorage.removeItem("session_expired");
-    }
-
     // 2. Parámetros de URL para Verificación de Correo
     const params = new URLSearchParams(window.location.search);
     if (params.get("check_email") === "true") {
@@ -131,22 +123,7 @@ export default function LoginPage() {
 
         {/* Formulario */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          {/* Mensaje de sesión expirada */}
-          {sessionExpiredMsg && (
-            <div className="mb-6 bg-amber-50 border border-amber-300 rounded-xl p-4">
-              <div className="flex items-start gap-3">
-                <span className="text-amber-600 text-xl shrink-0">⏱️</span>
-                <div>
-                  <p className="text-sm font-medium text-amber-900 mb-1">
-                    Tu sesión expiró
-                  </p>
-                  <p className="text-sm text-amber-800">
-                    Por seguridad, las sesiones expiran después de 12 horas. Por favor, iniciá sesión nuevamente.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
+
 
           {/* Mensaje de error */}
           {error && (

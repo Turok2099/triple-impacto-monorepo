@@ -21,7 +21,9 @@ export default function Navbar() {
     }
   }, [isMobileMenuOpen]);
 
-  const navLinks = [
+  const isDonarSlugPage = pathname?.startsWith("/donar/") && !["/donar/success", "/donar/error", "/donar"].includes(pathname);
+
+  const navLinks = isDonarSlugPage ? [] : [
     { name: "ONGs", href: "/ongs", icon: <HeartHandshake className="w-5 h-5" /> },
     { name: "Sobre nosotros", href: "/about", icon: <Info className="w-5 h-5" /> },
     { name: "Preguntas frecuentes", href: "/faqs", icon: <HelpCircle className="w-5 h-5" /> },
@@ -46,20 +48,33 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             {/* Logo + Branding */}
-            <Link
-              href="/"
-              onClick={(e) => handleNavClick(e, "/")}
-              className="flex items-center group transition-transform hover:scale-110"
-            >
-              <Image
-                src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto,f_auto,w_200,c_limit/v1775685229/ISOLOGOTIPO_AYNI_VERDE_FONDO_TRANSPARENTE_lx4yvh.png"
-                alt="AYNI"
-                width={140}
-                height={46}
-                className="h-14 w-auto object-contain"
-                priority
-              />
-            </Link>
+            {isDonarSlugPage ? (
+              <div className="flex items-center">
+                <Image
+                  src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto,f_auto,w_200,c_limit/v1775685229/ISOLOGOTIPO_AYNI_VERDE_FONDO_TRANSPARENTE_lx4yvh.png"
+                  alt="AYNI"
+                  width={140}
+                  height={46}
+                  className="h-14 w-auto object-contain"
+                  priority
+                />
+              </div>
+            ) : (
+              <Link
+                href="/"
+                onClick={(e) => handleNavClick(e, "/")}
+                className="flex items-center group transition-transform hover:scale-110"
+              >
+                <Image
+                  src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto,f_auto,w_200,c_limit/v1775685229/ISOLOGOTIPO_AYNI_VERDE_FONDO_TRANSPARENTE_lx4yvh.png"
+                  alt="AYNI"
+                  width={140}
+                  height={46}
+                  className="h-14 w-auto object-contain"
+                  priority
+                />
+              </Link>
+            )}
 
             {/* Links Desktop */}
             <div className="hidden lg:flex items-center gap-1">
@@ -84,15 +99,17 @@ export default function Navbar() {
                   {/* Auth - Usuario logueado */}
                   {isAuthenticated && user ? (
                     <div className="flex items-center gap-3">
-                      <Link
-                        href="/dashboard"
-                        onClick={(e) => {
-                          if (pathname === "/dashboard") e.preventDefault();
-                        }}
-                        className="px-4 py-2 text-[#40a8ab] hover:text-[#2c8184] hover:bg-teal-50 rounded-lg transition-all duration-200 font-medium text-sm"
-                      >
-                        Dashboard
-                      </Link>
+                      {!isDonarSlugPage && (
+                        <Link
+                          href="/dashboard"
+                          onClick={(e) => {
+                            if (pathname === "/dashboard") e.preventDefault();
+                          }}
+                          className="px-4 py-2 text-[#40a8ab] hover:text-[#2c8184] hover:bg-teal-50 rounded-lg transition-all duration-200 font-medium text-sm"
+                        >
+                          Dashboard
+                        </Link>
+                      )}
                       <span className="text-sm text-gray-700 font-medium">
                         Hola,{" "}
                         <span className="text-[#40a8ab]">{user.nombre}</span>
@@ -208,14 +225,16 @@ export default function Navbar() {
                         {user.nombre}
                       </div>
                     </div>
-                    <Link
-                      href="/dashboard"
-                      onClick={(e) => handleNavClick(e, "/dashboard")}
-                      className="flex items-center gap-3 px-4 py-3 text-[#40a8ab] hover:bg-teal-50 rounded-xl transition-colors font-medium"
-                    >
-                      <LayoutDashboard className="w-5 h-5 opacity-80" />
-                      <span>Dashboard</span>
-                    </Link>
+                     {!isDonarSlugPage && (
+                       <Link
+                         href="/dashboard"
+                         onClick={(e) => handleNavClick(e, "/dashboard")}
+                         className="flex items-center gap-3 px-4 py-3 text-[#40a8ab] hover:bg-teal-50 rounded-xl transition-colors font-medium"
+                       >
+                         <LayoutDashboard className="w-5 h-5 opacity-80" />
+                         <span>Dashboard</span>
+                       </Link>
+                     )}
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors font-medium"

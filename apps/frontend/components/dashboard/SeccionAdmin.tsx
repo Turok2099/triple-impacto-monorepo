@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Swal from 'sweetalert2';
 import { getAdminUsers, deleteAdminUser, AdminUser, createAdminUser, updateAdminUser, deleteAffiliation, getUserAdminPayments, toggleUserAdminRole } from "@/lib/admin";
 import { useAuth } from "@/contexts/AuthContext";
-import { Users, MoreVertical, Edit2, Trash2, UserPlus, X, ShieldAlert, Shield, CheckCircle, XCircle, Receipt, UserSearch, ArrowLeft, Mail, Phone, BookUser, Building2, Image as ImageIcon } from "lucide-react";
+import { Users, MoreVertical, Edit2, Trash2, UserPlus, X, ShieldAlert, Shield, CheckCircle, XCircle, Receipt, UserSearch, ArrowLeft, Mail, Phone, BookUser, Building2, Image as ImageIcon, Upload, Download } from "lucide-react";
 import SeccionAdminOngs from "./SeccionAdminOngs";
 import SeccionAdminBanners from "./SeccionAdminBanners";
 
@@ -21,6 +21,50 @@ export default function SeccionAdmin() {
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
   const [formData, setFormData] = useState({ nombre: "", email: "", telefono: "", dni: "", bondaSlug: "ctfin" });
   const [submitting, setSubmitting] = useState(false);
+
+  // Bulk Upload State
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [bulkFile, setBulkFile] = useState<File | null>(null);
+  const [isUploadingBulk, setIsUploadingBulk] = useState(false);
+
+  const handleDownloadTemplate = async () => {
+    try {
+      const token = localStorage.getItem("auth_token") || "";
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users/bulk-upload-template`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error("Error al descargar plantilla");
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'plantilla_usuarios_bonda.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (err: any) {
+      Swal.fire("Error", err.message, "error");
+    }
+  };
+
+  const handleBulkSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bulkFile) return;
+    setIsUploadingBulk(true);
+    try {
+      const token = localStorage.getItem("auth_token") || "";
+      const { bulkUploadUsers } = await import('@/lib/admin-ongs');
+      const result = await bulkUploadUsers(token, bulkFile);
+      Swal.fire("¡Archivo en Proceso!", result.message, "success");
+      setIsBulkModalOpen(false);
+      setBulkFile(null);
+      fetchUsers();
+    } catch (err: any) {
+      Swal.fire("Error", err.message, "error");
+    } finally {
+      setIsUploadingBulk(false);
+    }
+  };
 
   useEffect(() => {
     fetchUsers();
@@ -426,7 +470,14 @@ export default function SeccionAdmin() {
         <SeccionAdminBanners />
       ) : (
         <>
-          <div className="flex justify-end mb-4">
+          <div className="flex justify-end gap-3 mb-4">
+            <button
+              onClick={() => setIsBulkModalOpen(true)}
+              className="flex items-center gap-2 px-6 py-3 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-xl font-semibold transition-all shadow-sm"
+            >
+              <Users className="w-5 h-5" />
+              Carga Masiva (Bonda)
+            </button>
             <button
               onClick={openCreateModal}
               className="flex items-center gap-2 px-6 py-3 bg-[#40a8ab] hover:bg-[#2c8184] text-white rounded-xl font-semibold transition-all shadow-md hover:shadow-lg"
@@ -635,6 +686,51 @@ export default function SeccionAdmin() {
                     </button>
                   </div>
                 </form>
+              </div>
+            </div>
+          )}
+
+          {/* Modal Carga Masiva */}
+          {isBulkModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+              <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 my-auto">
+                <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                  <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <Users className="w-5 h-5 text-emerald-600" />
+                    Carga Masiva de Usuarios
+                  </h2>
+                  <button onClick={() => setIsBulkModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200 transition-colors">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                
+                <div className="p-6">
+                  <div className="mb-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
+                    <h3 className="font-semibold text-blue-900 mb-2">Paso 1: Descarga la plantilla</h3>
+                    <p className="text-sm text-blue-700 mb-3">La plantilla incluye la lista actualizada de ONGs activas en el sistema para que las selecciones fácilmente en el archivo.</p>
+                    <button type="button" onClick={handleDownloadTemplate} className="flex items-center gap-2 px-4 py-2 bg-white border border-blue-200 hover:bg-blue-50 text-blue-700 rounded-lg text-sm font-semibold transition-colors">
+                      <Download className="w-4 h-4" /> Descargar Plantilla Excel
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleBulkSubmit}>
+                    <h3 className="font-semibold text-slate-800 mb-2">Paso 2: Sube el archivo completado</h3>
+                    <label className="flex flex-col items-center justify-center w-full h-32 px-4 py-3 bg-white border-2 border-dashed border-emerald-200 rounded-xl cursor-pointer hover:bg-emerald-50 hover:border-emerald-400 transition-colors mb-6">
+                       <div className="flex flex-col items-center justify-center gap-2 text-emerald-600 font-medium">
+                         <Upload className="w-6 h-6" />
+                         <span className="text-sm">{bulkFile ? bulkFile.name : 'Seleccionar archivo .xlsx'}</span>
+                       </div>
+                       <input required type="file" accept=".xlsx" className="hidden" onChange={(e) => setBulkFile(e.target.files?.[0] || null)} />
+                    </label>
+
+                    <div className="flex gap-3">
+                      <button type="button" onClick={() => setIsBulkModalOpen(false)} className="flex-1 py-2.5 bg-slate-100 text-slate-700 hover:bg-slate-200 font-semibold rounded-xl transition-colors">Cancelar</button>
+                      <button type="submit" disabled={!bulkFile || isUploadingBulk} className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-300 text-white font-semibold rounded-xl transition-colors flex justify-center items-center">
+                        {isUploadingBulk ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div> : 'Procesar Archivo'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           )}

@@ -19,8 +19,14 @@ export default function LoginPage() {
 
   // Verificar si venimos de algún proceso de Auth
   useEffect(() => {
-    // 2. Parámetros de URL para Verificación de Correo
+    // 1. Guardar intención de redirección si existe
     const params = new URLSearchParams(window.location.search);
+    const redirectUrl = params.get("redirect");
+    if (redirectUrl) {
+      localStorage.setItem("redirectAfterLogin", redirectUrl);
+    }
+
+    // 2. Parámetros de URL para Verificación de Correo
     if (params.get("check_email") === "true") {
       setSuccessMsg("¡Cuenta creada! Revisa tu bandeja de entrada o SPAM para confirmar tu correo antes de iniciar sesión.");
     } else if (params.get("verified") === "true") {
@@ -98,7 +104,21 @@ export default function LoginPage() {
 
       // Redirigir al dashboard o página previa
       const params = new URLSearchParams(window.location.search);
-      const redirectUrl = params.get("redirect") || "/dashboard";
+      let redirectUrl = params.get("redirect");
+      
+      if (!redirectUrl) {
+        const localRedirect = localStorage.getItem("redirectAfterLogin");
+        if (localRedirect) {
+          redirectUrl = localRedirect;
+        }
+      }
+
+      if (redirectUrl) {
+        localStorage.removeItem("redirectAfterLogin");
+      } else {
+        redirectUrl = "/dashboard";
+      }
+
       window.location.href = redirectUrl;
     } catch (err: any) {
       setError(err.message || "Error al iniciar sesión. Verifica tus credenciales.");

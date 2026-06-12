@@ -1,11 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
 export default function RegisterPage() {
+  // Guardar intención de redirección si existe
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const redirectUrl = params.get("redirect");
+    if (redirectUrl) {
+      localStorage.setItem("redirectAfterLogin", redirectUrl);
+    }
+  }, []);
+
   const [formData, setFormData] = useState({
     nombre: "",
     email: "",

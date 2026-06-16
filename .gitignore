@@ -198,5 +198,18 @@ apps/backend/check-bonda-dni.ts
 apps/backend/scripts/
 # NOTA: El README.md de la raíz del proyecto SÍ se sube (no está ignorado)
 
+# Archivos de seguridad y certificados
+*.pfx
+*.pem
+*.key
+*secret*
+*credentials*
+*private*
+
+# Archivos Excel y reportes temporales generados en el backend
+apps/backend/*.xlsx
+apps/backend/*.csv
+apps/backend/*.xls
+
 # Antigravity Agents
 .agents/

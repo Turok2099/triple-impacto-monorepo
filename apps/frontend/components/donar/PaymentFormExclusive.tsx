@@ -198,22 +198,27 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
   }
 
   return (
-    <div className="max-w-2xl w-full mx-auto bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm">
-      <div className="bg-[#40a8ab] p-8 text-center flex flex-col items-center">
-        {organizacion.logo_url ? (
-          <div className="w-16 h-16 bg-white rounded-2xl overflow-hidden p-2 mb-3 shadow-md flex items-center justify-center">
-            <img src={organizacion.logo_url} alt={organizacion.nombre} className="w-full h-full object-contain" />
-          </div>
-        ) : (
-          <Lock className="w-8 h-8 text-white/90 mb-3" />
-        )}
-        <h2 className="text-2xl font-bold text-white mb-2">Donación Segura</h2>
-        <p className="text-teal-50 text-sm">
-          Estás colaborando con <span className="font-semibold text-white">{organizacion.nombre}</span>.
-        </p>
+    <div className="max-w-2xl w-full mx-auto bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-md">
+      <div className="bg-[#40a8ab] p-6 text-center text-white">
+        <h3 className="text-lg font-bold tracking-wide uppercase">
+          CLUB {organizacion.nombre} ¡¡DONAR TIENE PREMIO!!
+        </h3>
       </div>
 
       <div className="p-8">
+        <div className="mb-6">
+          <h2 className="text-2xl font-extrabold text-slate-800 mb-2">
+            {organizacion.nombre} - CLUB TRIPLE IMPACTO
+          </h2>
+          <p className="text-slate-500 text-sm leading-relaxed">
+            {organizacion.nombre === "PLATO LLENO" ? (
+              "¡Sumate a Club Plato Lleno y sé parte del Triple Impacto! Con tu aporte mensual, nos ayudás a seguir rescatando comida que de otro modo se perdería, y distribuirla entre quienes más lo necesitan. Como agradecimiento por tu compromiso, accedés a la Red de Beneficios del Club Triple Impacto, donde vas a encontrar descuentos exclusivos en tus marcas favoritas."
+            ) : (
+              organizacion.descripcion || `¡Sumate y sé parte del Triple Impacto! Con tu aporte mensual, nos ayudás a sostener proyectos de impacto y como agradecimiento accedés a nuestra red de beneficios y descuentos exclusivos.`
+            )}
+          </p>
+        </div>
+
         {(status === 'error' || errorMessage) && (
           <div className="mb-6 bg-red-50 text-red-700 p-4 rounded-xl border border-red-100 flex items-start gap-3">
             <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
@@ -234,8 +239,8 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                   key={monto}
                   type="button"
                   onClick={() => handleMontoSugeridoClick(monto)}
-                  className={`py-3 px-4 rounded-2xl font-semibold text-center transition-all ${montoSeleccionado === monto && !usarMontoCustom
-                    ? "bg-slate-900 text-white shadow-md"
+                  className={`py-3 px-4 rounded-2xl font-semibold text-center transition-all cursor-pointer ${montoSeleccionado === monto && !usarMontoCustom
+                    ? "bg-[#40a8ab] text-white shadow-md"
                     : "bg-slate-50 text-slate-700 border-2 border-slate-200 hover:border-slate-300"
                     }`}
                 >
@@ -249,8 +254,8 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                   setUsarMontoCustom(true);
                   setMontoSeleccionado(null);
                 }}
-                className={`py-3 px-4 rounded-2xl font-bold text-center transition-all ${usarMontoCustom
-                  ? "bg-slate-900 text-white shadow-md"
+                className={`py-3 px-4 rounded-2xl font-bold text-center transition-all cursor-pointer ${usarMontoCustom
+                  ? "bg-[#40a8ab] text-white shadow-md"
                   : "bg-slate-50 text-slate-700 border-2 border-slate-200 hover:border-slate-300"
                   }`}
               >
@@ -270,7 +275,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                     value={montoCustom}
                     onChange={(e) => handleMontoCustomChange(e.target.value)}
                     placeholder={montoMinimoActual.toString()}
-                    className="w-full pl-10 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none font-bold text-slate-800"
+                    className="w-full pl-10 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] outline-none font-bold text-slate-800"
                   />
                 </div>
               </div>
@@ -295,7 +300,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                   onChange={handleChange}
                   placeholder="Número de Tarjeta"
                   maxLength={19}
-                  className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
+                  className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#40a8ab] outline-none font-medium text-slate-800"
                   required
                 />
               </div>
@@ -308,7 +313,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                   value={formData.cardholderName}
                   onChange={handleChange}
                   placeholder="Titular de la Tarjeta"
-                  className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
+                  className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#40a8ab] outline-none font-medium text-slate-800"
                   required
                 />
               </div>
@@ -322,7 +327,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                   onChange={handleChange}
                   onBlur={() => setFormData(prev => ({ ...prev, expiryMonth: prev.expiryMonth ? prev.expiryMonth.padStart(2, '0') : '' }))}
                   placeholder="Mes (MM)"
-                  className="w-full px-4 py-3.5 bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
+                  className="w-full px-4 py-3.5 bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#40a8ab] outline-none font-medium text-slate-800"
                   required
                 />
                 <input
@@ -333,7 +338,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                   onChange={handleChange}
                   onBlur={() => setFormData(prev => ({ ...prev, expiryYear: prev.expiryYear.length === 4 ? prev.expiryYear.slice(-2) : prev.expiryYear.padStart(2, '0') }))}
                   placeholder="Año (YY)"
-                  className="w-full px-4 py-3.5 bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
+                  className="w-full px-4 py-3.5 bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#40a8ab] outline-none font-medium text-slate-800"
                   required
                 />
                 <input
@@ -343,7 +348,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                   value={formData.securityCode}
                   onChange={handleChange}
                   placeholder="CVV"
-                  className="w-full px-4 py-3.5 bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
+                  className="w-full px-4 py-3.5 bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#40a8ab] outline-none font-medium text-slate-800"
                   required
                 />
               </div>
@@ -353,18 +358,19 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#40a8ab] hover:bg-teal-600 disabled:opacity-50 text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-teal-600/20"
+            className="w-full bg-[#40a8ab] hover:bg-teal-600 disabled:opacity-50 text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg shadow-teal-600/20"
           >
             {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Lock className="w-5 h-5" />}
             <span>{loading ? 'Procesando...' : `Donar ${formatearMonto(montoActualVisual)} de forma segura`}</span>
           </button>
         </form>
 
-        <div className="mt-8 flex items-center justify-center gap-6 opacity-40 grayscale">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-4" />
-          <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-6" />
+        <div className="mt-8 flex items-center justify-center gap-6">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-5 object-contain" />
+          <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-7 object-contain" />
         </div>
       </div>
     </div>
   );
 }
+

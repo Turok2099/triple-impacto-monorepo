@@ -10,11 +10,17 @@ interface PaymentFormExclusiveProps {
   onError?: (error: any) => void;
 }
 
-const MONTOS_SUGERIDOS = [5000, 10000, 15000];
-const MONTO_MAXIMO = 20000;
+const MONTO_MAXIMO = 100000;
 
 export default function PaymentFormExclusive({ organizacion, onSuccess, onError }: PaymentFormExclusiveProps) {
-  const [montoSeleccionado, setMontoSeleccionado] = useState<number | null>(5000);
+  const montoMinimoActual = organizacion.monto_minimo || 5000;
+  const montosSugeridosActuales = [
+    montoMinimoActual,
+    montoMinimoActual * 2,
+    montoMinimoActual * 3
+  ];
+
+  const [montoSeleccionado, setMontoSeleccionado] = useState<number | null>(montoMinimoActual);
   const [montoCustom, setMontoCustom] = useState("");
   const [usarMontoCustom, setUsarMontoCustom] = useState(false);
 
@@ -30,9 +36,6 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
     expiryYear: '',
     securityCode: '',
   });
-
-  const montoMinimoActual = organizacion.monto_minimo || 500;
-  const montosSugeridosActuales = MONTOS_SUGERIDOS;
 
   const handleMontoSugeridoClick = (monto: number) => {
     if (monto < montoMinimoActual) {
@@ -189,9 +192,9 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
         </p>
         <button 
           onClick={() => window.location.href = '/dashboard'}
-          className="w-full py-4 bg-[#40a8ab] text-white rounded-2xl font-semibold hover:bg-teal-600 transition-all flex items-center justify-center gap-2"
+          className="w-full py-4 bg-[#40a8ab] text-white rounded-2xl font-semibold hover:bg-teal-600 transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
-          Ir a mis beneficios <ArrowRight className="w-4 h-4" />
+          Ir al Dashboard de AYNI <ArrowRight className="w-4 h-4" />
         </button>
       </div>
     );

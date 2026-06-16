@@ -9,9 +9,7 @@ interface PaymentFormRestProps {
   onError?: (error: any) => void;
 }
 
-const MONTOS_SUGERIDOS = [5000, 10000, 15000];
-const MONTO_MINIMO = 500;
-const MONTO_MAXIMO = 20000;
+const MONTO_MAXIMO = 100000;
 
 export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestProps) {
   // Estados para Organizaciones y Monto
@@ -38,12 +36,26 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
   });
 
   const organizacionSeleccionada = organizaciones.find(org => org.id === organizacionId);
-  const montoMinimoActual = MONTO_MINIMO;
-  const montosSugeridosActuales = MONTOS_SUGERIDOS;
+  const montoMinimoActual = organizacionSeleccionada?.monto_minimo || 5000;
+  const montosSugeridosActuales = [
+    montoMinimoActual,
+    montoMinimoActual * 2,
+    montoMinimoActual * 3
+  ];
 
   useEffect(() => {
     cargarOrganizaciones();
   }, []);
+
+  useEffect(() => {
+    if (organizacionSeleccionada) {
+      const min = organizacionSeleccionada.monto_minimo || 5000;
+      setMontoSeleccionado(min);
+      if (!usarMontoCustom) {
+        setErrorMessage('');
+      }
+    }
+  }, [organizacionId, organizaciones]);
 
   const cargarOrganizaciones = async () => {
     try {
@@ -137,7 +149,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
       setStatus('error');
       return;
     }
-    const errorMontoOrg = validarMonto(montoFinal, MONTO_MINIMO);
+    const errorMontoOrg = validarMonto(montoFinal, montoMinimoActual);
     if (errorMontoOrg) {
       setErrorMessage(errorMontoOrg);
       setStatus('error');
@@ -223,9 +235,9 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
         </p>
         <button 
           onClick={() => window.location.href = '/dashboard'}
-          className="w-full py-4 bg-[#40a8ab] text-white rounded-2xl font-semibold hover:bg-teal-600 transition-all flex items-center justify-center gap-2"
+          className="w-full py-4 bg-[#40a8ab] text-white rounded-2xl font-semibold hover:bg-teal-600 transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
-          Ir a mis beneficios <ArrowRight className="w-4 h-4" />
+          Ir al Dashboard de AYNI <ArrowRight className="w-4 h-4" />
         </button>
       </div>
     );

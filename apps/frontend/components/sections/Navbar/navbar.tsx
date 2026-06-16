@@ -23,6 +23,8 @@ export default function Navbar() {
 
   const isDonarSlugPage = pathname?.startsWith("/donar/") && !["/donar/success", "/donar/error", "/donar"].includes(pathname);
 
+  if (isDonarSlugPage) return null;
+
   const navLinks = isDonarSlugPage ? [] : [
     { name: "ONGs", href: "/ongs", icon: <HeartHandshake className="w-5 h-5" /> },
     { name: "Sobre nosotros", href: "/about", icon: <Info className="w-5 h-5" /> },

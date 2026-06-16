@@ -12,7 +12,8 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 const Tiktok = ({ className }: { className?: string }) => (
   <svg
@@ -25,9 +26,15 @@ const Tiktok = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export default function Footer() {
+function FooterContent() {
   const pathname = usePathname();
-  const isDonarSlugPage = pathname?.startsWith("/donar/") && !["/donar/success", "/donar/error", "/donar"].includes(pathname);
+  const searchParams = useSearchParams();
+  const redirectParam = searchParams?.get("redirect");
+
+  const isDonarSlugPage = 
+    (pathname?.startsWith("/donar/") && !["/donar/success", "/donar/error", "/donar"].includes(pathname)) ||
+    (redirectParam?.startsWith("/donar/") && !["/donar/success", "/donar/error", "/donar"].includes(redirectParam));
+
   const currentYear = new Date().getFullYear();
 
   // Newsletter State
@@ -273,5 +280,13 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+  );
+}
+
+export default function Footer() {
+  return (
+    <Suspense fallback={null}>
+      <FooterContent />
+    </Suspense>
   );
 }

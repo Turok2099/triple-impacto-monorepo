@@ -92,9 +92,9 @@ export default function DonarExclusivePage() {
 
   // Renderizado principal con diseño de dos columnas
   return (
-    <div className="min-h-screen bg-[#f4fafb] py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start">
+    <div className="min-h-screen bg-[#f4fafb] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 items-center">
           
           {/* Columna Izquierda: Tarjeta de Pago o Selección de Cuenta */}
           <div className="lg:col-span-7 flex justify-center">

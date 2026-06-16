@@ -3,14 +3,16 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { HeartHandshake, Info, HelpCircle, PhoneCall, LayoutDashboard, LogOut, User, Sparkles, Menu, X } from "lucide-react";
+import { Suspense } from "react";
 
-export default function Navbar() {
+function NavbarContent() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, isAuthenticated, logout, isLoading } = useAuth();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   // Prevenir scroll cuando el menú mobile está abierto
   useEffect(() => {
@@ -21,7 +23,11 @@ export default function Navbar() {
     }
   }, [isMobileMenuOpen]);
 
-  const isDonarSlugPage = pathname?.startsWith("/donar/") && !["/donar/success", "/donar/error", "/donar"].includes(pathname);
+  const redirectParam = searchParams?.get("redirect");
+
+  const isDonarSlugPage = 
+    (pathname?.startsWith("/donar/") && !["/donar/success", "/donar/error", "/donar"].includes(pathname)) ||
+    (redirectParam?.startsWith("/donar/") && !["/donar/success", "/donar/error", "/donar"].includes(redirectParam));
 
   if (isDonarSlugPage) return null;
 
@@ -276,5 +282,13 @@ export default function Navbar() {
       {/* Spacer para compensar el navbar fixed */}
       <div className="h-20"></div>
     </>
+  );
+}
+
+export default function Navbar() {
+  return (
+    <Suspense fallback={<div className="h-20"></div>}>
+      <NavbarContent />
+    </Suspense>
   );
 }

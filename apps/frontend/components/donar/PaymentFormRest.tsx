@@ -423,9 +423,16 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
           </button>
         </form>
 
-        <div className="mt-8 flex items-center justify-center gap-6 opacity-40 grayscale">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-4" />
-          <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-6" />
+        <div className="mt-8 flex flex-col items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-6">
+            <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1781652329/VISA-logo-500x281_k7clll.png" alt="Visa" className="h-6 object-contain" />
+            <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1781652329/Mastercard-logo_pwgxxu.png" alt="Mastercard" className="h-8 object-contain" />
+          </div>
+          <div className="flex items-center justify-center gap-2 text-xs text-slate-500 font-medium bg-slate-50 px-4 py-2 rounded-full border border-slate-100">
+            <Lock className="w-3.5 h-3.5" />
+            <span>Pagos procesados de forma segura por</span>
+            <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1781652396/Fiserv_logo.svg_veglfg.png" alt="Fiserv" className="h-3.5 object-contain ml-0.5" />
+          </div>
         </div>
       </div>
     </div>

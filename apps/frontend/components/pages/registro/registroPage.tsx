@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { UserPlus } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
@@ -161,20 +162,17 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-teal-50 via-white to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
-        {/* Logo y Header */}
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Creá tu cuenta
-          </h2>
-          <p className="text-gray-600">
-            Unite a AYNI y comenzá a generar cambio
-          </p>
+    <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+      <div className="max-w-2xl w-full bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm">
+        
+        {/* Header Similar a PaymentForm */}
+        <div className="bg-[#40a8ab] p-8 text-center flex flex-col items-center">
+          <UserPlus className="w-8 h-8 text-white/90 mb-3" />
+          <h2 className="text-2xl font-bold text-white mb-2">Creá tu cuenta</h2>
+          <p className="text-teal-50 text-sm">Unite a AYNI y comenzá a generar impacto</p>
         </div>
 
-        {/* Formulario */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="p-8">
           {/* Mensaje de error */}
           {error && (
             <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">

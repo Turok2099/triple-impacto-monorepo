@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { CheckCircle2, AlertCircle, Mail, KeyRound } from "lucide-react";
+import { CheckCircle2, AlertCircle, Mail, KeyRound, User } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
@@ -129,18 +129,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-teal-50 via-white to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        {/* Logo y Header */}
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Bienvenido de nuevo
-          </h2>
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm">
+        
+        {/* Header Similar a PaymentForm */}
+        <div className="bg-[#40a8ab] p-8 text-center flex flex-col items-center">
+          <User className="w-8 h-8 text-white/90 mb-3" />
+          <h2 className="text-2xl font-bold text-white mb-2">Bienvenido de nuevo</h2>
+          <p className="text-teal-50 text-sm">Ingresá tus credenciales para acceder</p>
         </div>
 
-        {/* Formulario */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-
+        <div className="p-8">
 
           {/* Mensaje de error */}
           {error && (

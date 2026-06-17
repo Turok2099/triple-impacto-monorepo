@@ -109,8 +109,19 @@ export default function DonarExclusivePage() {
                 
                 <div className="p-8">
                   <div className="mb-6">
-                    <h2 className="text-2xl font-extrabold text-slate-800 mb-2">
-                      {organizacion.nombre} - CLUB TRIPLE IMPACTO
+                    <div className="flex items-center gap-3 mb-4 flex-wrap">
+                      {organizacion.logo_url && (
+                        <img src={organizacion.logo_url} alt={organizacion.nombre} className="h-10 md:h-12 w-auto object-contain" />
+                      )}
+                      <span className="text-2xl font-light text-slate-300">+</span>
+                      <img
+                        src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto,f_auto,w_200,c_limit/v1775685229/ISOLOGOTIPO_AYNI_VERDE_FONDO_TRANSPARENTE_lx4yvh.png"
+                        alt="AYNI"
+                        className="h-10 md:h-12 w-auto object-contain"
+                      />
+                    </div>
+                    <h2 className="sr-only">
+                      {organizacion.nombre} y AYNI - CLUB TRIPLE IMPACTO
                     </h2>
                     <p className="text-slate-500 text-sm leading-relaxed">
                       {organizacion.nombre === "PLATO LLENO" ? (
@@ -119,6 +130,21 @@ export default function DonarExclusivePage() {
                         organizacion.descripcion || `¡Sumate y sé parte del Triple Impacto! Con tu aporte mensual, nos ayudás a sostener proyectos de impacto y como agradecimiento accedés a nuestra red de beneficios y descuentos exclusivos.`
                       )}
                     </p>
+                  </div>
+
+                  {/* Bonda Discounts Benefit Badge */}
+                  <div className="mb-6 bg-slate-50 border border-slate-100 rounded-2xl p-5 flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+                    <img
+                      src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1781655035/bonda_ujsbcf.png"
+                      alt="Bonda"
+                      className="h-8 md:h-9 w-auto object-contain shrink-0"
+                    />
+                    <div className="space-y-0.5">
+                      <h4 className="text-sm md:text-base font-bold text-slate-800">Portal de Beneficios Bonda</h4>
+                      <p className="text-xs md:text-sm text-slate-500 font-semibold leading-relaxed">
+                        Con tu donación mensual, accedés a más de <span className="font-bold text-[#40a8ab]">1700 cupones de descuento exclusivos</span> en primeras marcas nacionales.
+                      </p>
+                    </div>
                   </div>
                   
                   <div className="bg-teal-50/30 rounded-2xl p-6 border border-teal-100/50 text-center">
@@ -179,41 +205,82 @@ export default function DonarExclusivePage() {
                 </div>
               )}
               
-              <div className="text-center space-y-2">
-                <h3 className="font-bold text-lg text-slate-800 uppercase tracking-tight">
-                  {organizacion.nombre}
-                </h3>
-                <div className="text-[11px] bg-teal-50 text-teal-700 px-2.5 py-1 rounded-full font-bold inline-block">
-                  ORGANIZACIÓN VERIFICADA
-                </div>
-              </div>
-              
-              <p className="text-slate-500 text-xs leading-relaxed text-center">
-                {organizacion.descripcion || "Iniciativa de impacto social que trabaja activamente para transformar la realidad de los sectores más vulnerables."}
-              </p>
-              
-              <hr className="border-slate-100" />
-              
-              <div className="space-y-3 text-xs text-slate-600">
-                {organizacion.direccion && (
-                  <div className="flex items-start gap-2.5">
-                    <span className="font-semibold text-slate-800">Dirección:</span>
-                    <span className="text-slate-500">{organizacion.direccion}</span>
+              {organizacion.nombre === "PLATO LLENO" ? (
+                <>
+                  <div className="text-center space-y-2">
+                    <h3 className="font-bold text-lg text-slate-800 uppercase tracking-tight">
+                      Proyecto Plato Lleno
+                    </h3>
+                    <div className="text-[11px] text-slate-500 font-bold">
+                      Capital Federal, Argentina
+                    </div>
+                    <div className="text-[11px] bg-teal-50 text-teal-700 px-2.5 py-1 rounded-full font-bold inline-block">
+                      ORGANIZACIÓN VERIFICADA
+                    </div>
                   </div>
-                )}
-                {organizacion.email && (
-                  <div className="flex items-start gap-2.5">
-                    <span className="font-semibold text-slate-800">Email:</span>
-                    <a href={`mailto:${organizacion.email}`} className="text-[#40a8ab] hover:underline break-all">{organizacion.email}</a>
+                  
+                  <div className="space-y-4 text-xs text-slate-500 leading-relaxed">
+                    <p>
+                      Red Plato Lleno es una iniciativa de concientización alimentaria que busca devolverle al alimento el valor que fue perdiendo durante los últimos tiempos. Motivados por el respeto a la comida, voluntarios de Plato Lleno llevan a cabo la acción de «Rescate», la cual consiste en el retiro y distribución de alimentos excedentes que, por control estético u otras razones, quedan sin destino. Los alimentos rescatados son entregados de forma gratuita en merenderos, comedores y hogares.
+                    </p>
+                    
+                    <div className="bg-[#40a8ab]/5 border border-[#40a8ab]/10 rounded-2xl p-4 text-center">
+                      <p className="font-bold text-teal-900 mb-1">
+                        En el 2022 rescatamos 104 toneladas de alimentos
+                      </p>
+                      <p className="text-[11px] text-teal-700 font-bold">
+                        lo que equivale a 304.232 platos de comida.
+                      </p>
+                    </div>
+
+                    <p className="font-bold text-slate-700 text-center text-xs">
+                      ¡Imaginate cuánto más podríamos hacer con tu aporte!
+                    </p>
+
+                    <p className="text-[10px] text-slate-400 leading-normal border-t border-slate-100 pt-3">
+                      Somos una organización sin fines de lucro, independiente, que no acepta donaciones de gobiernos o partidos políticos. Tampoco aceptamos “colaboraciones simbólicas” de los sectores beneficiados con nuestros programas. Nuestro compromiso para con nuestros donantes garantiza transparencia, pues son nuestros principales auditores.
+                    </p>
                   </div>
-                )}
-                {organizacion.telefono && (
-                  <div className="flex items-start gap-2.5">
-                    <span className="font-semibold text-slate-800">Teléfono:</span>
-                    <span className="text-slate-500">{organizacion.telefono}</span>
+                </>
+              ) : (
+                <>
+                  <div className="text-center space-y-2">
+                    <h3 className="font-bold text-lg text-slate-800 uppercase tracking-tight">
+                      {organizacion.nombre}
+                    </h3>
+                    <div className="text-[11px] bg-teal-50 text-teal-700 px-2.5 py-1 rounded-full font-bold inline-block">
+                      ORGANIZACIÓN VERIFICADA
+                    </div>
                   </div>
-                )}
-              </div>
+                  
+                  <p className="text-slate-500 text-xs leading-relaxed text-center">
+                    {organizacion.descripcion || "Iniciativa de impacto social que trabaja activamente para transformar la realidad de los sectores más vulnerables."}
+                  </p>
+                  
+                  <hr className="border-slate-100" />
+                  
+                  <div className="space-y-3 text-xs text-slate-600">
+                    {organizacion.direccion && (
+                      <div className="flex items-start gap-2.5">
+                        <span className="font-semibold text-slate-800">Dirección:</span>
+                        <span className="text-slate-500">{organizacion.direccion}</span>
+                      </div>
+                    )}
+                    {organizacion.email && (
+                      <div className="flex items-start gap-2.5">
+                        <span className="font-semibold text-slate-800">Email:</span>
+                        <a href={`mailto:${organizacion.email}`} className="text-[#40a8ab] hover:underline break-all">{organizacion.email}</a>
+                      </div>
+                    )}
+                    {organizacion.telefono && (
+                      <div className="flex items-start gap-2.5">
+                        <span className="font-semibold text-slate-800">Teléfono:</span>
+                        <span className="text-slate-500">{organizacion.telefono}</span>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
               
               {organizacion.website_url && (
                 <a

@@ -496,6 +496,7 @@ export class BondaController {
           id: usuario.id,
           nombre: usuario.nombre || '',
           email: usuario.email || '',
+          avatar_url: usuario.avatar_url || null,
         },
         estadisticas: {
           cuponesActivos: stats.cupones_activos || 0,

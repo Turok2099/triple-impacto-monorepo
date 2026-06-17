@@ -12,6 +12,7 @@ interface User {
   provincia?: string | null;
   localidad?: string | null;
   role?: string;
+  avatar_url?: string | null;
 }
 
 const LOGOUT_DELAY_MS = 700;
@@ -24,6 +25,7 @@ interface AuthContextType {
   login: (token: string, userData: User) => void;
   logout: () => void;
   handleSessionExpired: () => void;
+  updateUser: (data: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -106,6 +108,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(userData);
   };
 
+  const updateUser = (data: Partial<User>) => {
+    if (user) {
+      const updatedUser = { ...user, ...data };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    }
+  };
+
   const logout = () => {
     setIsLoggingOut(true);
     setTimeout(() => {
@@ -136,6 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         logout,
         handleSessionExpired,
+        updateUser,
       }}
     >
       {children}

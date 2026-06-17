@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   actualizarPerfil, 
@@ -66,10 +66,11 @@ function formatMonto(monto: string, moneda: string): string {
 }
 
 export default function SeccionPerfil({ isActive = false, role = 'user', dashboard }: SeccionPerfilProps) {
-  const { user, logout } = useAuth();
-
-  // Tabs
+  const { user, updateUser } = useAuth();
   const [activeTab, setActiveTab] = useState<ProfileTab>('resumen');
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [subiendoFoto, setSubiendoFoto] = useState(false);
 
   // Toasts
   const [toast, setToast] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null);
@@ -182,6 +183,51 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
     }
   };
 
+  const handleSubirFoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    if (file.size > 2 * 1024 * 1024) {
+      mostrarToast('error', 'La imagen no debe superar los 2MB');
+      return;
+    }
+
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+
+    setSubiendoFoto(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+      const res = await fetch(`${API_URL}/auth/profile/avatar`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.message || 'Error al subir la imagen');
+      }
+
+      const data = await res.json();
+      updateUser({ avatar_url: data.avatar_url });
+      mostrarToast('ok', 'Foto de perfil actualizada correctamente');
+      
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } catch (error: any) {
+      mostrarToast('error', error.message || 'Ocurrió un error al subir la foto');
+    } finally {
+      setSubiendoFoto(false);
+    }
+  };
+
   const handleReenviarComprobante = async (id: string) => {
     const token = localStorage.getItem('auth_token');
     if (!token) return;
@@ -215,12 +261,25 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
           
           {/* User Info Compact */}
           <div className="flex items-center gap-4 mb-8">
-            <div
-              className="size-14 rounded-full bg-cover bg-center ring-2 ring-slate-100 shrink-0"
-              style={{
-                backgroundImage: `url(https://ui-avatars.com/api/?name=${encodeURIComponent(user.nombre)}&background=16a459&color=fff&size=128)`,
-              }}
-            />
+            <div className="relative group cursor-pointer" onClick={() => !subiendoFoto && fileInputRef.current?.click()}>
+              <div
+                className={`size-14 rounded-full bg-cover bg-center ring-2 ring-slate-100 shrink-0 transition-opacity ${subiendoFoto ? 'opacity-50' : 'group-hover:opacity-80'}`}
+                style={{
+                  backgroundImage: `url(${user.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.nombre)}&background=16a459&color=fff&size=128`})`,
+                }}
+              />
+              {!subiendoFoto && (
+                <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Camera className="w-5 h-5 text-white" />
+                </div>
+              )}
+              {subiendoFoto && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-[#40a8ab] border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              )}
+              <input type="file" ref={fileInputRef} onChange={handleSubirFoto} accept="image/png, image/jpeg, image/webp" className="hidden" />
+            </div>
             <div className="min-w-0 flex-1">
               <p className="font-bold text-slate-800 text-sm truncate">{user.nombre}</p>
               <div className="flex items-center gap-1 mt-0.5">

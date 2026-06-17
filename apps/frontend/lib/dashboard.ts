@@ -56,6 +56,7 @@ export interface DashboardUsuario {
     id: string;
     nombre: string;
     email: string;
+    avatar_url?: string | null;
   };
   estadisticas: EstadisticasUsuario;
   fundaciones: FundacionUsuario[];

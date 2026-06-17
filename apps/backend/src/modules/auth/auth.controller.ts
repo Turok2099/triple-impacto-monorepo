@@ -8,7 +8,11 @@ import {
   Res,
   UseGuards,
   Request,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -108,6 +112,20 @@ export class AuthController {
   @Patch('profile')
   async updateProfile(@Request() req, @Body() dto: UpdateProfileDto) {
     return this.authService.updateProfile(req.user.userId, dto);
+  }
+
+  /**
+   * POST /api/auth/profile/avatar
+   * Subir o actualizar foto de perfil
+   */
+  @UseGuards(JwtAuthGuard)
+  @Post('profile/avatar')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadAvatar(@Request() req, @UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('Se requiere una imagen');
+    }
+    return this.authService.uploadAvatar(req.user.userId, file);
   }
 
   /**

@@ -407,6 +407,19 @@ export class AuthService {
   }
 
   /**
+   * Subir foto de perfil a Supabase
+   */
+  async uploadAvatar(userId: string, file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('No se proporcionó ningún archivo');
+    }
+    const publicUrl = await this.supabaseService.uploadAvatar(userId, file.buffer, file.mimetype, file.originalname);
+    
+    this.logger.log(`✅ Foto de perfil actualizada para usuario ID: ${userId}`);
+    return { success: true, avatar_url: publicUrl };
+  }
+
+  /**
    * Validar usuario por ID (para guards)
    */
   async validateUser(userId: string): Promise<any> {

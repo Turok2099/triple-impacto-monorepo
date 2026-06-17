@@ -148,6 +148,41 @@ export class SupabaseService implements OnModuleInit {
   }
 
   /**
+   * Sube o actualiza la foto de perfil en Storage y guarda la URL en 'usuarios'
+   */
+  async uploadAvatar(userId: string, fileBuffer: Buffer, mimetype: string, originalname: string): Promise<string> {
+    const ext = originalname.split('.').pop() || 'png';
+    const filePath = `${userId}-${Date.now()}.${ext}`;
+
+    const { data: uploadData, error: uploadError } = await this.getClient().storage
+      .from('avatars')
+      .upload(filePath, fileBuffer, {
+        contentType: mimetype,
+        upsert: true,
+      });
+
+    if (uploadError) {
+      this.logger.error('Error al subir avatar a Storage:', uploadError);
+      throw new BadRequestException('No se pudo subir la foto de perfil');
+    }
+
+    const { data: { publicUrl } } = this.getClient().storage
+      .from('avatars')
+      .getPublicUrl(filePath);
+
+    const { error: updateError } = await this.from('usuarios')
+      .update({ avatar_url: publicUrl })
+      .eq('id', userId);
+
+    if (updateError) {
+      this.logger.error('Error al guardar avatar_url en BD:', updateError);
+      throw new BadRequestException('Error al guardar la foto de perfil');
+    }
+
+    return publicUrl;
+  }
+
+  /**
    * Actualizar el hash de contraseña del usuario
    */
   async updateUserPassword(userId: string, passwordHash: string) {

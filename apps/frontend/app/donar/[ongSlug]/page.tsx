@@ -108,24 +108,24 @@ export default function DonarExclusivePage() {
                 </div>
                 
                 <div className="p-8">
-                  <div className="mb-6">
-                    <div className="flex items-center gap-3 mb-4 flex-wrap">
+                  <div className="mb-6 text-center">
+                    <div className="flex items-center justify-center gap-6 mb-6 flex-wrap">
                       {organizacion.logo_url && (
-                        <img src={organizacion.logo_url} alt={organizacion.nombre} className="h-10 md:h-12 w-auto object-contain" />
+                        <img src={organizacion.logo_url} alt={organizacion.nombre} className="h-14 md:h-24 w-auto object-contain" />
                       )}
-                      <span className="text-2xl font-light text-slate-300">+</span>
+                      <span className="text-3xl md:text-5xl font-light text-slate-300">+</span>
                       <img
                         src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto,f_auto,w_200,c_limit/v1775685229/ISOLOGOTIPO_AYNI_VERDE_FONDO_TRANSPARENTE_lx4yvh.png"
                         alt="AYNI"
-                        className="h-10 md:h-12 w-auto object-contain"
+                        className="h-14 md:h-24 w-auto object-contain"
                       />
                     </div>
                     <h2 className="sr-only">
                       {organizacion.nombre} y AYNI - CLUB TRIPLE IMPACTO
                     </h2>
-                    <p className="text-slate-500 text-sm leading-relaxed">
+                    <p className="text-slate-500 text-sm md:text-base leading-relaxed text-center max-w-xl mx-auto">
                       {organizacion.nombre === "PLATO LLENO" ? (
-                        "¡Sumate a Club Plato Lleno y sé parte del Triple Impacto! Con tu aporte mensual, nos ayudás a seguir rescatando comida que de otro modo se perdería, y distribuirla entre quienes más lo necesitan. Como agradecimiento por tu compromiso, accedés a la Red de Beneficios del Club Triple Impacto, donde vas a encontrar descuentos exclusivos en tus marcas favoritas."
+                        "AYNI y Plato Lleno colaboran para llevar a sus donantes una plataforma de triple impacto única. Con tu aporte mensual, ayudás directamente a sostener el programa de rescate de alimentos de Plato Lleno y, al mismo tiempo, accedés de forma exclusiva a la Red de Beneficios de Club Triple Impacto como agradecimiento por tu compromiso."
                       ) : (
                         organizacion.descripcion || `¡Sumate y sé parte del Triple Impacto! Con tu aporte mensual, nos ayudás a sostener proyectos de impacto y como agradecimiento accedés a nuestra red de beneficios y descuentos exclusivos.`
                       )}
@@ -137,7 +137,7 @@ export default function DonarExclusivePage() {
                     <img
                       src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1781655035/bonda_ujsbcf.png"
                       alt="Bonda"
-                      className="h-8 md:h-9 w-auto object-contain shrink-0"
+                      className="h-10 md:h-18 w-auto object-contain shrink-0"
                     />
                     <div className="space-y-0.5">
                       <h4 className="text-sm md:text-base font-bold text-slate-800">Portal de Beneficios Bonda</h4>

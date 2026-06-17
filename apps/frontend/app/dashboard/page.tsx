@@ -341,97 +341,114 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="bg-[#F8FAFC] min-h-screen pb-8">
-      {/* Header */}
-      <header className="bg-white px-6 py-6 border-b border-slate-100">
-        <div className="max-w-7xl mx-auto">
-          {/* Top row: Avatar + Nombre centrados */}
-          <div className="flex flex-col items-center gap-3 mb-6">
-            <div
-              className="size-16 rounded-full bg-cover bg-center ring-2 ring-slate-50 shadow-md"
-              style={{
-                backgroundImage: `url(https://ui-avatars.com/api/?name=${encodeURIComponent(dashboard.usuario.nombre)}&background=16a459&color=fff&size=192)`,
-              }}
-            ></div>
-            <div className="flex flex-col md:flex-row items-center gap-3">
-              <span className="font-bold text-xl text-[#1A202C] whitespace-nowrap">
-                ¡Hola, {dashboard.usuario.nombre.split(" ")[0]}!
+    <div className="bg-[#F8FAFC] min-h-screen flex flex-col md:flex-row">
+      {/* Sidebar (Desktop) / Header (Mobile) */}
+      <aside className="bg-white w-full md:w-64 lg:w-72 md:min-h-screen border-b md:border-b-0 md:border-r border-slate-200 flex flex-col md:sticky md:top-0 h-auto md:h-screen md:overflow-y-auto shrink-0 z-20">
+        {/* Top row: Avatar + Nombre centrados */}
+        <div className="p-6 md:p-8 flex flex-col items-center gap-4 border-b border-slate-100 shrink-0">
+          <div
+            className="size-16 md:size-24 rounded-full bg-cover bg-center ring-4 ring-slate-50 shadow-md"
+            style={{
+              backgroundImage: `url(https://ui-avatars.com/api/?name=${encodeURIComponent(dashboard.usuario.nombre)}&background=16a459&color=fff&size=192)`,
+            }}
+          ></div>
+          <div className="flex flex-col items-center gap-2 text-center">
+            <span className="font-bold text-xl text-[#1A202C]">
+              ¡Hola, {dashboard.usuario.nombre.split(" ")[0]}!
+            </span>
+            {user?.role === 'admin' ? (
+              <span className="bg-purple-100 text-purple-700 text-[10px] md:text-xs px-3 py-1.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
+                <Shield className="w-3.5 h-3.5" />
+                Administrador
               </span>
-              {user?.role === 'admin' ? (
-                <span className="bg-purple-100 text-purple-700 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
-                  <Shield className="w-3 h-3" />
-                  Administrador
-                </span>
-              ) : dashboard.fundaciones.some(f => f.isActive) ? (
-                <span className="bg-emerald-100/60 text-emerald-700 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
-                  Colaborador
-                </span>
-              ) : (
-                <span className="bg-slate-100 text-slate-500 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
-                  Colaborador
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Navigation Links */}
-          <div className="flex items-center justify-center gap-8">
-            <button
-              onClick={() => setActiveTab("inicio")}
-              className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "inicio" ? "text-[#40a8ab]" : "text-slate-400 hover:text-[#40a8ab]"}`}
-            >
-              <LayoutGrid className="w-6 h-6" strokeWidth={2} />
-              <span className={`text-xs ${activeTab === "inicio" ? "font-semibold" : "font-medium"}`}>Cuponera</span>
-            </button>
-            <button
-              onClick={() => setActiveTab("perfil")}
-              className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "perfil" ? "text-[#40a8ab]" : "text-slate-400 hover:text-[#40a8ab]"}`}
-            >
-              <UserCircle className="w-6 h-6" strokeWidth={2} />
-              <span className={`text-xs ${activeTab === "perfil" ? "font-semibold" : "font-medium"}`}>Perfil</span>
-            </button>
-            <button
-              onClick={() => setActiveTab("cupones")}
-              className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "cupones" ? "text-[#40a8ab]" : "text-slate-400 hover:text-[#40a8ab]"}`}
-            >
-              <Gift className="w-6 h-6" strokeWidth={2} />
-              <span className={`text-xs ${activeTab === "cupones" ? "font-semibold" : "font-medium"}`}>Mis Cupones</span>
-            </button>
-            <button
-              onClick={() => setActiveTab("pagos")}
-              className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "pagos" ? "text-[#40a8ab]" : "text-slate-400 hover:text-[#40a8ab]"}`}
-            >
-              <Receipt className="w-6 h-6" strokeWidth={2} />
-              <span className={`text-xs ${activeTab === "pagos" ? "font-semibold" : "font-medium"}`}>Mis pagos</span>
-            </button>
-            {user?.role === 'admin' && (
-              <button
-                onClick={() => setActiveTab("admin")}
-                className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "admin" ? "text-[#40a8ab]" : "text-slate-400 hover:text-[#40a8ab]"}`}
-              >
-                <Shield className="w-6 h-6" strokeWidth={2} />
-                <span className={`text-xs ${activeTab === "admin" ? "font-semibold" : "font-medium"}`}>Admin</span>
-              </button>
+            ) : dashboard.fundaciones.some(f => f.isActive) ? (
+              <span className="bg-emerald-100/60 text-emerald-700 text-[10px] md:text-xs px-3 py-1.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
+                Colaborador
+              </span>
+            ) : (
+              <span className="bg-slate-100 text-slate-500 text-[10px] md:text-xs px-3 py-1.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
+                Colaborador
+              </span>
             )}
-            <button
-              onClick={() => setActiveTab("donar")}
-              className={`flex flex-col items-center gap-1 transition-colors ${activeTab === "donar" ? "text-[#40a8ab]" : "text-slate-400 hover:text-[#40a8ab]"}`}
-            >
-              <Heart className="w-6 h-6" strokeWidth={2} />
-              <span className={`text-xs ${activeTab === "donar" ? "font-semibold" : "font-medium"}`}>Donar +</span>
-            </button>
-            <button
-              onClick={logout}
-              className="flex flex-col items-center gap-1 text-slate-400 hover:text-red-500 transition-colors"
-              title="Cerrar sesión"
-            >
-              <LogOut className="w-6 h-6" strokeWidth={2} />
-              <span className="text-xs font-medium">Salir</span>
-            </button>
           </div>
         </div>
-      </header>
 
+        {/* Navigation Links */}
+        <nav className="flex md:flex-col items-center md:items-stretch overflow-x-auto md:overflow-visible gap-1 md:gap-2 p-2 md:p-4 hide-scrollbar">
+          <button
+            onClick={() => setActiveTab("inicio")}
+            className={`flex flex-col md:flex-row items-center md:justify-start gap-1 md:gap-3 px-4 py-2 md:py-3.5 rounded-xl transition-all shrink-0 ${activeTab === "inicio" ? "bg-teal-50 text-[#40a8ab]" : "text-slate-500 hover:bg-slate-50 hover:text-[#40a8ab]"}`}
+          >
+            <LayoutGrid className="w-5 h-5 md:w-6 md:h-6" strokeWidth={activeTab === "inicio" ? 2.5 : 2} />
+            <span className={`text-[11px] md:text-sm ${activeTab === "inicio" ? "font-bold" : "font-medium"}`}>Cuponera</span>
+          </button>
+          
+          <button
+            onClick={() => setActiveTab("perfil")}
+            className={`flex flex-col md:flex-row items-center md:justify-start gap-1 md:gap-3 px-4 py-2 md:py-3.5 rounded-xl transition-all shrink-0 ${activeTab === "perfil" ? "bg-teal-50 text-[#40a8ab]" : "text-slate-500 hover:bg-slate-50 hover:text-[#40a8ab]"}`}
+          >
+            <UserCircle className="w-5 h-5 md:w-6 md:h-6" strokeWidth={activeTab === "perfil" ? 2.5 : 2} />
+            <span className={`text-[11px] md:text-sm ${activeTab === "perfil" ? "font-bold" : "font-medium"}`}>Perfil</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("cupones")}
+            className={`flex flex-col md:flex-row items-center md:justify-start gap-1 md:gap-3 px-4 py-2 md:py-3.5 rounded-xl transition-all shrink-0 ${activeTab === "cupones" ? "bg-teal-50 text-[#40a8ab]" : "text-slate-500 hover:bg-slate-50 hover:text-[#40a8ab]"}`}
+          >
+            <Gift className="w-5 h-5 md:w-6 md:h-6" strokeWidth={activeTab === "cupones" ? 2.5 : 2} />
+            <span className={`text-[11px] md:text-sm ${activeTab === "cupones" ? "font-bold" : "font-medium"}`}>Mis Cupones</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("pagos")}
+            className={`flex flex-col md:flex-row items-center md:justify-start gap-1 md:gap-3 px-4 py-2 md:py-3.5 rounded-xl transition-all shrink-0 ${activeTab === "pagos" ? "bg-teal-50 text-[#40a8ab]" : "text-slate-500 hover:bg-slate-50 hover:text-[#40a8ab]"}`}
+          >
+            <Receipt className="w-5 h-5 md:w-6 md:h-6" strokeWidth={activeTab === "pagos" ? 2.5 : 2} />
+            <span className={`text-[11px] md:text-sm ${activeTab === "pagos" ? "font-bold" : "font-medium"}`}>Mis pagos</span>
+          </button>
+
+          {user?.role === 'admin' && (
+            <button
+              onClick={() => setActiveTab("admin")}
+              className={`flex flex-col md:flex-row items-center md:justify-start gap-1 md:gap-3 px-4 py-2 md:py-3.5 rounded-xl transition-all shrink-0 ${activeTab === "admin" ? "bg-teal-50 text-[#40a8ab]" : "text-slate-500 hover:bg-slate-50 hover:text-[#40a8ab]"}`}
+            >
+              <Shield className="w-5 h-5 md:w-6 md:h-6" strokeWidth={activeTab === "admin" ? 2.5 : 2} />
+              <span className={`text-[11px] md:text-sm ${activeTab === "admin" ? "font-bold" : "font-medium"}`}>Admin</span>
+            </button>
+          )}
+
+          <button
+            onClick={() => setActiveTab("donar")}
+            className={`flex flex-col md:flex-row items-center md:justify-start gap-1 md:gap-3 px-4 py-2 md:py-3.5 rounded-xl transition-all shrink-0 ${activeTab === "donar" ? "bg-teal-50 text-[#40a8ab]" : "text-slate-500 hover:bg-slate-50 hover:text-[#40a8ab]"}`}
+          >
+            <Heart className="w-5 h-5 md:w-6 md:h-6" strokeWidth={activeTab === "donar" ? 2.5 : 2} />
+            <span className={`text-[11px] md:text-sm ${activeTab === "donar" ? "font-bold" : "font-medium"}`}>Donar +</span>
+          </button>
+
+          <div className="md:mt-auto hidden md:block border-t border-slate-100 pt-4 mt-4">
+            <button
+              onClick={logout}
+              className="w-full flex items-center justify-start gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+              title="Cerrar sesión"
+            >
+              <LogOut className="w-5 h-5" strokeWidth={2} />
+              <span className="text-sm font-medium">Salir</span>
+            </button>
+          </div>
+          
+          <button
+            onClick={logout}
+            className="md:hidden flex flex-col items-center gap-1 px-4 py-2 rounded-xl text-slate-400 hover:text-red-500 transition-colors shrink-0"
+            title="Cerrar sesión"
+          >
+            <LogOut className="w-5 h-5" strokeWidth={2} />
+            <span className="text-[11px] font-medium">Salir</span>
+          </button>
+        </nav>
+      </aside>
+
+      {/* Main content */}
+      <div className="flex-1 w-full min-w-0 flex flex-col">
       {/* Secciones Perfil, Mis Cupones y Mis pagos */}
       {activeTab === "perfil" && (
         <SeccionPerfil 
@@ -844,6 +861,7 @@ export default function DashboardPage() {
           />
         );
       })()}
+      </div>
     </div>
   );
 }

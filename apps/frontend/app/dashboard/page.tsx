@@ -16,7 +16,6 @@ import { getOrganizationLogoUrl } from "@/lib/organization-logos";
 import CuponDetalleModal from "@/components/dashboard/CuponDetalleModal";
 import SeccionPerfil from "@/components/dashboard/SeccionPerfil";
 import SeccionMisCupones from "@/components/dashboard/SeccionMisCupones";
-import SeccionMisPagos from "@/components/dashboard/SeccionMisPagos";
 import SeccionAdmin from "@/components/dashboard/SeccionAdmin";
 import SeccionDonacion from "@/components/dashboard/SeccionDonacion";
 import {
@@ -46,7 +45,7 @@ import {
   History,
 } from "lucide-react";
 
-type ActiveTab = "inicio" | "perfil" | "pagos" | "admin" | "donar";
+type ActiveTab = "inicio" | "perfil" | "admin" | "donar";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -396,15 +395,6 @@ export default function DashboardPage() {
           </button>
 
 
-
-          <button
-            onClick={() => setActiveTab("pagos")}
-            className={`flex flex-col md:flex-row items-center md:justify-start gap-1 md:gap-3 px-4 py-2 md:py-3.5 rounded-xl transition-all shrink-0 ${activeTab === "pagos" ? "bg-teal-50 text-[#40a8ab]" : "text-slate-500 hover:bg-slate-50 hover:text-[#40a8ab]"}`}
-          >
-            <Receipt className="w-5 h-5 md:w-6 md:h-6" strokeWidth={activeTab === "pagos" ? 2.5 : 2} />
-            <span className={`text-[11px] md:text-sm ${activeTab === "pagos" ? "font-bold" : "font-medium"}`}>Mis pagos</span>
-          </button>
-
           {user?.role === 'admin' && (
             <button
               onClick={() => setActiveTab("admin")}
@@ -456,7 +446,6 @@ export default function DashboardPage() {
         />
       )}
 
-      {activeTab === "pagos" && <SeccionMisPagos />}
       {activeTab === "admin" && <SeccionAdmin />}
       {activeTab === "donar" && <SeccionDonacion />}
 

@@ -32,7 +32,7 @@ BEGIN
     DELETE FROM public.logs_sync_bonda WHERE usuario_id = target_user_id;
 
     -- 8. Opcional: Eliminar cupones solicitados guardados en cache
-    DELETE FROM public.cupones_bonda WHERE usuario_id = target_user_id;
+    DELETE FROM public.usuario_cupones_solicitados WHERE usuario_id = target_user_id;
 
     RAISE NOTICE '¡Listo! Se ha limpiado todo el historial del usuario % (ID: %). El usuario sigue existiendo en el sistema para iniciar sesión.', target_email, target_user_id;
   ELSE

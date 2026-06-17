@@ -71,6 +71,10 @@ export class DashboardUsuarioDto {
   fundaciones: FundacionUsuarioDto[]; // Fundaciones a las que ha donado
   cuponesActivos: CuponSolicitadoDto[];
   cuponesRecientes: CuponSolicitadoDto[]; // Últimos 5
+  metodoPago?: {
+    brand: string;
+    last4: string;
+  } | null;
 }
 
 /**

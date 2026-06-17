@@ -1004,6 +1004,50 @@ export class SupabaseService implements OnModuleInit {
   }
 
   /**
+   * Obtener donación por ID
+   */
+  async getDonacionById(id: string) {
+    const { data, error } = await this.from('donaciones')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (error) {
+      this.logger.error('Error al obtener donación por id:', error);
+      return null;
+    }
+    return data;
+  }
+
+  /**
+   * Obtener último método de pago de Fiserv (brand, last4)
+   */
+  async getUltimoMetodoPago(usuarioId: string) {
+    const { data, error } = await this.from('payment_attempts')
+      .select('fiserv_raw_response')
+      .eq('user_id', usuarioId)
+      .eq('status', 'completed')
+      .not('fiserv_raw_response', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error || !data || !data.fiserv_raw_response) return null;
+
+    const raw = data.fiserv_raw_response as any;
+    const ccbin = raw.ccbin || '';
+    const last4 = raw.ccard_last4 || raw.last4 || '';
+    const brand = raw.brand || raw.paymentMethod || 'Tarjeta';
+
+    if (!last4) return null;
+
+    return {
+      brand,
+      last4,
+    };
+  }
+
+  /**
    * Obtener fundaciones/micrositios a los que el usuario ha donado, con total donado por organización
    */
   async getFundacionesUsuario(usuarioId: string) {

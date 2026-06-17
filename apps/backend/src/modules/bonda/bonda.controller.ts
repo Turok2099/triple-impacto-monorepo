@@ -17,6 +17,7 @@ import {
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { SupabaseService } from '../supabase/supabase.service';
+import { MailService } from '../mail/mail.service';
 import { BondaService } from './bonda.service';
 import { CuponesResponseDto } from './dto/cupones-response.dto';
 import { CuponDto } from './dto/cupon.dto';
@@ -65,6 +66,7 @@ export class BondaController {
   constructor(
     private readonly bondaService: BondaService,
     private readonly supabase: SupabaseService,
+    private readonly mailService: MailService,
   ) {}
 
   // ========================================
@@ -478,17 +480,22 @@ export class BondaController {
           { pagina: 1, limite: 5 },
         );
       } catch (error) {
-        console.warn(
-          'Error al obtener historial reciente, usando array vacío:',
-          error,
-        );
+        console.warn('Error al obtener recientes, usando vacío:', error);
+      }
+
+      // Obtener último método de pago de Fiserv
+      let metodoPago: { brand: string; last4: string } | null = null;
+      try {
+        metodoPago = await this.supabase.getUltimoMetodoPago(userId);
+      } catch (error) {
+        console.warn('Error al obtener método de pago:', error);
       }
 
       return {
         usuario: {
           id: usuario.id,
-          nombre: usuario.nombre,
-          email: usuario.email,
+          nombre: usuario.nombre || '',
+          email: usuario.email || '',
         },
         estadisticas: {
           cuponesActivos: stats.cupones_activos || 0,
@@ -511,6 +518,7 @@ export class BondaController {
         cuponesRecientes: historialReciente.cupones.map(
           this.transformarACuponSolicitadoDto,
         ),
+        metodoPago,
       };
     } catch (error) {
       console.error('Error crítico en obtenerDashboard:', error);
@@ -536,6 +544,50 @@ export class BondaController {
 
     const donaciones = await this.supabase.getDonacionesUsuario(userId);
     return donaciones;
+  }
+
+  /**
+   * Reenviar comprobante de donación
+   * POST /api/bonda/mis-donaciones/:id/reenviar
+   */
+  @Post('mis-donaciones/:id/reenviar')
+  @UseGuards(JwtAuthGuard)
+  async reenviarComprobante(
+    @Req() req: Request & { user?: { userId: string } },
+    @Param('id') donacionId: string,
+  ) {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new BadRequestException('Se requiere autenticación');
+    }
+
+    const donacion = await this.supabase.getDonacionById(donacionId);
+    if (!donacion || donacion.usuario_id !== userId) {
+      throw new NotFoundException('Donación no encontrada o no pertenece a tu usuario');
+    }
+
+    const usuario = await this.supabase.findUserById(userId);
+    if (!usuario) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    const res = await this.mailService.sendPaymentReceiptEmail(
+      usuario.email,
+      usuario.nombre || 'Usuario',
+      {
+        status: donacion.estado === 'completada' ? 'approved' : 'declined',
+        amount: donacion.monto?.toString(),
+        currency: donacion.moneda,
+        approvalCode: donacion.payment_status || 'APROBADO',
+        oid: donacion.payment_id || donacion.id,
+      }
+    );
+
+    if (!res) {
+      throw new BadRequestException('No se pudo reenviar el comprobante, intenta de nuevo más tarde');
+    }
+
+    return { success: true, message: 'Comprobante reenviado con éxito' };
   }
 
   /**

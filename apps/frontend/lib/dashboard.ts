@@ -61,6 +61,10 @@ export interface DashboardUsuario {
   fundaciones: FundacionUsuario[];
   cuponesActivos: CuponSolicitado[];
   cuponesRecientes: CuponSolicitado[];
+  metodoPago?: {
+    brand: string;
+    last4: string;
+  } | null;
 }
 
 export interface HistorialCupones {
@@ -94,6 +98,26 @@ export interface SolicitarCuponRequest {
 // ============================================
 // FUNCIONES DEL API
 // ============================================
+
+/**
+ * Reenviar comprobante de donación por email
+ */
+export async function reenviarComprobante(donacionId: string, token: string) {
+  const res = await fetch(`${API_URL}/bonda/mis-donaciones/${donacionId}/reenviar`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.message || 'Error al reenviar comprobante');
+  }
+
+  return res.json();
+}
 
 /**
  * Solicitar un cupón específico de Bonda

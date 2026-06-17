@@ -396,7 +396,7 @@ export default function DashboardPage() {
             className={`flex flex-col md:flex-row items-center md:justify-start gap-1 md:gap-3 px-4 py-2 md:py-3.5 rounded-xl transition-all shrink-0 ${activeTab === "cupones" ? "bg-teal-50 text-[#40a8ab]" : "text-slate-500 hover:bg-slate-50 hover:text-[#40a8ab]"}`}
           >
             <Gift className="w-5 h-5 md:w-6 md:h-6" strokeWidth={activeTab === "cupones" ? 2.5 : 2} />
-            <span className={`text-[11px] md:text-sm ${activeTab === "cupones" ? "font-bold" : "font-medium"}`}>Mis Cupones</span>
+            <span className={`text-[11px] md:text-sm ${activeTab === "cupones" ? "font-bold" : "font-medium"}`}>Cupones Solicitados</span>
           </button>
 
           <button

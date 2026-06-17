@@ -247,8 +247,8 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
     <div className="max-w-2xl w-full mx-auto bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm">
       <div className="bg-[#40a8ab] p-8 text-center flex flex-col items-center">
         <Lock className="w-8 h-8 text-white/90 mb-3" />
-        <h2 className="text-2xl font-bold text-white mb-2">Pago Seguro</h2>
-        <p className="text-teal-50 text-sm">
+        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Pago Seguro</h2>
+        <p className="text-teal-50 text-sm md:text-base">
           Completa los datos de tu donación y tu tarjeta.
         </p>
       </div>
@@ -257,25 +257,25 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
         {(status === 'error' || errorMessage) && (
           <div className="mb-6 bg-red-50 text-red-700 p-4 rounded-xl border border-red-100 flex items-start gap-3">
             <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-            <p className="font-medium text-sm">{errorMessage}</p>
+            <p className="font-semibold text-sm md:text-base">{errorMessage}</p>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* SECCIÓN 1: ONG */}
           <div className="space-y-3">
-            <label className="block text-sm font-semibold text-slate-700 ml-1">
+            <label className="block text-sm md:text-base font-bold text-slate-700 ml-1">
               1. ¿A qué organización querés donar? *
             </label>
             {loadingOrgs ? (
               <div className="flex justify-center p-4"><Loader2 className="w-6 h-6 animate-spin text-[#40a8ab]" /></div>
             ) : errorOrgs ? (
-              <div className="text-red-500 text-sm">{errorOrgs}</div>
+              <div className="text-red-500 text-sm md:text-base">{errorOrgs}</div>
             ) : (
               <select
                 value={organizacionId}
                 onChange={(e) => setOrganizacionId(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 text-slate-800 bg-slate-50 font-medium"
+                className="w-full px-4 py-3 text-sm md:text-base border-2 border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 text-slate-800 bg-slate-50 font-semibold cursor-pointer"
                 required
               >
                 <option value="" disabled>Seleccioná una organización</option>
@@ -288,7 +288,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
 
           {/* SECCIÓN 2: MONTO */}
           <div className="space-y-3">
-            <label className="block text-sm font-semibold text-slate-700 ml-1">
+            <label className="block text-sm md:text-base font-bold text-slate-700 ml-1">
               2. ¿Cuánto querés donar? *
             </label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -297,7 +297,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
                   key={monto}
                   type="button"
                   onClick={() => handleMontoSugeridoClick(monto)}
-                  className={`py-3 px-4 rounded-2xl font-semibold text-center transition-all ${montoSeleccionado === monto && !usarMontoCustom
+                  className={`py-3 px-4 rounded-2xl text-sm md:text-base font-bold text-center transition-all cursor-pointer ${montoSeleccionado === monto && !usarMontoCustom
                     ? "bg-slate-900 text-white shadow-md"
                     : "bg-slate-50 text-slate-700 border-2 border-slate-200 hover:border-slate-300"
                     }`}
@@ -312,7 +312,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
                   setUsarMontoCustom(true);
                   setMontoSeleccionado(null);
                 }}
-                className={`py-3 px-4 rounded-2xl font-bold text-center transition-all ${usarMontoCustom
+                className={`py-3 px-4 rounded-2xl text-sm md:text-base font-bold text-center transition-all cursor-pointer ${usarMontoCustom
                   ? "bg-slate-900 text-white shadow-md"
                   : "bg-slate-50 text-slate-700 border-2 border-slate-200 hover:border-slate-300"
                   }`}
@@ -333,7 +333,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
                     value={montoCustom}
                     onChange={(e) => handleMontoCustomChange(e.target.value)}
                     placeholder={montoMinimoActual.toString()}
-                    className="w-full pl-10 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none font-bold text-slate-800"
+                    className="w-full pl-10 pr-4 py-3.5 text-sm md:text-base bg-slate-50 border-2 border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none font-bold text-slate-800"
                   />
                 </div>
               </div>
@@ -344,7 +344,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
 
           {/* SECCIÓN 3: TARJETA */}
           <div className="space-y-6">
-            <label className="block text-sm font-semibold text-slate-700 ml-1">
+            <label className="block text-sm md:text-base font-bold text-slate-700 ml-1">
               3. Datos de tu tarjeta
             </label>
             <div className="space-y-4">
@@ -358,7 +358,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
                   onChange={handleChange}
                   placeholder="Número de Tarjeta"
                   maxLength={19}
-                  className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
+                  className="w-full pl-12 pr-4 py-3.5 text-sm md:text-base bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
                   required
                 />
               </div>
@@ -371,7 +371,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
                   value={formData.cardholderName}
                   onChange={handleChange}
                   placeholder="Titular de la Tarjeta"
-                  className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
+                  className="w-full pl-12 pr-4 py-3.5 text-sm md:text-base bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
                   required
                 />
               </div>
@@ -385,7 +385,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
                   onChange={handleChange}
                   onBlur={() => setFormData(prev => ({ ...prev, expiryMonth: prev.expiryMonth ? prev.expiryMonth.padStart(2, '0') : '' }))}
                   placeholder="Mes (MM)"
-                  className="w-full px-4 py-3.5 bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
+                  className="w-full px-4 py-3.5 text-sm md:text-base bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
                   required
                 />
                 <input
@@ -396,7 +396,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
                   onChange={handleChange}
                   onBlur={() => setFormData(prev => ({ ...prev, expiryYear: prev.expiryYear.length === 4 ? prev.expiryYear.slice(-2) : prev.expiryYear.padStart(2, '0') }))}
                   placeholder="Año (YY)"
-                  className="w-full px-4 py-3.5 bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
+                  className="w-full px-4 py-3.5 text-sm md:text-base bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
                   required
                 />
                 <input
@@ -406,7 +406,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
                   value={formData.securityCode}
                   onChange={handleChange}
                   placeholder="CVV"
-                  className="w-full px-4 py-3.5 bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
+                  className="w-full px-4 py-3.5 text-sm md:text-base bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none font-medium text-slate-800"
                   required
                 />
               </div>
@@ -416,7 +416,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
           <button
             type="submit"
             disabled={loading || loadingOrgs || !organizacionId}
-            className="w-full bg-[#40a8ab] hover:bg-teal-600 disabled:opacity-50 text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-teal-600/20"
+            className="w-full bg-[#40a8ab] hover:bg-teal-600 disabled:opacity-50 text-white text-sm md:text-base font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-teal-600/20 cursor-pointer"
           >
             {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Lock className="w-5 h-5" />}
             <span>{loading ? 'Procesando...' : `Donar ${formatearMonto(montoActualVisual)} de forma segura`}</span>
@@ -428,7 +428,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
             <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1781652329/VISA-logo-500x281_k7clll.png" alt="Visa" className="h-6 object-contain" />
             <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1781652329/Mastercard-logo_pwgxxu.png" alt="Mastercard" className="h-8 object-contain" />
           </div>
-          <div className="flex items-center justify-center gap-2 text-xs text-slate-500 font-medium bg-slate-50 px-4 py-2 rounded-full border border-slate-100">
+          <div className="flex items-center justify-center gap-2 text-xs md:text-sm text-slate-500 font-medium bg-slate-50 px-4 py-2 rounded-full border border-slate-100">
             <Lock className="w-3.5 h-3.5" />
             <span>Pagos procesados de forma segura por</span>
             <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1781652396/Fiserv_logo.svg_veglfg.png" alt="Fiserv" className="h-3.5 object-contain ml-0.5" />

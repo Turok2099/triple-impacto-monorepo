@@ -159,15 +159,15 @@ export default function RegisterPage() {
         <div className="max-w-md w-full bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-md animate-in fade-in zoom-in duration-350">
           <div className="bg-[#40a8ab] p-8 text-center flex flex-col items-center">
             <Mail className="w-8 h-8 text-white/90 mb-3" strokeWidth={1.5} />
-            <h2 className="text-2xl font-bold text-white mb-2">¡Confirmá tu correo!</h2>
-            <p className="text-teal-50 text-sm">Te enviamos un enlace de activación</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">¡Confirmá tu correo!</h2>
+            <p className="text-teal-50 text-sm md:text-base">Te enviamos un enlace de activación</p>
           </div>
           <div className="p-8 text-center">
-            <p className="text-slate-600 mb-6 leading-relaxed text-sm">
+            <p className="text-slate-600 mb-6 leading-relaxed text-sm md:text-base">
               Te hemos enviado un correo a <span className="font-semibold text-slate-800 break-all">{formData.email}</span>.
               Por favor, revisá tu bandeja de entrada o la carpeta de correo no deseado (SPAM) y hacé clic en el enlace para activar tu cuenta.
             </p>
-            <div className="text-xs text-slate-400 border-t border-slate-100 pt-6">
+            <div className="text-xs md:text-sm text-slate-400 border-t border-slate-100 pt-6">
               Una vez que confirmes tu correo electrónico, podrás iniciar sesión normalmente.
             </div>
           </div>
@@ -182,23 +182,27 @@ export default function RegisterPage() {
         
         {/* Header Similar a PaymentForm */}
         <div className="bg-[#40a8ab] p-8 text-center flex flex-col items-center">
-          <UserPlus className="w-8 h-8 text-white/90 mb-3" />
-          <h2 className="text-2xl font-bold text-white mb-2">Creá tu cuenta</h2>
-          <p className="text-teal-50 text-sm">Unite a AYNI y comenzá a generar impacto</p>
+          <img
+            src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto,f_auto,w_200,c_limit/v1775685229/ISOLOGOTIPO_AYNI_FONDO_TRANSPARENTE_iwyuaw.png"
+            alt="AYNI"
+            className="h-12 w-auto object-contain mb-3"
+          />
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Creá tu cuenta</h2>
+          <p className="text-teal-50 text-sm md:text-base">Unite a AYNI y comenzá a generar impacto</p>
         </div>
 
         <div className="p-8">
           {/* Mensaje de error */}
           {error && (
             <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
-              <p className="text-sm text-red-800">{error}</p>
+              <p className="text-sm md:text-base text-red-800">{error}</p>
             </div>
           )}
 
           {/* Mensaje de éxito */}
           {success && (
             <div className="mb-6 bg-teal-50 border border-teal-200 rounded-xl p-4">
-              <p className="text-sm text-teal-800 font-medium">
+              <p className="text-sm md:text-base text-teal-800 font-semibold">
                 ¡Cuenta creada exitosamente! Revisa tu bandeja de entrada o SPAM para confirmar tu correo. Redirigiendo al login...
               </p>
             </div>
@@ -209,7 +213,7 @@ export default function RegisterPage() {
             <div>
               <label
                 htmlFor="nombre"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm md:text-base font-semibold text-gray-700 mb-2"
               >
                 Nombre completo *
               </label>
@@ -220,7 +224,7 @@ export default function RegisterPage() {
                 required
                 value={formData.nombre}
                 onChange={handleChange}
-                className="block w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                className="block w-full px-4 py-3 text-sm md:text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                 placeholder="Juan Pérez"
                 disabled={loading}
               />
@@ -230,7 +234,7 @@ export default function RegisterPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm md:text-base font-semibold text-gray-700 mb-2"
               >
                 Correo electrónico *
               </label>
@@ -242,7 +246,7 @@ export default function RegisterPage() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="block w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                className="block w-full px-4 py-3 text-sm md:text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                 placeholder="tu@email.com"
                 disabled={loading}
               />
@@ -252,7 +256,7 @@ export default function RegisterPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Teléfono Combinado */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm md:text-base font-semibold text-gray-700 mb-2">
                   Teléfono *
                 </label>
                 <div className="flex rounded-xl shadow-sm">
@@ -260,7 +264,7 @@ export default function RegisterPage() {
                     name="telefonoCodigo"
                     value={formData.telefonoCodigo}
                     onChange={handleChange}
-                    className="flex-none w-28 px-2 py-3 border border-r-0 border-gray-300 rounded-l-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all bg-gray-50 text-sm"
+                    className="flex-none w-28 px-2 py-3 border border-r-0 border-gray-300 rounded-l-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all bg-gray-50 text-sm md:text-base"
                     disabled={loading}
                   >
                     {COUNTRY_CODES.map((country) => (
@@ -277,7 +281,7 @@ export default function RegisterPage() {
                     value={formData.telefonoNumero}
                     onChange={handleChange}
                     maxLength={COUNTRY_CODES.find(c => c.code === formData.telefonoCodigo)?.maxLength || 15}
-                    className="flex-1 block w-full px-4 py-3 border border-gray-300 rounded-r-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                    className="flex-1 block w-full px-4 py-3 text-sm md:text-base border border-gray-300 rounded-r-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                     placeholder="11 1234 5678"
                     disabled={loading}
                   />
@@ -288,7 +292,7 @@ export default function RegisterPage() {
               <div>
                 <label
                   htmlFor="dni"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm md:text-base font-semibold text-gray-700 mb-2"
                 >
                   DNI *
                 </label>
@@ -299,14 +303,14 @@ export default function RegisterPage() {
                   required
                   value={formData.dni}
                   onChange={handleChange}
-                  className="block w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  className="block w-full px-4 py-3 text-sm md:text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                   placeholder="12345678"
                   maxLength={8}
                   disabled={loading}
                 />
               </div>
             </div>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs md:text-sm text-gray-500">
               Tu DNI es necesario para crear tu cuenta en Bonda y acceder a descuentos
             </p>
 
@@ -316,7 +320,7 @@ export default function RegisterPage() {
               <div>
                 <label
                   htmlFor="provincia"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm md:text-base font-semibold text-gray-700 mb-2"
                 >
                   Provincia *
                 </label>
@@ -326,7 +330,7 @@ export default function RegisterPage() {
                   required
                   value={formData.provincia}
                   onChange={handleChange}
-                  className="block w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all appearance-none bg-white cursor-pointer"
+                  className="block w-full px-4 py-3 text-sm md:text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all appearance-none bg-white cursor-pointer"
                   disabled={loading}
                 >
                   <option value="">Seleccioná una provincia</option>
@@ -342,7 +346,7 @@ export default function RegisterPage() {
               <div>
                 <label
                   htmlFor="localidad"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm md:text-base font-semibold text-gray-700 mb-2"
                 >
                   Localidad *
                 </label>
@@ -353,7 +357,7 @@ export default function RegisterPage() {
                   required
                   value={formData.localidad}
                   onChange={handleChange}
-                  className="block w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  className="block w-full px-4 py-3 text-sm md:text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                   placeholder="Tu ciudad"
                   disabled={loading}
                 />
@@ -364,7 +368,7 @@ export default function RegisterPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm md:text-base font-semibold text-gray-700 mb-2"
               >
                 Contraseña *
               </label>
@@ -377,20 +381,20 @@ export default function RegisterPage() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="block w-full px-4 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  className="block w-full px-4 pr-12 py-3 text-sm md:text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                   placeholder="••••••••"
                   disabled={loading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm text-gray-500 hover:text-gray-700"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm md:text-base text-gray-500 hover:text-gray-700"
                   disabled={loading}
                 >
                   {showPassword ? "Ocultar" : "Mostrar"}
                 </button>
               </div>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs md:text-sm text-gray-500">
                 Mínimo 8 caracteres, incluí letras y números
               </p>
             </div>
@@ -399,7 +403,7 @@ export default function RegisterPage() {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm md:text-base font-semibold text-gray-700 mb-2"
               >
                 Confirmar contraseña *
               </label>
@@ -412,14 +416,14 @@ export default function RegisterPage() {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="block w-full px-4 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  className="block w-full px-4 pr-12 py-3 text-sm md:text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                   placeholder="••••••••"
                   disabled={loading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm text-gray-500 hover:text-gray-700"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm md:text-base text-gray-500 hover:text-gray-700"
                   disabled={loading}
                 >
                   {showConfirmPassword ? "Ocultar" : "Mostrar"}
@@ -443,12 +447,12 @@ export default function RegisterPage() {
               <div className="ml-3">
                 <label
                   htmlFor="aceptaTerminos"
-                  className="text-sm text-gray-700 cursor-pointer"
+                  className="text-sm md:text-base text-gray-700 cursor-pointer"
                 >
                   Acepto los{" "}
                   <a
                     href="/terminos"
-                    className="text-[#40a8ab] hover:text-[#40a8ab] font-medium"
+                    className="text-[#40a8ab] hover:text-[#40a8ab] font-bold"
                     target="_blank"
                   >
                     Términos y Condiciones
@@ -456,7 +460,7 @@ export default function RegisterPage() {
                   y la{" "}
                   <a
                     href="/privacidad"
-                    className="text-[#40a8ab] hover:text-[#40a8ab] font-medium"
+                    className="text-[#40a8ab] hover:text-[#40a8ab] font-bold"
                     target="_blank"
                   >
                     Política de Privacidad
@@ -481,7 +485,7 @@ export default function RegisterPage() {
               <div className="ml-3">
                 <label
                   htmlFor="aceptaNewsletter"
-                  className="text-sm text-gray-700 cursor-pointer"
+                  className="text-sm md:text-base text-gray-700 cursor-pointer"
                 >
                   Quiero recibir novedades, promociones y reportes de impacto mensual en mi correo.
                 </label>
@@ -492,7 +496,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-lg text-sm md:text-base font-bold text-white bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none cursor-pointer"
             >
               {loading ? "Creando cuenta..." : "Crear cuenta"}
             </button>
@@ -504,7 +508,7 @@ export default function RegisterPage() {
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300"></div>
               </div>
-              <div className="relative flex justify-center text-sm">
+              <div className="relative flex justify-center text-sm md:text-base">
                 <span className="px-2 bg-white text-gray-500">
                   O regístrate con
                 </span>
@@ -515,14 +519,14 @@ export default function RegisterPage() {
             <div className="mt-6 grid grid-cols-2 gap-3">
               <button
                 type="button"
-                className="w-full inline-flex justify-center items-center gap-2 py-2.5 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                className="w-full inline-flex justify-center items-center gap-2 py-2.5 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm md:text-base font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 <span className="text-xl">G</span>
                 Google
               </button>
               <button
                 type="button"
-                className="w-full inline-flex justify-center items-center gap-2 py-2.5 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                className="w-full inline-flex justify-center items-center gap-2 py-2.5 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm md:text-base font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 <span className="text-xl">f</span>
                 Facebook
@@ -533,7 +537,7 @@ export default function RegisterPage() {
 
         {/* Login link */}
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm md:text-base text-gray-600">
             ¿Ya tenés cuenta?{" "}
             <a
               href="#"
@@ -543,7 +547,7 @@ export default function RegisterPage() {
                 const redirectUrl = params.get("redirect");
                 window.location.href = redirectUrl ? `/login?redirect=${encodeURIComponent(redirectUrl)}` : "/login";
               }}
-              className="font-semibold text-[#40a8ab] hover:text-[#40a8ab] transition-colors"
+              className="font-bold text-[#40a8ab] hover:text-[#40a8ab] transition-colors"
             >
               Iniciá sesión
             </a>
@@ -552,10 +556,10 @@ export default function RegisterPage() {
 
         {/* Benefits reminder */}
         <div className="mt-6 bg-teal-50 rounded-2xl p-6 border border-teal-100">
-          <h3 className="text-sm font-semibold text-teal-900 mb-3">
+          <h3 className="text-sm md:text-base font-bold text-teal-900 mb-3">
             Al registrarte obtenés:
           </h3>
-          <ul className="space-y-2 text-sm text-teal-800">
+          <ul className="space-y-2 text-sm md:text-base text-teal-800">
             <li className="flex items-start gap-2">
               <span className="text-[#40a8ab] shrink-0">✓</span>
               <span>Acceso a descuentos exclusivos de Bonda</span>

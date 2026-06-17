@@ -134,9 +134,13 @@ export default function LoginPage() {
         
         {/* Header Similar a PaymentForm */}
         <div className="bg-[#40a8ab] p-8 text-center flex flex-col items-center">
-          <User className="w-8 h-8 text-white/90 mb-3" />
-          <h2 className="text-2xl font-bold text-white mb-2">Bienvenido de nuevo</h2>
-          <p className="text-teal-50 text-sm">Ingresá tus credenciales para acceder</p>
+          <img
+            src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto,f_auto,w_200,c_limit/v1775685229/ISOLOGOTIPO_AYNI_FONDO_TRANSPARENTE_iwyuaw.png"
+            alt="AYNI"
+            className="h-12 w-auto object-contain mb-3"
+          />
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Bienvenido de nuevo</h2>
+          <p className="text-teal-50 text-sm md:text-base">Ingresá tus credenciales para acceder</p>
         </div>
 
         <div className="p-8">
@@ -149,10 +153,10 @@ export default function LoginPage() {
                   <AlertCircle className="w-5 h-5 text-red-600" />
                 </div>
                 <div className="pt-0.5 w-full">
-                  <p className="text-sm font-bold text-red-900 mb-1 tracking-tight">
+                  <p className="text-sm md:text-base font-bold text-red-900 mb-1 tracking-tight">
                     Ocurrió un problema
                   </p>
-                  <p className="text-sm text-red-800 leading-relaxed font-medium">
+                  <p className="text-sm md:text-base text-red-800 leading-relaxed font-medium">
                     {error}
                   </p>
                   {(error.includes("confirmar tu correo") || error.includes("Debes confirmar")) && (
@@ -160,7 +164,7 @@ export default function LoginPage() {
                       type="button"
                       onClick={handleResendVerification}
                       disabled={resendLoading}
-                      className="mt-3 text-sm font-semibold text-teal-700 hover:text-teal-800 underline underline-offset-2 transition-colors disabled:opacity-50"
+                      className="mt-3 text-sm md:text-base font-semibold text-teal-700 hover:text-teal-800 underline underline-offset-2 transition-colors disabled:opacity-50"
                     >
                       {resendLoading ? "Enviando enlace..." : "¿No recibiste o perdiste el correo? Reenviar enlace"}
                     </button>
@@ -184,10 +188,10 @@ export default function LoginPage() {
                   )}
                 </div>
                 <div className="pt-0.5">
-                  <p className="text-sm font-bold text-teal-900 mb-1 tracking-tight">
+                  <p className="text-sm md:text-base font-bold text-teal-900 mb-1 tracking-tight">
                     Completado con éxito
                   </p>
-                  <p className="text-sm text-teal-800 leading-relaxed font-medium">
+                  <p className="text-sm md:text-base text-teal-800 leading-relaxed font-medium">
                     {successMsg}
                   </p>
                 </div>
@@ -200,7 +204,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm md:text-base font-semibold text-gray-700 mb-2"
               >
                 Correo electrónico
               </label>
@@ -212,7 +216,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="block w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                className="block w-full px-4 py-3 text-sm md:text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                 placeholder="tu@email.com"
                 disabled={loading}
               />
@@ -222,7 +226,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm md:text-base font-semibold text-gray-700 mb-2"
               >
                 Contraseña
               </label>
@@ -235,14 +239,14 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full px-4 pr-20 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  className="block w-full px-4 pr-20 py-3 text-sm md:text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                   placeholder="••••••••"
                   disabled={loading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm text-gray-500 hover:text-gray-700"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm md:text-base text-gray-500 hover:text-gray-700"
                   disabled={loading}
                 >
                   {showPassword ? "Ocultar" : "Mostrar"}
@@ -263,13 +267,13 @@ export default function LoginPage() {
                 />
                 <label
                   htmlFor="remember-me"
-                  className="ml-2 block text-sm text-gray-700 cursor-pointer"
+                  className="ml-2 block text-sm md:text-base text-gray-700 cursor-pointer"
                 >
                   Recordarme
                 </label>
               </div>
 
-              <div className="text-sm">
+              <div className="text-sm md:text-base">
                 <a
                   href="/forgot-password"
                   className="font-medium text-[#40a8ab] hover:text-[#40a8ab] transition-colors"
@@ -283,7 +287,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-lg text-sm md:text-base font-bold text-white bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none cursor-pointer"
             >
               {loading ? "Iniciando sesión..." : "Iniciar sesión"}
             </button>
@@ -295,7 +299,7 @@ export default function LoginPage() {
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300"></div>
               </div>
-              <div className="relative flex justify-center text-sm">
+              <div className="relative flex justify-center text-sm md:text-base">
                 <span className="px-2 bg-white text-gray-500">
                   O continuar con
                 </span>
@@ -306,14 +310,14 @@ export default function LoginPage() {
             <div className="mt-6 grid grid-cols-2 gap-3">
               <button
                 type="button"
-                className="w-full inline-flex justify-center items-center gap-2 py-2.5 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                className="w-full inline-flex justify-center items-center gap-2 py-2.5 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm md:text-base font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 <span className="text-xl">G</span>
                 Google
               </button>
               <button
                 type="button"
-                className="w-full inline-flex justify-center items-center gap-2 py-2.5 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                className="w-full inline-flex justify-center items-center gap-2 py-2.5 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm md:text-base font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 <span className="text-xl">f</span>
                 Facebook
@@ -323,7 +327,7 @@ export default function LoginPage() {
         </div>
 
         <div className="text-center pb-8 mt-2">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm md:text-base text-gray-600">
             ¿No tenés cuenta?{" "}
             <a
               href="#"
@@ -333,16 +337,12 @@ export default function LoginPage() {
                 const redirectUrl = params.get("redirect");
                 window.location.href = redirectUrl ? `/registro?redirect=${encodeURIComponent(redirectUrl)}` : "/registro";
               }}
-              className="font-semibold text-[#40a8ab] hover:text-[#40a8ab] transition-colors"
+              className="font-bold text-[#40a8ab] hover:text-[#40a8ab] transition-colors"
             >
               Regístrate gratis
             </a>
           </p>
         </div>
-
-
-
-
       </div>
     </div>
   );

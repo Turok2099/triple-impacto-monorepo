@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { CreditCard, Lock, User, CheckCircle2, AlertCircle, Loader2, ArrowRight } from 'lucide-react';
 import { formatearMonto, validarMonto, type Organizacion } from "@/lib/payments";
+import { getOrganizationLogoUrl } from "@/lib/organization-logos";
 
 interface PaymentFormExclusiveProps {
   organizacion: Organizacion;
@@ -23,6 +24,8 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
   const [montoSeleccionado, setMontoSeleccionado] = useState<number | null>(montoMinimoActual);
   const [montoCustom, setMontoCustom] = useState("");
   const [usarMontoCustom, setUsarMontoCustom] = useState(false);
+
+  const logoUrl = organizacion.logo_url || getOrganizationLogoUrl(organizacion.nombre, organizacion.slug) || "";
 
   // Estados del pago
   const [loading, setLoading] = useState(false);
@@ -204,22 +207,50 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
     <div className="max-w-2xl w-full mx-auto bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-md">
       <div className="bg-[#40a8ab] p-6 text-center text-white">
         <h3 className="text-lg md:text-xl font-bold tracking-wide uppercase">
-          CLUB {organizacion.nombre} ¡¡DONAR TIENE PREMIO!!
+          {organizacion.nombre?.toUpperCase().startsWith("CLUB")
+            ? `${organizacion.nombre} ¡¡DONAR TIENE PREMIO!!`
+            : `CLUB ${organizacion.nombre} ¡¡DONAR TIENE PREMIO!!`}
         </h3>
       </div>
 
       <div className="p-8">
-        <div className="mb-6">
-          <h2 className="text-2xl md:text-3xl font-extrabold text-slate-800 mb-2">
-            {organizacion.nombre} - CLUB TRIPLE IMPACTO
+        <div className="mb-6 text-center">
+          <div className="flex items-center justify-center gap-6 mb-6 flex-wrap">
+            {logoUrl && (
+              <img src={logoUrl} alt={organizacion.nombre} className="h-14 md:h-24 w-auto object-contain" />
+            )}
+            <span className="text-3xl md:text-5xl font-light text-slate-300">+</span>
+            <img
+              src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto,f_auto,w_200,c_limit/v1775685229/ISOLOGOTIPO_AYNI_VERDE_FONDO_TRANSPARENTE_lx4yvh.png"
+              alt="AYNI"
+              className="h-14 md:h-24 w-auto object-contain"
+            />
+          </div>
+          <h2 className="sr-only">
+            {organizacion.nombre} y AYNI - CLUB TRIPLE IMPACTO
           </h2>
-          <p className="text-slate-500 text-sm md:text-base leading-relaxed">
-            {organizacion.nombre === "PLATO LLENO" ? (
-              "¡Sumate a Club Plato Lleno y sé parte del Triple Impacto! Con tu aporte mensual, nos ayudás a seguir rescatando comida que de otro modo se perdería, y distribuirla entre quienes más lo necesitan. Como agradecimiento por tu compromiso, accedés a la Red de Beneficios del Club Triple Impacto, donde vas a encontrar descuentos exclusivos en tus marcas favoritas."
+          <p className="text-slate-500 text-sm md:text-base leading-relaxed text-center max-w-xl mx-auto">
+            {organizacion.nombre?.toUpperCase().includes("PLATO LLENO") ? (
+              "AYNI y Plato Lleno colaboran para llevar a sus donantes una plataforma de triple impacto única. Con tu aporte mensual, ayudás directamente a sostener el programa de rescate de alimentos de Plato Lleno y, al mismo tiempo, accedés de forma exclusiva a la Red de Beneficios de Club Triple Impacto como agradecimiento por tu compromiso."
             ) : (
               organizacion.descripcion || `¡Sumate y sé parte del Triple Impacto! Con tu aporte mensual, nos ayudás a sostener proyectos de impacto y como agradecimiento accedés a nuestra red de beneficios y descuentos exclusivos.`
             )}
           </p>
+        </div>
+
+        {/* Bonda Discounts Benefit Badge */}
+        <div className="mb-6 bg-slate-50 border border-slate-100 rounded-2xl p-5 flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+          <img
+            src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1781655035/bonda_ujsbcf.png"
+            alt="Bonda"
+            className="h-10 md:h-18 w-auto object-contain shrink-0"
+          />
+          <div className="space-y-0.5">
+            <h4 className="text-sm md:text-base font-bold text-slate-800">Portal de Beneficios Bonda</h4>
+            <p className="text-xs md:text-sm text-slate-500 font-semibold leading-relaxed">
+              Con tu donación mensual, accedés a más de <span className="font-bold text-[#40a8ab]">1700 cupones de descuento exclusivos</span> en primeras marcas nacionales.
+            </p>
+          </div>
         </div>
 
         {(status === 'error' || errorMessage) && (

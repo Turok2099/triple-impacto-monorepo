@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import PaymentFormExclusive from "@/components/donar/PaymentFormExclusive";
 import { Loader2, AlertTriangle, ArrowLeft, LogIn, User } from "lucide-react";
 import { type Organizacion } from "@/lib/payments";
+import { getOrganizationLogoUrl } from "@/lib/organization-logos";
 
 export default function DonarExclusivePage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -17,6 +18,10 @@ export default function DonarExclusivePage() {
   const [loadingOrg, setLoadingOrg] = useState(true);
   const [organizacion, setOrganizacion] = useState<Organizacion | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const logoUrl = organizacion
+    ? organizacion.logo_url || getOrganizationLogoUrl(organizacion.nombre, organizacion.slug || ongSlug)
+    : null;
 
   // 1. Validar autenticación (no redireccionar automáticamente)
   useEffect(() => {
@@ -103,15 +108,17 @@ export default function DonarExclusivePage() {
                 {/* Banner superior estilo AYNI */}
                 <div className="bg-[#40a8ab] p-6 text-center text-white">
                   <h3 className="text-lg font-bold tracking-wide uppercase">
-                    CLUB {organizacion.nombre} ¡¡DONAR TIENE PREMIO!!
+                    {organizacion.nombre?.toUpperCase().startsWith("CLUB")
+                      ? `${organizacion.nombre} ¡¡DONAR TIENE PREMIO!!`
+                      : `CLUB ${organizacion.nombre} ¡¡DONAR TIENE PREMIO!!`}
                   </h3>
                 </div>
                 
                 <div className="p-8">
                   <div className="mb-6 text-center">
                     <div className="flex items-center justify-center gap-6 mb-6 flex-wrap">
-                      {organizacion.logo_url && (
-                        <img src={organizacion.logo_url} alt={organizacion.nombre} className="h-14 md:h-24 w-auto object-contain" />
+                      {logoUrl && (
+                        <img src={logoUrl} alt={organizacion.nombre} className="h-14 md:h-24 w-auto object-contain" />
                       )}
                       <span className="text-3xl md:text-5xl font-light text-slate-300">+</span>
                       <img
@@ -124,7 +131,7 @@ export default function DonarExclusivePage() {
                       {organizacion.nombre} y AYNI - CLUB TRIPLE IMPACTO
                     </h2>
                     <p className="text-slate-500 text-sm md:text-base leading-relaxed text-center max-w-xl mx-auto">
-                      {organizacion.nombre === "PLATO LLENO" ? (
+                      {organizacion.nombre?.toUpperCase().includes("PLATO LLENO") ? (
                         "AYNI y Plato Lleno colaboran para llevar a sus donantes una plataforma de triple impacto única. Con tu aporte mensual, ayudás directamente a sostener el programa de rescate de alimentos de Plato Lleno y, al mismo tiempo, accedés de forma exclusiva a la Red de Beneficios de Club Triple Impacto como agradecimiento por tu compromiso."
                       ) : (
                         organizacion.descripcion || `¡Sumate y sé parte del Triple Impacto! Con tu aporte mensual, nos ayudás a sostener proyectos de impacto y como agradecimiento accedés a nuestra red de beneficios y descuentos exclusivos.`
@@ -199,13 +206,13 @@ export default function DonarExclusivePage() {
           {/* Columna Derecha: Sidebar con información de la ONG (Solo visible en desktop) */}
           <div className="lg:col-span-3 hidden lg:block">
             <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-md sticky top-24 space-y-6">
-              {organizacion.logo_url && (
+              {logoUrl && (
                 <div className="w-24 h-24 mx-auto rounded-full overflow-hidden border border-slate-100 shadow-sm flex items-center justify-center bg-white p-2">
-                  <img src={organizacion.logo_url} alt={organizacion.nombre} className="max-w-full max-h-full object-contain" />
+                  <img src={logoUrl} alt={organizacion.nombre} className="max-w-full max-h-full object-contain" />
                 </div>
               )}
               
-              {organizacion.nombre === "PLATO LLENO" ? (
+              {organizacion.nombre?.toUpperCase().includes("PLATO LLENO") ? (
                 <>
                   <div className="text-center space-y-2">
                     <h3 className="font-bold text-lg text-slate-800 uppercase tracking-tight">

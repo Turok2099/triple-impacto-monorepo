@@ -1344,4 +1344,102 @@ export class SupabaseService implements OnModuleInit {
       ultima_sincronizacion: ultimoSync?.synced_at || null,
     };
   }
+
+  // ========================================
+  // MÉTODOS PARA SUSCRIPCIONES (PAGOS RECURRENTES)
+  // ========================================
+
+  /**
+   * Crear una nueva suscripción
+   */
+  async createSuscripcion(data: {
+    usuario_id: string;
+    organizacion_id: string;
+    payment_method_id: string;
+    monto: number;
+    moneda?: string;
+    frecuencia?: string;
+    fecha_proximo_cobro: string; // YYYY-MM-DD
+  }) {
+    const { data: row, error } = await this.from('suscripciones')
+      .insert({
+        ...data,
+        moneda: data.moneda ?? 'ARS',
+        frecuencia: data.frecuencia ?? 'mensual',
+        estado: 'activa',
+        reintentos: 0,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      this.logger.error('Error al crear suscripción:', error);
+      throw error;
+    }
+    this.logger.log(`✅ Suscripción creada para usuario ${data.usuario_id}`);
+    return row;
+  }
+
+  /**
+   * Obtener suscripciones activas cuya fecha de cobro sea hoy o anterior
+   */
+  async getDueSubscriptions() {
+    const hoy = new Date().toISOString().split('T')[0];
+    const { data, error } = await this.from('suscripciones')
+      .select(`
+        *,
+        usuarios ( nombre, email ),
+        organizaciones ( nombre, slug, fiserv_store_id, fiserv_shared_secret ),
+        user_payment_methods (*)
+      `)
+      .eq('estado', 'activa')
+      .lte('fecha_proximo_cobro', hoy);
+
+    if (error) {
+      this.logger.error('Error al buscar suscripciones pendientes:', error);
+      throw error;
+    }
+    return data;
+  }
+
+  /**
+   * Actualizar estado o datos de una suscripción
+   */
+  async updateSuscripcion(
+    id: string,
+    updates: {
+      estado?: string;
+      fecha_proximo_cobro?: string;
+      reintentos?: number;
+    },
+  ) {
+    const { data, error } = await this.from('suscripciones')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      this.logger.error(`Error al actualizar suscripción ${id}:`, error);
+      throw error;
+    }
+    return data;
+  }
+
+  /**
+   * Verificar si un usuario tiene al menos una suscripción activa (para evitar suspensión)
+   */
+  async hasActiveSubscription(userId: string): Promise<boolean> {
+    const { data, error } = await this.from('suscripciones')
+      .select('id')
+      .eq('usuario_id', userId)
+      .eq('estado', 'activa')
+      .limit(1);
+
+    if (error) {
+      this.logger.error('Error al verificar suscripciones activas:', error);
+      return false;
+    }
+    return Array.isArray(data) && data.length > 0;
+  }
 }

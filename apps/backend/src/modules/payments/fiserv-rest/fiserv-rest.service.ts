@@ -187,7 +187,7 @@ export class FiservRestService {
       if (result.transactionStatus === 'APPROVED' && result.paymentToken) {
         const tokenValue = result.paymentToken.value;
         
-        await this.supabaseService.from('user_payment_methods').insert({
+        const { data: insertedMethod } = await this.supabaseService.from('user_payment_methods').insert({
           user_id: userId,
           fiserv_token: tokenValue,
           scheme_transaction_id: result.schemeTransactionId || null,
@@ -197,9 +197,12 @@ export class FiservRestService {
           exp_year: paymentData.expiryYear,
           cardholder_name: paymentData.cardholderName,
           is_active: true,
-        });
+        }).select().single();
 
         this.logger.log(`✅ Pago exitoso y token guardado para usuario ${userId}`);
+        
+        // Devolvemos el paymentMethodId para poder suscribirlo si es necesario
+        return { ...result, orderId, paymentMethodId: insertedMethod?.id };
       }
 
       // Devolvemos tanto el resultado de Fiserv como el orderId original para poder validarlo luego

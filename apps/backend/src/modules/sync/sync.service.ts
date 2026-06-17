@@ -527,6 +527,16 @@ export class SyncService {
               isExpired = ahora > fechaVencimiento;
            }
 
+           // Verificar si el usuario tiene una suscripción activa
+           if (isExpired) {
+             const hasSubscription = await this.supabaseService.hasActiveSubscription(aff.user_id);
+             if (hasSubscription) {
+                // El usuario tiene una suscripción activa, el cron de pagos se encargará
+                isExpired = false;
+                this.logger.log(`Usuario ${aff.user_id} tiene una suscripción activa. Mantenido activo.`);
+             }
+           }
+
            if (isExpired) {
               this.logger.log(`Usuario ${aff.user_id} expirado para ONG. Suspendiendo en Bonda...`);
               

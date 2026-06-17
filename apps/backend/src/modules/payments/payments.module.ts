@@ -6,10 +6,11 @@ import { PaymentsController } from './payments.controller';
 import { FiservWebhookService } from './fiserv-webhook.service';
 import { MailModule } from '../mail/mail.module';
 import { FiservRestModule } from './fiserv-rest/fiserv-rest.module';
+import { SubscriptionsCronService } from './subscriptions.cron';
 
 @Module({
   imports: [FiservConnectModule, BondaModule, AuthModule, MailModule, FiservRestModule],
   controllers: [PaymentsController],
-  providers: [FiservWebhookService],
+  providers: [FiservWebhookService, SubscriptionsCronService],
 })
 export class PaymentsModule {}

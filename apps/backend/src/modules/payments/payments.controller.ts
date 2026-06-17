@@ -235,6 +235,29 @@ export class PaymentsController {
           );
         }
 
+        // Si es pago recurrente, registrar la suscripción
+        if (body.isRecurring && result.paymentMethodId) {
+          try {
+            const nextMonth = new Date();
+            nextMonth.setMonth(nextMonth.getMonth() + 1);
+            const fechaProximoCobro = nextMonth.toISOString().split('T')[0];
+
+            await this.supabase.createSuscripcion({
+              usuario_id: userId,
+              organizacion_id: body.organizacion_id,
+              payment_method_id: result.paymentMethodId,
+              monto: parseFloat(body.amount),
+              moneda: body.currency || 'ARS',
+              frecuencia: 'mensual',
+              fecha_proximo_cobro: fechaProximoCobro,
+            });
+            this.logger.log(`Suscripción creada exitosamente para orden ${orderId}`);
+          } catch (subError) {
+            this.logger.error('Error al crear suscripción en rest-sale:', subError);
+            // No fallamos el pago completo si la suscripción falla, ya cobramos.
+          }
+        }
+
         return { success: true, result };
       } else {
         // El pago no fue aprobado (declinado)

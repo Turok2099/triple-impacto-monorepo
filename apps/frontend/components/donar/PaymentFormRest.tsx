@@ -21,6 +21,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
   const [montoSeleccionado, setMontoSeleccionado] = useState<number | null>(5000);
   const [montoCustom, setMontoCustom] = useState("");
   const [usarMontoCustom, setUsarMontoCustom] = useState(false);
+  const [isRecurring, setIsRecurring] = useState(true);
 
   // Estados del pago
   const [loading, setLoading] = useState(false);
@@ -191,6 +192,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
         amount: montoFinal,
         currency: 'ARS',
         organizacion_id: organizacionId,
+        isRecurring: isRecurring,
       };
 
       const response = await fetch(`${apiUrl}/payments/fiserv/rest-sale`, {
@@ -286,10 +288,44 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
             )}
           </div>
 
-          {/* SECCIÓN 2: MONTO */}
+          {/* SECCIÓN 2: FRECUENCIA */}
           <div className="space-y-3">
             <label className="block text-sm md:text-base font-bold text-slate-700 ml-1">
-              2. ¿Cuánto querés donar? *
+              2. Frecuencia de donación
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setIsRecurring(true)}
+                className={`py-3 px-4 rounded-2xl text-sm md:text-base font-bold text-center transition-all cursor-pointer ${isRecurring
+                  ? "bg-[#40a8ab] text-white shadow-md"
+                  : "bg-slate-50 text-slate-700 border-2 border-slate-200 hover:border-slate-300"
+                  }`}
+              >
+                Mensual
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsRecurring(false)}
+                className={`py-3 px-4 rounded-2xl text-sm md:text-base font-bold text-center transition-all cursor-pointer ${!isRecurring
+                  ? "bg-[#40a8ab] text-white shadow-md"
+                  : "bg-slate-50 text-slate-700 border-2 border-slate-200 hover:border-slate-300"
+                  }`}
+              >
+                Única vez
+              </button>
+            </div>
+            {!isRecurring && (
+              <p className="text-xs text-amber-600 bg-amber-50 p-2 rounded-xl border border-amber-100 ml-1">
+                Aviso: Los beneficios de Bonda solo aplican para donaciones mensuales recurrentes.
+              </p>
+            )}
+          </div>
+
+          {/* SECCIÓN 3: MONTO */}
+          <div className="space-y-3">
+            <label className="block text-sm md:text-base font-bold text-slate-700 ml-1">
+              3. ¿Cuánto querés donar? *
             </label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {montosSugeridosActuales.map((monto) => (
@@ -342,10 +378,10 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
 
           <hr className="border-slate-100" />
 
-          {/* SECCIÓN 3: TARJETA */}
+          {/* SECCIÓN 4: TARJETA */}
           <div className="space-y-6">
             <label className="block text-sm md:text-base font-bold text-slate-700 ml-1">
-              3. Datos de tu tarjeta
+              4. Datos de tu tarjeta
             </label>
             <div className="space-y-4">
               <div className="relative">

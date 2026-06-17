@@ -43,14 +43,16 @@ import {
   Receipt,
   Search,
   X,
+  History,
 } from "lucide-react";
 
-type ActiveTab = "inicio" | "perfil" | "cupones" | "pagos" | "admin" | "donar";
+type ActiveTab = "inicio" | "perfil" | "pagos" | "admin" | "donar";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isLoading: authLoading, logout, handleSessionExpired } = useAuth();
   const [activeTab, setActiveTab] = useState<ActiveTab>("inicio");
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [dashboard, setDashboard] = useState<DashboardUsuario | null>(null);
   const [cupones, setCupones] = useState<PublicCouponDto[]>([]);
   const [categorias, setCategorias] = useState<CategoriaDto[]>([]);
@@ -391,13 +393,7 @@ export default function DashboardPage() {
             <span className={`text-[11px] md:text-sm ${activeTab === "perfil" ? "font-bold" : "font-medium"}`}>Perfil</span>
           </button>
 
-          <button
-            onClick={() => setActiveTab("cupones")}
-            className={`flex flex-col md:flex-row items-center md:justify-start gap-1 md:gap-3 px-4 py-2 md:py-3.5 rounded-xl transition-all shrink-0 ${activeTab === "cupones" ? "bg-teal-50 text-[#40a8ab]" : "text-slate-500 hover:bg-slate-50 hover:text-[#40a8ab]"}`}
-          >
-            <Gift className="w-5 h-5 md:w-6 md:h-6" strokeWidth={activeTab === "cupones" ? 2.5 : 2} />
-            <span className={`text-[11px] md:text-sm ${activeTab === "cupones" ? "font-bold" : "font-medium"}`}>Cupones Solicitados</span>
-          </button>
+
 
           <button
             onClick={() => setActiveTab("pagos")}
@@ -457,7 +453,7 @@ export default function DashboardPage() {
           dashboard={dashboard}
         />
       )}
-      {activeTab === "cupones" && <SeccionMisCupones />}
+
       {activeTab === "pagos" && <SeccionMisPagos />}
       {activeTab === "admin" && <SeccionAdmin />}
       {activeTab === "donar" && <SeccionDonacion />}
@@ -492,14 +488,23 @@ export default function DashboardPage() {
 
             return (
               <>
-                <div className="flex items-center justify-center gap-3">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-slate-900 tracking-tight">
-              TUS DESCUENTOS EXCLUSIVOS
-            </h2>
-            <span className="inline-flex items-center justify-center px-4 py-2 bg-[#40a8ab] text-white text-lg font-bold rounded-full shadow-lg">
-              {totalCuponesDisponibles}
-            </span>
-          </div>
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-100 pb-5 mb-6">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-2xl md:text-3xl font-extrabold text-slate-950 tracking-tight">
+                      TUS DESCUENTOS EXCLUSIVOS
+                    </h2>
+                    <span className="inline-flex items-center justify-center px-3.5 py-1.5 bg-[#40a8ab] text-white text-sm font-bold rounded-full shadow-md">
+                      {totalCuponesDisponibles}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setIsHistoryOpen(true)}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 hover:text-[#40a8ab] hover:border-[#40a8ab] hover:shadow-sm font-bold text-xs md:text-sm rounded-xl transition-all shadow-sm shrink-0"
+                  >
+                    <History className="w-4 h-4" />
+                    Ver Cupones Usados
+                  </button>
+                </div>
 
           {/* Search Bar Redesign */}
           <div className="relative group max-w-2xl mx-auto w-full">
@@ -862,6 +867,9 @@ export default function DashboardPage() {
         );
       })()}
       </div>
+
+      {/* Drawer de historial de cupones usados */}
+      <SeccionMisCupones isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} />
     </div>
   );
 }

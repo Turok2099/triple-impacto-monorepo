@@ -3,6 +3,7 @@ import { HttpModule } from '@nestjs/axios';
 import { BondaController } from './bonda.controller';
 import { BondaService } from './bonda.service';
 import { AuthModule } from '../auth/auth.module';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { AuthModule } from '../auth/auth.module';
       maxRedirects: 5,
     }),
     forwardRef(() => AuthModule),
+    MailModule,
   ],
   controllers: [BondaController],
   providers: [BondaService],

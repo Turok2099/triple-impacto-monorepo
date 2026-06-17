@@ -2,22 +2,23 @@
 
 import { useEffect, useState } from 'react';
 import { obtenerHistorialCupones, CuponSolicitado } from '@/lib/dashboard';
-import { Ticket, X, Calendar, ArrowRight } from 'lucide-react';
+import { Ticket, X, Calendar, ArrowRight, Shield } from 'lucide-react';
 
 interface SeccionMisCuponesProps {
   isOpen: boolean;
   onClose: () => void;
+  isBlocked?: boolean;
 }
 
-export default function SeccionMisCupones({ isOpen, onClose }: SeccionMisCuponesProps) {
+export default function SeccionMisCupones({ isOpen, onClose, isBlocked = false }: SeccionMisCuponesProps) {
   const [cupones, setCupones] = useState<CuponSolicitado[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !isBlocked) {
       cargarCupones();
     }
-  }, [isOpen]);
+  }, [isOpen, isBlocked]);
 
   const cargarCupones = async () => {
     const token = localStorage.getItem('auth_token');
@@ -70,7 +71,19 @@ export default function SeccionMisCupones({ isOpen, onClose }: SeccionMisCupones
 
             {/* List Content */}
             <div className="flex-1 overflow-y-auto px-6 py-4 hide-scrollbar">
-              {loading ? (
+              {isBlocked ? (
+                <div className="h-full flex flex-col items-center justify-center text-center px-4 py-12">
+                  <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-4 text-slate-400 border border-slate-100">
+                    <Shield className="w-8 h-8" strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-base font-bold text-slate-800 mb-1">
+                    Historial no disponible
+                  </h3>
+                  <p className="text-xs text-slate-500 max-w-xs leading-relaxed">
+                    Para acceder al historial debes estar registrado y tener una donación activa.
+                  </p>
+                </div>
+              ) : loading ? (
                 <div className="flex flex-col items-center justify-center h-64">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#40a8ab] mb-3" />
                   <p className="text-slate-400 text-xs font-medium">Cargando historial...</p>

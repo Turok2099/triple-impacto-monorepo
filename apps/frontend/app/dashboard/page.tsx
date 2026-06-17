@@ -342,6 +342,8 @@ export default function DashboardPage() {
     return null;
   }
 
+  const hasActiveOngs = dashboard.fundaciones?.some(f => f.isActive !== false && f.codigoAfiliado) ?? false;
+
   return (
     <div className="bg-[#F8FAFC] min-h-screen flex flex-col md:flex-row">
       {/* Sidebar (Desktop) / Header (Mobile) */}
@@ -462,8 +464,6 @@ export default function DashboardPage() {
         {/* Exclusive Benefits Section */}
         <section className="space-y-6">
           {(() => {
-            const hasActiveOngs = dashboard.fundaciones?.some(f => f.isActive !== false) ?? false;
-            
             if (!hasActiveOngs) {
               return (
                 <div className="bg-white border border-slate-100 rounded-3xl p-10 text-center shadow-sm relative overflow-hidden mt-8">
@@ -869,7 +869,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Drawer de historial de cupones usados */}
-      <SeccionMisCupones isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} />
+      <SeccionMisCupones isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} isBlocked={!hasActiveOngs} />
     </div>
   );
 }

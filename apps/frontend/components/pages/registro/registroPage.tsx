@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Mail } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
@@ -145,14 +145,6 @@ export default function RegisterPage() {
 
       // Mostrar éxito
       setSuccess(true);
-
-      // Redirigir al login después de 3 segundos para que puedan validar su correo
-      setTimeout(() => {
-        const params = new URLSearchParams(window.location.search);
-        const redirectUrl = params.get("redirect");
-        const redirectParam = redirectUrl ? `&redirect=${encodeURIComponent(redirectUrl)}` : "";
-        window.location.href = `/login?check_email=true${redirectParam}`;
-      }, 3000);
     } catch (err: any) {
       setError(err.message || "Error al crear la cuenta. Por favor, intenta nuevamente.");
       console.error("Error en registro:", err);
@@ -160,6 +152,29 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-[#f4fafb] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-md animate-in fade-in zoom-in duration-350">
+          <div className="bg-[#40a8ab] p-8 text-center flex flex-col items-center">
+            <Mail className="w-8 h-8 text-white/90 mb-3" strokeWidth={1.5} />
+            <h2 className="text-2xl font-bold text-white mb-2">¡Confirmá tu correo!</h2>
+            <p className="text-teal-50 text-sm">Te enviamos un enlace de activación</p>
+          </div>
+          <div className="p-8 text-center">
+            <p className="text-slate-600 mb-6 leading-relaxed text-sm">
+              Te hemos enviado un correo a <span className="font-semibold text-slate-800 break-all">{formData.email}</span>.
+              Por favor, revisá tu bandeja de entrada o la carpeta de correo no deseado (SPAM) y hacé clic en el enlace para activar tu cuenta.
+            </p>
+            <div className="text-xs text-slate-400 border-t border-slate-100 pt-6">
+              Una vez que confirmes tu correo electrónico, podrás iniciar sesión normalmente.
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f4fafb] py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">

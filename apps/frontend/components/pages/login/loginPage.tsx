@@ -322,7 +322,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="text-center">
+        <div className="text-center pb-8 mt-2">
           <p className="text-sm text-gray-600">
             ¿No tenés cuenta?{" "}
             <a

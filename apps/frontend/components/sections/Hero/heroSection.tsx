@@ -12,30 +12,18 @@ export default function HeroSection() {
     fetchPriority: "high" as const,
   };
 
-  const {
-    props: { srcSet: desktopSrcSet },
-  } = getImageProps({
-    ...common,
-    loader: cloudinaryLoader,
-    src: "v1768268779/Fondo_hero_yzustd.png",
-  });
-
-  const {
-    props: { srcSet: mobileSrcSet, ...rest },
-  } = getImageProps({
-    ...common,
-    loader: cloudinaryLoader,
-    src: "v1781902898/ayni_o5dqqq.png",
-  });
+const desktopUrl = cloudinaryLoader({ src: "v1768268779/Fondo_hero_yzustd.png", width: 1920 });
+  const mobileUrl = cloudinaryLoader({ src: "v1781902898/ayni_o5dqqq.png", width: 768 });
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
       {/* Imagen de fondo responsiva con Art Direction */}
       <picture className="absolute inset-0">
-        <source media="(min-width: 768px)" srcSet={desktopSrcSet} />
-        <source media="(max-width: 767px)" srcSet={mobileSrcSet} />
+        <source media="(min-width: 768px)" srcSet={desktopUrl} />
+        <source media="(max-width: 767px)" srcSet={mobileUrl} />
         <img 
-          {...rest} 
+          src={desktopUrl}
+          alt="AYNI Hero Background"
           className="object-cover object-center w-full h-full absolute inset-0" 
         />
       </picture>

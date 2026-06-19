@@ -206,99 +206,45 @@ export class PublicController {
     @Query('deduplicate') deduplicate?: string,
   ): Promise<any> {
     try {
-      const now = Date.now();
-      let cuponesBase: any[] = [];
+      this.logger.log('🔄 Obteniendo cupones desde Supabase (public_coupons_v2)...');
+      
+      // Obtenemos TODOS los cupones que coincidan con los filtros básicos (categoría y búsqueda)
+      // para poder hacer la deduplicación por marca en memoria (o paginamos si no se requiere deduplicar).
+      // Sin embargo, si traemos todos, podemos aplicar la paginación final aquí de manera segura.
+      const res = await this.supabase.getPublicCouponsV2({
+        categoria,
+        busqueda,
+        soloActivos: true,
+        // No pasamos límite ni offset aquí si necesitamos deduplicar primero
+      });
 
-      // 1. Verificar si tenemos el catálogo en caché y es válido
-      if (this.catalogCache && (now - this.catalogCache.timestamp < this.CACHE_TTL)) {
-        cuponesBase = this.catalogCache.data;
-      } else {
-        // 2. Si no hay caché, solicitar a Bonda usando el Bot de Servicio
-        // Iteramos por las páginas para obtener el catálogo completo (Bonda entrega de a 15)
-        this.logger.log('🔄 Iniciando carga completa del catálogo de Bonda (Proxy)...');
-        let page = 1;
-        let hasMore = true;
-        const allFetched: any[] = [];
+      let cuponesFiltrados = res.cupones.map((c: any) => ({
+        id: c.bonda_cupon_id || c.id,
+        nombre: c.nombre,
+        descuento: c.descuento,
+        descripcion: c.descripcion ?? null,
+        empresa: {
+          nombre: c.empresa_nombre,
+        },
+        imagen_url: c.imagen_url || null,
+        logo_empresa: c.empresa_logo_url || null,
+        categoria_principal: c.categoria_principal || null,
+        fecha_vencimiento: c.fecha_vencimiento || null,
+      }));
 
-        while (hasMore && page <= 150) { // Límite de seguridad de 150 páginas (~2250 cupones)
-          const response = await this.bondaService.obtenerCupones(
-            this.PUBLIC_BOT_CONFIG.dni,
-            {
-              slug: this.PUBLIC_BOT_CONFIG.masterSlug,
-              page: page,
-            },
-          );
-
-          if (response && response.cupones && response.cupones.length > 0) {
-            allFetched.push(...response.cupones);
-            this.logger.debug(`📄 Cargada página ${page} (${response.cupones.length} cupones)`);
-            
-            // Si hay menos de 15, es la última página. 
-            // O si no hay 'next' en la respuesta original (aunque BondaService oculta el raw)
-            if (response.cupones.length < 15) {
-              hasMore = false;
-            } else {
-              page++;
-            }
-          } else {
-            hasMore = false;
-          }
-        }
-
-        if (allFetched.length > 0) {
-          cuponesBase = allFetched.map((c: any) => ({
-            id: c.id.toString(),
-            nombre: c.nombre,
-            descuento: c.descuento,
-            descripcion: c.descripcionBreve ?? null,
-            empresa: {
-              nombre: c.empresa?.nombre,
-            },
-            imagen_url: c.imagenes?.principal?.['280x190'] || c.imagenes?.principal?.original || null,
-            logo_empresa: c.empresa?.logoThumbnail?.['90x90'] || null,
-            categoria_principal: c.categorias?.[0]?.nombre || null,
-            fecha_vencimiento: c.fecha_vencimiento || c.fechaVencimiento || null,
-          }));
-
-          // Actualizar caché
-          this.catalogCache = {
-            data: cuponesBase,
-            timestamp: now,
-          };
-          this.logger.log(`✅ Catálogo de Bonda cargado en caché: ${cuponesBase.length} cupones.`);
-        }
-      }
-
-      // 3. Aplicar filtros locales sobre los datos obtenidos
-      let cuponesFiltrados = [...cuponesBase];
-
-      if (categoria && categoria !== 'Todo') {
-        const catNormalizada = this.normalizarNombre(categoria);
-        cuponesFiltrados = cuponesFiltrados.filter(c => 
-          this.normalizarNombre(c.categoria_principal) === catNormalizada
-        );
-      }
-
-      if (busqueda) {
-        const busqNormalizada = this.normalizarNombre(busqueda);
-        cuponesFiltrados = cuponesFiltrados.filter(c => 
-          this.normalizarNombre(c.nombre).includes(busqNormalizada) || 
-          this.normalizarNombre(c.empresa.nombre).includes(busqNormalizada)
-        );
-      }
-
-      // 4. Deduplicación por MARCA (por defecto true para home)
+      // Deduplicación por MARCA (por defecto true para home)
       const shouldDeduplicate = deduplicate !== 'false';
       if (shouldDeduplicate) {
         const seen = new Set();
         cuponesFiltrados = cuponesFiltrados.filter(c => {
+          if (!c.empresa.nombre) return true; // Si no tiene empresa, lo dejamos
           if (seen.has(c.empresa.nombre)) return false;
           seen.add(c.empresa.nombre);
           return true;
         });
       }
 
-      // 5. Paginación manual sobre el set de datos
+      // Paginación manual
       const limitVal = limite ? parseInt(limite, 10) : 20;
       const offsetVal = offset ? parseInt(offset, 10) : 0;
       const paginados = cuponesFiltrados.slice(offsetVal, offsetVal + limitVal);
@@ -307,12 +253,12 @@ export class PublicController {
         count: paginados.length,
         cupones: paginados,
         total_disponible: cuponesFiltrados.length,
-        sincronizado_desde: 'bonda-proxy-cache',
+        sincronizado_desde: 'supabase',
         deduplicated: shouldDeduplicate,
-        cached_at: new Date(this.catalogCache?.timestamp || now).toISOString(),
+        cached_at: new Date().toISOString(),
       };
     } catch (error) {
-      console.error('Error in getCuponesDesdeBonda (Proxy):', error);
+      console.error('Error in getCuponesDesdeBonda (Supabase):', error);
       throw error;
     }
   }

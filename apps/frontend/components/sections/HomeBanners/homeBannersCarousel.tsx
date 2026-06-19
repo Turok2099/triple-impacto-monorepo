@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Banner {
@@ -74,22 +75,32 @@ export default function HomeBannersCarousel() {
             className="flex transition-transform duration-700 ease-out h-full"
             style={{ transform: `translateX(-${currentIndex * 100}%)` }}
           >
-            {banners.map((banner) => (
+            {banners.map((banner, index) => (
               <div key={banner.id} className="w-full h-full flex-shrink-0 relative">
                 {banner.link_url ? (
-                  <a href={banner.link_url} className="block w-full h-full">
-                    <img 
+                  <a href={banner.link_url} className="block w-full h-full relative">
+                    <Image 
                       src={banner.image_url} 
                       alt={banner.title}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 1200px"
+                      priority={index === 0}
+                      unoptimized={true}
+                      className="object-cover hover:scale-105 transition-transform duration-1000"
                     />
                   </a>
                 ) : (
-                  <img 
-                    src={banner.image_url} 
-                    alt={banner.title}
-                    className="w-full h-full object-cover"
-                  />
+                  <div className="w-full h-full relative">
+                    <Image 
+                      src={banner.image_url} 
+                      alt={banner.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 1200px"
+                      priority={index === 0}
+                      unoptimized={true}
+                      className="object-cover"
+                    />
+                  </div>
                 )}
                 
                 {/* Overlay/Gradient (optional) */}

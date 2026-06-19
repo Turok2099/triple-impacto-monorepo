@@ -8,6 +8,7 @@ interface Banner {
   id: string;
   title: string;
   image_url: string;
+  image_url_mobile?: string;
   link_url?: string;
   order: number;
 }
@@ -69,7 +70,7 @@ export default function HomeBannersCarousel() {
   return (
     <section className="relative w-full overflow-hidden bg-slate-50 border-y border-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-8">
-        <div className="relative group aspect-[3/1] rounded-2xl overflow-hidden shadow-xl border border-slate-200">
+        <div className="relative group aspect-[1/1] md:aspect-[3/1] rounded-2xl overflow-hidden shadow-xl border border-slate-200">
           {/* Banners Slider */}
           <div 
             className="flex transition-transform duration-700 ease-out h-full"
@@ -79,27 +80,33 @@ export default function HomeBannersCarousel() {
               <div key={banner.id} className="w-full h-full flex-shrink-0 relative">
                 {banner.link_url ? (
                   <a href={banner.link_url} className="block w-full h-full relative">
-                    <Image 
-                      src={banner.image_url} 
-                      alt={banner.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 1200px"
-                      priority={index === 0}
-                      unoptimized={true}
-                      className="object-cover hover:scale-105 transition-transform duration-1000"
-                    />
+                    <picture className="w-full h-full block">
+                      {banner.image_url_mobile && (
+                        <source media="(max-width: 768px)" srcSet={banner.image_url_mobile} />
+                      )}
+                      <img 
+                        src={banner.image_url} 
+                        alt={banner.title}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000"
+                        loading={index === 0 ? "eager" : "lazy"}
+                        fetchPriority={index === 0 ? "high" : "auto"}
+                      />
+                    </picture>
                   </a>
                 ) : (
                   <div className="w-full h-full relative">
-                    <Image 
-                      src={banner.image_url} 
-                      alt={banner.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 1200px"
-                      priority={index === 0}
-                      unoptimized={true}
-                      className="object-cover"
-                    />
+                    <picture className="w-full h-full block">
+                      {banner.image_url_mobile && (
+                        <source media="(max-width: 768px)" srcSet={banner.image_url_mobile} />
+                      )}
+                      <img 
+                        src={banner.image_url} 
+                        alt={banner.title}
+                        className="w-full h-full object-cover"
+                        loading={index === 0 ? "eager" : "lazy"}
+                        fetchPriority={index === 0 ? "high" : "auto"}
+                      />
+                    </picture>
                   </div>
                 )}
                 

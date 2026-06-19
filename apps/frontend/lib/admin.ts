@@ -117,6 +117,7 @@ export interface Banner {
   id: string;
   title: string;
   image_url: string;
+  image_url_mobile?: string;
   link_url?: string;
   is_active: boolean;
   order: number;

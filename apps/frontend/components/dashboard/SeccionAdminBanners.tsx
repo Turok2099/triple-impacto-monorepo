@@ -16,6 +16,7 @@ export default function SeccionAdminBanners() {
   const [formData, setFormData] = useState({
     title: "",
     image_url: "",
+    image_url_mobile: "",
     link_url: "",
     is_active: true,
     order: 0
@@ -45,6 +46,7 @@ export default function SeccionAdminBanners() {
       setFormData({
         title: banner.title,
         image_url: banner.image_url,
+        image_url_mobile: banner.image_url_mobile || "",
         link_url: banner.link_url || "",
         is_active: banner.is_active,
         order: banner.order
@@ -54,6 +56,7 @@ export default function SeccionAdminBanners() {
       setFormData({
         title: "",
         image_url: "",
+        image_url_mobile: "",
         link_url: "",
         is_active: true,
         order: banners.length > 0 ? Math.max(...banners.map(b => b.order)) + 1 : 0
@@ -103,7 +106,7 @@ export default function SeccionAdminBanners() {
     });
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, isMobile: boolean = false) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -115,7 +118,11 @@ export default function SeccionAdminBanners() {
       
       const token = localStorage.getItem("auth_token") || "";
       const res = await uploadBannerImage(token, optimizedFile);
-      setFormData({ ...formData, image_url: res.url });
+      if (isMobile) {
+        setFormData({ ...formData, image_url_mobile: res.url });
+      } else {
+        setFormData({ ...formData, image_url: res.url });
+      }
       Swal.fire({
         title: 'Imagen optimizada y subida',
         text: 'Se ha convertido a WebP para mejor rendimiento',
@@ -367,36 +374,72 @@ export default function SeccionAdminBanners() {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">Imagen del Banner</label>
-                  <div className="mt-1 flex flex-col gap-3">
-                    {formData.image_url && (
-                      <div className="relative w-full aspect-[21/9] rounded-xl overflow-hidden border border-slate-200">
-                        <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover" />
-                        <button 
-                          type="button"
-                          onClick={() => setFormData({...formData, image_url: ""})}
-                          className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center justify-center w-full">
-                      <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all ${uploading ? 'bg-slate-50 border-slate-200' : 'bg-slate-50 border-slate-300 hover:bg-slate-100 hover:border-[#2c8184]'}`}>
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          {uploading ? (
-                            <Loader2 className="w-8 h-8 animate-spin text-[#2c8184] mb-2" />
-                          ) : (
-                            <Plus className="w-8 h-8 text-slate-400 mb-2" />
-                          )}
-                          <p className="text-sm text-slate-500">
-                            {uploading ? 'Subiendo...' : formData.image_url ? 'Cambiar imagen' : 'Haz clic para subir imagen'}
-                          </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Imagen (Desktop)</label>
+                    <div className="mt-1 flex flex-col gap-3">
+                      {formData.image_url && (
+                        <div className="relative w-full aspect-[3/1] rounded-xl overflow-hidden border border-slate-200">
+                          <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover" />
+                          <button 
+                            type="button"
+                            onClick={() => setFormData({...formData, image_url: ""})}
+                            className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
                         </div>
-                        <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} disabled={uploading} />
-                      </label>
+                      )}
+                      
+                      <div className="flex items-center justify-center w-full">
+                        <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all ${uploading ? 'bg-slate-50 border-slate-200' : 'bg-slate-50 border-slate-300 hover:bg-slate-100 hover:border-[#2c8184]'}`}>
+                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                            {uploading ? (
+                              <Loader2 className="w-8 h-8 animate-spin text-[#2c8184] mb-2" />
+                            ) : (
+                              <Plus className="w-8 h-8 text-slate-400 mb-2" />
+                            )}
+                            <p className="text-sm text-slate-500 text-center">
+                              {uploading ? 'Subiendo...' : formData.image_url ? 'Cambiar imagen' : 'Haz clic para subir imagen (Recomendado 1920x600)'}
+                            </p>
+                          </div>
+                          <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, false)} disabled={uploading} />
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Imagen (Móvil)</label>
+                    <div className="mt-1 flex flex-col gap-3">
+                      {formData.image_url_mobile && (
+                        <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden border border-slate-200 max-h-40 object-contain mx-auto">
+                          <img src={formData.image_url_mobile} alt="Preview Mobile" className="w-full h-full object-cover" />
+                          <button 
+                            type="button"
+                            onClick={() => setFormData({...formData, image_url_mobile: ""})}
+                            className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center justify-center w-full mt-auto">
+                        <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all ${uploading ? 'bg-slate-50 border-slate-200' : 'bg-slate-50 border-slate-300 hover:bg-slate-100 hover:border-[#2c8184]'}`}>
+                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                            {uploading ? (
+                              <Loader2 className="w-8 h-8 animate-spin text-[#2c8184] mb-2" />
+                            ) : (
+                              <Plus className="w-8 h-8 text-slate-400 mb-2" />
+                            )}
+                            <p className="text-sm text-slate-500 text-center">
+                              {uploading ? 'Subiendo...' : formData.image_url_mobile ? 'Cambiar imagen' : 'Haz clic para subir imagen (Recomendado 800x1000)'}
+                            </p>
+                          </div>
+                          <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, true)} disabled={uploading} />
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>

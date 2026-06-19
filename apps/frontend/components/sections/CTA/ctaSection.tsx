@@ -7,8 +7,8 @@ export default function CTASection() {
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-linear-to-br from-[#2c8184] via-teal-600 to-teal-800 relative overflow-hidden">
       {/* Elementos decorativos de fondo */}
       <div className="absolute inset-0 overflow-hidden opacity-20">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-teal-300 rounded-full filter blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-300 rounded-full filter blur-3xl"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-teal-500 rounded-full filter blur-3xl"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-500 rounded-full filter blur-3xl"></div>
       </div>
 
       <div className="max-w-4xl mx-auto text-center relative z-10">
@@ -17,7 +17,7 @@ export default function CTASection() {
         {/* Título Principal */}
         <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6 leading-tight">
           Transformá tu donación en{" "}
-          <span className="inline-block bg-white/20 backdrop-blur-sm px-4 py-2 rounded-2xl mt-2">
+          <span className="inline-block bg-black/20 backdrop-blur-sm px-4 py-2 rounded-2xl mt-2">
             impacto y beneficios
           </span>
         </h2>
@@ -32,15 +32,15 @@ export default function CTASection() {
 
         {/* Propuesta de valor rápida */}
         <div className="flex flex-wrap justify-center gap-6 mb-10 text-white">
-          <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-full">
+          <div className="flex items-center gap-2 bg-black/20 backdrop-blur-sm px-4 py-3 rounded-full">
             <Zap className="w-6 h-6" strokeWidth={2} />
             <span className="font-medium">Impacto inmediato</span>
           </div>
-          <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-full">
+          <div className="flex items-center gap-2 bg-black/20 backdrop-blur-sm px-4 py-3 rounded-full">
             <Gift className="w-6 h-6" strokeWidth={2} />
             <span className="font-medium">Descuentos al instante</span>
           </div>
-          <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-full">
+          <div className="flex items-center gap-2 bg-black/20 backdrop-blur-sm px-4 py-3 rounded-full">
             <ShieldCheck className="w-6 h-6" strokeWidth={2} />
             <span className="font-medium">100% transparente</span>
           </div>

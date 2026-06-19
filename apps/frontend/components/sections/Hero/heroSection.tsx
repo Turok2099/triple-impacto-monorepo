@@ -1,27 +1,44 @@
-"use client";
-
-import Image from "next/image";
+import { getImageProps } from "next/image";
 
 const cloudinaryLoader = ({ src, width, quality }: { src: string; width: number; quality?: number }) => {
   return `https://res.cloudinary.com/dxbtafe9u/image/upload/f_auto,q_${quality || 'auto'},w_${width}/${src}`;
 };
 
 export default function HeroSection() {
+  const common = { 
+    alt: "AYNI Hero Background", 
+    fill: true, 
+    priority: true, 
+    fetchPriority: "high" as const,
+  };
+
+  const {
+    props: { srcSet: desktopSrcSet },
+  } = getImageProps({
+    ...common,
+    loader: cloudinaryLoader,
+    src: "v1768268779/Fondo_hero_yzustd.png",
+  });
+
+  const {
+    props: { srcSet: mobileSrcSet, ...rest },
+  } = getImageProps({
+    ...common,
+    loader: cloudinaryLoader,
+    src: "v1781902898/ayni_o5dqqq.png",
+  });
+
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Imagen de fondo */}
-      <div className="absolute inset-0">
-        <Image
-          loader={cloudinaryLoader}
-          src="v1768268779/Fondo_hero_yzustd.png"
-          alt="AYNI Hero Background"
-          fill
-          priority
-          fetchPriority="high"
-          sizes="100vw"
-          className="object-cover object-center"
+      {/* Imagen de fondo responsiva con Art Direction */}
+      <picture className="absolute inset-0">
+        <source media="(min-width: 768px)" srcSet={desktopSrcSet} />
+        <source media="(max-width: 767px)" srcSet={mobileSrcSet} />
+        <img 
+          {...rest} 
+          className="object-cover object-center w-full h-full absolute inset-0" 
         />
-      </div>
+      </picture>
 
       {/* Overlay oscuro para mejor legibilidad del texto */}
       <div className="absolute inset-0 bg-black/50" />

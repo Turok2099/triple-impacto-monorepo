@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 
 const cloudinaryLoader = ({ src, width, quality }: { src: string; width: number; quality?: number }) => {

@@ -1,75 +1,74 @@
 
-Solicitudes de bloqueo de renderización Ahorro estimado de 700 ms
-Las solicitudes bloquean la renderización inicial de la página, lo que puede retrasar el LCP. La aparición diferida o intercalada puede mover estas solicitudes de red fuera de la ruta crítica.FCPLCPSin puntuación
-Solicitudes de bloqueo de renderización Ahorro estimado de 320 ms
-Las solicitudes bloquean la renderización inicial de la página, lo que puede retrasar el LCP. La aparición diferida o intercalada puede mover estas solicitudes de red fuera de la ruta crítica.LCPFCPSin puntuación
+Mejora la entrega de imágenes Ahorro estimado de 22 KiB
+Reducir el tiempo de descarga de las imágenes puede mejorar el tiempo de carga percibido de la página y el LCP. Más información para optimizar el tamaño de las imágenesLCPFCPSin puntuación
+URL
+Tamaño del recurso
+Ahorro estimado
+supabase.co
+32.3 KiB	22.4 KiB
+Banner Plato Lleno
+<img alt="Banner Plato Lleno" decoding="async" data-nimg="fill" class="object-cover" src="https://faibhrhrassmrokvzqeu.supabase.co/storage/v1/object/public/home-ban…" style="position: absolute; height: 100%; width: 100%; inset: 0px;">
+…home-banners/banner-178…-plato-lleno-1200-x-400-webp.webp(faibhrhrassmrokvzqeu.supabase.co)
+32.3 KiB
+22.4 KiB
+Este archivo de imagen es más grande de lo necesario (1200x397) para sus dimensiones de visualización (662x221). Usa imágenes responsivas para reducir el tamaño de descarga de la imagen.
+22.4 KiB
+Desglose de LCP
+Terceros
+Estas estadísticas también están disponibles en el panel de rendimiento de las Herramientas para desarrolladores de Chrome: graba un registro para ver información más detallada.
+Diagnóstico
+
+--------------------------------
+
+
+Reduce el código JavaScript sin usar Ahorro estimado de 46 KiB
+Reduce el código JavaScript sin usar y posterga la carga de las secuencias de comandos hasta que se necesiten, a fin de disminuir los bytes que consume la actividad de red. Obtén información para reducir el JavaScript sin usar.LCPFCPSin puntuación
 URL
 Tamaño de transferencia
-Duración
+Ahorro estimado
 ayni.ar Propio
-20.1 KiB	800 ms
-…chunks/0o__.340wvds8.css(www.ayni.ar)
-17.4 KiB
-640 ms
-…chunks/066jf0nk75nic.css(www.ayni.ar)
-2.7 KiB
-160 ms
-JavaScript heredado Ahorro estimado de 14 KiB
-El complemento Polyfill y las transformaciones permiten que los navegadores más antiguos utilicen nuevas funciones de JavaScript. Sin embargo, la mayoría no es necesaria en los navegadores actualizados. Considera modificar tu proceso de compilación de JavaScript para que no se transpilen las funciones de Baseline, a menos que sepas que debes admitir navegadores más antiguos. Descubre por qué la mayoría de los sitios pueden implementar código ES6+ sin transpilación.LCPFCPSin puntuación
-URL
-Bytes desperdiciados
-ayni.ar Propio
-13.9 KiB
+91.9 KiB	45.6 KiB
 …chunks/0wmouk63wwkru.js(www.ayni.ar)
-13.9 KiB
-…chunks/0wmouk63wwkru.js:1:6432(www.ayni.ar)
-Array.prototype.at
-…chunks/0wmouk63wwkru.js:1:5820(www.ayni.ar)
-Array.prototype.flat
-…chunks/0wmouk63wwkru.js:1:5933(www.ayni.ar)
-Array.prototype.flatMap
-…chunks/0wmouk63wwkru.js:1:6309(www.ayni.ar)
-Object.fromEntries
-…chunks/0wmouk63wwkru.js:1:6567(www.ayni.ar)
-Object.hasOwn
-…chunks/0wmouk63wwkru.js:1:5562(www.ayni.ar)
-String.prototype.trimEnd
-…chunks/0wmouk63wwkru.js:1:5477(www.ayni.ar)
-String.prototype.trimStart
-Usa tiempos de almacenamiento en caché eficientes Ahorro estimado de 5 KiB
-La duración en caché por un período prolongado puede acelerar la carga de la página cuando el usuario la visita de manera repetida. Obtén más información sobre el almacenamiento en caché.LCPFCPSin puntuación
-Solicitud
-TTL en caché
-Tamaño de transferencia
-Cloudflare utility 
-12 KiB
-/beacon.min.js/v833ccba…(static.cloudflareinsights.com)
-1d.
-12 KiB
-Árbol de dependencias de red
-Evita encadenar solicitudes críticas reduciendo la longitud de las cadenas, disminuyendo el tamaño de los recursos para la descarga o postergando la descarga de recursos innecesarios para mejorar la carga de la página.LCPSin puntuación
-Latencia de ruta crítica máxima: 414 ms
-Navegación inicial
-https://www.ayni.ar - 236 ms, 15.01 KiB
-…chunks/066jf0nk75nic.css(www.ayni.ar) - 264 ms, 2.70 KiB
-…chunks/0o__.340wvds8.css(www.ayni.ar) - 414 ms, 17.41 KiB
-Orígenes conectados previamente
-Las sugerencias de conexión previa ayudan al navegador a establecer una conexión antes de la carga de la página, lo que ahorra tiempo cuando se realiza la primera solicitud para ese origen. Estos son los orígenes a los que la página se conectó previamente.
-Origen
-Fuente
-https://backend-production-83f0.up.railway.app/
-head > link
-<link rel="preconnect" href="https://backend-production-83f0.up.railway.app" crossorigin="anonymous">
-Conexión previa no utilizada. Comprueba que el atributo crossorigin se use correctamente.
-https://faibhrhrassmrokvzqeu.supabase.co/
-head > link
-<link rel="preconnect" href="https://faibhrhrassmrokvzqeu.supabase.co" crossorigin="anonymous">
-Conexión previa no utilizada. Comprueba que el atributo crossorigin se use correctamente.
-Candidatos para la conexión previa
-Agrega sugerencias de conexión previa a tus orígenes más importantes, pero intenta usar no más de 4.
-Origen
-Ahorro estimado de LCP
-https://faibhrhrassmrokvzqeu.supabase.co
-310 ms
-https://backend-production-83f0.up.railway.app
-310 ms
+70.5 KiB
+24.2 KiB
+…chunks/05ornlde6ts~1.js(www.ayni.ar)
+21.4 KiB
+21.3 KiB
+
+
+--------------------
+
+
+Los colores de fondo y de primer plano no tienen una relación de contraste adecuada.
+Los textos con poco contraste resultan difíciles o imposibles de leer para muchos usuarios. Obtén información para proporcionar suficiente contraste de color.
+Elementos con errores
+impacto y beneficios
+<span class="inline-block bg-white/20 backdrop-blur-sm px-4 py-2 rounded-2xl mt-2">
+div > section.py-20 > div.absolute > div.absolute
+<div class="absolute top-0 left-1/4 w-96 h-96 bg-teal-300 rounded-full filter blur-3xl">
+Impacto inmediato
+<span class="font-medium">
+Impacto inmediato
+<div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-full">
+div > section.py-20 > div.absolute > div.absolute
+<div class="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-300 rounded-full filter blur…">
+Descuentos al instante
+<span class="font-medium">
+Descuentos al instante
+<div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-full">
+div > section.py-20 > div.absolute > div.absolute
+<div class="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-300 rounded-full filter blur…">
+100% transparente
+<span class="font-medium">
+100% transparente
+<div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-full">
+div > section.py-20 > div.absolute > div.absolute
+<div class="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-300 rounded-full filter blur…">
+Sin comisiones ocultas
+<span>
+div > section.py-20 > div.absolute > div.absolute
+<div class="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-300 rounded-full filter blur…">
+Seguro y confiable
+<span>
+div > section.py-20 > div.absolute > div.absolute
+<div class="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-300 rounded-full filter blur…">

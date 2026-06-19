@@ -149,9 +149,9 @@ function FooterContent() {
 
           {/* Columna 2: ONGs Aliadas */}
           <div>
-            <h4 className="text-white font-semibold text-lg mb-4">
+            <div className="text-white font-semibold text-lg mb-4">
               ONGs Aliadas
-            </h4>
+            </div>
             <p className="text-sm text-gray-400 mb-4 leading-relaxed">
               Conocé todas las organizaciones que forman parte de nuestra comunidad.
             </p>
@@ -165,7 +165,7 @@ function FooterContent() {
 
           {/* Columna 4: Contacto */}
           <div>
-            <h4 className="text-white font-semibold text-lg mb-4">Contacto</h4>
+            <div className="text-white font-semibold text-lg mb-4">Contacto</div>
             <ul className="space-y-4 text-sm mb-6">
               <li className="flex items-start gap-3">
                 <Mail className="text-[#2c8184] w-6 h-6 shrink-0 mt-0.5" />
@@ -208,7 +208,7 @@ function FooterContent() {
 
             {/* Newsletter */}
             <div className="mt-6">
-              <h5 className="text-white font-medium text-sm mb-3">Newsletter</h5>
+              <div className="text-white font-medium text-sm mb-3">Newsletter</div>
               <form onSubmit={handleSubscribe} className="flex flex-col gap-2">
                 <div className="flex gap-2">
                   <input

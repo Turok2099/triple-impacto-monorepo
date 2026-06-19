@@ -19,7 +19,7 @@ export default function JoinUsSection() {
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {/* Card ONGs */}
           <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 hover:border-teal-200 hover:shadow-lg transition-all duration-300 group">
-            <div className="w-14 h-14 bg-teal-100/50 rounded-2xl flex items-center justify-center mb-6 text-[#2c8184] group-hover:scale-110 group-hover:bg-teal-100 transition-transform">
+            <div className="w-14 h-14 bg-teal-100/50 rounded-2xl flex items-center justify-center mb-6 text-teal-600 group-hover:scale-110 group-hover:bg-teal-100 transition-transform">
               <HeartHandshake className="w-7 h-7" />
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-3">Sumá tu ONG</h3>
@@ -28,7 +28,7 @@ export default function JoinUsSection() {
             </p>
             <Link
               href="/contact"
-              className="inline-flex items-center text-[#2c8184] font-semibold hover:text-[#1e6063] transition-colors"
+              className="inline-flex items-center text-teal-600 font-semibold hover:text-teal-700 transition-colors"
             >
               Registrar mi ONG
               <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />

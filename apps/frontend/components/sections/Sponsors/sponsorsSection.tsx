@@ -84,14 +84,14 @@ export default function SponsorsSection() {
             </h2>
             <p className="max-w-2xl mx-auto text-xl text-gray-600">
               Empresas comprometidas con{" "}
-              <span className="font-semibold" style={{ color: "#2c8184" }}>
+              <span className="font-bold text-teal-600">
                 AYNI
               </span>{" "}
               que ofrecen beneficios exclusivos a nuestra comunidad
             </p>
           </div>
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2c8184]"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
           </div>
         </div>
       </section>
@@ -108,7 +108,7 @@ export default function SponsorsSection() {
           </h2>
           <p className="max-w-2xl mx-auto text-xl text-gray-600">
             Empresas comprometidas con{" "}
-            <span className="font-semibold" style={{ color: "#2c8184" }}>
+            <span className="font-bold text-teal-600">
               AYNI
             </span>{" "}
             que ofrecen beneficios exclusivos a nuestra comunidad

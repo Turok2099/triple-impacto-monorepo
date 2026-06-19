@@ -6,9 +6,9 @@ export default function CTASection() {
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-linear-to-br from-[#2c8184] via-teal-600 to-teal-800 relative overflow-hidden">
       {/* Elementos decorativos de fondo */}
-      <div className="absolute inset-0 overflow-hidden opacity-20">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-teal-500 rounded-full filter blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-500 rounded-full filter blur-3xl"></div>
+      <div className="absolute inset-0 overflow-hidden opacity-10">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-teal-700 rounded-full filter blur-3xl"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-700 rounded-full filter blur-3xl"></div>
       </div>
 
       <div className="max-w-4xl mx-auto text-center relative z-10">
@@ -47,7 +47,7 @@ export default function CTASection() {
         </div>
 
         {/* Trust elements */}
-        <div className="flex flex-wrap justify-center gap-4 text-teal-50 text-sm">
+        <div className="flex flex-wrap justify-center gap-4 text-white font-medium text-sm">
           <div className="flex items-center gap-2">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path

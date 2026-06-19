@@ -9,6 +9,7 @@ import "./globals.css";
 const Footer = dynamic(() => import("@/components/sections/Footer/footer"));
 const WhatsAppButton = dynamic(() => import("@/components/shared/WhatsAppButton"));
 const FloatingDonateButton = dynamic(() => import("@/components/shared/FloatingDonateButton"));
+const CookieConsent = dynamic(() => import("@/components/shared/CookieConsent"));
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default function RootLayout({
           <Footer />
           <WhatsAppButton />
           <FloatingDonateButton />
+          <CookieConsent />
         </AuthProvider>
         <SpeedInsights />
       </body>

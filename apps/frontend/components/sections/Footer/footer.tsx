@@ -155,13 +155,12 @@ function FooterContent() {
             <p className="text-sm text-gray-400 mb-4 leading-relaxed">
               Conocé todas las organizaciones que forman parte de nuestra comunidad.
             </p>
-            <a
+            <Link
               href="/ongs"
               className="inline-flex items-center gap-2 text-teal-400 hover:text-teal-300 transition-colors duration-200 font-medium"
             >
-              Ver todas las ONGs
-              <span>→</span>
-            </a>
+              ONG´s
+            </Link>
           </div>
 
           {/* Columna 4: Contacto */}
@@ -268,12 +267,12 @@ function FooterContent() {
               >
                 Política de privacidad
               </a>
-              <a
-                href="#cookies"
+              <Link
+                href="/politica-de-cookies"
                 className="text-gray-400 hover:text-teal-400 transition-colors"
               >
                 Política de cookies
-              </a>
+              </Link>
             </div>
           </div>
         </div>

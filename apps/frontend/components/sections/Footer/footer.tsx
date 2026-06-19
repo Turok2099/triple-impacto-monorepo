@@ -118,8 +118,7 @@ function FooterContent() {
                   alt="AYNI"
                   width={140}
                   height={50}
-                  className="object-contain"
-                  style={{ width: "auto", height: "auto" }}
+                  className="object-contain w-[70px] sm:w-[140px] h-auto"
                   priority
                 />
               </Link>

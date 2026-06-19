@@ -385,9 +385,16 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                 }}
               />
               {!subiendoFoto && (
-                <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <Camera className="w-5 h-5 text-white" />
-                </div>
+                <>
+                  {/* Overlay oscuro con icono en desktop (hover) */}
+                  <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Camera className="w-5 h-5 text-white" />
+                  </div>
+                  {/* Badge de cámara siempre visible (ideal para móvil y feedback visual inmediato) */}
+                  <div className="absolute bottom-0 right-0 bg-[#40a8ab] text-white p-1 rounded-full border border-white shadow-sm flex items-center justify-center translate-x-1 translate-y-0.5 z-10 transition-transform active:scale-95">
+                    <Camera className="w-3 h-3" />
+                  </div>
+                </>
               )}
               {subiendoFoto && (
                 <div className="absolute inset-0 flex items-center justify-center">

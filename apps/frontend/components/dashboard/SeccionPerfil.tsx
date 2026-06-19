@@ -322,8 +322,18 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
   const handleGuardarFotoCamara = async () => {
     if (!capturedPhoto) return;
     try {
-      const response = await fetch(capturedPhoto);
-      const blob = await response.blob();
+      // Conversión manual de base64 a Blob para máxima compatibilidad móvil (evita bloqueos de fetch en iOS/Android)
+      const parts = capturedPhoto.split(';base64,');
+      const contentType = parts[0].split(':')[1] || 'image/jpeg';
+      const raw = window.atob(parts[1]);
+      const rawLength = raw.length;
+      const uInt8Array = new Uint8Array(rawLength);
+      
+      for (let i = 0; i < rawLength; ++i) {
+        uInt8Array[i] = raw.charCodeAt(i);
+      }
+      
+      const blob = new Blob([uInt8Array], { type: contentType });
       const success = await subirAvatar(blob, 'avatar-camara.jpg');
       if (success) {
         cerrarCameraModal();

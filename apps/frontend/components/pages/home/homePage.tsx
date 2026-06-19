@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import HeroSection from "@/components/sections/Hero/heroSection";
 import HomeBannersCarousel from "@/components/sections/HomeBanners/homeBannersCarousel";
+import HomeBannersMobileCarousel from "@/components/sections/HomeBanners/homeBannersMobileCarousel";
 
 const AboutProjectSection = dynamic(() => import("@/components/sections/AboutProject/aboutProject"));
 const HowItWorksSection = dynamic(() => import("@/components/sections/HowItWorks/howItWorksSection"));
@@ -19,6 +20,7 @@ export default function HomePage() {
     <div>
       <HeroSection />
       <HomeBannersCarousel />
+      <HomeBannersMobileCarousel />
       <AboutProjectSection />
       <HowItWorksSection />
       <CuponesShowcase />

@@ -12,7 +12,7 @@ interface Banner {
   order: number;
 }
 
-export default function HomeBannersCarousel() {
+export default function HomeBannersMobileCarousel() {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -27,9 +27,9 @@ export default function HomeBannersCarousel() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/public/banners`);
       if (res.ok) {
         const data: Banner[] = await res.json();
-        // Filtrar solo banners de escritorio
-        const desktopBanners = data.filter(b => b.device_type === 'desktop');
-        setBanners(desktopBanners);
+        // Filtrar solo banners móviles
+        const mobileBanners = data.filter(b => b.device_type === 'mobile');
+        setBanners(mobileBanners);
       }
     } catch (err) {
       console.error("Error fetching banners:", err);
@@ -69,9 +69,9 @@ export default function HomeBannersCarousel() {
   if (loading || banners.length === 0) return null;
 
   return (
-    <section className="relative w-full overflow-hidden bg-slate-50 border-y border-slate-100 hidden md:block">
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="relative group aspect-[3/1] rounded-2xl overflow-hidden shadow-xl border border-slate-200">
+    <section className="relative w-full overflow-hidden bg-slate-50 border-y border-slate-100 block md:hidden">
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="relative group aspect-[4/5] rounded-2xl overflow-hidden shadow-xl border border-slate-200">
           {/* Banners Slider */}
           <div 
             className="flex transition-transform duration-700 ease-out h-full"
@@ -112,15 +112,15 @@ export default function HomeBannersCarousel() {
             <>
               <button 
                 onClick={handlePrev}
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 backdrop-blur-sm text-slate-800 shadow-md opacity-0 group-hover:opacity-100 transition-all hover:bg-white"
+                className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/80 backdrop-blur-sm text-slate-800 shadow-md opacity-0 group-hover:opacity-100 transition-all hover:bg-white"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-5 h-5" />
               </button>
               <button 
                 onClick={handleNext}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 backdrop-blur-sm text-slate-800 shadow-md opacity-0 group-hover:opacity-100 transition-all hover:bg-white"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/80 backdrop-blur-sm text-slate-800 shadow-md opacity-0 group-hover:opacity-100 transition-all hover:bg-white"
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-5 h-5" />
               </button>
             </>
           )}
@@ -132,7 +132,7 @@ export default function HomeBannersCarousel() {
                 <button
                   key={index}
                   onClick={() => setCurrentIndex(index)}
-                  className={`w-2.5 h-2.5 rounded-full transition-all ${index === currentIndex ? 'bg-white scale-125' : 'bg-white/40'}`}
+                  className={`w-2 h-2 rounded-full transition-all ${index === currentIndex ? 'bg-white scale-125' : 'bg-white/40'}`}
                 />
               ))}
             </div>

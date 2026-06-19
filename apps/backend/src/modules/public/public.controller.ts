@@ -294,7 +294,7 @@ export class PublicController {
   async getBanners(): Promise<any[]> {
     const { data, error } = await this.supabase.getClient()
       .from('banners')
-      .select('id, title, image_url, link_url, order')
+      .select('id, title, image_url, device_type, link_url, order')
       .eq('is_active', true)
       .order('order', { ascending: true });
 

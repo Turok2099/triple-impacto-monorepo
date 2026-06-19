@@ -461,6 +461,7 @@ export class AdminService {
       .insert({
         title: payload.title,
         image_url: payload.image_url,
+        device_type: payload.device_type || 'desktop',
         link_url: payload.link_url,
         is_active: payload.is_active ?? true,
         order: payload.order ?? 0
@@ -482,6 +483,7 @@ export class AdminService {
       .update({
         title: payload.title,
         image_url: payload.image_url,
+        device_type: payload.device_type,
         link_url: payload.link_url,
         is_active: payload.is_active,
         order: payload.order,

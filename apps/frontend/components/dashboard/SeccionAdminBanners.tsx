@@ -3,20 +3,23 @@
 import { useState, useEffect } from "react";
 import Swal from 'sweetalert2';
 import { getAdminBanners, createBanner, updateBanner, deleteBanner, uploadBannerImage, Banner } from "@/lib/admin";
-import { Image as ImageIcon, Plus, Edit2, Trash2, X, ExternalLink, ArrowUp, ArrowDown, CheckCircle, XCircle, Save, Loader2 } from "lucide-react";
+import { Image as ImageIcon, Plus, Edit2, Trash2, X, ExternalLink, ArrowUp, ArrowDown, CheckCircle, XCircle, Save, Loader2, Smartphone, Monitor } from "lucide-react";
 
 export default function SeccionAdminBanners() {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'desktop' | 'mobile'>('desktop');
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
     image_url: "",
-    image_url_mobile: "",
+    device_type: "desktop" as 'desktop' | 'mobile',
     link_url: "",
     is_active: true,
     order: 0
@@ -40,13 +43,15 @@ export default function SeccionAdminBanners() {
     }
   };
 
+  const filteredBanners = banners.filter(b => b.device_type === activeTab).sort((a, b) => a.order - b.order);
+
   const handleOpenModal = (banner?: Banner) => {
     if (banner) {
       setEditingBanner(banner);
       setFormData({
         title: banner.title,
         image_url: banner.image_url,
-        image_url_mobile: banner.image_url_mobile || "",
+        device_type: banner.device_type,
         link_url: banner.link_url || "",
         is_active: banner.is_active,
         order: banner.order
@@ -56,10 +61,10 @@ export default function SeccionAdminBanners() {
       setFormData({
         title: "",
         image_url: "",
-        image_url_mobile: "",
+        device_type: activeTab,
         link_url: "",
         is_active: true,
-        order: banners.length > 0 ? Math.max(...banners.map(b => b.order)) + 1 : 0
+        order: filteredBanners.length > 0 ? Math.max(...filteredBanners.map(b => b.order)) + 1 : 0
       });
     }
     setIsModalOpen(true);
@@ -106,23 +111,13 @@ export default function SeccionAdminBanners() {
     });
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, isMobile: boolean = false) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const processFile = async (file: File) => {
     try {
       setUploading(true);
-      
-      // Optimizar imagen antes de subir
       const optimizedFile = await compressImage(file);
-      
       const token = localStorage.getItem("auth_token") || "";
       const res = await uploadBannerImage(token, optimizedFile);
-      if (isMobile) {
-        setFormData({ ...formData, image_url_mobile: res.url });
-      } else {
-        setFormData({ ...formData, image_url: res.url });
-      }
+      setFormData({ ...formData, image_url: res.url });
       Swal.fire({
         title: 'Imagen optimizada y subida',
         text: 'Se ha convertido a WebP para mejor rendimiento',
@@ -137,6 +132,32 @@ export default function SeccionAdminBanners() {
       Swal.fire('Error', 'No se pudo subir la imagen optimizada.', 'error');
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) await processFile(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      await processFile(file);
+    } else {
+      Swal.fire('Error', 'Por favor, suelta un archivo de imagen válido.', 'warning');
     }
   };
 
@@ -200,16 +221,15 @@ export default function SeccionAdminBanners() {
   };
 
   const handleMove = async (banner: Banner, direction: 'up' | 'down') => {
-    const currentIndex = banners.findIndex(b => b.id === banner.id);
+    const currentIndex = filteredBanners.findIndex(b => b.id === banner.id);
     if (direction === 'up' && currentIndex === 0) return;
-    if (direction === 'down' && currentIndex === banners.length - 1) return;
+    if (direction === 'down' && currentIndex === filteredBanners.length - 1) return;
 
     const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
-    const targetBanner = banners[targetIndex];
+    const targetBanner = filteredBanners[targetIndex];
 
     try {
       const token = localStorage.getItem("auth_token") || "";
-      // Swap orders
       const tempOrder = banner.order;
       await updateBanner(token, banner.id, { order: targetBanner.order });
       await updateBanner(token, targetBanner.id, { order: tempOrder });
@@ -221,14 +241,41 @@ export default function SeccionAdminBanners() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
           <ImageIcon className="w-6 h-6 text-[#2c8184]" />
-          Gestión de Banners (Carrusel Home)
+          Gestión de Banners
         </h2>
+        
+        {/* Device Tabs */}
+        <div className="flex bg-slate-100 p-1 rounded-xl shadow-inner">
+          <button
+            onClick={() => setActiveTab('desktop')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+              activeTab === 'desktop' 
+                ? 'bg-white text-[#2c8184] shadow-sm' 
+                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+            }`}
+          >
+            <Monitor className="w-4 h-4" />
+            Escritorio
+          </button>
+          <button
+            onClick={() => setActiveTab('mobile')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+              activeTab === 'mobile' 
+                ? 'bg-white text-[#2c8184] shadow-sm' 
+                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+            }`}
+          >
+            <Smartphone className="w-4 h-4" />
+            Móvil
+          </button>
+        </div>
+
         <button
           onClick={() => handleOpenModal()}
-          className="flex items-center gap-2 px-4 py-2 bg-[#2c8184] hover:bg-[#1e6063] text-white rounded-xl font-semibold transition-all shadow-md"
+          className="flex items-center gap-2 px-4 py-2 bg-[#2c8184] hover:bg-[#1e6063] text-white rounded-xl font-semibold transition-all shadow-md shrink-0"
         >
           <Plus className="w-5 h-5" />
           Nuevo Banner
@@ -239,10 +286,10 @@ export default function SeccionAdminBanners() {
         <div className="flex justify-center py-12">
           <Loader2 className="w-8 h-8 animate-spin text-[#2c8184]" />
         </div>
-      ) : banners.length === 0 ? (
+      ) : filteredBanners.length === 0 ? (
         <div className="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center">
-          <ImageIcon className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-          <p className="text-slate-500 font-medium">No hay banners configurados</p>
+          {activeTab === 'desktop' ? <Monitor className="w-12 h-12 text-slate-300 mx-auto mb-4" /> : <Smartphone className="w-12 h-12 text-slate-300 mx-auto mb-4" />}
+          <p className="text-slate-500 font-medium">No hay banners {activeTab === 'desktop' ? 'de escritorio' : 'móviles'} configurados</p>
           <button
             onClick={() => handleOpenModal()}
             className="mt-4 text-[#2c8184] font-bold hover:underline"
@@ -262,7 +309,7 @@ export default function SeccionAdminBanners() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {banners.map((banner, index) => (
+              {filteredBanners.map((banner, index) => (
                 <tr key={banner.id} className="hover:bg-slate-50/50 transition-colors">
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-2">
@@ -277,7 +324,7 @@ export default function SeccionAdminBanners() {
                         </button>
                         <button 
                           onClick={() => handleMove(banner, 'down')}
-                          disabled={index === banners.length - 1}
+                          disabled={index === filteredBanners.length - 1}
                           className="p-1 text-slate-400 hover:text-[#2c8184] disabled:opacity-30"
                         >
                           <ArrowDown className="w-4 h-4" />
@@ -287,7 +334,7 @@ export default function SeccionAdminBanners() {
                   </td>
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-32 h-16 rounded-lg bg-slate-100 overflow-hidden border border-slate-200 shrink-0">
+                      <div className={`rounded-lg bg-slate-100 overflow-hidden border border-slate-200 shrink-0 ${activeTab === 'desktop' ? 'w-32 h-16' : 'w-16 h-20'}`}>
                         <img 
                           src={banner.image_url} 
                           alt={banner.title} 
@@ -354,7 +401,8 @@ export default function SeccionAdminBanners() {
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
               <h2 className="text-xl font-bold text-slate-800">
-                {editingBanner ? "Editar Banner" : "Nuevo Banner"}
+                {editingBanner ? "Editar Banner" : "Nuevo Banner"} 
+                <span className="text-slate-500 text-sm ml-2 font-normal">({formData.device_type === 'desktop' ? 'Escritorio' : 'Móvil'})</span>
               </h2>
               <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200 transition-colors">
                 <X className="w-5 h-5" />
@@ -374,73 +422,53 @@ export default function SeccionAdminBanners() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1">Imagen (Desktop)</label>
-                    <div className="mt-1 flex flex-col gap-3">
-                      {formData.image_url && (
-                        <div className="relative w-full aspect-[3/1] rounded-xl overflow-hidden border border-slate-200">
-                          <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover" />
-                          <button 
-                            type="button"
-                            onClick={() => setFormData({...formData, image_url: ""})}
-                            className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      )}
-                      
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Imagen del Banner</label>
+                  <div className="mt-1 flex flex-col gap-3">
+                    {formData.image_url && (
+                      <div className={`relative w-full overflow-hidden border border-slate-200 rounded-xl mx-auto ${formData.device_type === 'desktop' ? 'aspect-[3/1]' : 'aspect-[4/5] max-h-48'}`}>
+                        <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover" />
+                        <button 
+                          type="button"
+                          onClick={() => setFormData({...formData, image_url: ""})}
+                          className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                    
+                    {!formData.image_url && (
                       <div className="flex items-center justify-center w-full">
-                        <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all ${uploading ? 'bg-slate-50 border-slate-200' : 'bg-slate-50 border-slate-300 hover:bg-slate-100 hover:border-[#2c8184]'}`}>
+                        <label 
+                          onDragOver={handleDragOver}
+                          onDragLeave={handleDragLeave}
+                          onDrop={handleDrop}
+                          className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
+                            isDragging 
+                              ? 'bg-emerald-50 border-emerald-400 scale-[1.02]' 
+                              : uploading 
+                                ? 'bg-slate-50 border-slate-200' 
+                                : 'bg-slate-50 border-slate-300 hover:bg-slate-100 hover:border-[#2c8184]'
+                          }`}
+                        >
                           <div className="flex flex-col items-center justify-center pt-5 pb-6">
                             {uploading ? (
                               <Loader2 className="w-8 h-8 animate-spin text-[#2c8184] mb-2" />
                             ) : (
-                              <Plus className="w-8 h-8 text-slate-400 mb-2" />
+                              <Plus className={`w-8 h-8 mb-2 ${isDragging ? 'text-emerald-500 animate-bounce' : 'text-slate-400'}`} />
                             )}
-                            <p className="text-sm text-slate-500 text-center">
-                              {uploading ? 'Subiendo...' : formData.image_url ? 'Cambiar imagen' : 'Haz clic para subir imagen (Recomendado 1920x600)'}
+                            <p className={`text-sm font-medium ${isDragging ? 'text-emerald-600' : 'text-slate-500'}`}>
+                              {uploading ? 'Subiendo...' : isDragging ? 'Suelta la imagen aquí' : 'Haz clic o arrastra una imagen'}
+                            </p>
+                            <p className="text-xs text-slate-400 mt-1">
+                              {formData.device_type === 'desktop' ? 'Recomendado: 1920x600px' : 'Recomendado: 800x1000px'}
                             </p>
                           </div>
-                          <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, false)} disabled={uploading} />
+                          <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} disabled={uploading} />
                         </label>
                       </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1">Imagen (Móvil)</label>
-                    <div className="mt-1 flex flex-col gap-3">
-                      {formData.image_url_mobile && (
-                        <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden border border-slate-200 max-h-40 object-contain mx-auto">
-                          <img src={formData.image_url_mobile} alt="Preview Mobile" className="w-full h-full object-cover" />
-                          <button 
-                            type="button"
-                            onClick={() => setFormData({...formData, image_url_mobile: ""})}
-                            className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      )}
-                      
-                      <div className="flex items-center justify-center w-full mt-auto">
-                        <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all ${uploading ? 'bg-slate-50 border-slate-200' : 'bg-slate-50 border-slate-300 hover:bg-slate-100 hover:border-[#2c8184]'}`}>
-                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            {uploading ? (
-                              <Loader2 className="w-8 h-8 animate-spin text-[#2c8184] mb-2" />
-                            ) : (
-                              <Plus className="w-8 h-8 text-slate-400 mb-2" />
-                            )}
-                            <p className="text-sm text-slate-500 text-center">
-                              {uploading ? 'Subiendo...' : formData.image_url_mobile ? 'Cambiar imagen' : 'Haz clic para subir imagen (Recomendado 800x1000)'}
-                            </p>
-                          </div>
-                          <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, true)} disabled={uploading} />
-                        </label>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </div>
 
@@ -486,8 +514,8 @@ export default function SeccionAdminBanners() {
                 </button>
                 <button 
                   type="submit" 
-                  disabled={submitting || uploading} 
-                  className="flex-1 py-3 px-4 bg-[#2c8184] hover:bg-[#1e6063] disabled:bg-slate-300 text-white font-semibold rounded-xl shadow-lg transition-all flex justify-center items-center gap-2"
+                  disabled={submitting || uploading || !formData.image_url} 
+                  className="flex-1 py-3 px-4 bg-[#2c8184] hover:bg-[#1e6063] disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold rounded-xl shadow-lg transition-all flex justify-center items-center gap-2"
                 >
                   {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="w-5 h-5" />}
                   {editingBanner ? 'Guardar Cambios' : 'Crear Banner'}

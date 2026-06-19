@@ -98,7 +98,7 @@ export default function CuponDetalleModal({
           />
           {/* Descuento sobre la imagen (izquierda) */}
           <div className="absolute top-3 left-3">
-            <span className="bg-[#40a8ab] text-white text-base font-black size-16 rounded-full shadow-md flex items-center justify-center text-center leading-tight">
+            <span className="bg-[#2c8184] text-white text-base font-black size-16 rounded-full shadow-md flex items-center justify-center text-center leading-tight">
               {cupon.descuento}
             </span>
           </div>
@@ -129,7 +129,7 @@ export default function CuponDetalleModal({
           {estado === 'detalle' && (
             <button
               onClick={handleSolicitar}
-              className="w-full py-3.5 bg-[#40a8ab] hover:bg-[#12854a] text-white font-bold rounded-2xl transition-colors shadow-md shadow-[#40a8ab]/20 flex items-center justify-center gap-2"
+              className="w-full py-3.5 bg-[#2c8184] hover:bg-[#12854a] text-white font-bold rounded-2xl transition-colors shadow-md shadow-[#2c8184]/20 flex items-center justify-center gap-2"
             >
               <Ticket className="w-5 h-5" />
               Solicitar código de descuento
@@ -139,7 +139,7 @@ export default function CuponDetalleModal({
           {/* ── Estado: SOLICITANDO ── */}
           {estado === 'solicitando' && (
             <div className="w-full py-3.5 bg-slate-100 rounded-2xl flex items-center justify-center gap-3">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#40a8ab]" />
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#2c8184]" />
               <span className="text-slate-600 font-medium text-sm">Obteniendo tu código...</span>
             </div>
           )}
@@ -147,18 +147,18 @@ export default function CuponDetalleModal({
           {/* ── Estado: CÓDIGO OBTENIDO ── */}
           {estado === 'codigo_obtenido' && cuponObtenido && (
             <div className="space-y-4">
-              <div className="flex items-center gap-2 text-[#40a8ab]">
+              <div className="flex items-center gap-2 text-[#2c8184]">
                 <CheckCircle className="w-5 h-5" />
                 <span className="text-sm font-bold">¡Código obtenido exitosamente!</span>
               </div>
 
               {/* Código destacado */}
-              <div className="bg-[#E8F5EE] border border-[#40a8ab]/20 rounded-2xl p-4">
+              <div className="bg-[#E8F5EE] border border-[#2c8184]/20 rounded-2xl p-4">
                 <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">
                   Tu código de descuento
                 </p>
                 <div className="flex items-center justify-between gap-3">
-                  <span className="text-2xl font-mono font-black text-[#40a8ab] tracking-widest uppercase break-all">
+                  <span className="text-2xl font-mono font-black text-[#2c8184] tracking-widest uppercase break-all">
                     {cuponObtenido.codigo}
                   </span>
                   <button
@@ -166,7 +166,7 @@ export default function CuponDetalleModal({
                     className={`shrink-0 size-10 rounded-full flex items-center justify-center transition-colors ${
                       copiado
                         ? 'bg-green-500 text-white'
-                        : 'bg-[#40a8ab]/10 text-[#40a8ab] hover:bg-[#40a8ab]/20'
+                        : 'bg-[#2c8184]/10 text-[#2c8184] hover:bg-[#2c8184]/20'
                     }`}
                   >
                     {copiado ? (
@@ -192,7 +192,7 @@ export default function CuponDetalleModal({
               <div className="grid grid-cols-2 gap-3">
                 <a
                   href="/dashboard/mis-cupones"
-                  className="py-3 bg-[#40a8ab] text-white text-sm font-bold rounded-xl text-center hover:bg-[#12854a] transition-colors"
+                  className="py-3 bg-[#2c8184] text-white text-sm font-bold rounded-xl text-center hover:bg-[#12854a] transition-colors"
                 >
                   Ver mis cupones
                 </a>

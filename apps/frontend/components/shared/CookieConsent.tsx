@@ -95,7 +95,7 @@ export default function CookieConsent() {
   return (
     <div className="fixed bottom-6 right-6 left-6 md:left-auto md:w-[440px] bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-gray-100 p-6 z-50 transition-all duration-300 ease-out animate-in fade-in slide-in-from-bottom-8">
       <div className="flex items-start gap-4 mb-4">
-        <div className="shrink-0 w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center text-[#40a8ab]">
+        <div className="shrink-0 w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center text-[#2c8184]">
           <Cookie className="w-6 h-6" />
         </div>
         <div>
@@ -150,7 +150,7 @@ export default function CookieConsent() {
                 onChange={() => togglePreference("analytics")}
                 className="sr-only peer"
               />
-              <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#40a8ab]"></div>
+              <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#2c8184]"></div>
             </label>
           </div>
 
@@ -169,14 +169,14 @@ export default function CookieConsent() {
                 onChange={() => togglePreference("marketing")}
                 className="sr-only peer"
               />
-              <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#40a8ab]"></div>
+              <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#2c8184]"></div>
             </label>
           </div>
         </div>
       ) : (
         <div className="text-xs text-gray-500 mb-4 flex items-center gap-1">
           <span>Consultá nuestra</span>
-          <Link href="/politica-de-cookies" className="text-[#40a8ab] hover:underline font-medium">
+          <Link href="/politica-de-cookies" className="text-[#2c8184] hover:underline font-medium">
             Política de cookies
           </Link>
         </div>
@@ -194,7 +194,7 @@ export default function CookieConsent() {
             </button>
             <button
               onClick={handleSavePreferences}
-              className="flex-1 py-2 px-3 bg-[#40a8ab] hover:bg-[#2c8184] text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
+              className="flex-1 py-2 px-3 bg-[#2c8184] hover:bg-[#1e6063] text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
             >
               <Check className="w-3.5 h-3.5" />
               Guardar selección
@@ -219,7 +219,7 @@ export default function CookieConsent() {
             </div>
             <button
               onClick={handleAcceptAll}
-              className="w-full py-2.5 px-4 bg-[#40a8ab] hover:bg-[#2c8184] text-white rounded-xl text-xs font-semibold shadow-sm hover:shadow transition-colors"
+              className="w-full py-2.5 px-4 bg-[#2c8184] hover:bg-[#1e6063] text-white rounded-xl text-xs font-semibold shadow-sm hover:shadow transition-colors"
             >
               Aceptar todo
             </button>

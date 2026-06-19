@@ -107,7 +107,7 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
           </p>
           <Link
             href="/donar"
-            className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-[#40a8ab] text-white font-semibold rounded-xl hover:bg-[#40a8ab] transition-colors"
+            className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-[#2c8184] text-white font-semibold rounded-xl hover:bg-[#2c8184] transition-colors"
           >
             <Heart className="w-4 h-4" />
             Ir a donar
@@ -147,7 +147,7 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                     {logoUrl ? (
                       <Image src={logoUrl} alt={org.nombre} fill sizes="64px" className="object-contain p-1" />
                     ) : (
-                      <span className="w-full h-full flex items-center justify-center text-lg font-bold text-[#40a8ab]">
+                      <span className="w-full h-full flex items-center justify-center text-lg font-bold text-[#2c8184]">
                         {org.nombre.charAt(0)}
                       </span>
                     )}
@@ -166,7 +166,7 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                 <Link
                   href="/donar"
                   onClick={(e) => e.stopPropagation()}
-                  className="bg-[#40a8ab] text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-teal-500/20 active:scale-95 transition-transform shrink-0"
+                  className="bg-[#2c8184] text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-teal-500/20 active:scale-95 transition-transform shrink-0"
                 >
                   Donar
                 </Link>
@@ -190,12 +190,12 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                     {logoUrl ? (
                       <Image src={logoUrl} alt={org.nombre} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-contain p-2" />
                     ) : (
-                      <span className="w-full h-full flex items-center justify-center text-2xl font-bold text-[#40a8ab]">
+                      <span className="w-full h-full flex items-center justify-center text-2xl font-bold text-[#2c8184]">
                         {org.nombre.charAt(0)}
                       </span>
                     )}
                   </div>
-                  <h3 className="text-lg font-bold text-[#1A202C] mb-1 group-hover:text-[#40a8ab] transition-colors leading-tight line-clamp-2">
+                  <h3 className="text-lg font-bold text-[#1A202C] mb-1 group-hover:text-[#2c8184] transition-colors leading-tight line-clamp-2">
                     {org.nombre}
                   </h3>
                   {org.descripcion && (
@@ -207,7 +207,7 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                 <Link
                   href="/donar"
                   onClick={(e) => e.stopPropagation()}
-                  className="w-full bg-[#40a8ab] text-white py-4 font-bold text-sm tracking-wide hover:bg-[#40a8ab] transition-colors mt-auto text-center"
+                  className="w-full bg-[#2c8184] text-white py-4 font-bold text-sm tracking-wide hover:bg-[#2c8184] transition-colors mt-auto text-center"
                 >
                   Donar
                 </Link>
@@ -243,13 +243,13 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                     return logoUrl ? (
                       <Image src={logoUrl} alt={selectedOrg.nombre} fill sizes="96px" className="object-contain p-3" />
                     ) : (
-                      <span className="text-4xl font-bold text-[#40a8ab]">{selectedOrg.nombre.charAt(0)}</span>
+                      <span className="text-4xl font-bold text-[#2c8184]">{selectedOrg.nombre.charAt(0)}</span>
                     );
                   })()}
                 </div>
                 <div>
                   <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-1">{selectedOrg.nombre}</h2>
-                  <p className="text-[#40a8ab] font-medium text-sm">Organización Aliada</p>
+                  <p className="text-[#2c8184] font-medium text-sm">Organización Aliada</p>
                 </div>
               </div>
 
@@ -268,27 +268,27 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                     <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Información y Contacto</h3>
                     {selectedOrg.email && (
                       <div className="flex items-start gap-4">
-                        <Mail className="w-5 h-5 text-[#40a8ab] mt-0.5 shrink-0" />
+                        <Mail className="w-5 h-5 text-[#2c8184] mt-0.5 shrink-0" />
                         <p className="text-base text-slate-700 break-all sm:break-words">{selectedOrg.email}</p>
                       </div>
                     )}
                     {selectedOrg.telefono && (
                       <div className="flex items-start gap-4">
-                        <Phone className="w-5 h-5 text-[#40a8ab] mt-0.5 shrink-0" />
+                        <Phone className="w-5 h-5 text-[#2c8184] mt-0.5 shrink-0" />
                         <p className="text-base text-slate-700">{selectedOrg.telefono}</p>
                       </div>
                     )}
                     {selectedOrg.direccion && (
                       <div className="flex items-start gap-4">
-                        <MapPin className="w-5 h-5 text-[#40a8ab] mt-0.5 shrink-0" />
+                        <MapPin className="w-5 h-5 text-[#2c8184] mt-0.5 shrink-0" />
                         <p className="text-base text-slate-700">{selectedOrg.direccion}</p>
                       </div>
                     )}
                     
                     {selectedOrg.website_url && (
                       <div className="flex items-start gap-4">
-                        <Globe className="w-5 h-5 text-[#40a8ab] mt-0.5 shrink-0" />
-                        <a href={selectedOrg.website_url} target="_blank" rel="noopener noreferrer" className="text-base text-[#40a8ab] hover:text-[#2c8184] hover:underline break-all">
+                        <Globe className="w-5 h-5 text-[#2c8184] mt-0.5 shrink-0" />
+                        <a href={selectedOrg.website_url} target="_blank" rel="noopener noreferrer" className="text-base text-[#2c8184] hover:text-[#1e6063] hover:underline break-all">
                           {selectedOrg.website_url}
                         </a>
                       </div>
@@ -296,8 +296,8 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                     
                     {selectedOrg.slug && (
                       <div className="flex items-start gap-4">
-                        <ExternalLink className="w-5 h-5 text-[#40a8ab] mt-0.5 shrink-0" />
-                        <a href={selectedOrg.slug.startsWith('http') ? selectedOrg.slug : `https://${selectedOrg.slug}`} target="_blank" rel="noopener noreferrer" className="text-base text-[#40a8ab] hover:text-[#2c8184] hover:underline break-all">
+                        <ExternalLink className="w-5 h-5 text-[#2c8184] mt-0.5 shrink-0" />
+                        <a href={selectedOrg.slug.startsWith('http') ? selectedOrg.slug : `https://${selectedOrg.slug}`} target="_blank" rel="noopener noreferrer" className="text-base text-[#2c8184] hover:text-[#1e6063] hover:underline break-all">
                           Sitio de beneficios Bonda
                         </a>
                       </div>
@@ -314,7 +314,7 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                 <Link
                   href="/donar"
                   onClick={closeModal}
-                  className="w-full flex justify-center items-center gap-2 bg-[#40a8ab] text-white font-bold py-4 px-6 rounded-xl hover:bg-[#40a8ab] transition-colors shadow-lg shadow-teal-500/20 text-lg active:scale-[0.98]"
+                  className="w-full flex justify-center items-center gap-2 bg-[#2c8184] text-white font-bold py-4 px-6 rounded-xl hover:bg-[#2c8184] transition-colors shadow-lg shadow-teal-500/20 text-lg active:scale-[0.98]"
                 >
                   <Heart className="w-5 h-5" />
                   Donar a esta Organización

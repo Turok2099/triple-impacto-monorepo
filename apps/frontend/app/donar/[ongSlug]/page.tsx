@@ -70,7 +70,7 @@ export default function DonarExclusivePage() {
   if (authLoading || checkingAuth || loadingOrg) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2 className="w-10 h-10 animate-spin text-[#40a8ab]" />
+        <Loader2 className="w-10 h-10 animate-spin text-[#2c8184]" />
       </div>
     );
   }
@@ -86,7 +86,7 @@ export default function DonarExclusivePage() {
           <p className="text-slate-500 mb-8">{error || "No pudimos cargar la página de donación."}</p>
           <button
             onClick={() => router.push("/")}
-            className="w-full py-3 bg-[#40a8ab] text-white rounded-2xl font-semibold hover:bg-teal-600 transition-all flex items-center justify-center gap-2"
+            className="w-full py-3 bg-[#2c8184] text-white rounded-2xl font-semibold hover:bg-teal-600 transition-all flex items-center justify-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" /> Volver al Inicio
           </button>
@@ -106,7 +106,7 @@ export default function DonarExclusivePage() {
             {!isAuthenticated ? (
               <div className="max-w-2xl w-full bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-md">
                 {/* Banner superior estilo AYNI */}
-                <div className="bg-[#40a8ab] p-6 text-center text-white">
+                <div className="bg-[#2c8184] p-6 text-center text-white">
                   <h3 className="text-lg font-bold tracking-wide uppercase">
                     {organizacion.nombre?.toUpperCase().startsWith("CLUB")
                       ? `${organizacion.nombre} ¡¡DONAR TIENE PREMIO!!`
@@ -149,7 +149,7 @@ export default function DonarExclusivePage() {
                     <div className="space-y-0.5">
                       <h4 className="text-sm md:text-base font-bold text-slate-800">Portal de Beneficios Bonda</h4>
                       <p className="text-xs md:text-sm text-slate-500 font-semibold leading-relaxed">
-                        Con tu donación mensual, accedés a más de <span className="font-bold text-[#40a8ab]">1700 cupones de descuento exclusivos</span> en primeras marcas nacionales.
+                        Con tu donación mensual, accedés a más de <span className="font-bold text-[#2c8184]">1700 cupones de descuento exclusivos</span> en primeras marcas nacionales.
                       </p>
                     </div>
                   </div>
@@ -162,7 +162,7 @@ export default function DonarExclusivePage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <button
                         onClick={() => router.push(`/login?redirect=/donar/${ongSlug}`)}
-                        className="w-full py-4 px-6 bg-[#40a8ab] hover:bg-teal-600 text-white rounded-2xl font-bold transition-all cursor-pointer shadow-md flex items-center justify-between gap-4 group"
+                        className="w-full py-4 px-6 bg-[#2c8184] hover:bg-teal-600 text-white rounded-2xl font-bold transition-all cursor-pointer shadow-md flex items-center justify-between gap-4 group"
                       >
                         <div className="flex items-center gap-3 text-left">
                           <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
@@ -231,7 +231,7 @@ export default function DonarExclusivePage() {
                       Red Plato Lleno es una iniciativa de concientización alimentaria que busca devolverle al alimento el valor que fue perdiendo durante los últimos tiempos. Motivados por el respeto a la comida, voluntarios de Plato Lleno llevan a cabo la acción de «Rescate», la cual consiste en el retiro y distribución de alimentos excedentes que, por control estético u otras razones, quedan sin destino. Los alimentos rescatados son entregados de forma gratuita en merenderos, comedores y hogares.
                     </p>
                     
-                    <div className="bg-[#40a8ab]/5 border border-[#40a8ab]/10 rounded-2xl p-4 text-center">
+                    <div className="bg-[#2c8184]/5 border border-[#2c8184]/10 rounded-2xl p-4 text-center">
                       <p className="font-bold text-teal-900 mb-1">
                         En el 2022 rescatamos 104 toneladas de alimentos
                       </p>
@@ -276,7 +276,7 @@ export default function DonarExclusivePage() {
                     {organizacion.email && (
                       <div className="flex items-start gap-2.5">
                         <span className="font-semibold text-slate-800">Email:</span>
-                        <a href={`mailto:${organizacion.email}`} className="text-[#40a8ab] hover:underline break-all">{organizacion.email}</a>
+                        <a href={`mailto:${organizacion.email}`} className="text-[#2c8184] hover:underline break-all">{organizacion.email}</a>
                       </div>
                     )}
                     {organizacion.telefono && (
@@ -294,7 +294,7 @@ export default function DonarExclusivePage() {
                   href={organizacion.website_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full py-2.5 text-center bg-teal-50 hover:bg-teal-100 text-[#40a8ab] font-bold rounded-2xl text-xs transition-colors"
+                  className="block w-full py-2.5 text-center bg-teal-50 hover:bg-teal-100 text-[#2c8184] font-bold rounded-2xl text-xs transition-colors"
                 >
                   Visitar sitio web
                 </a>

@@ -129,7 +129,7 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
         <div className="min-h-[200px]">
           {loading && (
             <div className="flex flex-col items-center justify-center py-16">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#40a8ab] mb-4" />
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2c8184] mb-4" />
               <p className="text-gray-600">Cargando cupones...</p>
             </div>
           )}
@@ -169,7 +169,7 @@ export default function CuponesShowcase({ microsite }: CuponesShowcaseProps) {
               <div className="flex justify-center mt-12">
                 <button
                   onClick={handleVerMas}
-                  className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#40a8ab] to-teal-600 text-white font-bold text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                  className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#2c8184] to-teal-600 text-white font-bold text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
                 >
                   <span>Ver más descuentos</span>
                   <svg

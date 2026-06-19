@@ -93,7 +93,7 @@ function NavbarContent() {
                   onClick={(e) => {
                     if (pathname === link.href) e.preventDefault();
                   }}
-                  className="px-4 py-2 text-gray-700 hover:text-[#40a8ab] hover:bg-teal-50 rounded-lg transition-all duration-200 font-medium text-sm"
+                  className="px-4 py-2 text-gray-700 hover:text-[#2c8184] hover:bg-teal-50 rounded-lg transition-all duration-200 font-medium text-sm"
                 >
                   {link.name}
                 </Link>
@@ -113,14 +113,14 @@ function NavbarContent() {
                           onClick={(e) => {
                             if (pathname === "/dashboard") e.preventDefault();
                           }}
-                          className="px-4 py-2 text-[#40a8ab] hover:text-[#2c8184] hover:bg-teal-50 rounded-lg transition-all duration-200 font-medium text-sm"
+                          className="px-4 py-2 text-[#2c8184] hover:text-[#1e6063] hover:bg-teal-50 rounded-lg transition-all duration-200 font-medium text-sm"
                         >
                           Dashboard
                         </Link>
                       )}
                       <span className="text-sm text-gray-700 font-medium">
                         Hola,{" "}
-                        <span className="text-[#40a8ab]">{user.nombre}</span>
+                        <span className="text-[#2c8184]">{user.nombre}</span>
                       </span>
                       <button
                         onClick={handleLogout}
@@ -136,7 +136,7 @@ function NavbarContent() {
                       onClick={(e) => {
                         if (pathname === "/login") e.preventDefault();
                       }}
-                      className="px-4 py-2 text-gray-700 hover:text-[#40a8ab] transition-colors font-medium text-sm"
+                      className="px-4 py-2 text-gray-700 hover:text-[#2c8184] transition-colors font-medium text-sm"
                     >
                       Iniciar sesión
                     </Link>
@@ -213,9 +213,9 @@ function NavbarContent() {
                 key={link.name}
                 href={link.href}
                 onClick={(e) => handleNavClick(e, link.href)}
-                className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-teal-50 hover:text-[#40a8ab] rounded-xl transition-all duration-200 font-medium"
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-teal-50 hover:text-[#2c8184] rounded-xl transition-all duration-200 font-medium"
               >
-                <span className="text-[#40a8ab] opacity-80">{link.icon}</span>
+                <span className="text-[#2c8184] opacity-80">{link.icon}</span>
                 <span>{link.name}</span>
               </Link>
             ))}
@@ -230,7 +230,7 @@ function NavbarContent() {
                   <>
                     <div className="px-4 py-3 bg-teal-50 rounded-xl">
                       <div className="text-sm text-gray-600">Bienvenido/a</div>
-                      <div className="text-lg font-bold text-[#40a8ab]">
+                      <div className="text-lg font-bold text-[#2c8184]">
                         {user.nombre}
                       </div>
                     </div>
@@ -238,7 +238,7 @@ function NavbarContent() {
                        <Link
                          href="/dashboard"
                          onClick={(e) => handleNavClick(e, "/dashboard")}
-                         className="flex items-center gap-3 px-4 py-3 text-[#40a8ab] hover:bg-teal-50 rounded-xl transition-colors font-medium"
+                         className="flex items-center gap-3 px-4 py-3 text-[#2c8184] hover:bg-teal-50 rounded-xl transition-colors font-medium"
                        >
                          <LayoutDashboard className="w-5 h-5 opacity-80" />
                          <span>Dashboard</span>

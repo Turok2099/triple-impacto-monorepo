@@ -71,7 +71,7 @@ export default function MisCuponesPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#40a8ab] mx-auto mb-4" />
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2c8184] mx-auto mb-4" />
           <p className="text-[#2D3748]">Cargando tus cupones...</p>
         </div>
       </div>
@@ -98,13 +98,13 @@ export default function MisCuponesPage() {
             onClick={() => setTab('activos')}
             className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${
               tab === 'activos'
-                ? 'bg-white text-[#40a8ab] shadow-sm'
+                ? 'bg-white text-[#2c8184] shadow-sm'
                 : 'text-slate-500 hover:text-slate-700'
             }`}
           >
             Activos
             <span className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full font-black ${
-              tab === 'activos' ? 'bg-[#40a8ab]/10 text-[#40a8ab]' : 'bg-slate-200 text-slate-500'
+              tab === 'activos' ? 'bg-[#2c8184]/10 text-[#2c8184]' : 'bg-slate-200 text-slate-500'
             }`}>
               {cuponesActivos.length}
             </span>
@@ -130,9 +130,9 @@ export default function MisCuponesPage() {
       {/* Contenido */}
       <section className="px-4 py-4 pb-12">
         {lista.length === 0 ? (
-          <div className="rounded-2xl bg-[#E8F5EE] border border-[#40a8ab]/20 p-10 text-center mt-4">
+          <div className="rounded-2xl bg-[#E8F5EE] border border-[#2c8184]/20 p-10 text-center mt-4">
             <div className="flex justify-center mb-4">
-              <Ticket className="w-16 h-16 text-[#40a8ab]" strokeWidth={1.5} />
+              <Ticket className="w-16 h-16 text-[#2c8184]" strokeWidth={1.5} />
             </div>
             <h3 className="text-lg font-bold text-[#2D3748] mb-2">
               {tab === 'activos' ? 'No tenés cupones activos' : 'No tenés cupones usados'}
@@ -145,7 +145,7 @@ export default function MisCuponesPage() {
             {tab === 'activos' && (
               <button
                 onClick={() => router.push('/dashboard')}
-                className="bg-[#40a8ab] text-white text-sm font-bold py-3 px-6 rounded-xl shadow-sm hover:bg-[#12854a] transition-colors"
+                className="bg-[#2c8184] text-white text-sm font-bold py-3 px-6 rounded-xl shadow-sm hover:bg-[#12854a] transition-colors"
               >
                 Ver Catálogo
               </button>
@@ -158,7 +158,7 @@ export default function MisCuponesPage() {
                 key={cupon.id}
                 className={`rounded-2xl border p-5 shadow-sm ${
                   tab === 'activos'
-                    ? 'bg-[#E8F5EE] border-[#40a8ab]/20'
+                    ? 'bg-[#E8F5EE] border-[#2c8184]/20'
                     : 'bg-slate-50 border-slate-200'
                 }`}
               >
@@ -196,14 +196,14 @@ export default function MisCuponesPage() {
                 {/* Código */}
                 {cupon.codigo && (
                   <div className={`bg-white rounded-xl p-3 border border-dashed mb-3 flex justify-between items-center ${
-                    tab === 'activos' ? 'border-[#40a8ab]/30' : 'border-slate-200'
+                    tab === 'activos' ? 'border-[#2c8184]/30' : 'border-slate-200'
                   }`}>
                     <div>
                       <p className="text-[8px] uppercase font-bold text-slate-400 mb-0.5">
                         Código de descuento
                       </p>
                       <p className={`text-base font-mono font-black tracking-widest uppercase ${
-                        tab === 'activos' ? 'text-[#40a8ab]' : 'text-slate-400 line-through'
+                        tab === 'activos' ? 'text-[#2c8184]' : 'text-slate-400 line-through'
                       }`}>
                         {cupon.codigo}
                       </p>
@@ -214,7 +214,7 @@ export default function MisCuponesPage() {
                         className={`size-8 rounded-full flex items-center justify-center transition-colors ${
                           copiedCode === cupon.id
                             ? 'bg-green-100 text-green-600'
-                            : 'bg-[#40a8ab]/10 text-[#40a8ab] hover:bg-[#40a8ab]/20'
+                            : 'bg-[#2c8184]/10 text-[#2c8184] hover:bg-[#2c8184]/20'
                         }`}
                       >
                         {copiedCode === cupon.id ? (
@@ -237,7 +237,7 @@ export default function MisCuponesPage() {
                   <button
                     onClick={() => handleMarcarUsado(cupon.id)}
                     disabled={marcandoUsado === cupon.id}
-                    className="w-full py-2.5 bg-[#40a8ab] hover:bg-[#12854a] text-white text-xs font-bold rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                    className="w-full py-2.5 bg-[#2c8184] hover:bg-[#12854a] text-white text-xs font-bold rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
                   >
                     {marcandoUsado === cupon.id ? (
                       <>

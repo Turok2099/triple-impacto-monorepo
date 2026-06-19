@@ -364,7 +364,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
       {/* Toast flotante */}
       {toast && (
         <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-xl text-sm font-semibold transition-all animate-in fade-in slide-in-from-bottom-4 ${
-          toast.tipo === 'ok' ? 'bg-[#40a8ab] text-white' : 'bg-red-500 text-white'
+          toast.tipo === 'ok' ? 'bg-[#2c8184] text-white' : 'bg-red-500 text-white'
         }`}>
           {toast.tipo === 'ok' ? <CheckCircle2 className="w-5 h-5 shrink-0" /> : <XCircle className="w-5 h-5 shrink-0" />}
           {toast.texto}
@@ -391,14 +391,14 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                     <Camera className="w-5 h-5 text-white" />
                   </div>
                   {/* Badge de cámara siempre visible (ideal para móvil y feedback visual inmediato) */}
-                  <div className="absolute bottom-0 right-0 bg-[#40a8ab] text-white p-1 rounded-full border border-white shadow-sm flex items-center justify-center translate-x-1 translate-y-0.5 z-10 transition-transform active:scale-95">
+                  <div className="absolute bottom-0 right-0 bg-[#2c8184] text-white p-1 rounded-full border border-white shadow-sm flex items-center justify-center translate-x-1 translate-y-0.5 z-10 transition-transform active:scale-95">
                     <Camera className="w-3 h-3" />
                   </div>
                 </>
               )}
               {subiendoFoto && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-5 h-5 border-2 border-[#40a8ab] border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-5 h-5 border-2 border-[#2c8184] border-t-transparent rounded-full animate-spin"></div>
                 </div>
               )}
             </div>
@@ -418,7 +418,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                     }}
                     className="flex items-center gap-2.5 w-full px-4 py-2.5 text-slate-700 hover:bg-slate-50 text-xs font-bold transition-all text-left"
                   >
-                    <Camera className="w-4 h-4 text-[#40a8ab]" />
+                    <Camera className="w-4 h-4 text-[#2c8184]" />
                     Usar Cámara
                   </button>
                   <button
@@ -428,7 +428,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                     }}
                     className="flex items-center gap-2.5 w-full px-4 py-2.5 text-slate-700 hover:bg-slate-50 text-xs font-bold transition-all text-left"
                   >
-                    <PlusCircle className="w-4 h-4 text-[#40a8ab]" />
+                    <PlusCircle className="w-4 h-4 text-[#2c8184]" />
                     Subir Archivo
                   </button>
                 </div>
@@ -438,7 +438,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
             <div className="min-w-0 flex-1">
               <p className="font-bold text-slate-800 text-sm break-words whitespace-normal leading-tight">{user.nombre}</p>
               <div className="flex items-center gap-1 mt-0.5">
-                {isActive ? <CheckCircle className="w-3.5 h-3.5 text-[#40a8ab]" /> : <AlertCircle className="w-3.5 h-3.5 text-slate-400" />}
+                {isActive ? <CheckCircle className="w-3.5 h-3.5 text-[#2c8184]" /> : <AlertCircle className="w-3.5 h-3.5 text-slate-400" />}
                 <p className="text-[11px] text-slate-500 font-medium truncate">
                   {isActive ? 'Suscripción Activa' : 'Sin Suscripción'}
                 </p>
@@ -451,7 +451,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
               onClick={() => setActiveTab('resumen')}
               className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-bold text-sm transition-all ${
                 activeTab === 'resumen' 
-                  ? 'bg-[#40a8ab]/10 text-[#40a8ab]' 
+                  ? 'bg-[#2c8184]/10 text-[#2c8184]' 
                   : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
               }`}
             >
@@ -463,7 +463,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
               onClick={() => setActiveTab('suscripcion')}
               className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-bold text-sm transition-all ${
                 activeTab === 'suscripcion' 
-                  ? 'bg-[#40a8ab]/10 text-[#40a8ab]' 
+                  ? 'bg-[#2c8184]/10 text-[#2c8184]' 
                   : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
               }`}
             >
@@ -475,7 +475,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
               onClick={() => setActiveTab('historial')}
               className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-bold text-sm transition-all ${
                 activeTab === 'historial' 
-                  ? 'bg-[#40a8ab]/10 text-[#40a8ab]' 
+                  ? 'bg-[#2c8184]/10 text-[#2c8184]' 
                   : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
               }`}
             >
@@ -487,7 +487,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
               onClick={() => setActiveTab('ajustes')}
               className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-bold text-sm transition-all ${
                 activeTab === 'ajustes' 
-                  ? 'bg-[#40a8ab]/10 text-[#40a8ab]' 
+                  ? 'bg-[#2c8184]/10 text-[#2c8184]' 
                   : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
               }`}
             >
@@ -510,7 +510,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="bg-white p-6 rounded-3xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] border border-slate-100 flex flex-col gap-2">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="p-2 bg-teal-50 rounded-lg"><Heart className="w-5 h-5 text-[#40a8ab]" /></div>
+                    <div className="p-2 bg-teal-50 rounded-lg"><Heart className="w-5 h-5 text-[#2c8184]" /></div>
                     <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Donado</span>
                   </div>
                   <p className="text-3xl font-extrabold text-slate-800">
@@ -520,7 +520,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
 
                 <div className="bg-white p-6 rounded-3xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] border border-slate-100 flex flex-col gap-2">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="p-2 bg-teal-50 rounded-lg"><CheckCircle2 className="w-5 h-5 text-[#40a8ab]" /></div>
+                    <div className="p-2 bg-teal-50 rounded-lg"><CheckCircle2 className="w-5 h-5 text-[#2c8184]" /></div>
                     <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Cupones Usados</span>
                   </div>
                   <p className="text-3xl font-extrabold text-slate-800">
@@ -530,7 +530,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
 
                 <div className="bg-white p-6 rounded-3xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] border border-slate-100 flex flex-col gap-2">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="p-2 bg-teal-50 rounded-lg"><Ticket className="w-5 h-5 text-[#40a8ab]" /></div>
+                    <div className="p-2 bg-teal-50 rounded-lg"><Ticket className="w-5 h-5 text-[#2c8184]" /></div>
                     <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Cupones Activos</span>
                   </div>
                   <p className="text-3xl font-extrabold text-slate-800">
@@ -564,7 +564,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                           </div>
                           <div className="flex-1 min-w-0">
                             <h4 className="font-bold text-slate-800 text-sm truncate">{fundacion.nombre}</h4>
-                            <p className="text-xs text-[#40a8ab] font-bold mt-1">${totalFormateado} aportados</p>
+                            <p className="text-xs text-[#2c8184] font-bold mt-1">${totalFormateado} aportados</p>
                           </div>
                           {isInactive && <span className="text-[10px] bg-slate-200 text-slate-600 px-2 py-1 rounded-full font-bold">Inactiva</span>}
                         </div>
@@ -573,7 +573,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                   ) : (
                     <div className="col-span-full py-8 text-center bg-slate-50 rounded-3xl border border-dashed border-slate-200">
                       <p className="text-slate-500 text-sm">Aún no estás apoyando a ninguna organización.</p>
-                      <Link href="/donar" className="inline-block mt-3 text-[#40a8ab] text-sm font-bold hover:underline">Comenzar a donar</Link>
+                      <Link href="/donar" className="inline-block mt-3 text-[#2c8184] text-sm font-bold hover:underline">Comenzar a donar</Link>
                     </div>
                   )}
                 </div>
@@ -672,7 +672,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                       <CreditCard className="w-8 h-8 text-slate-300" />
                     </div>
                     <p className="text-slate-500 text-sm mb-4">No tienes tarjetas asociadas actualmente.</p>
-                    <Link href="/donar" className="bg-[#40a8ab] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm hover:bg-[#2c8184] transition-colors">
+                    <Link href="/donar" className="bg-[#2c8184] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm hover:bg-[#1e6063] transition-colors">
                       Agregar Método
                     </Link>
                   </div>
@@ -690,7 +690,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                 <h2 className="text-2xl font-bold text-slate-800">Historial de Pagos</h2>
                 <p className="text-sm text-slate-500">Listado de todas tus donaciones realizadas.</p>
               </div>
-              <div className="bg-teal-50 text-[#40a8ab] px-4 py-2 rounded-xl border border-teal-100 flex items-center gap-2">
+              <div className="bg-teal-50 text-[#2c8184] px-4 py-2 rounded-xl border border-teal-100 flex items-center gap-2">
                 <Heart className="w-4 h-4" />
                 <span className="text-sm font-bold">Total: ${totalDonadoHistorial.toLocaleString('es-AR')}</span>
               </div>
@@ -698,7 +698,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
 
             {cargandoPagos ? (
               <div className="flex justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#40a8ab]"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2c8184]"></div>
               </div>
             ) : errorPagos ? (
               <div className="bg-red-50 text-red-600 p-4 rounded-2xl text-sm font-medium">{errorPagos}</div>
@@ -707,7 +707,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                 <Receipt className="w-12 h-12 text-slate-200 mx-auto mb-4" />
                 <h3 className="text-lg font-bold text-slate-800 mb-2">Aún no hay pagos registrados</h3>
                 <p className="text-slate-500 text-sm mb-6">Cuando realices una donación aparecerá aquí.</p>
-                <Link href="/donar" className="inline-block bg-[#40a8ab] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-[#40a8ab]/20 hover:bg-[#2c8184] transition-all">
+                <Link href="/donar" className="inline-block bg-[#2c8184] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-[#2c8184]/20 hover:bg-[#1e6063] transition-all">
                   Hacer mi primer aporte
                 </Link>
               </div>
@@ -743,7 +743,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                             </div>
                           </td>
                           <td className="py-4 px-6 text-right">
-                            <span className="font-extrabold text-[#40a8ab] whitespace-nowrap">
+                            <span className="font-extrabold text-[#2c8184] whitespace-nowrap">
                               {formatMonto(d.monto, d.moneda)}
                             </span>
                             <span className="block text-[10px] text-slate-400 font-medium uppercase mt-0.5">
@@ -753,7 +753,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                           <td className="py-4 px-6 text-center">
                             <button
                               onClick={() => handleReenviarComprobante(d.id)}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 hover:text-[#40a8ab] hover:border-[#40a8ab] text-xs font-bold rounded-lg shadow-sm transition-all"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 hover:text-[#2c8184] hover:border-[#2c8184] text-xs font-bold rounded-lg shadow-sm transition-all"
                               title="Reenviar comprobante al mail"
                             >
                               <Mail className="w-3.5 h-3.5" />
@@ -784,7 +784,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                 <div>
                   <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1">NOMBRE COMPLETO</label>
                   <input
-                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all shadow-sm"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#2c8184] focus:border-[#2c8184] transition-all shadow-sm"
                     type="text"
                     value={nombre}
                     onChange={(e) => setNombre(e.target.value)}
@@ -804,7 +804,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                 <div>
                   <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1">TELÉFONO</label>
                   <input
-                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all shadow-sm"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#2c8184] focus:border-[#2c8184] transition-all shadow-sm"
                     type="tel"
                     value={telefono}
                     onChange={(e) => setTelefono(e.target.value)}
@@ -825,7 +825,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                   <div>
                     <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1">PROVINCIA</label>
                     <select
-                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all appearance-none cursor-pointer shadow-sm"
+                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#2c8184] focus:border-[#2c8184] transition-all appearance-none cursor-pointer shadow-sm"
                       value={provincia}
                       onChange={(e) => setProvincia(e.target.value)}
                     >
@@ -838,7 +838,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                   <div>
                     <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1">LOCALIDAD</label>
                     <input
-                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all shadow-sm"
+                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#2c8184] focus:border-[#2c8184] transition-all shadow-sm"
                       type="text"
                       value={localidad}
                       onChange={(e) => setLocalidad(e.target.value)}
@@ -850,7 +850,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                 <button
                   onClick={handleGuardarPerfil}
                   disabled={guardando}
-                  className="w-full bg-[#40a8ab] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-[#40a8ab]/20 active:scale-[0.98] transition-all mt-4 hover:bg-[#2c8184] disabled:opacity-50"
+                  className="w-full bg-[#2c8184] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-[#2c8184]/20 active:scale-[0.98] transition-all mt-4 hover:bg-[#1e6063] disabled:opacity-50"
                 >
                   {guardando ? 'Guardando...' : 'Guardar Datos Personales'}
                 </button>
@@ -885,7 +885,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                     <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1">CONTRASEÑA ACTUAL</label>
                     <div className="relative">
                       <input
-                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 pr-11 text-sm font-medium focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all shadow-sm"
+                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 pr-11 text-sm font-medium focus:ring-2 focus:ring-[#2c8184] focus:border-[#2c8184] transition-all shadow-sm"
                         type={verPassActual ? 'text' : 'password'}
                         value={passActual}
                         onChange={(e) => setPassActual(e.target.value)}
@@ -901,7 +901,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                     <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1">NUEVA CONTRASEÑA</label>
                     <div className="relative">
                       <input
-                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 pr-11 text-sm font-medium focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] transition-all shadow-sm"
+                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 pr-11 text-sm font-medium focus:ring-2 focus:ring-[#2c8184] focus:border-[#2c8184] transition-all shadow-sm"
                         type={verPassNueva ? 'text' : 'password'}
                         value={passNueva}
                         onChange={(e) => setPassNueva(e.target.value)}
@@ -917,7 +917,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                     <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1">CONFIRMAR NUEVA CONTRASEÑA</label>
                     <div className="relative">
                       <input
-                        className={`w-full bg-white border rounded-xl px-4 py-3 pr-11 text-sm font-medium focus:ring-2 focus:ring-[#40a8ab] transition-all shadow-sm ${passConfirmar && passNueva !== passConfirmar ? 'border-red-300' : 'border-slate-200'}`}
+                        className={`w-full bg-white border rounded-xl px-4 py-3 pr-11 text-sm font-medium focus:ring-2 focus:ring-[#2c8184] transition-all shadow-sm ${passConfirmar && passNueva !== passConfirmar ? 'border-red-300' : 'border-slate-200'}`}
                         type={verPassConfirmar ? 'text' : 'password'}
                         value={passConfirmar}
                         onChange={(e) => setPassConfirmar(e.target.value)}
@@ -953,7 +953,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
             {/* Header */}
             <div className="flex justify-between items-center px-6 py-5 border-b border-slate-100">
               <h3 className="font-extrabold text-slate-800 text-base flex items-center gap-2">
-                <Camera className="w-5 h-5 text-[#40a8ab]" />
+                <Camera className="w-5 h-5 text-[#2c8184]" />
                 Tomar Foto de Perfil
               </h3>
               <button
@@ -968,7 +968,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
             <div className="p-6 flex flex-col items-center justify-center bg-slate-50 relative min-h-[320px]">
               {cameraLoading && (
                 <div className="flex flex-col items-center gap-3">
-                  <div className="w-10 h-10 border-4 border-[#40a8ab] border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-10 h-10 border-4 border-[#2c8184] border-t-transparent rounded-full animate-spin"></div>
                   <p className="text-xs font-bold text-slate-500">Iniciando cámara...</p>
                 </div>
               )}
@@ -1024,7 +1024,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                   <button
                     onClick={capturarFoto}
                     disabled={cameraLoading || !!cameraError}
-                    className="px-5 py-2.5 bg-[#40a8ab] text-white text-xs font-bold rounded-xl shadow-lg shadow-[#40a8ab]/20 hover:bg-[#2c8184] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+                    className="px-5 py-2.5 bg-[#2c8184] text-white text-xs font-bold rounded-xl shadow-lg shadow-[#2c8184]/20 hover:bg-[#1e6063] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
                   >
                     <Camera className="w-4 h-4" />
                     Capturar
@@ -1042,7 +1042,7 @@ export default function SeccionPerfil({ isActive = false, role = 'user', dashboa
                   <button
                     onClick={handleGuardarFotoCamara}
                     disabled={subiendoFoto}
-                    className="px-5 py-2.5 bg-[#40a8ab] text-white text-xs font-bold rounded-xl shadow-lg shadow-[#40a8ab]/20 hover:bg-[#2c8184] transition-all disabled:opacity-50 flex items-center gap-1.5"
+                    className="px-5 py-2.5 bg-[#2c8184] text-white text-xs font-bold rounded-xl shadow-lg shadow-[#2c8184]/20 hover:bg-[#1e6063] transition-all disabled:opacity-50 flex items-center gap-1.5"
                   >
                     {subiendoFoto ? (
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

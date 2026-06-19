@@ -171,7 +171,7 @@ export default function BondaBenefitsSection() {
                 onClick={() => setSelectedCategory(cat.id as Category)}
                 className={`px-5 py-2.5 rounded-full font-medium transition-all duration-200 ${
                   selectedCategory === cat.id
-                    ? "bg-[#40a8ab] text-white shadow-lg scale-105"
+                    ? "bg-[#2c8184] text-white shadow-lg scale-105"
                     : "bg-white text-gray-700 hover:bg-gray-100 border-2 border-gray-200"
                 }`}
               >
@@ -252,7 +252,7 @@ export default function BondaBenefitsSection() {
                 </div>
 
                 {/* CTA */}
-                <button className="w-full py-3 bg-[#40a8ab] hover:bg-[#2c8184] text-white font-semibold rounded-xl transition-all duration-200 transform group-hover:scale-105 shadow-lg hover:shadow-xl">
+                <button className="w-full py-3 bg-[#2c8184] hover:bg-[#1e6063] text-white font-semibold rounded-xl transition-all duration-200 transform group-hover:scale-105 shadow-lg hover:shadow-xl">
                   Obtener con mi donación →
                 </button>
               </div>
@@ -288,7 +288,7 @@ export default function BondaBenefitsSection() {
         <div className="mt-16 bg-white rounded-2xl shadow-lg p-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-              <div className="text-4xl font-bold text-[#40a8ab] mb-2">
+              <div className="text-4xl font-bold text-[#2c8184] mb-2">
                 {mockBenefits.length}
               </div>
               <div className="text-gray-600 text-sm">Beneficios activos</div>

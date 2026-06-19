@@ -76,7 +76,7 @@ export default function ForgotPasswordPage() {
             <div className="mb-6 bg-teal-50/80 border border-teal-200/60 shadow-sm rounded-xl p-4 transition-all animate-in fade-in slide-in-from-top-4 duration-500">
               <div className="flex items-start gap-4">
                 <div className="bg-teal-100/80 p-2 rounded-full shrink-0">
-                  <Mail className="w-5 h-5 text-[#40a8ab]" />
+                  <Mail className="w-5 h-5 text-[#2c8184]" />
                 </div>
                 <div className="pt-0.5">
                   <p className="text-sm font-bold text-teal-900 mb-1 tracking-tight">

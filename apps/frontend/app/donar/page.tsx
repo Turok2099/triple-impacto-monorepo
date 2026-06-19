@@ -24,7 +24,7 @@ export default function DonarPage() {
   if (isLoading || checkingAuth) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2 className="w-10 h-10 animate-spin text-[#40a8ab]" />
+        <Loader2 className="w-10 h-10 animate-spin text-[#2c8184]" />
       </div>
     );
   }

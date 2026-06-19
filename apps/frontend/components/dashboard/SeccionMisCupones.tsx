@@ -54,7 +54,7 @@ export default function SeccionMisCupones({ isOpen, onClose, isBlocked = false }
             <div className="px-6 py-6 border-b border-slate-100 flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2" id="slide-over-title">
-                  <Ticket className="w-5 h-5 text-[#40a8ab]" />
+                  <Ticket className="w-5 h-5 text-[#2c8184]" />
                   Historial de Cupones
                 </h2>
                 <p className="text-xs text-slate-500 mt-1">Récord de beneficios que has disfrutado</p>
@@ -85,7 +85,7 @@ export default function SeccionMisCupones({ isOpen, onClose, isBlocked = false }
                 </div>
               ) : loading ? (
                 <div className="flex flex-col items-center justify-center h-64">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#40a8ab] mb-3" />
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2c8184] mb-3" />
                   <p className="text-slate-400 text-xs font-medium">Cargando historial...</p>
                 </div>
               ) : cuponesUsados.length === 0 ? (
@@ -105,11 +105,11 @@ export default function SeccionMisCupones({ isOpen, onClose, isBlocked = false }
                   {cuponesUsados.map((cupon) => (
                     <div
                       key={cupon.id}
-                      className="group bg-white rounded-2xl border border-slate-100 p-4 shadow-sm hover:shadow-md transition-all hover:border-[#40a8ab]/20"
+                      className="group bg-white rounded-2xl border border-slate-100 p-4 shadow-sm hover:shadow-md transition-all hover:border-[#2c8184]/20"
                     >
                       <div className="flex justify-between items-start gap-2">
                         <div className="space-y-1">
-                          <h4 className="font-bold text-slate-800 text-sm group-hover:text-[#40a8ab] transition-colors leading-tight">
+                          <h4 className="font-bold text-slate-800 text-sm group-hover:text-[#2c8184] transition-colors leading-tight">
                             {cupon.nombre || `Cupón #${cupon.id.slice(0, 8)}`}
                           </h4>
                           {cupon.empresaNombre && (
@@ -117,7 +117,7 @@ export default function SeccionMisCupones({ isOpen, onClose, isBlocked = false }
                           )}
                           {cupon.descuento && (
                             <div className="inline-flex mt-1">
-                              <span className="text-[10px] font-bold bg-[#40a8ab]/10 text-[#40a8ab] px-2.5 py-0.5 rounded-full">
+                              <span className="text-[10px] font-bold bg-[#2c8184]/10 text-[#2c8184] px-2.5 py-0.5 rounded-full">
                                 {cupon.descuento}
                               </span>
                             </div>

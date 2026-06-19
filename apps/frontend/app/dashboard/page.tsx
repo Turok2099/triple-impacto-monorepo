@@ -214,7 +214,7 @@ export default function DashboardPage() {
                  icon: "warning",
                  title: "Suscripción Inactiva",
                  text: "Para disfrutar de tus beneficios doná a alguna ONG",
-                 confirmButtonColor: "#40a8ab",
+                 confirmButtonColor: "#2c8184",
                  confirmButtonText: "Entendido"
                });
              });
@@ -307,7 +307,7 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#40a8ab] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2c8184] mx-auto mb-4"></div>
           <p className="text-gray-600">Cargando tu dashboard...</p>
         </div>
       </div>
@@ -326,7 +326,7 @@ export default function DashboardPage() {
             <p className="text-gray-600 mb-4">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-[#40a8ab] text-white rounded-lg hover:bg-[#2c8184]"
+              className="px-4 py-2 bg-[#2c8184] text-white rounded-lg hover:bg-[#1e6063]"
             >
               Reintentar
             </button>
@@ -380,7 +380,7 @@ export default function DashboardPage() {
         <nav className="flex md:flex-col items-center md:items-stretch overflow-x-auto md:overflow-visible gap-1 md:gap-2 p-2 md:p-4 hide-scrollbar">
           <button
             onClick={() => setActiveTab("inicio")}
-            className={`flex flex-col md:flex-row items-center md:justify-start gap-1 md:gap-3 px-4 py-2 md:py-3.5 rounded-xl transition-all shrink-0 ${activeTab === "inicio" ? "bg-teal-50 text-[#40a8ab]" : "text-slate-500 hover:bg-slate-50 hover:text-[#40a8ab]"}`}
+            className={`flex flex-col md:flex-row items-center md:justify-start gap-1 md:gap-3 px-4 py-2 md:py-3.5 rounded-xl transition-all shrink-0 ${activeTab === "inicio" ? "bg-teal-50 text-[#2c8184]" : "text-slate-500 hover:bg-slate-50 hover:text-[#2c8184]"}`}
           >
             <LayoutGrid className="w-5 h-5 md:w-6 md:h-6" strokeWidth={activeTab === "inicio" ? 2.5 : 2} />
             <span className={`text-[11px] md:text-sm ${activeTab === "inicio" ? "font-bold" : "font-medium"}`}>Cuponera</span>
@@ -388,7 +388,7 @@ export default function DashboardPage() {
           
           <button
             onClick={() => setActiveTab("perfil")}
-            className={`flex flex-col md:flex-row items-center md:justify-start gap-1 md:gap-3 px-4 py-2 md:py-3.5 rounded-xl transition-all shrink-0 ${activeTab === "perfil" ? "bg-teal-50 text-[#40a8ab]" : "text-slate-500 hover:bg-slate-50 hover:text-[#40a8ab]"}`}
+            className={`flex flex-col md:flex-row items-center md:justify-start gap-1 md:gap-3 px-4 py-2 md:py-3.5 rounded-xl transition-all shrink-0 ${activeTab === "perfil" ? "bg-teal-50 text-[#2c8184]" : "text-slate-500 hover:bg-slate-50 hover:text-[#2c8184]"}`}
           >
             <UserCircle className="w-5 h-5 md:w-6 md:h-6" strokeWidth={activeTab === "perfil" ? 2.5 : 2} />
             <span className={`text-[11px] md:text-sm ${activeTab === "perfil" ? "font-bold" : "font-medium"}`}>Perfil</span>
@@ -398,7 +398,7 @@ export default function DashboardPage() {
           {user?.role === 'admin' && (
             <button
               onClick={() => setActiveTab("admin")}
-              className={`flex flex-col md:flex-row items-center md:justify-start gap-1 md:gap-3 px-4 py-2 md:py-3.5 rounded-xl transition-all shrink-0 ${activeTab === "admin" ? "bg-teal-50 text-[#40a8ab]" : "text-slate-500 hover:bg-slate-50 hover:text-[#40a8ab]"}`}
+              className={`flex flex-col md:flex-row items-center md:justify-start gap-1 md:gap-3 px-4 py-2 md:py-3.5 rounded-xl transition-all shrink-0 ${activeTab === "admin" ? "bg-teal-50 text-[#2c8184]" : "text-slate-500 hover:bg-slate-50 hover:text-[#2c8184]"}`}
             >
               <Shield className="w-5 h-5 md:w-6 md:h-6" strokeWidth={activeTab === "admin" ? 2.5 : 2} />
               <span className={`text-[11px] md:text-sm ${activeTab === "admin" ? "font-bold" : "font-medium"}`}>Admin</span>
@@ -407,7 +407,7 @@ export default function DashboardPage() {
 
           <button
             onClick={() => setActiveTab("donar")}
-            className={`flex flex-col md:flex-row items-center md:justify-start gap-1 md:gap-3 px-4 py-2 md:py-3.5 rounded-xl transition-all shrink-0 ${activeTab === "donar" ? "bg-teal-50 text-[#40a8ab]" : "text-slate-500 hover:bg-slate-50 hover:text-[#40a8ab]"}`}
+            className={`flex flex-col md:flex-row items-center md:justify-start gap-1 md:gap-3 px-4 py-2 md:py-3.5 rounded-xl transition-all shrink-0 ${activeTab === "donar" ? "bg-teal-50 text-[#2c8184]" : "text-slate-500 hover:bg-slate-50 hover:text-[#2c8184]"}`}
           >
             <Heart className="w-5 h-5 md:w-6 md:h-6" strokeWidth={activeTab === "donar" ? 2.5 : 2} />
             <span className={`text-[11px] md:text-sm ${activeTab === "donar" ? "font-bold" : "font-medium"}`}>Donar +</span>
@@ -476,7 +476,7 @@ export default function DashboardPage() {
                     </p>
                     <button
                       onClick={() => setActiveTab("donar")}
-                      className="px-6 py-3 bg-[#40a8ab] hover:bg-[#2c8184] text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                      className="px-6 py-3 bg-[#2c8184] hover:bg-[#1e6063] text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition-all hover:scale-105 active:scale-95 cursor-pointer"
                     >
                       Donar ahora para activar
                     </button>
@@ -492,13 +492,13 @@ export default function DashboardPage() {
                     <h2 className="text-2xl md:text-3xl font-extrabold text-slate-950 tracking-tight">
                       TUS DESCUENTOS EXCLUSIVOS
                     </h2>
-                    <span className="inline-flex items-center justify-center px-3.5 py-1.5 bg-[#40a8ab] text-white text-sm font-bold rounded-full shadow-md">
+                    <span className="inline-flex items-center justify-center px-3.5 py-1.5 bg-[#2c8184] text-white text-sm font-bold rounded-full shadow-md">
                       {totalCuponesDisponibles}
                     </span>
                   </div>
                   <button
                     onClick={() => setIsHistoryOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 hover:text-[#40a8ab] hover:border-[#40a8ab] hover:shadow-sm font-bold text-xs md:text-sm rounded-xl transition-all shadow-sm shrink-0"
+                    className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 hover:text-[#2c8184] hover:border-[#2c8184] hover:shadow-sm font-bold text-xs md:text-sm rounded-xl transition-all shadow-sm shrink-0"
                   >
                     <History className="w-4 h-4" />
                     Ver Cupones Usados
@@ -507,11 +507,11 @@ export default function DashboardPage() {
 
           {/* Search Bar Redesign */}
           <div className="relative group max-w-2xl mx-auto w-full">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#40a8ab] transition-colors pointer-events-none">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#2c8184] transition-colors pointer-events-none">
               <Search className="w-5 h-5" strokeWidth={2.5} />
             </div>
             <input
-              className="w-full bg-white border border-slate-200 rounded-2xl py-4 pl-12 pr-12 focus:ring-4 focus:ring-[#40a8ab]/10 focus:border-[#40a8ab] outline-none transition-all shadow-sm text-slate-700 font-medium placeholder:text-slate-400"
+              className="w-full bg-white border border-slate-200 rounded-2xl py-4 pl-12 pr-12 focus:ring-4 focus:ring-[#2c8184]/10 focus:border-[#2c8184] outline-none transition-all shadow-sm text-slate-700 font-medium placeholder:text-slate-400"
               placeholder="¿Qué marca o descuento buscás hoy?"
               type="text"
               value={busqueda}
@@ -537,7 +537,7 @@ export default function DashboardPage() {
                   <select
                     value={categoriaSeleccionada}
                     onChange={(e) => setCategoriaSeleccionada(e.target.value)}
-                    className="w-full bg-white border border-teal-100 rounded-xl py-3 pl-4 pr-10 appearance-none focus:ring-2 focus:ring-[#40a8ab] focus:border-transparent outline-none font-bold text-slate-700 shadow-sm transition-all"
+                    className="w-full bg-white border border-teal-100 rounded-xl py-3 pl-4 pr-10 appearance-none focus:ring-2 focus:ring-[#2c8184] focus:border-transparent outline-none font-bold text-slate-700 shadow-sm transition-all"
                   >
                     {categorias.map((categoria) => (
                       <option key={categoria.id} value={categoria.nombre}>
@@ -560,7 +560,7 @@ export default function DashboardPage() {
                       key={categoria.id}
                       onClick={() => setCategoriaSeleccionada(categoria.nombre)}
                       className={`flex items-center gap-2 whitespace-nowrap px-5 py-2.5 rounded-full font-bold text-sm transition-all hover:scale-110 ${categoriaSeleccionada === categoria.nombre
-                        ? "bg-[#40a8ab] text-white shadow-md"
+                        ? "bg-[#2c8184] text-white shadow-md"
                         : "bg-white text-slate-600 border border-teal-100 hover:border-teal-400 hover:shadow-md"
                         }`}
                     >
@@ -618,7 +618,7 @@ export default function DashboardPage() {
                     ) : (
                       <button
                         onClick={() => setCuponSeleccionado(cupon)}
-                        className="bg-[#40a8ab] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg shadow-[#40a8ab]/20 active:scale-95 transition-transform shrink-0 whitespace-nowrap"
+                        className="bg-[#2c8184] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg shadow-[#2c8184]/20 active:scale-95 transition-transform shrink-0 whitespace-nowrap"
                       >
                         Obtener
                       </button>
@@ -677,7 +677,7 @@ export default function DashboardPage() {
                       ) : (
                         <button
                           onClick={() => setCuponSeleccionado(cupon)}
-                          className="mt-4 w-full py-2.5 bg-[#40a8ab] hover:bg-[#2c8184] text-white font-semibold rounded-xl transition-colors text-sm"
+                          className="mt-4 w-full py-2.5 bg-[#2c8184] hover:bg-[#1e6063] text-white font-semibold rounded-xl transition-colors text-sm"
                         >
                           Obtener descuento
                         </button>
@@ -696,7 +696,7 @@ export default function DashboardPage() {
                     setBusqueda("");
                     setCategoriaSeleccionada("Todo");
                   }}
-                  className="mt-3 px-4 py-2 bg-[#40a8ab] text-white rounded-lg text-sm font-bold hover:bg-[#2c8184]"
+                  className="mt-3 px-4 py-2 bg-[#2c8184] text-white rounded-lg text-sm font-bold hover:bg-[#1e6063]"
                 >
                   Limpiar filtros
                 </button>
@@ -751,7 +751,7 @@ export default function DashboardPage() {
                         }
                       }
                     }}
-                    className="w-16 text-center text-teal-700 bg-teal-50 border border-teal-200 outline-none focus:ring-2 focus:ring-[#40a8ab] px-2 py-1 rounded-lg appearance-none font-bold transition-all"
+                    className="w-16 text-center text-teal-700 bg-teal-50 border border-teal-200 outline-none focus:ring-2 focus:ring-[#2c8184] px-2 py-1 rounded-lg appearance-none font-bold transition-all"
                   /> 
                   de {totalPaginas}
                 </span>
@@ -795,7 +795,7 @@ export default function DashboardPage() {
                 className={`px-5 py-2.5 font-bold rounded-xl transition-all flex items-center gap-2 ${
                   !hayMasCupones
                     ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                    : "bg-[#40a8ab] text-white hover:bg-[#40a8ab] shadow-lg shadow-teal-500/20"
+                    : "bg-[#2c8184] text-white hover:bg-[#2c8184] shadow-lg shadow-teal-500/20"
                 }`}
               >
                 {loadingMore ? (

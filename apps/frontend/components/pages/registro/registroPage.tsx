@@ -157,7 +157,7 @@ export default function RegisterPage() {
     return (
       <div className="min-h-screen bg-[#f4fafb] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-md animate-in fade-in zoom-in duration-350">
-          <div className="bg-[#40a8ab] p-8 text-center flex flex-col items-center">
+          <div className="bg-[#2c8184] p-8 text-center flex flex-col items-center">
             <Mail className="w-8 h-8 text-white/90 mb-3" strokeWidth={1.5} />
             <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">¡Confirmá tu correo!</h2>
             <p className="text-teal-50 text-sm md:text-base">Te enviamos un enlace de activación</p>
@@ -181,7 +181,7 @@ export default function RegisterPage() {
       <div className="max-w-2xl w-full bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm">
         
         {/* Header Similar a PaymentForm */}
-        <div className="bg-[#40a8ab] p-8 text-center flex flex-col items-center">
+        <div className="bg-[#2c8184] p-8 text-center flex flex-col items-center">
           <img
             src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto,f_auto,w_200,c_limit/v1775685229/ISOLOGOTIPO_AYNI_FONDO_TRANSPARENTE_iwyuaw.png"
             alt="AYNI"
@@ -441,7 +441,7 @@ export default function RegisterPage() {
                   required
                   checked={formData.aceptaTerminos}
                   onChange={handleChange}
-                  className="h-4 w-4 text-[#40a8ab] focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
+                  className="h-4 w-4 text-[#2c8184] focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
                 />
               </div>
               <div className="ml-3">
@@ -452,7 +452,7 @@ export default function RegisterPage() {
                   Acepto los{" "}
                   <a
                     href="/terminos"
-                    className="text-[#40a8ab] hover:text-[#40a8ab] font-bold"
+                    className="text-[#2c8184] hover:text-[#2c8184] font-bold"
                     target="_blank"
                   >
                     Términos y Condiciones
@@ -460,7 +460,7 @@ export default function RegisterPage() {
                   y la{" "}
                   <a
                     href="/privacidad"
-                    className="text-[#40a8ab] hover:text-[#40a8ab] font-bold"
+                    className="text-[#2c8184] hover:text-[#2c8184] font-bold"
                     target="_blank"
                   >
                     Política de Privacidad
@@ -479,7 +479,7 @@ export default function RegisterPage() {
                   type="checkbox"
                   checked={formData.aceptaNewsletter}
                   onChange={handleChange}
-                  className="h-4 w-4 text-[#40a8ab] focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
+                  className="h-4 w-4 text-[#2c8184] focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
                 />
               </div>
               <div className="ml-3">
@@ -547,7 +547,7 @@ export default function RegisterPage() {
                 const redirectUrl = params.get("redirect");
                 window.location.href = redirectUrl ? `/login?redirect=${encodeURIComponent(redirectUrl)}` : "/login";
               }}
-              className="font-bold text-[#40a8ab] hover:text-[#40a8ab] transition-colors"
+              className="font-bold text-[#2c8184] hover:text-[#2c8184] transition-colors"
             >
               Iniciá sesión
             </a>
@@ -561,19 +561,19 @@ export default function RegisterPage() {
           </h3>
           <ul className="space-y-2 text-sm md:text-base text-teal-800">
             <li className="flex items-start gap-2">
-              <span className="text-[#40a8ab] shrink-0">✓</span>
+              <span className="text-[#2c8184] shrink-0">✓</span>
               <span>Acceso a descuentos exclusivos de Bonda</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-[#40a8ab] shrink-0">✓</span>
+              <span className="text-[#2c8184] shrink-0">✓</span>
               <span>Dashboard personal para gestionar donaciones</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-[#40a8ab] shrink-0">✓</span>
+              <span className="text-[#2c8184] shrink-0">✓</span>
               <span>Reportes de impacto de tus aportes</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-[#40a8ab] shrink-0">✓</span>
+              <span className="text-[#2c8184] shrink-0">✓</span>
               <span>Certificados de donación para deducir impuestos</span>
             </li>
           </ul>

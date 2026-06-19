@@ -39,7 +39,7 @@ export default function OngPrograms() {
                     </span>
                     <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                         Programas que{" "}
-                        <span className="text-[#40a8ab]">transforman vidas</span>
+                        <span className="text-[#2c8184]">transforman vidas</span>
                     </h2>
                     <p className="text-lg text-gray-600">
                         Desarrollamos iniciativas integrales que abordan las necesidades más
@@ -68,12 +68,12 @@ export default function OngPrograms() {
                             </p>
 
                             <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                                <span className="text-sm font-medium text-[#40a8ab]">
+                                <span className="text-sm font-medium text-[#2c8184]">
                                     {program.stats}
                                 </span>
                                 <button
                                     type="button"
-                                    className="text-sm font-semibold text-gray-500 hover:text-[#40a8ab] flex items-center gap-1 group-hover:gap-2 transition-all"
+                                    className="text-sm font-semibold text-gray-500 hover:text-[#2c8184] flex items-center gap-1 group-hover:gap-2 transition-all"
                                 >
                                     Ver más
                                     <svg

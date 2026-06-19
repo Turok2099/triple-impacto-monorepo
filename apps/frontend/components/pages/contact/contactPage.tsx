@@ -91,13 +91,13 @@ export default function ContactPage() {
               <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
                 <div className="flex items-start gap-4">
                   <div className="shrink-0 w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center">
-                    <Mail className="w-6 h-6 text-[#40a8ab]" />
+                    <Mail className="w-6 h-6 text-[#2c8184]" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
                     <a
                       href="mailto:contacto@ayni.ar"
-                      className="text-[#40a8ab] hover:text-[#2c8184] transition-colors"
+                      className="text-[#2c8184] hover:text-[#1e6063] transition-colors"
                     >
                       contacto@ayni.ar
                     </a>
@@ -162,7 +162,7 @@ export default function ContactPage() {
                         Horarios
                       </h3>
                       <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#40a8ab] mr-1.5 animate-pulse"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#2c8184] mr-1.5 animate-pulse"></span>
                         En línea
                       </span>
                     </div>
@@ -176,7 +176,7 @@ export default function ContactPage() {
             </div>
 
             {/* Preguntas frecuentes */}
-            <div className="bg-linear-to-br from-[#40a8ab] to-teal-700 rounded-2xl p-8 text-white">
+            <div className="bg-linear-to-br from-[#2c8184] to-teal-700 rounded-2xl p-8 text-white">
               <h3 className="text-2xl font-bold mb-4">¿Tenés dudas rápidas?</h3>
               <p className="text-teal-50 mb-6">
                 Consultá nuestra sección de preguntas frecuentes antes de
@@ -322,7 +322,7 @@ export default function ContactPage() {
               Al enviar este formulario, aceptas nuestra{" "}
               <a
                 href="/privacidad"
-                className="text-[#40a8ab] hover:text-[#2c8184]"
+                className="text-[#2c8184] hover:text-[#1e6063]"
               >
                 Política de Privacidad
               </a>

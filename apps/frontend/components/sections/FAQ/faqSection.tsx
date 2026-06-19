@@ -100,7 +100,7 @@ export default function FAQSection() {
                 <div className="flex items-center gap-4 flex-1">
                   <div className="shrink-0 w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center">
                     <faq.icon
-                      className="w-6 h-6 text-[#40a8ab]"
+                      className="w-6 h-6 text-[#2c8184]"
                       strokeWidth={2}
                     />
                   </div>

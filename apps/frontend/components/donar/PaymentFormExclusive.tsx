@@ -197,7 +197,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
         </p>
         <button 
           onClick={() => window.location.href = '/dashboard'}
-          className="w-full py-4 bg-[#40a8ab] text-white rounded-2xl font-semibold hover:bg-teal-600 transition-all flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full py-4 bg-[#2c8184] text-white rounded-2xl font-semibold hover:bg-teal-600 transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
           Ir al Dashboard de AYNI <ArrowRight className="w-4 h-4" />
         </button>
@@ -207,7 +207,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
 
   return (
     <div className="max-w-2xl w-full mx-auto bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-md">
-      <div className="bg-[#40a8ab] p-6 text-center text-white">
+      <div className="bg-[#2c8184] p-6 text-center text-white">
         <h3 className="text-lg md:text-xl font-bold tracking-wide uppercase">
           {organizacion.nombre?.toUpperCase().startsWith("CLUB")
             ? `${organizacion.nombre} ¡¡DONAR TIENE PREMIO!!`
@@ -250,7 +250,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
           <div className="space-y-0.5">
             <h4 className="text-sm md:text-base font-bold text-slate-800">Portal de Beneficios Bonda</h4>
             <p className="text-xs md:text-sm text-slate-500 font-semibold leading-relaxed">
-              Con tu donación mensual, accedés a más de <span className="font-bold text-[#40a8ab]">1700 cupones de descuento exclusivos</span> en primeras marcas nacionales.
+              Con tu donación mensual, accedés a más de <span className="font-bold text-[#2c8184]">1700 cupones de descuento exclusivos</span> en primeras marcas nacionales.
             </p>
           </div>
         </div>
@@ -274,7 +274,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                 type="button"
                 onClick={() => setIsRecurring(true)}
                 className={`py-3 px-4 rounded-2xl text-sm md:text-base font-bold text-center transition-all cursor-pointer ${isRecurring
-                  ? "bg-[#40a8ab] text-white shadow-md"
+                  ? "bg-[#2c8184] text-white shadow-md"
                   : "bg-slate-50 text-slate-700 border-2 border-slate-200 hover:border-slate-300"
                   }`}
               >
@@ -284,7 +284,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                 type="button"
                 onClick={() => setIsRecurring(false)}
                 className={`py-3 px-4 rounded-2xl text-sm md:text-base font-bold text-center transition-all cursor-pointer ${!isRecurring
-                  ? "bg-[#40a8ab] text-white shadow-md"
+                  ? "bg-[#2c8184] text-white shadow-md"
                   : "bg-slate-50 text-slate-700 border-2 border-slate-200 hover:border-slate-300"
                   }`}
               >
@@ -312,7 +312,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                   type="button"
                   onClick={() => handleMontoSugeridoClick(monto)}
                   className={`py-3 px-4 rounded-2xl text-sm md:text-base font-bold text-center transition-all cursor-pointer ${montoSeleccionado === monto && !usarMontoCustom
-                    ? "bg-[#40a8ab] text-white shadow-md"
+                    ? "bg-[#2c8184] text-white shadow-md"
                     : "bg-slate-50 text-slate-700 border-2 border-slate-200 hover:border-slate-300"
                     }`}
                 >
@@ -327,7 +327,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                   setMontoSeleccionado(null);
                 }}
                 className={`py-3 px-4 rounded-2xl text-sm md:text-base font-bold text-center transition-all cursor-pointer ${usarMontoCustom
-                  ? "bg-[#40a8ab] text-white shadow-md"
+                  ? "bg-[#2c8184] text-white shadow-md"
                   : "bg-slate-50 text-slate-700 border-2 border-slate-200 hover:border-slate-300"
                   }`}
               >
@@ -347,7 +347,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                     value={montoCustom}
                     onChange={(e) => handleMontoCustomChange(e.target.value)}
                     placeholder={montoMinimoActual.toString()}
-                    className="w-full pl-10 pr-4 py-3.5 text-sm md:text-base bg-slate-50 border-2 border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] outline-none font-bold text-slate-800"
+                    className="w-full pl-10 pr-4 py-3.5 text-sm md:text-base bg-slate-50 border-2 border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#2c8184] focus:border-[#2c8184] outline-none font-bold text-slate-800"
                   />
                 </div>
               </div>
@@ -372,7 +372,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                   onChange={handleChange}
                   placeholder="Número de Tarjeta"
                   maxLength={19}
-                  className="w-full pl-12 pr-4 py-3.5 text-sm md:text-base bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#40a8ab] outline-none font-medium text-slate-800"
+                  className="w-full pl-12 pr-4 py-3.5 text-sm md:text-base bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#2c8184] outline-none font-medium text-slate-800"
                   required
                 />
               </div>
@@ -385,7 +385,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                   value={formData.cardholderName}
                   onChange={handleChange}
                   placeholder="Titular de la Tarjeta"
-                  className="w-full pl-12 pr-4 py-3.5 text-sm md:text-base bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#40a8ab] outline-none font-medium text-slate-800"
+                  className="w-full pl-12 pr-4 py-3.5 text-sm md:text-base bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#2c8184] outline-none font-medium text-slate-800"
                   required
                 />
               </div>
@@ -399,7 +399,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                   onChange={handleChange}
                   onBlur={() => setFormData(prev => ({ ...prev, expiryMonth: prev.expiryMonth ? prev.expiryMonth.padStart(2, '0') : '' }))}
                   placeholder="Mes (MM)"
-                  className="w-full px-4 py-3.5 text-sm md:text-base bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#40a8ab] outline-none font-medium text-slate-800"
+                  className="w-full px-4 py-3.5 text-sm md:text-base bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#2c8184] outline-none font-medium text-slate-800"
                   required
                 />
                 <input
@@ -410,7 +410,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                   onChange={handleChange}
                   onBlur={() => setFormData(prev => ({ ...prev, expiryYear: prev.expiryYear.length === 4 ? prev.expiryYear.slice(-2) : prev.expiryYear.padStart(2, '0') }))}
                   placeholder="Año (YY)"
-                  className="w-full px-4 py-3.5 text-sm md:text-base bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#40a8ab] outline-none font-medium text-slate-800"
+                  className="w-full px-4 py-3.5 text-sm md:text-base bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#2c8184] outline-none font-medium text-slate-800"
                   required
                 />
                 <input
@@ -420,7 +420,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                   value={formData.securityCode}
                   onChange={handleChange}
                   placeholder="CVV"
-                  className="w-full px-4 py-3.5 text-sm md:text-base bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#40a8ab] outline-none font-medium text-slate-800"
+                  className="w-full px-4 py-3.5 text-sm md:text-base bg-slate-50 text-center border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#2c8184] outline-none font-medium text-slate-800"
                   required
                 />
               </div>
@@ -430,7 +430,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#40a8ab] hover:bg-teal-600 disabled:opacity-50 text-white text-sm md:text-base font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg shadow-teal-600/20"
+            className="w-full bg-[#2c8184] hover:bg-teal-600 disabled:opacity-50 text-white text-sm md:text-base font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg shadow-teal-600/20"
           >
             {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Lock className="w-5 h-5" />}
             <span>{loading ? 'Procesando...' : `Donar ${formatearMonto(montoActualVisual)} de forma segura`}</span>

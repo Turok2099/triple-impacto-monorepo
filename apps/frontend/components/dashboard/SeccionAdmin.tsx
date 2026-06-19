@@ -296,7 +296,7 @@ export default function SeccionAdmin() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         <button 
           onClick={() => setSelectedUserForDetails(null)}
-          className="mb-8 flex items-center gap-2 text-slate-500 hover:text-[#40a8ab] transition-colors font-medium border border-transparent hover:border-[#40a8ab]/20 px-3 py-1.5 rounded-lg"
+          className="mb-8 flex items-center gap-2 text-slate-500 hover:text-[#2c8184] transition-colors font-medium border border-transparent hover:border-[#2c8184]/20 px-3 py-1.5 rounded-lg"
         >
           <ArrowLeft className="w-5 h-5" />
           Volver al panel principal
@@ -427,7 +427,7 @@ export default function SeccionAdmin() {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
-            <ShieldAlert className="w-8 h-8 text-[#40a8ab]" />
+            <ShieldAlert className="w-8 h-8 text-[#2c8184]" />
             Panel de Súper Administrador
           </h1>
           <p className="text-slate-500 mt-2">Gestiona usuarios, ONGs y accesos al sistema.</p>
@@ -438,7 +438,7 @@ export default function SeccionAdmin() {
         <button
           onClick={() => setAdminTab("ongs")}
           className={`pb-4 px-2 font-semibold text-sm flex items-center gap-2 border-b-2 transition-colors ${
-            adminTab === "ongs" ? "border-[#40a8ab] text-[#40a8ab]" : "border-transparent text-slate-500 hover:text-slate-700"
+            adminTab === "ongs" ? "border-[#2c8184] text-[#2c8184]" : "border-transparent text-slate-500 hover:text-slate-700"
           }`}
         >
           <Building2 className="w-4 h-4" />
@@ -447,7 +447,7 @@ export default function SeccionAdmin() {
         <button
           onClick={() => setAdminTab("usuarios")}
           className={`pb-4 px-2 font-semibold text-sm flex items-center gap-2 border-b-2 transition-colors ${
-            adminTab === "usuarios" ? "border-[#40a8ab] text-[#40a8ab]" : "border-transparent text-slate-500 hover:text-slate-700"
+            adminTab === "usuarios" ? "border-[#2c8184] text-[#2c8184]" : "border-transparent text-slate-500 hover:text-slate-700"
           }`}
         >
           <Users className="w-4 h-4" />
@@ -456,7 +456,7 @@ export default function SeccionAdmin() {
         <button
           onClick={() => setAdminTab("banners")}
           className={`pb-4 px-2 font-semibold text-sm flex items-center gap-2 border-b-2 transition-colors ${
-            adminTab === "banners" ? "border-[#40a8ab] text-[#40a8ab]" : "border-transparent text-slate-500 hover:text-slate-700"
+            adminTab === "banners" ? "border-[#2c8184] text-[#2c8184]" : "border-transparent text-slate-500 hover:text-slate-700"
           }`}
         >
           <ImageIcon className="w-4 h-4" />
@@ -480,7 +480,7 @@ export default function SeccionAdmin() {
             </button>
             <button
               onClick={openCreateModal}
-              className="flex items-center gap-2 px-6 py-3 bg-[#40a8ab] hover:bg-[#2c8184] text-white rounded-xl font-semibold transition-all shadow-md hover:shadow-lg"
+              className="flex items-center gap-2 px-6 py-3 bg-[#2c8184] hover:bg-[#1e6063] text-white rounded-xl font-semibold transition-all shadow-md hover:shadow-lg"
             >
               <UserPlus className="w-5 h-5" />
               Nuevo Usuario
@@ -489,7 +489,7 @@ export default function SeccionAdmin() {
 
       {loading ? (
         <div className="flex justify-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#40a8ab]"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2c8184]"></div>
         </div>
       ) : error ? (
         <div className="bg-red-50 text-red-600 p-6 rounded-2xl border border-red-100 flex items-center gap-3">
@@ -533,7 +533,7 @@ export default function SeccionAdmin() {
                     <td className="py-4 px-6 text-center">
                       <button
                         onClick={() => setSelectedUserForDetails(u)}
-                        className="p-2 bg-slate-50 hover:bg-[#40a8ab]/10 text-slate-400 hover:text-[#40a8ab] rounded-lg transition-colors inline-flex items-center justify-center border border-slate-200 hover:border-[#40a8ab]/30"
+                        className="p-2 bg-slate-50 hover:bg-[#2c8184]/10 text-slate-400 hover:text-[#2c8184] rounded-lg transition-colors inline-flex items-center justify-center border border-slate-200 hover:border-[#2c8184]/30"
                         title="Ver datos del usuario"
                       >
                         <BookUser className="w-5 h-5" />
@@ -598,7 +598,7 @@ export default function SeccionAdmin() {
                         </button>
                         <button
                           onClick={() => openEditModal(u)}
-                          className="p-2 text-slate-400 hover:text-[#40a8ab] hover:bg-emerald-50 rounded-lg transition-colors"
+                          className="p-2 text-slate-400 hover:text-[#2c8184] hover:bg-emerald-50 rounded-lg transition-colors"
                           title="Editar usuario"
                         >
                           <Edit2 className="w-4 h-4" />
@@ -681,7 +681,7 @@ export default function SeccionAdmin() {
                     <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 px-4 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold rounded-xl transition-colors">
                       Cancelar
                     </button>
-                    <button type="submit" disabled={submitting} className="flex-1 py-3 px-4 bg-[#40a8ab] hover:bg-[#2c8184] disabled:bg-emerald-400 text-white font-semibold rounded-xl shadow-lg shadow-emerald-200 transition-all flex justify-center items-center">
+                    <button type="submit" disabled={submitting} className="flex-1 py-3 px-4 bg-[#2c8184] hover:bg-[#1e6063] disabled:bg-emerald-400 text-white font-semibold rounded-xl shadow-lg shadow-emerald-200 transition-all flex justify-center items-center">
                       {submitting ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div> : 'Guardar Cambios'}
                     </button>
                   </div>

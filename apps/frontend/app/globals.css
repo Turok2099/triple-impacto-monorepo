@@ -17,11 +17,11 @@
   --color-teal-200: #aadddf;
   --color-teal-300: #7ec4c7;
   --color-teal-400: #58a9ac;
-  --color-teal-500: #40a8ab; /* Main Teal */
-  --color-teal-600: #358588;
-  --color-teal-700: #2d6b6e;
-  --color-teal-800: #265558;
-  --color-teal-900: #224749;
+  --color-teal-500: #2c8184; /* Main Teal (Ajustado para accesibilidad y contraste) */
+  --color-teal-600: #1e6063; /* Hover principal */
+  --color-teal-700: #184d50;
+  --color-teal-800: #133e40;
+  --color-teal-900: #0f2e30;
 
   --color-amber-50: #fbf6ec;
   --color-amber-100: #f5eed3;

@@ -4,7 +4,7 @@ import { Zap, Gift, ShieldCheck } from "lucide-react";
 
 export default function CTASection() {
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-linear-to-br from-[#40a8ab] via-teal-600 to-teal-800 relative overflow-hidden">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-linear-to-br from-[#2c8184] via-teal-600 to-teal-800 relative overflow-hidden">
       {/* Elementos decorativos de fondo */}
       <div className="absolute inset-0 overflow-hidden opacity-20">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-white rounded-full filter blur-3xl"></div>

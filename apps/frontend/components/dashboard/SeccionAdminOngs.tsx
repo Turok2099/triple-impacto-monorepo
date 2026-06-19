@@ -266,7 +266,7 @@ export default function SeccionAdminOngs() {
   };
 
   if (loading) {
-    return <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#40a8ab]"></div></div>;
+    return <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2c8184]"></div></div>;
   }
 
   if (error) {
@@ -277,13 +277,13 @@ export default function SeccionAdminOngs() {
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
       <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
         <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-          <Building2 className="w-6 h-6 text-[#40a8ab]" /> Gestor de ONGs y Fundaciones
+          <Building2 className="w-6 h-6 text-[#2c8184]" /> Gestor de ONGs y Fundaciones
         </h2>
         <div className="flex gap-2">
           <button onClick={() => setIsBulkModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-xl font-semibold transition-all">
             <Users className="w-4 h-4" /> Carga Masiva (Bonda)
           </button>
-          <button onClick={openCreateModal} className="flex items-center gap-2 px-4 py-2 bg-[#40a8ab] hover:bg-[#2c8184] text-white rounded-xl font-semibold transition-all">
+          <button onClick={openCreateModal} className="flex items-center gap-2 px-4 py-2 bg-[#2c8184] hover:bg-[#1e6063] text-white rounded-xl font-semibold transition-all">
             <Plus className="w-4 h-4" /> Nueva ONG
           </button>
         </div>
@@ -313,7 +313,7 @@ export default function SeccionAdminOngs() {
                         <p className="font-semibold text-slate-900">{ong.nombre}</p>
                         <p className="text-xs text-slate-500 line-clamp-1 max-w-[200px] mb-1">{ong.descripcion || "Sin descripción"}</p>
                         {ong.slug && (
-                          <div className="flex items-center gap-1 text-[11px] text-[#40a8ab] font-bold">
+                          <div className="flex items-center gap-1 text-[11px] text-[#2c8184] font-bold">
                             <LinkIcon className="w-3 h-3" />
                             <a
                               href={`/donar/${ong.slug}`}
@@ -341,12 +341,12 @@ export default function SeccionAdminOngs() {
                   <td className="py-4 px-6">
                     <div className="flex flex-col gap-3">
                       <div className="flex items-center justify-between">
-                        <span className={`text-xs font-medium w-16 ${ong.activa ? 'text-[#40a8ab]' : 'text-slate-400'}`}>
+                        <span className={`text-xs font-medium w-16 ${ong.activa ? 'text-[#2c8184]' : 'text-slate-400'}`}>
                           General
                         </span>
                         <button
                           onClick={() => handleToggleStatus(ong)}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#40a8ab] focus:ring-offset-2 ${ong.activa ? 'bg-[#40a8ab]' : 'bg-slate-200'}`}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#2c8184] focus:ring-offset-2 ${ong.activa ? 'bg-[#2c8184]' : 'bg-slate-200'}`}
                           role="switch"
                           aria-checked={ong.activa}
                         >
@@ -373,7 +373,7 @@ export default function SeccionAdminOngs() {
                   </td>
                   <td className="py-4 px-6 text-right">
                     <div className="flex justify-end gap-2">
-                      <button onClick={() => openEditModal(ong)} className="p-2 text-slate-400 hover:text-[#40a8ab] hover:bg-emerald-50 rounded-lg transition-colors" title="Editar ONG">
+                      <button onClick={() => openEditModal(ong)} className="p-2 text-slate-400 hover:text-[#2c8184] hover:bg-emerald-50 rounded-lg transition-colors" title="Editar ONG">
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button onClick={() => handlePermanentDelete(ong.id, ong.nombre)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Eliminar ONG permanentemente">
@@ -393,7 +393,7 @@ export default function SeccionAdminOngs() {
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto">
             <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
               <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-[#40a8ab]" />
+                <Building2 className="w-5 h-5 text-[#2c8184]" />
                 {editingOng ? "Editar ONG" : "Nueva ONG"}
               </h2>
               <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200 transition-colors">
@@ -437,7 +437,7 @@ export default function SeccionAdminOngs() {
                       <p className="text-[11px] text-slate-400 mt-1">
                         Si se define, la URL exclusiva será:{" "}
                         {formData.slug ? (
-                          <span className="font-bold text-[#40a8ab]">
+                          <span className="font-bold text-[#2c8184]">
                             /donar/{formData.slug}
                           </span>
                         ) : (
@@ -552,7 +552,7 @@ export default function SeccionAdminOngs() {
                 <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 px-4 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold rounded-xl transition-colors">
                   Cancelar
                 </button>
-                <button type="submit" disabled={submitting} className="flex-1 py-3 px-4 bg-[#40a8ab] hover:bg-[#2c8184] disabled:bg-emerald-400 text-white font-semibold rounded-xl shadow-lg shadow-emerald-200 transition-all flex justify-center items-center">
+                <button type="submit" disabled={submitting} className="flex-1 py-3 px-4 bg-[#2c8184] hover:bg-[#1e6063] disabled:bg-emerald-400 text-white font-semibold rounded-xl shadow-lg shadow-emerald-200 transition-all flex justify-center items-center">
                   {submitting ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div> : 'Guardar Organización'}
                 </button>
               </div>

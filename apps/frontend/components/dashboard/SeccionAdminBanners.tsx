@@ -216,12 +216,12 @@ export default function SeccionAdminBanners() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-          <ImageIcon className="w-6 h-6 text-[#40a8ab]" />
+          <ImageIcon className="w-6 h-6 text-[#2c8184]" />
           Gestión de Banners (Carrusel Home)
         </h2>
         <button
           onClick={() => handleOpenModal()}
-          className="flex items-center gap-2 px-4 py-2 bg-[#40a8ab] hover:bg-[#2c8184] text-white rounded-xl font-semibold transition-all shadow-md"
+          className="flex items-center gap-2 px-4 py-2 bg-[#2c8184] hover:bg-[#1e6063] text-white rounded-xl font-semibold transition-all shadow-md"
         >
           <Plus className="w-5 h-5" />
           Nuevo Banner
@@ -230,7 +230,7 @@ export default function SeccionAdminBanners() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <Loader2 className="w-8 h-8 animate-spin text-[#40a8ab]" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#2c8184]" />
         </div>
       ) : banners.length === 0 ? (
         <div className="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center">
@@ -238,7 +238,7 @@ export default function SeccionAdminBanners() {
           <p className="text-slate-500 font-medium">No hay banners configurados</p>
           <button
             onClick={() => handleOpenModal()}
-            className="mt-4 text-[#40a8ab] font-bold hover:underline"
+            className="mt-4 text-[#2c8184] font-bold hover:underline"
           >
             Crear el primer banner
           </button>
@@ -264,14 +264,14 @@ export default function SeccionAdminBanners() {
                         <button 
                           onClick={() => handleMove(banner, 'up')}
                           disabled={index === 0}
-                          className="p-1 text-slate-400 hover:text-[#40a8ab] disabled:opacity-30"
+                          className="p-1 text-slate-400 hover:text-[#2c8184] disabled:opacity-30"
                         >
                           <ArrowUp className="w-4 h-4" />
                         </button>
                         <button 
                           onClick={() => handleMove(banner, 'down')}
                           disabled={index === banners.length - 1}
-                          className="p-1 text-slate-400 hover:text-[#40a8ab] disabled:opacity-30"
+                          className="p-1 text-slate-400 hover:text-[#2c8184] disabled:opacity-30"
                         >
                           <ArrowDown className="w-4 h-4" />
                         </button>
@@ -294,7 +294,7 @@ export default function SeccionAdminBanners() {
                             href={banner.link_url} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-xs text-[#40a8ab] hover:underline flex items-center gap-1"
+                            className="text-xs text-[#2c8184] hover:underline flex items-center gap-1"
                           >
                             <ExternalLink className="w-3 h-3" />
                             {banner.link_url}
@@ -320,7 +320,7 @@ export default function SeccionAdminBanners() {
                     <div className="flex justify-end gap-2">
                       <button
                         onClick={() => handleOpenModal(banner)}
-                        className="p-2 text-slate-400 hover:text-[#40a8ab] hover:bg-emerald-50 rounded-lg transition-colors"
+                        className="p-2 text-slate-400 hover:text-[#2c8184] hover:bg-emerald-50 rounded-lg transition-colors"
                         title="Editar"
                       >
                         <Edit2 className="w-4 h-4" />
@@ -384,10 +384,10 @@ export default function SeccionAdminBanners() {
                     )}
                     
                     <div className="flex items-center justify-center w-full">
-                      <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all ${uploading ? 'bg-slate-50 border-slate-200' : 'bg-slate-50 border-slate-300 hover:bg-slate-100 hover:border-[#40a8ab]'}`}>
+                      <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all ${uploading ? 'bg-slate-50 border-slate-200' : 'bg-slate-50 border-slate-300 hover:bg-slate-100 hover:border-[#2c8184]'}`}>
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                           {uploading ? (
-                            <Loader2 className="w-8 h-8 animate-spin text-[#40a8ab] mb-2" />
+                            <Loader2 className="w-8 h-8 animate-spin text-[#2c8184] mb-2" />
                           ) : (
                             <Plus className="w-8 h-8 text-slate-400 mb-2" />
                           )}
@@ -427,7 +427,7 @@ export default function SeccionAdminBanners() {
                     <label className="flex items-center gap-2 cursor-pointer group">
                       <div 
                         onClick={() => setFormData({...formData, is_active: !formData.is_active})}
-                        className={`w-12 h-6 rounded-full transition-all relative ${formData.is_active ? 'bg-[#40a8ab]' : 'bg-slate-300'}`}
+                        className={`w-12 h-6 rounded-full transition-all relative ${formData.is_active ? 'bg-[#2c8184]' : 'bg-slate-300'}`}
                       >
                         <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${formData.is_active ? 'left-7' : 'left-1'}`} />
                       </div>
@@ -444,7 +444,7 @@ export default function SeccionAdminBanners() {
                 <button 
                   type="submit" 
                   disabled={submitting || uploading} 
-                  className="flex-1 py-3 px-4 bg-[#40a8ab] hover:bg-[#2c8184] disabled:bg-slate-300 text-white font-semibold rounded-xl shadow-lg transition-all flex justify-center items-center gap-2"
+                  className="flex-1 py-3 px-4 bg-[#2c8184] hover:bg-[#1e6063] disabled:bg-slate-300 text-white font-semibold rounded-xl shadow-lg transition-all flex justify-center items-center gap-2"
                 >
                   {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="w-5 h-5" />}
                   {editingBanner ? 'Guardar Cambios' : 'Crear Banner'}

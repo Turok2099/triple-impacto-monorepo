@@ -133,7 +133,7 @@ export default function LoginPage() {
       <div className="max-w-md w-full bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm">
         
         {/* Header Similar a PaymentForm */}
-        <div className="bg-[#40a8ab] p-8 text-center flex flex-col items-center">
+        <div className="bg-[#2c8184] p-8 text-center flex flex-col items-center">
           <img
             src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto,f_auto,w_200,c_limit/v1775685229/ISOLOGOTIPO_AYNI_FONDO_TRANSPARENTE_iwyuaw.png"
             alt="AYNI"
@@ -180,11 +180,11 @@ export default function LoginPage() {
               <div className="flex items-start gap-4">
                 <div className="bg-teal-100/80 p-2 rounded-full shrink-0">
                   {successMsg.includes("etapa de verificación") || successMsg.includes("correo") ? (
-                    <Mail className="w-5 h-5 text-[#40a8ab]" />
+                    <Mail className="w-5 h-5 text-[#2c8184]" />
                   ) : successMsg.includes("contraseña") ? (
-                    <KeyRound className="w-5 h-5 text-[#40a8ab]" />
+                    <KeyRound className="w-5 h-5 text-[#2c8184]" />
                   ) : (
-                    <CheckCircle2 className="w-5 h-5 text-[#40a8ab]" />
+                    <CheckCircle2 className="w-5 h-5 text-[#2c8184]" />
                   )}
                 </div>
                 <div className="pt-0.5">
@@ -263,7 +263,7 @@ export default function LoginPage() {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 text-[#40a8ab] focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
+                  className="h-4 w-4 text-[#2c8184] focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
                 />
                 <label
                   htmlFor="remember-me"
@@ -276,7 +276,7 @@ export default function LoginPage() {
               <div className="text-sm md:text-base">
                 <a
                   href="/forgot-password"
-                  className="font-medium text-[#40a8ab] hover:text-[#40a8ab] transition-colors"
+                  className="font-medium text-[#2c8184] hover:text-[#2c8184] transition-colors"
                 >
                   ¿Olvidaste tu contraseña?
                 </a>
@@ -337,7 +337,7 @@ export default function LoginPage() {
                 const redirectUrl = params.get("redirect");
                 window.location.href = redirectUrl ? `/registro?redirect=${encodeURIComponent(redirectUrl)}` : "/registro";
               }}
-              className="font-bold text-[#40a8ab] hover:text-[#40a8ab] transition-colors"
+              className="font-bold text-[#2c8184] hover:text-[#2c8184] transition-colors"
             >
               Regístrate gratis
             </a>

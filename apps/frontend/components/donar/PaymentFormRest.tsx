@@ -237,7 +237,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
         </p>
         <button 
           onClick={() => window.location.href = '/dashboard'}
-          className="w-full py-4 bg-[#40a8ab] text-white rounded-2xl font-semibold hover:bg-teal-600 transition-all flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full py-4 bg-[#2c8184] text-white rounded-2xl font-semibold hover:bg-teal-600 transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
           Ir al Dashboard de AYNI <ArrowRight className="w-4 h-4" />
         </button>
@@ -247,7 +247,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
 
   return (
     <div className="max-w-2xl w-full mx-auto bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm">
-      <div className="bg-[#40a8ab] p-8 text-center flex flex-col items-center">
+      <div className="bg-[#2c8184] p-8 text-center flex flex-col items-center">
         <Lock className="w-8 h-8 text-white/90 mb-3" />
         <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Pago Seguro</h2>
         <p className="text-teal-50 text-sm md:text-base">
@@ -270,7 +270,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
               1. ¿A qué organización querés donar? *
             </label>
             {loadingOrgs ? (
-              <div className="flex justify-center p-4"><Loader2 className="w-6 h-6 animate-spin text-[#40a8ab]" /></div>
+              <div className="flex justify-center p-4"><Loader2 className="w-6 h-6 animate-spin text-[#2c8184]" /></div>
             ) : errorOrgs ? (
               <div className="text-red-500 text-sm md:text-base">{errorOrgs}</div>
             ) : (
@@ -298,7 +298,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
                 type="button"
                 onClick={() => setIsRecurring(true)}
                 className={`py-3 px-4 rounded-2xl text-sm md:text-base font-bold text-center transition-all cursor-pointer ${isRecurring
-                  ? "bg-[#40a8ab] text-white shadow-md"
+                  ? "bg-[#2c8184] text-white shadow-md"
                   : "bg-slate-50 text-slate-700 border-2 border-slate-200 hover:border-slate-300"
                   }`}
               >
@@ -308,7 +308,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
                 type="button"
                 onClick={() => setIsRecurring(false)}
                 className={`py-3 px-4 rounded-2xl text-sm md:text-base font-bold text-center transition-all cursor-pointer ${!isRecurring
-                  ? "bg-[#40a8ab] text-white shadow-md"
+                  ? "bg-[#2c8184] text-white shadow-md"
                   : "bg-slate-50 text-slate-700 border-2 border-slate-200 hover:border-slate-300"
                   }`}
               >
@@ -452,7 +452,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
           <button
             type="submit"
             disabled={loading || loadingOrgs || !organizacionId}
-            className="w-full bg-[#40a8ab] hover:bg-teal-600 disabled:opacity-50 text-white text-sm md:text-base font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-teal-600/20 cursor-pointer"
+            className="w-full bg-[#2c8184] hover:bg-teal-600 disabled:opacity-50 text-white text-sm md:text-base font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-teal-600/20 cursor-pointer"
           >
             {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Lock className="w-5 h-5" />}
             <span>{loading ? 'Procesando...' : `Donar ${formatearMonto(montoActualVisual)} de forma segura`}</span>

@@ -193,28 +193,28 @@ export default function WhyDonateSection() {
             
             {/* Personas Beneficiadas (Stat principal) */}
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:border-teal-300 hover:shadow-xl transition-all text-center flex flex-col items-center justify-center">
-              <Users className="w-12 h-12 text-[#40a8ab] mb-4" strokeWidth={1.5} />
-              <div className="font-bold text-4xl text-[#40a8ab] mb-2">+ 15.000</div>
+              <Users className="w-12 h-12 text-[#2c8184] mb-4" strokeWidth={1.5} />
+              <div className="font-bold text-4xl text-[#2c8184] mb-2">+ 15.000</div>
               <p className="font-bold text-sm tracking-wide uppercase text-gray-800">Personas beneficiadas</p>
             </div>
 
             {/* Transparencia */}
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:border-teal-300 hover:shadow-xl transition-all text-center flex flex-col items-center justify-center">
-              <ShieldCheck className="w-12 h-12 text-[#40a8ab] mb-4" strokeWidth={1.5} />
+              <ShieldCheck className="w-12 h-12 text-[#2c8184] mb-4" strokeWidth={1.5} />
               <div className="font-bold text-xl text-gray-900 mb-2">Transparencia garantizada</div>
               <p className="text-sm text-gray-600">Cada donación es auditada, trazable y verificable.</p>
             </div>
 
             {/* Descuentos */}
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:border-teal-300 hover:shadow-xl transition-all text-center flex flex-col items-center justify-center">
-              <Gift className="w-12 h-12 text-[#40a8ab] mb-4" strokeWidth={1.5} />
+              <Gift className="w-12 h-12 text-[#2c8184] mb-4" strokeWidth={1.5} />
               <div className="font-bold text-xl text-gray-900 mb-2">Descuentos al instante</div>
               <p className="text-sm text-gray-600">Accedé a cientos de beneficios sumando impacto.</p>
             </div>
 
             {/* Cancelación */}
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:border-teal-300 hover:shadow-xl transition-all text-center flex flex-col items-center justify-center">
-              <XCircle className="w-12 h-12 text-[#40a8ab] mb-4" strokeWidth={1.5} />
+              <XCircle className="w-12 h-12 text-[#2c8184] mb-4" strokeWidth={1.5} />
               <div className="font-bold text-xl text-gray-900 mb-2">Cancela cuando quieras</div>
               <p className="text-sm text-gray-600">Pausá o cancelá tu donación online y sin ataduras.</p>
             </div>
@@ -259,7 +259,7 @@ export default function WhyDonateSection() {
             {/* Controles del Carrusel */}
             <button 
               onClick={scrollLeftClick}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 p-3 bg-white border-2 border-gray-100 rounded-full shadow-lg text-[#40a8ab] hover:bg-teal-50 hover:scale-110 transition-all sm:-ml-6"
+              className="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 p-3 bg-white border-2 border-gray-100 rounded-full shadow-lg text-[#2c8184] hover:bg-teal-50 hover:scale-110 transition-all sm:-ml-6"
               aria-label="Testimonio anterior"
             >
               <ChevronLeft className="w-6 h-6" />
@@ -267,7 +267,7 @@ export default function WhyDonateSection() {
 
             <button 
               onClick={scrollRightClick}
-              className="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 p-3 bg-white border-2 border-gray-100 rounded-full shadow-lg text-[#40a8ab] hover:bg-teal-50 hover:scale-110 transition-all sm:-mr-6"
+              className="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 p-3 bg-white border-2 border-gray-100 rounded-full shadow-lg text-[#2c8184] hover:bg-teal-50 hover:scale-110 transition-all sm:-mr-6"
               aria-label="Testimonio siguiente"
             >
               <ChevronRight className="w-6 h-6" />

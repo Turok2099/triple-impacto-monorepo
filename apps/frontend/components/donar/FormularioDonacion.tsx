@@ -148,7 +148,7 @@ export default function FormularioDonacion({
         icon: 'warning',
         title: 'Aún no disponible para donación',
         text: 'Esta organización está completando su configuración de pagos.',
-        confirmButtonColor: '#40a8ab',
+        confirmButtonColor: '#2c8184',
       });
       return;
     }
@@ -161,7 +161,7 @@ export default function FormularioDonacion({
   if (authLoading) {
     return (
       <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#40a8ab] mx-auto mb-4"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2c8184] mx-auto mb-4"></div>
         <p className="text-gray-600">Verificando sesión...</p>
       </div>
     );
@@ -175,7 +175,7 @@ export default function FormularioDonacion({
         </p>
         <a
           href="/login"
-          className="inline-block px-6 py-2 bg-[#40a8ab] text-white rounded-lg hover:bg-[#40a8ab]"
+          className="inline-block px-6 py-2 bg-[#2c8184] text-white rounded-lg hover:bg-[#2c8184]"
         >
           Iniciar Sesión
         </a>
@@ -193,7 +193,7 @@ export default function FormularioDonacion({
 
         {loadingOrgs ? (
           <div className="text-center py-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#40a8ab] mx-auto"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2c8184] mx-auto"></div>
           </div>
         ) : errorOrgs ? (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -212,7 +212,7 @@ export default function FormularioDonacion({
             <select
               value={organizacionId}
               onChange={(e) => setOrganizacionId(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40a8ab] focus:border-[#40a8ab] text-gray-900 bg-white"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2c8184] focus:border-[#2c8184] text-gray-900 bg-white"
               required
             >
               <option value="" disabled>
@@ -239,7 +239,7 @@ export default function FormularioDonacion({
                       />
                     ) : (
                       <div
-                        className="w-full h-full flex items-center justify-center text-[#40a8ab] text-4xl font-bold"
+                        className="w-full h-full flex items-center justify-center text-[#2c8184] text-4xl font-bold"
                         aria-hidden
                       >
                         {organizacionSeleccionada.nombre.charAt(0)}
@@ -277,7 +277,7 @@ export default function FormularioDonacion({
               type="button"
               onClick={() => handleMontoSugeridoClick(monto)}
               className={`py-3 px-4 rounded-lg font-medium text-center transition-all ${montoSeleccionado === monto && !usarMontoCustom
-                ? "bg-[#40a8ab] text-white"
+                ? "bg-[#2c8184] text-white"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
             >
@@ -292,7 +292,7 @@ export default function FormularioDonacion({
               setMontoSeleccionado(null);
             }}
             className={`py-3 px-4 rounded-lg font-bold text-center transition-all ${usarMontoCustom
-              ? "bg-[#40a8ab] text-white"
+              ? "bg-[#2c8184] text-white"
               : "bg-slate-100 text-slate-700 hover:bg-slate-200"
               }`}
           >
@@ -316,7 +316,7 @@ export default function FormularioDonacion({
                 onChange={(e) => handleMontoCustomChange(e.target.value)}
                 placeholder={montoMinimoActual.toString()}
                 autoFocus
-                className="w-full pl-8 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 border-[#40a8ab] focus:ring-[#40a8ab]"
+                className="w-full pl-8 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 border-[#2c8184] focus:ring-[#2c8184]"
               />
             </div>
           </div>
@@ -356,7 +356,7 @@ export default function FormularioDonacion({
 
         <div className="mt-4 pt-4 border-t border-teal-200">
           <div className="flex items-start gap-3 text-sm text-teal-800">
-            <Gift className="w-5 h-5 flex-shrink-0 mt-0.5 text-[#40a8ab]" />
+            <Gift className="w-5 h-5 flex-shrink-0 mt-0.5 text-[#2c8184]" />
             <p>
               Al donar, obtendrás acceso exclusivo a cupones de descuento de
               Bonda en marcas reconocidas.
@@ -369,7 +369,7 @@ export default function FormularioDonacion({
       <button
         type="submit"
         disabled={loading || loadingOrgs || !organizacionId}
-        className="w-full py-4 px-6 bg-gradient-to-r from-[#40a8ab] to-teal-600 text-white font-bold rounded-lg hover:from-teal-600 hover:to-teal-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+        className="w-full py-4 px-6 bg-gradient-to-r from-[#2c8184] to-teal-600 text-white font-bold rounded-lg hover:from-teal-600 hover:to-teal-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
       >
         {loading ? (
           <>

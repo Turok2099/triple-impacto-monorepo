@@ -86,7 +86,7 @@ export default function CuponCard({ cupon }: CuponCardProps) {
         </div>
         <button 
           onClick={handleObtenerDescuento}
-          className="bg-[#40a8ab] text-white text-xs font-bold px-4 py-2 rounded-xl shadow-lg shadow-[#40a8ab]/20 active:scale-95 transition-transform shrink-0"
+          className="bg-[#2c8184] text-white text-xs font-bold px-4 py-2 rounded-xl shadow-lg shadow-[#2c8184]/20 active:scale-95 transition-transform shrink-0"
         >
           Obtener
         </button>
@@ -126,7 +126,7 @@ export default function CuponCard({ cupon }: CuponCardProps) {
           <p className="text-sm text-gray-500 line-clamp-3 min-h-[3.6rem]">{descripcion}</p>
           <button 
             onClick={handleObtenerDescuento}
-            className="mt-4 w-full py-2.5 bg-[#40a8ab] hover:bg-[#2c8184] text-white font-semibold rounded-xl transition-colors text-sm"
+            className="mt-4 w-full py-2.5 bg-[#2c8184] hover:bg-[#1e6063] text-white font-semibold rounded-xl transition-colors text-sm"
           >
             Obtener descuento
           </button>

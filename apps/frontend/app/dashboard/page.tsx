@@ -455,21 +455,31 @@ export default function DashboardPage() {
           {(() => {
             if (!hasActiveOngs) {
               return (
-                <div className="bg-white border border-slate-100 rounded-3xl p-10 text-center shadow-sm relative overflow-hidden mt-8">
-                  <div className="absolute inset-0 bg-slate-50/50 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-6">
-                    <Shield className="w-16 h-16 text-slate-300 mb-4" />
-                    <h3 className="text-xl font-bold text-slate-700 mb-2">Bloqueo de Beneficios</h3>
-                    <p className="text-slate-500 max-w-md mx-auto">
+                <div className="bg-white border border-slate-100 rounded-3xl p-6 sm:p-10 text-center shadow-sm relative overflow-hidden mt-8 min-h-[320px] flex items-center justify-center">
+                  {/* Fondo difuminado simulando cupones (detrás del contenido) */}
+                  <div className="absolute inset-0 opacity-[0.03] sm:opacity-[0.07] blur-[2px] flex justify-center items-center gap-4 pointer-events-none z-0">
+                    <div className="w-32 h-44 sm:w-48 sm:h-64 bg-slate-400 rounded-xl shrink-0"></div>
+                    <div className="w-32 h-44 sm:w-48 sm:h-64 bg-slate-400 rounded-xl shrink-0"></div>
+                    <div className="w-32 h-44 sm:w-48 sm:h-64 bg-slate-400 rounded-xl shrink-0"></div>
+                  </div>
+                  
+                  {/* Contenido en flujo normal (se adapta automáticamente al alto de cualquier dispositivo) */}
+                  <div className="relative z-10 flex flex-col items-center justify-center p-2 max-w-md mx-auto">
+                    <div className="size-14 sm:size-16 rounded-2xl bg-slate-50 border border-slate-100 shadow-xs flex items-center justify-center text-slate-400 mb-4">
+                      <Shield className="w-7 h-7 sm:w-8 sm:h-8" />
+                    </div>
+                    <h3 className="text-lg sm:text-xl font-bold text-slate-800 mb-2">Bloqueo de Beneficios</h3>
+                    <p className="text-xs sm:text-sm text-slate-500 leading-relaxed mb-6">
                       Actualmente no cuentas con ninguna afiliación activa en nuestras ONGs. 
                       Para acceder a la red de descuentos exclusivos, debes estar acreditado 
                       en al menos una fundación activa.
                     </p>
-                  </div>
-                  {/* Fondo difuminado simulando cupones */}
-                  <div className="opacity-10 blur-sm flex justify-center gap-4 pointer-events-none">
-                    <div className="w-48 h-64 bg-slate-200 rounded-xl"></div>
-                    <div className="w-48 h-64 bg-slate-200 rounded-xl"></div>
-                    <div className="w-48 h-64 bg-slate-200 rounded-xl"></div>
+                    <button
+                      onClick={() => setActiveTab("donar")}
+                      className="px-6 py-3 bg-[#40a8ab] hover:bg-[#2c8184] text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                    >
+                      Donar ahora para activar
+                    </button>
                   </div>
                 </div>
               );

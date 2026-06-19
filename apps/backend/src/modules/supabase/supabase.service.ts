@@ -154,6 +154,27 @@ export class SupabaseService implements OnModuleInit {
     const ext = originalname.split('.').pop() || 'png';
     const filePath = `${userId}-${Date.now()}.${ext}`;
 
+    // Delete old avatar from storage if it exists
+    const { data: userRecord } = await this.from('usuarios')
+      .select('avatar_url')
+      .eq('id', userId)
+      .single();
+
+    if (userRecord?.avatar_url) {
+      try {
+        const parts = userRecord.avatar_url.split('/avatars/');
+        if (parts.length > 1) {
+          const oldFileName = parts[1];
+          await this.getClient().storage
+            .from('avatars')
+            .remove([oldFileName]);
+          this.logger.log(`Old avatar deleted: ${oldFileName}`);
+        }
+      } catch (err) {
+        this.logger.warn(`Could not delete old avatar: ${err.message}`);
+      }
+    }
+
     const { data: uploadData, error: uploadError } = await this.getClient().storage
       .from('avatars')
       .upload(filePath, fileBuffer, {

@@ -129,48 +129,40 @@ const impactAreas = [
 ];
 
 export default function WhyDonateSection() {
-  const carouselRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Listen to screen size to adjust scroll behavior dynamically
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 768px)");
+    setIsMobile(media.matches);
+    const listener = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    media.addEventListener("change", listener);
+    return () => media.removeEventListener("change", listener);
+  }, []);
+
+  const totalSlides = testimonials.length;
+  const visibleSlides = isMobile ? 1 : 3;
+  const maxIndex = Math.max(0, totalSlides - visibleSlides);
 
   // Auto-play logic
   useEffect(() => {
     if (isHovered) return;
 
     const intervalId = setInterval(() => {
-      requestAnimationFrame(() => {
-        if (carouselRef.current) {
-          const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
-          // Si llegamos al final, volvemos al principio suavemente
-          if (scrollLeft + clientWidth >= scrollWidth - 10) {
-            carouselRef.current.scrollTo({ left: 0, behavior: "smooth" });
-          } else {
-            // Sino, pasamos a la siguiente tarjeta (aproximadamente el ancho de una tarjeta)
-            const scrollAmount = clientWidth > 768 ? clientWidth / 3 : clientWidth;
-            carouselRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
-          }
-        }
-      });
+      setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
     }, 4500);
 
     return () => clearInterval(intervalId);
-  }, [isHovered]);
+  }, [isHovered, maxIndex]);
 
   const scrollLeftClick = () => {
-    requestAnimationFrame(() => {
-      if (carouselRef.current) {
-        const scrollAmount = carouselRef.current.clientWidth > 768 ? carouselRef.current.clientWidth / 3 : carouselRef.current.clientWidth;
-        carouselRef.current.scrollBy({ left: -scrollAmount, behavior: "smooth" });
-      }
-    });
+    setCurrentIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
   };
 
   const scrollRightClick = () => {
-    requestAnimationFrame(() => {
-      if (carouselRef.current) {
-        const scrollAmount = carouselRef.current.clientWidth > 768 ? carouselRef.current.clientWidth / 3 : carouselRef.current.clientWidth;
-        carouselRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
-      }
-    });
+    setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
   };
 
   return (
@@ -273,56 +265,61 @@ export default function WhyDonateSection() {
               <ChevronRight className="w-6 h-6" />
             </button>
 
-            {/* Contenedor scrolleable */}
-            <div 
-              ref={carouselRef}
-              className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory scroll-smooth hide-scrollbar px-2"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              {testimonials.map((testimonial, index) => (
-                <div
-                  key={testimonial.id}
-                  className="snap-center min-w-[100%] md:min-w-[calc(33.3333%-1rem)] lg:min-w-[calc(33.3333%-1rem)] bg-white border-2 border-gray-200 rounded-2xl p-6 hover:border-teal-400 hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
-                  style={{
-                    animation: `slideInUp 0.6s ease-out ${index * 0.15}s both`,
-                  }}
-                >
-                  <div>
-                    {/* Rating */}
-                    <div className="flex gap-1 mb-4">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <span key={i} className="text-amber-400 text-xl">
-                          ⭐
-                        </span>
-                      ))}
-                    </div>
+            {/* Contenedor principal con recorte de desborde */}
+            <div className="overflow-hidden pb-8 -mx-3">
+              <div 
+                className="flex flex-row flex-nowrap w-full transition-transform duration-500 ease-out"
+                style={{ 
+                  transform: `translate3d(-${currentIndex * (isMobile ? 100 : 33.33333)}%, 0, 0)` 
+                }}
+              >
+                {testimonials.map((testimonial, index) => (
+                  <div
+                    key={testimonial.id}
+                    className="w-full md:w-1/3 shrink-0 px-3 flex flex-col"
+                    style={{
+                      animation: `slideInUp 0.6s ease-out ${index * 0.15}s both`,
+                    }}
+                  >
+                    <div className="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:border-teal-400 hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full">
+                      <div>
+                        {/* Rating */}
+                        <div className="flex gap-1 mb-4">
+                          {[...Array(testimonial.rating)].map((_, i) => (
+                            <span key={i} className="text-amber-400 text-xl">
+                              ⭐
+                            </span>
+                          ))}
+                        </div>
 
-                    {/* Texto */}
-                    <p className="text-gray-700 mb-6 leading-relaxed italic whitespace-pre-line text-sm">
-                      "{testimonial.text}"
-                    </p>
-                  </div>
+                        {/* Texto */}
+                        <p className="text-gray-700 mb-6 leading-relaxed italic whitespace-pre-line text-sm">
+                          "{testimonial.text}"
+                        </p>
+                      </div>
 
-                  {/* Autor */}
-                  <div className="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
-                    <div className="w-12 h-12 bg-linear-to-br from-purple-400 to-blue-400 rounded-full flex items-center justify-center overflow-hidden text-2xl shrink-0">
-                      {testimonial.avatar.startsWith('http') ? (
-                        <img src={testimonial.avatar} alt={testimonial.name} className="w-full h-full object-cover" />
-                      ) : (
-                        testimonial.avatar
-                      )}
-                    </div>
-                    <div>
-                      <div className="font-semibold text-gray-900 text-sm">
-                        {testimonial.name}
-                      </div>
-                      <div className="text-xs text-gray-600">
-                        {testimonial.role}
+                      {/* Autor */}
+                      <div className="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
+                        <div className="w-12 h-12 bg-linear-to-br from-purple-400 to-blue-400 rounded-full flex items-center justify-center overflow-hidden text-2xl shrink-0">
+                          {testimonial.avatar.startsWith('http') ? (
+                            <img src={testimonial.avatar} alt={testimonial.name} className="w-full h-full object-cover" />
+                          ) : (
+                            testimonial.avatar
+                          )}
+                        </div>
+                        <div>
+                          <div className="font-semibold text-gray-900 text-sm">
+                            {testimonial.name}
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            {testimonial.role}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
             
             {/* Pequeña capa invisible para esconder barra de scroll webkit en CSS si no aplica lo de style */}

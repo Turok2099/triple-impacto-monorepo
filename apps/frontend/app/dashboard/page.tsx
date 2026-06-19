@@ -352,7 +352,7 @@ export default function DashboardPage() {
           <div
             className="size-16 md:size-24 rounded-full bg-cover bg-center ring-4 ring-slate-50 shadow-md"
             style={{
-              backgroundImage: `url(https://ui-avatars.com/api/?name=${encodeURIComponent(dashboard.usuario.nombre)}&background=16a459&color=fff&size=192)`,
+              backgroundImage: `url(${user?.avatar_url || dashboard.usuario.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(dashboard.usuario.nombre)}&background=16a459&color=fff&size=192`})`,
             }}
           ></div>
           <div className="flex flex-col items-center gap-2 text-center">

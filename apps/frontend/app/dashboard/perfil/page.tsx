@@ -123,7 +123,7 @@ export default function PerfilPage() {
             <div
               className="size-24 rounded-full bg-cover bg-center ring-4 ring-slate-50 shadow-sm"
               style={{
-                backgroundImage: `url(https://ui-avatars.com/api/?name=${encodeURIComponent(user.nombre)}&background=16a459&color=fff&size=192)`,
+                backgroundImage: `url(${user.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.nombre)}&background=16a459&color=fff&size=192`})`,
               }}
             />
             <button className="absolute bottom-0 right-0 bg-[#2c8184] text-white p-1.5 rounded-full border-2 border-white shadow-md active:scale-95 transition-transform hover:bg-[#2c8184]/90">

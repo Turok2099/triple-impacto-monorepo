@@ -9,6 +9,7 @@ export class AuthResponseDto {
     provincia?: string | null;
     localidad?: string | null;
     role?: string;
+    avatar_url?: string | null;
   };
   token: string;
   message?: string;

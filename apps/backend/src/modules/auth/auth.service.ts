@@ -156,6 +156,7 @@ export class AuthService {
         provincia: usuario.provincia ?? null,
         localidad: usuario.localidad ?? null,
         role,
+        avatar_url: usuario.avatar_url ?? null,
       },
       token,
     };
@@ -370,6 +371,7 @@ export class AuthService {
       dni: updated.dni ?? null,
       provincia: updated.provincia ?? null,
       localidad: updated.localidad ?? null,
+      avatar_url: updated.avatar_url ?? null,
     };
   }
 

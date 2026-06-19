@@ -200,6 +200,7 @@ function NavbarContent() {
             <button
               onClick={() => setIsMobileMenuOpen(false)}
               className="p-2.5 text-gray-400 hover:bg-red-50 hover:text-red-500 rounded-xl transition-colors"
+              aria-label="Cerrar menú"
             >
               <X className="w-6 h-6" />
             </button>

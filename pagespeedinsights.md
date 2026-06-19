@@ -1,35 +1,75 @@
 
 Solicitudes de bloqueo de renderización Ahorro estimado de 700 ms
 Las solicitudes bloquean la renderización inicial de la página, lo que puede retrasar el LCP. La aparición diferida o intercalada puede mover estas solicitudes de red fuera de la ruta crítica.FCPLCPSin puntuación
+Solicitudes de bloqueo de renderización Ahorro estimado de 320 ms
+Las solicitudes bloquean la renderización inicial de la página, lo que puede retrasar el LCP. La aparición diferida o intercalada puede mover estas solicitudes de red fuera de la ruta crítica.LCPFCPSin puntuación
 URL
 Tamaño de transferencia
 Duración
 ayni.ar Propio
-19.1 KiB	1,160 ms
-…chunks/049zpc6p_dvad.css(www.ayni.ar)
-17.0 KiB
-910 ms
+20.1 KiB	800 ms
+…chunks/0o__.340wvds8.css(www.ayni.ar)
+17.4 KiB
+640 ms
 …chunks/066jf0nk75nic.css(www.ayni.ar)
-2.1 KiB
-250 ms
-Reprocesamiento forzado
-Se produce un reprocesamiento forzado cuando JavaScript consulta propiedades geométricas (como offsetWidth) después de que los estilos se invalidan por un cambio en el estado del DOM. Esto puede reducir el rendimiento. Obtén más información sobre los reprocesamientos forzados y sus posibles mitigaciones.Sin puntuación
-Llamada a función principal
-Tiempo total de reprocesamiento
-0wmouk63wwkru.js:2
-11 ms
-Fuente
-Tiempo total de reprocesamiento
-[unattributed]
-71 ms
-installHook.js:1
-11 ms
-sidePanelUtil.js:18
-0 ms
+2.7 KiB
+160 ms
+JavaScript heredado Ahorro estimado de 14 KiB
+El complemento Polyfill y las transformaciones permiten que los navegadores más antiguos utilicen nuevas funciones de JavaScript. Sin embargo, la mayoría no es necesaria en los navegadores actualizados. Considera modificar tu proceso de compilación de JavaScript para que no se transpilen las funciones de Baseline, a menos que sepas que debes admitir navegadores más antiguos. Descubre por qué la mayoría de los sitios pueden implementar código ES6+ sin transpilación.LCPFCPSin puntuación
+URL
+Bytes desperdiciados
+ayni.ar Propio
+13.9 KiB
+…chunks/0wmouk63wwkru.js(www.ayni.ar)
+13.9 KiB
+…chunks/0wmouk63wwkru.js:1:6432(www.ayni.ar)
+Array.prototype.at
+…chunks/0wmouk63wwkru.js:1:5820(www.ayni.ar)
+Array.prototype.flat
+…chunks/0wmouk63wwkru.js:1:5933(www.ayni.ar)
+Array.prototype.flatMap
+…chunks/0wmouk63wwkru.js:1:6309(www.ayni.ar)
+Object.fromEntries
+…chunks/0wmouk63wwkru.js:1:6567(www.ayni.ar)
+Object.hasOwn
+…chunks/0wmouk63wwkru.js:1:5562(www.ayni.ar)
+String.prototype.trimEnd
+…chunks/0wmouk63wwkru.js:1:5477(www.ayni.ar)
+String.prototype.trimStart
+Usa tiempos de almacenamiento en caché eficientes Ahorro estimado de 5 KiB
+La duración en caché por un período prolongado puede acelerar la carga de la página cuando el usuario la visita de manera repetida. Obtén más información sobre el almacenamiento en caché.LCPFCPSin puntuación
+Solicitud
+TTL en caché
+Tamaño de transferencia
+Cloudflare utility 
+12 KiB
+/beacon.min.js/v833ccba…(static.cloudflareinsights.com)
+1d.
+12 KiB
 Árbol de dependencias de red
 Evita encadenar solicitudes críticas reduciendo la longitud de las cadenas, disminuyendo el tamaño de los recursos para la descarga o postergando la descarga de recursos innecesarios para mejorar la carga de la página.LCPSin puntuación
-Latencia de ruta crítica máxima: 338 ms
+Latencia de ruta crítica máxima: 414 ms
 Navegación inicial
-https://www.ayni.ar - 239 ms, 15.17 KiB
-…chunks/049zpc6p_dvad.css(www.ayni.ar) - 338 ms, 17.00 KiB
-…chunks/066jf0nk75nic.css(www.ayni.ar) - 313 ms, 2.08 KiB
+https://www.ayni.ar - 236 ms, 15.01 KiB
+…chunks/066jf0nk75nic.css(www.ayni.ar) - 264 ms, 2.70 KiB
+…chunks/0o__.340wvds8.css(www.ayni.ar) - 414 ms, 17.41 KiB
+Orígenes conectados previamente
+Las sugerencias de conexión previa ayudan al navegador a establecer una conexión antes de la carga de la página, lo que ahorra tiempo cuando se realiza la primera solicitud para ese origen. Estos son los orígenes a los que la página se conectó previamente.
+Origen
+Fuente
+https://backend-production-83f0.up.railway.app/
+head > link
+<link rel="preconnect" href="https://backend-production-83f0.up.railway.app" crossorigin="anonymous">
+Conexión previa no utilizada. Comprueba que el atributo crossorigin se use correctamente.
+https://faibhrhrassmrokvzqeu.supabase.co/
+head > link
+<link rel="preconnect" href="https://faibhrhrassmrokvzqeu.supabase.co" crossorigin="anonymous">
+Conexión previa no utilizada. Comprueba que el atributo crossorigin se use correctamente.
+Candidatos para la conexión previa
+Agrega sugerencias de conexión previa a tus orígenes más importantes, pero intenta usar no más de 4.
+Origen
+Ahorro estimado de LCP
+https://faibhrhrassmrokvzqeu.supabase.co
+310 ms
+https://backend-production-83f0.up.railway.app
+310 ms

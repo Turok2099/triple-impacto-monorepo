@@ -1,17 +1,22 @@
 import Image from "next/image";
 
+const cloudinaryLoader = ({ src, width, quality }: { src: string; width: number; quality?: number }) => {
+  return `https://res.cloudinary.com/dxbtafe9u/image/upload/f_auto,q_${quality || 'auto'},w_${width}/${src}`;
+};
+
 export default function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
       {/* Imagen de fondo */}
       <div className="absolute inset-0">
         <Image
-          src="https://res.cloudinary.com/dxbtafe9u/image/upload/f_auto,q_auto,w_1920/v1768268779/Fondo_hero_yzustd.png"
+          loader={cloudinaryLoader}
+          src="v1768268779/Fondo_hero_yzustd.png"
           alt="AYNI Hero Background"
           fill
           priority
           fetchPriority="high"
-          unoptimized
+          sizes="100vw"
           className="object-cover object-center"
         />
       </div>

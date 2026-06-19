@@ -6,6 +6,13 @@ import Image from "next/image";
 import { Heart, X, ExternalLink, Mail, Globe, Phone, MapPin } from "lucide-react";
 import { obtenerOrganizaciones, type Organizacion } from "@/lib/payments";
 
+const supabaseLoader = ({ src, width, quality }: { src: string; width: number; quality?: number }) => {
+  if (src.includes("supabase.co")) {
+    return `https://images.weserv.nl/?url=${encodeURIComponent(src)}&w=${width}&output=webp&q=${quality || 80}`;
+  }
+  return src;
+};
+
 interface PartnersSectionProps {
   hideHeader?: boolean;
   hideCTA?: boolean;
@@ -145,7 +152,14 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                 <div className="flex items-center gap-4 min-w-0 pointer-events-none">
                   <div className="size-16 rounded-full bg-transparent shrink-0 overflow-hidden flex items-center justify-center p-1 relative">
                     {logoUrl ? (
-                      <Image src={logoUrl} alt={org.nombre} fill sizes="64px" className="object-contain p-1" />
+                      <Image 
+                        loader={supabaseLoader}
+                        src={logoUrl} 
+                        alt={org.nombre} 
+                        fill 
+                        sizes="64px" 
+                        className="object-contain p-1" 
+                      />
                     ) : (
                       <span className="w-full h-full flex items-center justify-center text-lg font-bold text-[#2c8184]">
                         {org.nombre.charAt(0)}
@@ -153,9 +167,9 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                     )}
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-bold text-[#1A202C] text-sm leading-tight line-clamp-2">
+                    <h2 className="font-bold text-[#1A202C] text-sm leading-tight line-clamp-2">
                       {org.nombre}
-                    </h3>
+                    </h2>
                     {org.descripcion && (
                       <p className="text-[11px] text-slate-500 font-medium mt-0.5 line-clamp-1">
                         {org.descripcion}
@@ -188,16 +202,23 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                 <div className="p-8 pb-4 flex flex-col items-center grow text-center pointer-events-none">
                   <div className="h-28 w-full bg-transparent mb-6 shrink-0 overflow-hidden flex items-center justify-center p-2 relative">
                     {logoUrl ? (
-                      <Image src={logoUrl} alt={org.nombre} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-contain p-2" />
+                      <Image 
+                        loader={supabaseLoader}
+                        src={logoUrl} 
+                        alt={org.nombre} 
+                        fill 
+                        sizes="120px" 
+                        className="object-contain p-2" 
+                      />
                     ) : (
                       <span className="w-full h-full flex items-center justify-center text-2xl font-bold text-[#2c8184]">
                         {org.nombre.charAt(0)}
                       </span>
                     )}
                   </div>
-                  <h3 className="text-lg font-bold text-[#1A202C] mb-1 group-hover:text-[#2c8184] transition-colors leading-tight line-clamp-2">
+                  <h2 className="text-lg font-bold text-[#1A202C] mb-1 group-hover:text-[#2c8184] transition-colors leading-tight line-clamp-2">
                     {org.nombre}
-                  </h3>
+                  </h2>
                   {org.descripcion && (
                     <p className="text-xs text-slate-400 mt-4 leading-relaxed line-clamp-3">
                       {org.descripcion}
@@ -241,7 +262,14 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                   {(() => {
                     const logoUrl = selectedOrg.logo_url;
                     return logoUrl ? (
-                      <Image src={logoUrl} alt={selectedOrg.nombre} fill sizes="96px" className="object-contain p-3" />
+                      <Image 
+                        loader={supabaseLoader}
+                        src={logoUrl} 
+                        alt={selectedOrg.nombre} 
+                        fill 
+                        sizes="96px" 
+                        className="object-contain p-3" 
+                      />
                     ) : (
                       <span className="text-4xl font-bold text-[#2c8184]">{selectedOrg.nombre.charAt(0)}</span>
                     );

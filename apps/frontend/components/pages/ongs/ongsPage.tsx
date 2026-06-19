@@ -38,7 +38,7 @@ export default function ONGsPage() {
           <div className="relative z-10 flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/donar"
-              className="inline-flex items-center justify-center px-8 py-4 bg-amber-500 hover:bg-amber-400 text-white font-bold rounded-xl shadow-lg hover:scroll-m-0 hover:scale-105 transition-all text-lg"
+              className="inline-flex items-center justify-center px-8 py-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl shadow-lg hover:scroll-m-0 hover:scale-105 transition-all text-lg"
             >
               Quiero donar ahora
             </Link>

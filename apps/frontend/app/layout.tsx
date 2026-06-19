@@ -43,7 +43,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <Navbar />
-          {children}
+          <main>{children}</main>
           <Footer />
           <WhatsAppButton />
           <FloatingDonateButton />

@@ -24,7 +24,9 @@ const desktopUrl = cloudinaryLoader({ src: "v1768268779/Fondo_hero_yzustd.png", 
         <img 
           src={desktopUrl}
           alt="AYNI Hero Background"
-          className="object-cover object-center w-full h-full absolute inset-0" 
+          className="object-cover object-center w-full h-full absolute inset-0"
+          loading="eager"
+          fetchPriority="high"
         />
       </picture>
 

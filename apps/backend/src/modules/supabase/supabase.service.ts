@@ -159,6 +159,7 @@ export class SupabaseService implements OnModuleInit {
       .upload(filePath, fileBuffer, {
         contentType: mimetype,
         upsert: true,
+        cacheControl: '31536000',
       });
 
     if (uploadError) {

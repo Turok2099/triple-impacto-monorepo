@@ -232,7 +232,8 @@ export class AdminService {
       .from('ong-logos')
       .upload(fileName, file.buffer, {
         contentType: file.mimetype,
-        upsert: true
+        upsert: true,
+        cacheControl: '31536000',
       });
 
     if (error) {
@@ -436,7 +437,8 @@ export class AdminService {
       .from('home-banners')
       .upload(fileName, file.buffer, {
         contentType: file.mimetype,
-        upsert: true
+        upsert: true,
+        cacheControl: '31536000',
       });
 
     if (error) {

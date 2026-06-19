@@ -1,16 +1,18 @@
-import CuponesShowcase from "@/components/sections/Cupones/CuponesShowcase";
-import CouponCounter from "@/components/sections/CouponCounter/couponCounter";
-import CTASection from "@/components/sections/CTA/ctaSection";
-import FAQCTASection from "@/components/sections/FAQ/faqCTA";
-import FounderQuote from "@/components/sections/FounderQuote/founderQuote";
+import dynamic from "next/dynamic";
 import HeroSection from "@/components/sections/Hero/heroSection";
-import HowItWorksSection from "@/components/sections/HowItWorks/howItWorksSection";
-import PartnersSection from "@/components/sections/Partners/partnersSection";
-import SponsorsSection from "@/components/sections/Sponsors/sponsorsSection";
-import WhyDonateSection from "@/components/sections/WhyDonate/whyDonateSection";
-import JoinUsSection from "@/components/sections/JoinUs/joinUsSection";
-import AboutProjectSection from "@/components/sections/AboutProject/aboutProject";
 import HomeBannersCarousel from "@/components/sections/HomeBanners/homeBannersCarousel";
+
+const AboutProjectSection = dynamic(() => import("@/components/sections/AboutProject/aboutProject"));
+const HowItWorksSection = dynamic(() => import("@/components/sections/HowItWorks/howItWorksSection"));
+const CuponesShowcase = dynamic(() => import("@/components/sections/Cupones/CuponesShowcase"));
+const CouponCounter = dynamic(() => import("@/components/sections/CouponCounter/couponCounter"));
+const SponsorsSection = dynamic(() => import("@/components/sections/Sponsors/sponsorsSection"));
+const PartnersSection = dynamic(() => import("@/components/sections/Partners/partnersSection"));
+const JoinUsSection = dynamic(() => import("@/components/sections/JoinUs/joinUsSection"));
+const FounderQuote = dynamic(() => import("@/components/sections/FounderQuote/founderQuote"));
+const WhyDonateSection = dynamic(() => import("@/components/sections/WhyDonate/whyDonateSection"));
+const CTASection = dynamic(() => import("@/components/sections/CTA/ctaSection"));
+const FAQCTASection = dynamic(() => import("@/components/sections/FAQ/faqCTA"));
 
 export default function HomePage() {
   return (

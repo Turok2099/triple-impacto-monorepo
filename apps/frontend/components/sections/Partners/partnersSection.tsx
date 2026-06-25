@@ -322,10 +322,10 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                       </div>
                     )}
                     
-                    {selectedOrg.slug && (
+                    {selectedOrg.bonda_slug && (
                       <div className="flex items-start gap-4">
                         <ExternalLink className="w-5 h-5 text-[#2c8184] mt-0.5 shrink-0" />
-                        <a href={selectedOrg.slug.startsWith('http') ? selectedOrg.slug : `https://${selectedOrg.slug}`} target="_blank" rel="noopener noreferrer" className="text-base text-[#2c8184] hover:text-[#1e6063] hover:underline break-all">
+                        <a href={selectedOrg.bonda_slug.startsWith('http') ? selectedOrg.bonda_slug : `https://${selectedOrg.bonda_slug}`} target="_blank" rel="noopener noreferrer" className="text-base text-[#2c8184] hover:text-[#1e6063] hover:underline break-all">
                           Sitio de beneficios Bonda
                         </a>
                       </div>

@@ -45,6 +45,8 @@ export interface OrganizacionPublicDto {
   telefono: string | null;
   direccion: string | null;
   monto_minimo: number | null;
+  slug: string | null;
+  bonda_slug: string | null;
   activa: boolean;
   verificada: boolean;
   created_at: string;

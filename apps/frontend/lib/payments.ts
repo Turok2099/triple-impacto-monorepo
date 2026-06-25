@@ -33,6 +33,7 @@ export interface Organizacion {
   telefono?: string;
   direccion?: string;
   slug?: string;
+  bonda_slug?: string;
   monto_minimo?: number;
   activa: boolean;
   has_fiserv_config?: boolean;

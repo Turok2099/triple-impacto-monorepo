@@ -340,7 +340,7 @@ export default function SeccionAdminOngs() {
                   <td className="py-4 px-6">
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-1 text-xs">
-                        {ong.fiserv_store_id ? <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-medium">Fiserv OK</span> : <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded">Fiserv Genérico</span>}
+                        {(ong.fiserv_store_id && ong.fiserv_shared_secret) ? <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-medium">FISERV OK</span> : <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded">SIN STORE PARA PAGO</span>}
                       </div>
                       <div className="flex items-center gap-1 text-xs">
                         {bonda ? <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded font-medium">Bonda: {bonda.slug}</span> : <span className="bg-red-50 text-red-500 px-2 py-0.5 rounded">Sin Bonda</span>}
@@ -505,19 +505,25 @@ export default function SeccionAdminOngs() {
                       <input type="number" min="10000" value={formData.monto_fijo_3} onChange={e => setFormData({ ...formData, monto_fijo_3: Number(e.target.value) })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
                     </div>
                   </div>
-                  <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-semibold text-blue-900 mb-1">Fiserv Store ID</label>
-                      <input placeholder="Sin información" autoComplete="off" value={formData.fiserv_store_id} onChange={e => setFormData({ ...formData, fiserv_store_id: e.target.value })} className="w-full px-4 py-2.5 rounded-lg border border-blue-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-blue-900 mb-1">Fiserv Shared Secret</label>
-                      <div className="relative">
-                        <input placeholder="Sin información" autoComplete="new-password" type={showSecrets ? "text" : "password"} value={formData.fiserv_shared_secret} onChange={e => setFormData({ ...formData, fiserv_shared_secret: e.target.value })} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-blue-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" />
-                        <button type="button" onClick={() => setShowSecrets(!showSecrets)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
-                          {showSecrets ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
+                  <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex flex-col gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-blue-900 mb-1">Fiserv Store ID</label>
+                        <input placeholder="Sin información" autoComplete="off" value={formData.fiserv_store_id} onChange={e => setFormData({ ...formData, fiserv_store_id: e.target.value })} className="w-full px-4 py-2.5 rounded-lg border border-blue-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" />
                       </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-blue-900 mb-1">Fiserv Shared Secret</label>
+                        <div className="relative">
+                          <input placeholder="Sin información" autoComplete="new-password" type={showSecrets ? "text" : "password"} value={formData.fiserv_shared_secret} onChange={e => setFormData({ ...formData, fiserv_shared_secret: e.target.value })} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-blue-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" />
+                          <button type="button" onClick={() => setShowSecrets(!showSecrets)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
+                            {showSecrets ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 mt-2 border-t border-blue-200/60 pt-4">
+                      <input type="checkbox" id="fiserv_activo" checked={formData.fiserv_activo} onChange={e => setFormData({ ...formData, fiserv_activo: e.target.checked })} className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                      <label htmlFor="fiserv_activo" className="font-semibold text-blue-900">Fiserv Activo (Habilita la ONG en el formulario de pago, requiere store id)</label>
                     </div>
                   </div>
                 </section>
@@ -561,10 +567,6 @@ export default function SeccionAdminOngs() {
                   <div className="flex items-center gap-3">
                     <input type="checkbox" id="activa" checked={formData.activa} onChange={e => setFormData({ ...formData, activa: e.target.checked })} className="w-5 h-5 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500" />
                     <label htmlFor="activa" className="font-semibold text-slate-700">ONG Activa (Visible en la sección pública /ongs)</label>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <input type="checkbox" id="fiserv_activo" checked={formData.fiserv_activo} onChange={e => setFormData({ ...formData, fiserv_activo: e.target.checked })} className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
-                    <label htmlFor="fiserv_activo" className="font-semibold text-slate-700">Fiserv Activo (Habilita la ONG en el formulario de pago, requiere store id)</label>
                   </div>
                 </div>
               </div>

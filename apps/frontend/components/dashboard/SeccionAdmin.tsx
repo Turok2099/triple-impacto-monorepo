@@ -467,7 +467,7 @@ export default function SeccionAdmin() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className="w-full max-w-7xl mx-auto px-6 py-8">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">

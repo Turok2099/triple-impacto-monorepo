@@ -444,7 +444,12 @@ export default function SeccionAdminOngs() {
 
                 {/* 2. Donaciones Fiserv */}
                 <section>
-                  <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2"><DollarSign className="w-5 h-5 text-slate-400" /> Pagos y Fiserv</h3>
+                  <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <DollarSign className="w-5 h-5 text-slate-400" strokeWidth={2.5} />
+                      Pagos sugeridos
+                    </span>
+                  </h3>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                     <div>
                       <label className="block text-sm font-semibold text-slate-700 mb-1">Monto Mín.</label>
@@ -463,70 +468,86 @@ export default function SeccionAdminOngs() {
                       <input type="number" min="10000" value={formData.monto_fijo_3} onChange={e => setFormData({ ...formData, monto_fijo_3: Number(e.target.value) })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
                     </div>
                   </div>
-                  <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex flex-col gap-4">
+
+                  <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-3 mt-6">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Fiserv_logo.svg" alt="Fiserv" className="h-5 object-contain select-none" />
+                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pasarela de Pagos</span>
+                  </h3>
+                  <div className="bg-orange-50/50 p-4 rounded-xl border border-orange-100 flex flex-col gap-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-semibold text-blue-900 mb-1">Fiserv Store ID</label>
-                        <input placeholder="Sin información" autoComplete="off" value={formData.fiserv_store_id} onChange={e => setFormData({ ...formData, fiserv_store_id: e.target.value })} className="w-full px-4 py-2.5 rounded-lg border border-blue-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" />
+                        <label className="block text-sm font-semibold text-orange-950 mb-1">Fiserv Store ID</label>
+                        <input placeholder="Sin información" autoComplete="off" value={formData.fiserv_store_id} onChange={e => setFormData({ ...formData, fiserv_store_id: e.target.value })} className="w-full px-4 py-2.5 rounded-lg border border-orange-200 focus:ring-2 focus:ring-orange-500 outline-none font-mono text-sm" />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-blue-900 mb-1">Fiserv Shared Secret</label>
+                        <label className="block text-sm font-semibold text-orange-950 mb-1">Fiserv Shared Secret</label>
                         <div className="relative">
-                          <input placeholder="Sin información" autoComplete="new-password" type={showSecrets ? "text" : "password"} value={formData.fiserv_shared_secret} onChange={e => setFormData({ ...formData, fiserv_shared_secret: e.target.value })} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-blue-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" />
+                          <input placeholder="Sin información" autoComplete="new-password" type={showSecrets ? "text" : "password"} value={formData.fiserv_shared_secret} onChange={e => setFormData({ ...formData, fiserv_shared_secret: e.target.value })} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-orange-200 focus:ring-2 focus:ring-orange-500 outline-none font-mono text-sm" />
                           <button type="button" onClick={() => setShowSecrets(!showSecrets)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
                             {showSecrets ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 mt-2 border-t border-blue-200/60 pt-4">
-                      <input type="checkbox" id="fiserv_activo" checked={formData.fiserv_activo} onChange={e => setFormData({ ...formData, fiserv_activo: e.target.checked })} className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
-                      <label htmlFor="fiserv_activo" className="font-semibold text-blue-900">Fiserv Activo (Habilita la ONG en el formulario de pago, requiere store id)</label>
+                    <div className="flex items-center gap-3 mt-2 border-t border-orange-200/50 pt-4">
+                      <input type="checkbox" id="fiserv_activo" checked={formData.fiserv_activo} onChange={e => setFormData({ ...formData, fiserv_activo: e.target.checked })} className="w-5 h-5 text-orange-600 rounded border-orange-300 focus:ring-orange-500" />
+                      <label htmlFor="fiserv_activo" className="font-semibold text-orange-950">Fiserv Activo (Habilita la ONG en el formulario de pago, requiere store id)</label>
                     </div>
                   </div>
                 </section>
 
                 {/* 3. Integración Bonda */}
                 <section>
-                  <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2"><Key className="w-5 h-5 text-slate-400" /> Beneficios Bonda</h3>
-                  <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2 mt-6">
+                    <svg viewBox="0 0 200 200" className="w-5 h-5 shrink-0 select-none">
+                      <defs>
+                        <linearGradient id="bondaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#e11d48" />
+                          <stop offset="100%" stopColor="#701a75" />
+                        </linearGradient>
+                      </defs>
+                      <rect width="200" height="200" rx="50" fill="url(#bondaGrad)" />
+                      <rect x="55" y="45" width="20" height="110" rx="5" fill="white" />
+                      <circle cx="115" cy="72" r="27" fill="white" />
+                      <circle cx="115" cy="72" r="12" fill="url(#bondaGrad)" />
+                      <circle cx="115" cy="122" r="27" fill="white" />
+                      <circle cx="115" cy="122" r="12" fill="url(#bondaGrad)" />
+                    </svg>
+                    <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#701a75] tracking-tight">bonda</span>
+                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Beneficios corporativos</span>
+                  </h3>
+                  <div className="bg-rose-50/50 p-4 rounded-xl border border-rose-100 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="col-span-2">
-                      <label className="block text-sm font-semibold text-emerald-900 mb-1">URL ONG + BONDA</label>
-                      <input placeholder="ej: https://beneficios-mi-ong.bonda.com" value={formData.bonda_slug} onChange={e => setFormData({ ...formData, bonda_slug: e.target.value.trim().replace(/\/+$/, '') })} className="w-full px-4 py-2.5 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                      <label className="block text-sm font-semibold text-rose-950 mb-1">URL ONG + BONDA</label>
+                      <input placeholder="ej: https://beneficios-mi-ong.bonda.com" value={formData.bonda_slug} onChange={e => setFormData({ ...formData, bonda_slug: e.target.value.trim().replace(/\/+$/, '') })} className="w-full px-4 py-2.5 rounded-lg border border-rose-200 focus:ring-2 focus:ring-rose-500 outline-none" />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-emerald-900 mb-1">API Key de Cupones</label>
-                      <p className="text-xs text-emerald-600 mb-2">Usada para consultar el catálogo de beneficios.</p>
+                      <label className="block text-sm font-semibold text-rose-950 mb-1">API Key de Cupones</label>
+                      <p className="text-xs text-rose-600 mb-2">Usada para consultar el catálogo de beneficios.</p>
                       <div className="relative">
-                        <input type={showSecrets ? "text" : "password"} placeholder="Token API Cupones" value={formData.bonda_api_token} onChange={e => setFormData({ ...formData, bonda_api_token: e.target.value })} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none font-mono text-sm" />
+                        <input type={showSecrets ? "text" : "password"} placeholder="Token API Cupones" value={formData.bonda_api_token} onChange={e => setFormData({ ...formData, bonda_api_token: e.target.value })} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-rose-200 focus:ring-2 focus:ring-rose-500 outline-none font-mono text-sm" />
                         <button type="button" onClick={() => setShowSecrets(!showSecrets)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
                           {showSecrets ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-emerald-900 mb-1">API Key de Nóminas (Afiliados)</label>
-                      <p className="text-xs text-emerald-600 mb-2">Usada para crear/eliminar afiliados desde nuestro sistema.</p>
+                      <label className="block text-sm font-semibold text-rose-950 mb-1">API Key de Nóminas (Afiliados)</label>
+                      <p className="text-xs text-rose-600 mb-2">Usada para crear/eliminar afiliados desde nuestro sistema.</p>
                       <div className="relative">
-                        <input type={showSecrets ? "text" : "password"} placeholder="Token API Nóminas" value={formData.bonda_api_token_nominas} onChange={e => setFormData({ ...formData, bonda_api_token_nominas: e.target.value })} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none font-mono text-sm" />
+                        <input type={showSecrets ? "text" : "password"} placeholder="Token API Nóminas" value={formData.bonda_api_token_nominas} onChange={e => setFormData({ ...formData, bonda_api_token_nominas: e.target.value })} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-rose-200 focus:ring-2 focus:ring-rose-500 outline-none font-mono text-sm" />
                         <button type="button" onClick={() => setShowSecrets(!showSecrets)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
                           {showSecrets ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
                     <div className="col-span-2">
-                      <label className="block text-sm font-semibold text-emerald-900 mb-1">Bonda Microsite ID</label>
-                      <input placeholder="ID numérico si aplica" value={formData.bonda_microsite_id} onChange={e => setFormData({ ...formData, bonda_microsite_id: e.target.value })} className="w-full px-4 py-2.5 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 outline-none font-mono text-sm" />
+                      <label className="block text-sm font-semibold text-rose-950 mb-1">Bonda Microsite ID</label>
+                      <input placeholder="ID numérico si aplica" value={formData.bonda_microsite_id} onChange={e => setFormData({ ...formData, bonda_microsite_id: e.target.value })} className="w-full px-4 py-2.5 rounded-lg border border-rose-200 focus:ring-2 focus:ring-rose-500 outline-none font-mono text-sm" />
                     </div>
                   </div>
                 </section>
 
-                <div className="flex flex-col gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                  <div className="flex items-center gap-3">
-                    <input type="checkbox" id="activa" checked={formData.activa} onChange={e => setFormData({ ...formData, activa: e.target.checked })} className="w-5 h-5 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500" />
-                    <label htmlFor="activa" className="font-semibold text-slate-700">ONG Activa (Visible en la sección pública /ongs)</label>
-                  </div>
-                </div>
               </div>
 
               <div className="mt-8 flex gap-3 pt-6 border-t border-slate-100">

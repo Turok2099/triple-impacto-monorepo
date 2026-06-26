@@ -39,6 +39,10 @@
   --color-gray-900: #24272a;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   background: #ffffff;
   color: #171717;

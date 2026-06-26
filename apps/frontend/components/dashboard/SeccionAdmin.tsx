@@ -464,7 +464,8 @@ export default function SeccionAdmin() {
         </button>
       </div>
 
-      {adminTab === "ongs" ? (
+      <div className="min-h-[600px]">
+        {adminTab === "ongs" ? (
         <SeccionAdminOngs />
       ) : adminTab === "banners" ? (
         <SeccionAdminBanners />
@@ -735,7 +736,8 @@ export default function SeccionAdmin() {
             </div>
           )}
         </>
-      )}
+        )}
+      </div>
     </div>
   );
 }

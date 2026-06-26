@@ -231,7 +231,7 @@ export class PublicController {
         empresa: {
           nombre: c.empresa_nombre,
         },
-        imagen_url: c.imagen_url || null,
+        imagen_url: c.imagen_principal_url || c.imagen_thumbnail_url || null,
         logo_empresa: c.empresa_logo_url || null,
         categoria_principal: c.categoria_principal || null,
         fecha_vencimiento: c.fecha_vencimiento || null,

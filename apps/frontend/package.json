@@ -10,7 +10,7 @@
     "lhci": "lhci autorun"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": "20.x"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^16.2.4",

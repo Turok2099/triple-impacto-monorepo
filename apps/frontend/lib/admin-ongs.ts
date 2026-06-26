@@ -19,6 +19,9 @@ export interface Ong {
   telefono: string | null;
   direccion: string | null;
   monto_minimo: number | null;
+  monto_fijo_1: number | null;
+  monto_fijo_2: number | null;
+  monto_fijo_3: number | null;
   activa: boolean;
   verificada: boolean;
   fiserv_activo: boolean;

@@ -35,6 +35,9 @@ export interface Organizacion {
   slug?: string;
   bonda_slug?: string;
   monto_minimo?: number;
+  monto_fijo_1?: number;
+  monto_fijo_2?: number;
+  monto_fijo_3?: number;
   activa: boolean;
   has_fiserv_config?: boolean;
 }

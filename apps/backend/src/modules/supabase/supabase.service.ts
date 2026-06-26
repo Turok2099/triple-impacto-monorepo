@@ -545,6 +545,9 @@ export class SupabaseService implements OnModuleInit {
     id: string;
     nombre: string;
     monto_minimo: number | null;
+    monto_fijo_1: number | null;
+    monto_fijo_2: number | null;
+    monto_fijo_3: number | null;
     [key: string]: unknown;
   } | null> {
     const { data, error } = await this.from('organizaciones')
@@ -575,6 +578,9 @@ export class SupabaseService implements OnModuleInit {
         telefono,
         direccion,
         monto_minimo,
+        monto_fijo_1,
+        monto_fijo_2,
+        monto_fijo_3,
         verificada,
         activa,
         fiserv_activo,
@@ -618,6 +624,9 @@ export class SupabaseService implements OnModuleInit {
       telefono: data.telefono || null,
       direccion: data.direccion || null,
       monto_minimo: data.monto_minimo || 5000,
+      monto_fijo_1: data.monto_fijo_1 || 10000,
+      monto_fijo_2: data.monto_fijo_2 || 20000,
+      monto_fijo_3: data.monto_fijo_3 || 30000,
       slug: data.slug || null,
       bonda_slug: (bonda as any)?.slug || null,
       has_fiserv_config,
@@ -646,6 +655,9 @@ export class SupabaseService implements OnModuleInit {
         telefono,
         direccion,
         monto_minimo,
+        monto_fijo_1,
+        monto_fijo_2,
+        monto_fijo_3,
         verificada,
         activa,
         fiserv_activo,
@@ -689,6 +701,9 @@ export class SupabaseService implements OnModuleInit {
         telefono: org.telefono || null,
         direccion: org.direccion || null,
         monto_minimo: org.monto_minimo || 5000,
+        monto_fijo_1: org.monto_fijo_1 || 10000,
+        monto_fijo_2: org.monto_fijo_2 || 20000,
+        monto_fijo_3: org.monto_fijo_3 || 30000,
         slug: org.slug || null,
         bonda_slug: bonda?.slug || null,
         has_fiserv_config,

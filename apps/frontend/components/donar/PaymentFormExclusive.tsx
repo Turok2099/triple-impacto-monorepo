@@ -16,9 +16,9 @@ const MONTO_MAXIMO = 100000;
 export default function PaymentFormExclusive({ organizacion, onSuccess, onError }: PaymentFormExclusiveProps) {
   const montoMinimoActual = organizacion.monto_minimo || 5000;
   const montosSugeridosActuales = [
-    montoMinimoActual,
-    montoMinimoActual * 2,
-    montoMinimoActual * 3
+    organizacion.monto_fijo_1 || 10000,
+    organizacion.monto_fijo_2 || 20000,
+    organizacion.monto_fijo_3 || 30000
   ];
 
   const [montoSeleccionado, setMontoSeleccionado] = useState<number | null>(montoMinimoActual);

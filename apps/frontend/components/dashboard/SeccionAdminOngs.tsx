@@ -32,6 +32,9 @@ export default function SeccionAdminOngs() {
     website_url: "",
     slug: "",
     monto_minimo: 5000,
+    monto_fijo_1: 10000,
+    monto_fijo_2: 20000,
+    monto_fijo_3: 30000,
     activa: true,
     fiserv_activo: false,
     fiserv_store_id: "",
@@ -146,6 +149,9 @@ export default function SeccionAdminOngs() {
       nombre: "", descripcion: "", logo_url: "", email: "", telefono: "", website_url: "",
       slug: "",
       monto_minimo: 5000,
+      monto_fijo_1: 10000,
+      monto_fijo_2: 20000,
+      monto_fijo_3: 30000,
       activa: true, fiserv_activo: false, fiserv_store_id: "", fiserv_shared_secret: "", bonda_slug: "", bonda_api_token: "",
       bonda_api_token_nominas: "", bonda_microsite_id: ""
     });
@@ -168,6 +174,9 @@ export default function SeccionAdminOngs() {
       website_url: ong.website_url || "",
       slug: ong.slug || "",
       monto_minimo: ong.monto_minimo || 5000,
+      monto_fijo_1: ong.monto_fijo_1 || 10000,
+      monto_fijo_2: ong.monto_fijo_2 || 20000,
+      monto_fijo_3: ong.monto_fijo_3 || 30000,
       activa: ong.activa,
       fiserv_activo: ong.fiserv_activo || false,
       fiserv_store_id: ong.fiserv_store_id || "",
@@ -478,10 +487,22 @@ export default function SeccionAdminOngs() {
                 {/* 2. Donaciones Fiserv */}
                 <section>
                   <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2"><DollarSign className="w-5 h-5 text-slate-400" /> Pagos y Fiserv</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div className="col-span-2">
-                      <label className="block text-sm font-semibold text-slate-700 mb-1">Monto Mínimo (ARS)</label>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">Monto Mín.</label>
                       <input type="number" min="0" value={formData.monto_minimo} onChange={e => setFormData({ ...formData, monto_minimo: Number(e.target.value) })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">Opción 1</label>
+                      <input type="number" min="10000" value={formData.monto_fijo_1} onChange={e => setFormData({ ...formData, monto_fijo_1: Number(e.target.value) })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">Opción 2</label>
+                      <input type="number" min="10000" value={formData.monto_fijo_2} onChange={e => setFormData({ ...formData, monto_fijo_2: Number(e.target.value) })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">Opción 3</label>
+                      <input type="number" min="10000" value={formData.monto_fijo_3} onChange={e => setFormData({ ...formData, monto_fijo_3: Number(e.target.value) })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
                     </div>
                   </div>
                   <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 grid grid-cols-1 md:grid-cols-2 gap-4">

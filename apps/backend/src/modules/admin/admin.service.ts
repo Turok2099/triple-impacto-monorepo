@@ -274,6 +274,14 @@ export class AdminService {
   }
 
   async createOrganizacion(adminId: string, payload: any) {
+    if (
+      (payload.monto_fijo_1 !== undefined && payload.monto_fijo_1 !== null && payload.monto_fijo_1 < 10000) ||
+      (payload.monto_fijo_2 !== undefined && payload.monto_fijo_2 !== null && payload.monto_fijo_2 < 10000) ||
+      (payload.monto_fijo_3 !== undefined && payload.monto_fijo_3 !== null && payload.monto_fijo_3 < 10000)
+    ) {
+      throw new BadRequestException('Los montos fijos sugeridos no pueden ser menores a $10.000');
+    }
+
     const client = this.supabaseService.getClient();
 
     // 1. Crear Organización
@@ -288,6 +296,9 @@ export class AdminService {
         telefono: payload.telefono,
         direccion: payload.direccion,
         monto_minimo: payload.monto_minimo,
+        monto_fijo_1: payload.monto_fijo_1 || 10000,
+        monto_fijo_2: payload.monto_fijo_2 || 20000,
+        monto_fijo_3: payload.monto_fijo_3 || 30000,
         activa: payload.activa ?? true,
         verificada: payload.verificada ?? false,
         fiserv_activo: payload.fiserv_activo ?? false,
@@ -326,6 +337,14 @@ export class AdminService {
   }
 
   async updateOrganizacion(adminId: string, id: string, payload: any) {
+    if (
+      (payload.monto_fijo_1 !== undefined && payload.monto_fijo_1 !== null && payload.monto_fijo_1 < 10000) ||
+      (payload.monto_fijo_2 !== undefined && payload.monto_fijo_2 !== null && payload.monto_fijo_2 < 10000) ||
+      (payload.monto_fijo_3 !== undefined && payload.monto_fijo_3 !== null && payload.monto_fijo_3 < 10000)
+    ) {
+      throw new BadRequestException('Los montos fijos sugeridos no pueden ser menores a $10.000');
+    }
+
     const client = this.supabaseService.getClient();
 
     const { data: org, error: orgError } = await client
@@ -339,6 +358,9 @@ export class AdminService {
         telefono: payload.telefono,
         direccion: payload.direccion,
         monto_minimo: payload.monto_minimo,
+        monto_fijo_1: payload.monto_fijo_1,
+        monto_fijo_2: payload.monto_fijo_2,
+        monto_fijo_3: payload.monto_fijo_3,
         activa: payload.activa,
         verificada: payload.verificada,
         fiserv_activo: payload.fiserv_activo,

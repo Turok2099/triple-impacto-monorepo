@@ -39,9 +39,9 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
   const organizacionSeleccionada = organizaciones.find(org => org.id === organizacionId);
   const montoMinimoActual = organizacionSeleccionada?.monto_minimo || 5000;
   const montosSugeridosActuales = [
-    montoMinimoActual,
-    montoMinimoActual * 2,
-    montoMinimoActual * 3
+    organizacionSeleccionada?.monto_fijo_1 || 10000,
+    organizacionSeleccionada?.monto_fijo_2 || 20000,
+    organizacionSeleccionada?.monto_fijo_3 || 30000
   ];
 
   useEffect(() => {

@@ -135,6 +135,9 @@ CREATE TABLE IF NOT EXISTS organizaciones (
   
   -- Montos de donación (por ONG)
   monto_minimo DECIMAL(10, 2),   -- Mínimo aceptado para donar a esta ONG (NULL = sin mínimo)
+  monto_fijo_1 DECIMAL(10, 2) DEFAULT 10000, -- Primer monto fijo sugerido
+  monto_fijo_2 DECIMAL(10, 2) DEFAULT 20000, -- Segundo monto fijo sugerido
+  monto_fijo_3 DECIMAL(10, 2) DEFAULT 30000, -- Tercer monto fijo sugerido
   monto_sugerido DECIMAL(10, 2), -- Monto sugerido que muestra el front (NULL = usar default en front)
   
   -- Estado

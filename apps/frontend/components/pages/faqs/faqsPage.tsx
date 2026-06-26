@@ -51,7 +51,7 @@ const faqs: FAQItem[] = [
     id: 6,
     question: "¿Cuál es el monto mínimo para donar?",
     answer:
-      "Podés donar desde $5.000 en adelante. Creemos que cada aporte cuenta y genera impacto. Los beneficios y descuentos están disponibles desde la primera donación, independientemente del monto.",
+      "Podés donar desde $10.000 en adelante. Creemos que cada aporte cuenta y genera impacto. Los beneficios y descuentos están disponibles desde la primera donación, independientemente del monto.",
     icon: DollarSign,
   },
   {

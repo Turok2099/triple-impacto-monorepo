@@ -51,6 +51,21 @@ export interface FundacionUsuario {
   isActive?: boolean;
 }
 
+export interface SuscripcionUsuario {
+  id: string;
+  monto: number;
+  moneda: string;
+  frecuencia: string;
+  fechaProximoCobro: string;
+  estado: string;
+  organizacionId?: string;
+  organizacionNombre?: string;
+  metodoPago?: {
+    brand: string;
+    last4: string;
+  } | null;
+}
+
 export interface DashboardUsuario {
   usuario: {
     id: string;
@@ -62,6 +77,7 @@ export interface DashboardUsuario {
   fundaciones: FundacionUsuario[];
   cuponesActivos: CuponSolicitado[];
   cuponesRecientes: CuponSolicitado[];
+  suscripciones?: SuscripcionUsuario[];
   metodoPago?: {
     brand: string;
     last4: string;
@@ -273,6 +289,30 @@ export async function marcarCuponComoUsado(
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Error al marcar cupón como usado');
+  }
+
+  return response.json();
+}
+
+/**
+ * Cancelar una suscripción activa
+ */
+export async function cancelarSuscripcion(
+  token: string,
+  organizacionId: string,
+): Promise<{ ok: boolean; message: string }> {
+  const response = await fetch(`${API_URL}/payments/fiserv/cancelar-suscripcion`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ organizacionId }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || 'Error al cancelar la suscripción');
   }
 
   return response.json();

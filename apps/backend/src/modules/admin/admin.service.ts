@@ -166,6 +166,9 @@ export class AdminService {
     // Cascading soft-delete to local affiliations
     await this.supabaseService.getClient().from('usuarios_bonda_afiliados').update({ is_active: false }).eq('user_id', id);
 
+    // Cancelar suscripciones activas vinculadas al usuario
+    await this.supabaseService.getClient().from('suscripciones').update({ estado: 'cancelada' }).eq('usuario_id', id).eq('estado', 'activa');
+
     const { error } = await this.supabaseService.getClient().from('usuarios').update({ is_active: false }).eq('id', id);
     if (error) throw new InternalServerErrorException('Failed to soft delete local user');
     
@@ -174,13 +177,15 @@ export class AdminService {
   }
 
   async deleteAffiliate(adminId: string, userId: string, bondaCode: string, micrositeId: string) {
+    let microsite: any = null;
     try {
       // Find the specific slug for this code to satisfy Bonda API requirements
-      const { data: microsite } = await this.supabaseService.getClient()
+      const response = await this.supabaseService.getClient()
         .from('bonda_microsites')
-        .select('slug')
+        .select('slug, organizacion_id')
         .eq('id', micrositeId)
         .single();
+      microsite = response.data;
         
       const slug = microsite?.slug;
       
@@ -200,6 +205,14 @@ export class AdminService {
     if (error) {
       this.logger.error('Failed to remove affiliate locally', error);
       throw new InternalServerErrorException('Afiliado dado de baja en Bonda exitosamente, pero falló borrado local');
+    }
+
+    if (microsite?.organizacion_id) {
+       await this.supabaseService.getClient().from('suscripciones')
+          .update({ estado: 'cancelada' })
+          .eq('usuario_id', userId)
+          .eq('organizacion_id', microsite.organizacion_id)
+          .eq('estado', 'activa');
     }
 
     await this.logAudit(adminId, userId, 'DELETE_AFFILIATE', 'SUCCESS', { affiliate_code: bondaCode });

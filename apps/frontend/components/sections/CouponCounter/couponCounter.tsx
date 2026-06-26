@@ -39,7 +39,7 @@ export default function CouponCounter() {
     if (!isVisible) return;
 
     let inicio = 0;
-    const fin = 10000;
+    const fin = 1700;
     const duracion = 2000; // 2 segundos
     const incremento = fin / (duracion / 16); // 60fps
 
@@ -66,7 +66,7 @@ export default function CouponCounter() {
             <div className="text-center lg:text-left">
               <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
                 Descubrí los más de{" "}
-                <span className="text-[#2c8184]">10.000 cupones</span> que tenemos
+                <span className="text-[#2c8184]">1.700 cupones</span> que tenemos
                 para vos
               </h3>
               <div className="flex items-center justify-center lg:justify-start gap-3 mb-6">

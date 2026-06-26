@@ -16,7 +16,7 @@ export default function HowItWorksSection() {
       number: "3",
       title: "Usá tu cuponera mientras generás impacto positivo.",
       description:
-        "Más de 10.000 descuentos en marcas de Gastronomía, Entretenimientos, Compras, Turismo, Educación, Servicios, Salud y Bienestar.",
+        "Más de 1.700 cupones de descuento en marcas de Gastronomía, Entretenimientos, Compras, Turismo, Educación, Servicios, Salud y Bienestar.",
     },
   ];
 

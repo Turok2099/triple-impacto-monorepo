@@ -59,6 +59,24 @@ export class FundacionUsuarioDto {
 }
 
 /**
+ * DTO para suscripciones activas del usuario
+ */
+export class SuscripcionUsuarioDto {
+  id: string;
+  monto: number;
+  moneda: string;
+  frecuencia: string;
+  fechaProximoCobro: string;
+  estado: string;
+  organizacionId?: string;
+  organizacionNombre?: string;
+  metodoPago?: {
+    brand: string;
+    last4: string;
+  } | null;
+}
+
+/**
  * DTO para el dashboard completo del usuario
  */
 export class DashboardUsuarioDto {
@@ -72,6 +90,7 @@ export class DashboardUsuarioDto {
   fundaciones: FundacionUsuarioDto[]; // Fundaciones a las que ha donado
   cuponesActivos: CuponSolicitadoDto[];
   cuponesRecientes: CuponSolicitadoDto[]; // Últimos 5
+  suscripciones?: SuscripcionUsuarioDto[]; // Suscripciones activas
   metodoPago?: {
     brand: string;
     last4: string;

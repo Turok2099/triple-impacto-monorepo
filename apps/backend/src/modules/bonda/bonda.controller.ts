@@ -483,6 +483,44 @@ export class BondaController {
         console.warn('Error al obtener recientes, usando vacío:', error);
       }
 
+      // Obtener suscripciones activas
+      let suscripciones: any[] = [];
+      try {
+        const { data, error } = await this.supabase.getClient()
+          .from('suscripciones')
+          .select(`
+            id,
+            monto,
+            moneda,
+            frecuencia,
+            fecha_proximo_cobro,
+            estado,
+            organizacion:organizaciones!inner (id, nombre),
+            metodo_pago:user_payment_methods (card_brand, last_4)
+          `)
+          .eq('usuario_id', userId)
+          .eq('estado', 'activa');
+          
+        if (!error && data) {
+           suscripciones = (data as any[]).map(sub => ({
+              id: sub.id,
+              monto: sub.monto,
+              moneda: sub.moneda,
+              frecuencia: sub.frecuencia,
+              fechaProximoCobro: sub.fecha_proximo_cobro,
+              estado: sub.estado,
+              organizacionId: Array.isArray(sub.organizacion) ? sub.organizacion[0]?.id : sub.organizacion?.id,
+              organizacionNombre: Array.isArray(sub.organizacion) ? sub.organizacion[0]?.nombre : sub.organizacion?.nombre,
+              metodoPago: sub.metodo_pago ? {
+                 brand: Array.isArray(sub.metodo_pago) ? sub.metodo_pago[0]?.card_brand : sub.metodo_pago.card_brand,
+                 last4: Array.isArray(sub.metodo_pago) ? sub.metodo_pago[0]?.last_4 : sub.metodo_pago.last_4
+              } : null
+           }));
+        }
+      } catch (error) {
+        console.warn('Error al obtener suscripciones:', error);
+      }
+
       // Obtener último método de pago de Fiserv
       let metodoPago: { brand: string; last4: string } | null = null;
       try {
@@ -519,6 +557,7 @@ export class BondaController {
         cuponesRecientes: historialReciente.cupones.map(
           this.transformarACuponSolicitadoDto,
         ),
+        suscripciones,
         metodoPago,
       };
     } catch (error) {

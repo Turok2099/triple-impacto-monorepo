@@ -17,6 +17,7 @@ import { SupabaseService } from '../supabase/supabase.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CrearTransaccionDto } from './dto/crear-transaccion.dto';
 import { FiservRestService } from './fiserv-rest/fiserv-rest.service';
+import { BondaService } from '../bonda/bonda.service';
 
 /** Respuesta de crear-transaccion: params para el form POST a Fiserv + URL del gateway */
 export interface CrearTransaccionResponseDto {
@@ -42,6 +43,7 @@ export class PaymentsController {
     private readonly fiservConnect: FiservConnectService,
     private readonly supabase: SupabaseService,
     private readonly fiservRest: FiservRestService,
+    private readonly bondaService: BondaService,
   ) {}
 
   /**
@@ -320,6 +322,68 @@ export class PaymentsController {
   async voidTransaccion(@Body() body: any) {
     this.logger.log(`Mock VOID api call para orden: ${JSON.stringify(body)}`);
     return { ok: true, message: 'VOID procesado vía API REST Backend' };
+  }
+
+  @Post('cancelar-suscripcion')
+  @UseGuards(JwtAuthGuard)
+  async cancelarSuscripcion(
+    @Body() body: { organizacionId: string },
+    @Req() req: Request & { user?: { userId: string } },
+  ) {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new BadRequestException('Se requiere autenticación');
+    }
+
+    if (!body.organizacionId) {
+      throw new BadRequestException('Falta organizacionId');
+    }
+
+    try {
+      // 1. Cancelar suscripción activa local para evitar futuros cobros
+      const { data: suscripciones, error: subError } = await this.supabase.getClient()
+        .from('suscripciones')
+        .update({ estado: 'cancelada' })
+        .eq('usuario_id', userId)
+        .eq('organizacion_id', body.organizacionId)
+        .eq('estado', 'activa')
+        .select();
+
+      if (subError) {
+        this.logger.error('Error cancelando suscripción local:', subError);
+        throw new BadRequestException('No se pudo cancelar la suscripción local');
+      }
+
+      // 2. Desactivar afiliación a Bonda (API + Local DB)
+      try {
+        const bondaMicrosite = await this.supabase.getBondaMicrositeByOrganizacionId(body.organizacionId);
+        if (bondaMicrosite) {
+          const affiliate = await this.supabase.getAffiliateForUserAndMicrosite(userId, bondaMicrosite.id);
+          if (affiliate && affiliate.affiliate_code) {
+             // Llama a Bonda para eliminar el afiliado (soft delete por 30 días)
+             await this.bondaService.eliminarAfiliado(affiliate.affiliate_code, { organizacionId: body.organizacionId });
+             
+             // Actualizar DB local
+             await this.supabase.getClient().from('usuarios_bonda_afiliados')
+               .update({ is_active: false })
+               .eq('user_id', userId)
+               .eq('bonda_microsite_id', bondaMicrosite.id);
+          }
+        }
+      } catch (bondaError) {
+        this.logger.error('Error cancelando afiliación Bonda:', bondaError);
+        // Continuamos de todos modos porque la suscripción ya se canceló
+      }
+
+      return {
+        ok: true,
+        message: 'Suscripción y afiliación canceladas exitosamente',
+        canceladas: suscripciones?.length || 0
+      };
+    } catch (err: any) {
+      this.logger.error('Error general cancelando suscripción:', err);
+      throw new BadRequestException(err.message || 'Error al cancelar la suscripción');
+    }
   }
 
   @Post('return')

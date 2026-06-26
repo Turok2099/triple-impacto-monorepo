@@ -39,7 +39,9 @@
   --color-gray-900: #24272a;
 }
 
-html {
+html,
+.overflow-y-auto,
+.overflow-auto {
   scrollbar-gutter: stable;
 }
 

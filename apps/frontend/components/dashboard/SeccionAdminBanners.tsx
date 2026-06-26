@@ -299,7 +299,8 @@ export default function SeccionAdminBanners() {
         </div>
       ) : (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          <table className="w-full text-left border-collapse">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200">
                 <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase">Orden</th>
@@ -392,6 +393,7 @@ export default function SeccionAdminBanners() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 

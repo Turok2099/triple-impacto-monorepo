@@ -109,19 +109,19 @@ export default function CuponCard({ cupon }: CuponCardProps) {
         </div>
 
         {/* Floating Overlapping Logo Container */}
-        <div className="absolute left-1/2 top-32 -translate-x-1/2 -translate-y-1/2 z-10 w-24 h-24 rounded-2xl bg-white shadow-[0_8px_24px_rgba(0,0,0,0.08)] flex items-center justify-center p-2 border border-slate-50 overflow-hidden">
+        <div className="absolute left-1/2 top-32 -translate-x-1/2 -translate-y-1/2 z-10 w-32 h-32 rounded-3xl bg-white shadow-[0_8px_24px_rgba(0,0,0,0.08)] flex items-center justify-center p-3 border border-slate-50 overflow-hidden">
           <ImageWithFallback
             src={logoEmpresa}
             fallbackSrc={defaultLogo}
             alt={cupon.empresa.nombre}
             fill
-            sizes="96px"
-            className="object-contain p-1.5"
+            sizes="128px"
+            className="object-contain p-2"
           />
         </div>
 
         {/* Card Body */}
-        <div className="relative z-0 pt-16 pb-6 px-5 text-center flex flex-col items-center justify-between flex-1">
+        <div className="relative z-0 pt-20 pb-6 px-5 text-center flex flex-col items-center justify-between flex-1">
           {/* Pill Badge with Company Name */}
           <div className="px-4 py-1.5 border border-slate-200/60 rounded-full text-[11px] font-bold tracking-wider text-slate-700 bg-white mb-4 shadow-sm uppercase leading-none">
             {cupon.empresa.nombre}

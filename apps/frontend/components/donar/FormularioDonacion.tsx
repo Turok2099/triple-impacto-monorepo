@@ -354,15 +354,6 @@ export default function FormularioDonacion({
           </div>
         </div>
 
-        <div className="mt-4 pt-4 border-t border-teal-200">
-          <div className="flex items-start gap-3 text-sm text-teal-800">
-            <Gift className="w-5 h-5 flex-shrink-0 mt-0.5 text-[#2c8184]" />
-            <p>
-              Al donar, obtendrás acceso exclusivo a cupones de descuento de
-              Bonda en marcas reconocidas.
-            </p>
-          </div>
-        </div>
       </div>
 
       {/* Botón de envío */}

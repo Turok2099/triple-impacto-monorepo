@@ -193,7 +193,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
         </div>
         <h2 className="text-2xl font-bold text-slate-800 mb-2">¡Donación Aprobada!</h2>
         <p className="text-slate-500 mb-8">
-          Tu donación a <span className="font-semibold text-slate-800">{organizacion.nombre}</span> ha sido procesada correctamente. Ya estás dado de alta en Bonda para disfrutar de tus beneficios.
+          Tu donación a <span className="font-semibold text-slate-800">{organizacion.nombre}</span> ha sido procesada correctamente. ¡Muchas gracias por tu compromiso!
         </p>
         <button 
           onClick={() => window.location.href = '/dashboard'}
@@ -240,20 +240,6 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
           </p>
         </div>
 
-        {/* Bonda Discounts Benefit Badge */}
-        <div className="mb-6 bg-slate-50 border border-slate-100 rounded-2xl p-5 flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-          <img
-            src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1781655035/bonda_ujsbcf.png"
-            alt="Bonda"
-            className="h-10 md:h-18 w-auto object-contain shrink-0"
-          />
-          <div className="space-y-0.5">
-            <h4 className="text-sm md:text-base font-bold text-slate-800">Portal de Beneficios Bonda</h4>
-            <p className="text-xs md:text-sm text-slate-500 font-semibold leading-relaxed">
-              Con tu donación mensual, accedés a más de <span className="font-bold text-[#2c8184]">1700 cupones de descuento exclusivos</span> en primeras marcas nacionales.
-            </p>
-          </div>
-        </div>
 
         {(status === 'error' || errorMessage) && (
           <div className="mb-6 bg-red-50 text-red-700 p-4 rounded-xl border border-red-100 flex items-start gap-3">
@@ -291,11 +277,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                 Única vez
               </button>
             </div>
-            {!isRecurring && (
-              <p className="text-xs text-amber-600 bg-amber-50 p-2 rounded-xl border border-amber-100 ml-1">
-                Aviso: Los beneficios de Bonda solo aplican para donaciones mensuales recurrentes.
-              </p>
-            )}
+
           </div>
 
           <hr className="border-slate-100" />

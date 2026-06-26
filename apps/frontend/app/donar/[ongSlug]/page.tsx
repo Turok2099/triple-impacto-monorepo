@@ -139,21 +139,7 @@ export default function DonarExclusivePage() {
                     </p>
                   </div>
 
-                  {/* Bonda Discounts Benefit Badge */}
-                  <div className="mb-6 bg-slate-50 border border-slate-100 rounded-2xl p-5 flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-                    <img
-                      src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1781655035/bonda_ujsbcf.png"
-                      alt="Bonda"
-                      className="h-10 md:h-18 w-auto object-contain shrink-0"
-                    />
-                    <div className="space-y-0.5">
-                      <h4 className="text-sm md:text-base font-bold text-slate-800">Portal de Beneficios Bonda</h4>
-                      <p className="text-xs md:text-sm text-slate-500 font-semibold leading-relaxed">
-                        Con tu donación mensual, accedés a más de <span className="font-bold text-[#2c8184]">1700 cupones de descuento exclusivos</span> en primeras marcas nacionales.
-                      </p>
-                    </div>
-                  </div>
-                  
+
                   <div className="bg-teal-50/30 rounded-2xl p-6 border border-teal-100/50 text-center">
                     <p className="text-slate-700 text-sm font-semibold mb-6">
                       Para realizar tu donación de forma segura, seleccioná una de las siguientes opciones:

@@ -233,7 +233,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
         </div>
         <h2 className="text-2xl font-bold text-slate-800 mb-2">¡Pago Aprobado!</h2>
         <p className="text-slate-500 mb-8">
-          Tu donación ha sido procesada correctamente y ya estás dado de alta en Bonda para disfrutar de tus beneficios.
+          Tu donación ha sido procesada correctamente. ¡Muchas gracias por tu compromiso!
         </p>
         <button 
           onClick={() => window.location.href = '/dashboard'}
@@ -315,11 +315,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
                 Única vez
               </button>
             </div>
-            {!isRecurring && (
-              <p className="text-xs text-amber-600 bg-amber-50 p-2 rounded-xl border border-amber-100 ml-1">
-                Aviso: Los beneficios de Bonda solo aplican para donaciones mensuales recurrentes.
-              </p>
-            )}
+
           </div>
 
           {/* SECCIÓN 3: MONTO */}

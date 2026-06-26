@@ -1,6 +1,7 @@
 import { Injectable, Logger, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { BondaService } from '../bonda/bonda.service';
+import * as ExcelJS from 'exceljs';
 
 const bondaAllowedFields = ['email', 'nombre', 'apellido', 'telefono', 'genero', 'fecha_nacimiento', 'provincia', 'localidad', 'code'];
 
@@ -13,12 +14,18 @@ export class AdminService {
     private readonly bondaService: BondaService,
   ) {}
 
-  async getUsers(page: number = 1, limit: number = 20) {
+  async getUsers(page: number = 1, limit: number = 20, search?: string, ongId?: string, bondaStatus?: string) {
     const offset = (page - 1) * limit;
 
-    const { data: users, error, count } = await this.supabaseService.getClient()
+    let query = this.supabaseService.getClient()
       .from('usuarios')
-      .select('*, donaciones(estado), usuarios_bonda_afiliados(affiliate_code, bonda_microsite_id, bonda_microsites(nombre), is_active)', { count: 'exact' })
+      .select('*, donaciones(monto, moneda, estado, created_at, organizacion_nombre), usuarios_bonda_afiliados(affiliate_code, bonda_microsite_id, bonda_microsites(nombre, organizacion_id), is_active)', { count: 'exact' });
+
+    if (search) {
+      query = query.or(`nombre.ilike.%${search}%,email.ilike.%${search}%,dni.ilike.%${search}%`);
+    }
+
+    const { data: users, error, count } = await query
       .range(offset, offset + limit - 1)
       .order('created_at', { ascending: false });
 
@@ -27,7 +34,7 @@ export class AdminService {
       throw new InternalServerErrorException('Error al obtener usuarios locales');
     }
 
-    const mappedUsers = users.map(u => ({
+    let mappedUsers = users.map(u => ({
       ...u,
       role: u.role || 'user',
       status: u.is_active ? 'ACTIVO' : 'INACTIVO (Local)',
@@ -35,9 +42,27 @@ export class AdminService {
          affiliate_code: a.affiliate_code,
          bonda_microsite_id: a.bonda_microsite_id,
          ong_name: (a.bonda_microsites as any)?.nombre || (a.bonda_microsites as any)?.[0]?.nombre || 'Suscripción Bonda',
+         organizacion_id: (a.bonda_microsites as any)?.organizacion_id || (a.bonda_microsites as any)?.[0]?.organizacion_id,
          is_active: a.is_active !== false // Defaults to true if historically null
       }))
     }));
+
+    // Local filtering for JSON relationships (since Supabase PostgREST !inner on arrays can be complex)
+    if (ongId) {
+      mappedUsers = mappedUsers.filter(u => 
+        u.usuarios_bonda_afiliados?.some((a: any) => a.organizacion_id === ongId)
+      );
+    }
+    
+    if (bondaStatus === 'activo') {
+      mappedUsers = mappedUsers.filter(u => 
+        u.usuarios_bonda_afiliados?.some((a: any) => a.is_active === true && (!ongId || a.organizacion_id === ongId))
+      );
+    } else if (bondaStatus === 'inactivo') {
+      mappedUsers = mappedUsers.filter(u => 
+        u.usuarios_bonda_afiliados?.some((a: any) => a.is_active === false && (!ongId || a.organizacion_id === ongId))
+      );
+    }
 
     return {
       users: mappedUsers,
@@ -46,6 +71,93 @@ export class AdminService {
       limit,
       totalPages: Math.ceil((count || 0) / limit),
     };
+  }
+
+  async exportUsersToExcel(adminId: string, search?: string, ongId?: string, bondaStatus?: string): Promise<Buffer> {
+    // Fetch all users matching search (no pagination limit for export, or a very high limit)
+    // We use a high limit like 100000 to get all without breaking
+    const result = await this.getUsers(1, 100000, search, ongId, bondaStatus);
+    const users = result.users;
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Usuarios Registrados');
+
+    worksheet.columns = [
+      { header: 'ID Usuario', key: 'id', width: 36 },
+      { header: 'Nombre', key: 'nombre', width: 25 },
+      { header: 'Email', key: 'email', width: 30 },
+      { header: 'DNI', key: 'dni', width: 15 },
+      { header: 'Teléfono', key: 'telefono', width: 20 },
+      { header: 'Estado Plataforma', key: 'status', width: 20 },
+      { header: 'Fecha de Registro', key: 'created_at', width: 20 },
+      { header: 'ONGs Afiliadas (Bonda)', key: 'ongs', width: 40 },
+      { header: 'Estado Bonda', key: 'bonda_status', width: 20 },
+      { header: 'Total Donaciones', key: 'total_donaciones', width: 20 },
+      { header: 'Último Pago', key: 'ultimo_pago', width: 25 },
+      { header: 'Monto Último Pago', key: 'monto_ultimo_pago', width: 20 },
+    ];
+
+    worksheet.getRow(1).font = { bold: true };
+    worksheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2C8184' } };
+    worksheet.getRow(1).font = { color: { argb: 'FFFFFFFF' }, bold: true };
+
+    for (const u of users) {
+      // Afiliaciones Bonda
+      let relevantAffiliations = u.usuarios_bonda_afiliados || [];
+      if (ongId) {
+        relevantAffiliations = relevantAffiliations.filter((a: any) => a.organizacion_id === ongId);
+      }
+      
+      const ongsString = relevantAffiliations.map((a: any) => a.ong_name).join(', ');
+      
+      let bondaState = 'Sin afiliación';
+      if (relevantAffiliations.length > 0) {
+        const allActive = relevantAffiliations.every((a: any) => a.is_active);
+        const someActive = relevantAffiliations.some((a: any) => a.is_active);
+        if (allActive) bondaState = 'Activo en todas';
+        else if (someActive) bondaState = 'Parcialmente activo';
+        else bondaState = 'Inactivo en todas';
+      }
+
+      // Donaciones
+      const donaciones = u.donaciones || [];
+      const successfulDonations = donaciones.filter((d: any) => d.estado === 'COMPLETED');
+      
+      let totalPagos = successfulDonations.length;
+      let ultimoPagoDate = 'N/A';
+      let montoUltimoPago = 'N/A';
+      
+      if (successfulDonations.length > 0) {
+         // Sort descending by created_at
+         successfulDonations.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+         const lastDonation = successfulDonations[0];
+         ultimoPagoDate = new Date(lastDonation.created_at).toLocaleDateString();
+         montoUltimoPago = `${lastDonation.monto} ${lastDonation.moneda}`;
+      }
+
+      worksheet.addRow({
+        id: u.id,
+        nombre: u.nombre,
+        email: u.email,
+        dni: u.dni || 'N/A',
+        telefono: u.telefono || 'N/A',
+        status: u.status,
+        created_at: new Date(u.created_at).toLocaleDateString(),
+        ongs: ongsString || 'Ninguna',
+        bonda_status: bondaState,
+        total_donaciones: totalPagos,
+        ultimo_pago: ultimoPagoDate,
+        monto_ultimo_pago: montoUltimoPago
+      });
+    }
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    
+    await this.logAudit(adminId, 'SYSTEM', 'EXPORT_USERS', 'SUCCESS', { 
+      filters: { search, ongId, bondaStatus }, 
+      count: users.length 
+    });
+    return buffer as any;
   }
 
   async getUserPayments(userId: string) {

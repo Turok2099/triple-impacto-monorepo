@@ -9,6 +9,7 @@ export interface AdminUser {
   is_active: boolean;
   role?: string;
   usuarios_bonda_afiliados?: { affiliate_code: string; bonda_microsite_id: string; ong_name?: string; is_active?: boolean; }[];
+  donaciones?: any[];
   created_at: string;
 }
 
@@ -27,11 +28,55 @@ const getHeaders = (token: string) => ({
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
-export const getAdminUsers = async (token: string, page = 1, limit = 20): Promise<AdminUsersResponse> => {
-  const url = `${API_URL}/admin/users?page=${page}&limit=${limit}`;
+export const getAdminUsers = async (
+  token: string, 
+  page = 1, 
+  limit = 20, 
+  search?: string, 
+  ongId?: string, 
+  bondaStatus?: string
+): Promise<AdminUsersResponse> => {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString()
+  });
+  if (search) params.append('search', search);
+  if (ongId) params.append('ongId', ongId);
+  if (bondaStatus) params.append('bondaStatus', bondaStatus);
+
+  const url = `${API_URL}/admin/users?${params.toString()}`;
   const res = await fetch(url, { headers: getHeaders(token) });
   if (!res.ok) throw new Error('Error recuperando usuarios. Status: ' + res.status);
   return await res.json();
+};
+
+export const exportAdminUsersToExcel = async (
+  token: string,
+  search?: string,
+  ongId?: string,
+  bondaStatus?: string
+): Promise<void> => {
+  const params = new URLSearchParams();
+  if (search) params.append('search', search);
+  if (ongId) params.append('ongId', ongId);
+  if (bondaStatus) params.append('bondaStatus', bondaStatus);
+
+  const url = `${API_URL}/admin/users/export?${params.toString()}`;
+  const res = await fetch(url, { 
+    headers: { Authorization: `Bearer ${token}` } // without application/json to handle streams properly
+  });
+  
+  if (!res.ok) throw new Error('Error exportando usuarios a Excel. Status: ' + res.status);
+  
+  const blob = await res.blob();
+  const downloadUrl = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = downloadUrl;
+  a.download = 'usuarios_registrados.xlsx';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(downloadUrl);
 };
 
 export const createAdminUser = async (token: string, payload: any) => {

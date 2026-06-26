@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Swal from 'sweetalert2';
-import { getAdminUsers, deleteAdminUser, AdminUser, createAdminUser, updateAdminUser, deleteAffiliation, getUserAdminPayments, toggleUserAdminRole } from "@/lib/admin";
+import { getAdminUsers, deleteAdminUser, AdminUser, createAdminUser, updateAdminUser, deleteAffiliation, getUserAdminPayments, toggleUserAdminRole, exportAdminUsersToExcel } from "@/lib/admin";
+import { getOrganizaciones } from "@/lib/admin-ongs";
 import { useAuth } from "@/contexts/AuthContext";
 import { Users, MoreVertical, Edit2, Trash2, UserPlus, X, ShieldAlert, Shield, CheckCircle, XCircle, Receipt, UserSearch, ArrowLeft, Mail, Phone, BookUser, Building2, Image as ImageIcon, Upload, Download } from "lucide-react";
 import SeccionAdminOngs from "./SeccionAdminOngs";
@@ -15,6 +16,13 @@ export default function SeccionAdmin() {
   const [error, setError] = useState<string | null>(null);
   const [total, setTotal] = useState(0);
   const [selectedUserForDetails, setSelectedUserForDetails] = useState<AdminUser | null>(null);
+  
+  // Filters & Export
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedOngFilter, setSelectedOngFilter] = useState("");
+  const [bondaStatusFilter, setBondaStatusFilter] = useState("");
+  const [ongs, setOngs] = useState<{ id: string; nombre: string }[]>([]);
+  const [isExporting, setIsExporting] = useState(false);
   
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -68,19 +76,55 @@ export default function SeccionAdmin() {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+    fetchOngs();
+  }, [selectedOngFilter, bondaStatusFilter]);
 
-  const fetchUsers = async () => {
+  const fetchOngs = async () => {
+    try {
+      const token = localStorage.getItem("auth_token") || "";
+      const orgs = await getOrganizaciones(token);
+      setOngs(orgs);
+    } catch (e) {
+      console.error("Error fetching ONGs", e);
+    }
+  };
+
+  const fetchUsers = async (customSearch?: string) => {
     try {
       setLoading(true);
       const token = localStorage.getItem("auth_token") || "";
-      const data = await getAdminUsers(token, 1, 50); // Fetch up to 50 for now
+      const activeSearch = customSearch !== undefined ? customSearch : searchQuery;
+      const data = await getAdminUsers(token, 1, 50, activeSearch, selectedOngFilter, bondaStatusFilter); // Fetch up to 50 for now
       setUsers(data.users);
       setTotal(data.total);
     } catch (err: any) {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchUsers();
+  };
+
+  const handleExportExcel = async () => {
+    setIsExporting(true);
+    try {
+      const token = localStorage.getItem("auth_token") || "";
+      await exportAdminUsersToExcel(token, searchQuery, selectedOngFilter, bondaStatusFilter);
+      Swal.fire({
+        title: "Éxito",
+        text: "Reporte descargado correctamente",
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } catch (err: any) {
+      Swal.fire("Error", "No se pudo generar el reporte: " + err.message, "error");
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -471,19 +515,65 @@ export default function SeccionAdmin() {
         <SeccionAdminBanners />
       ) : (
         <>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+            <form onSubmit={handleSearchSubmit} className="flex-1 w-full md:max-w-md flex items-center gap-2 relative">
+              <UserSearch className="w-5 h-5 absolute left-3 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Buscar por nombre, email o DNI..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#2c8184] focus:border-[#2c8184] outline-none transition-all text-sm"
+              />
+              <button type="submit" className="hidden" />
+            </form>
+            
+            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+              <select
+                value={selectedOngFilter}
+                onChange={(e) => setSelectedOngFilter(e.target.value)}
+                className="px-3 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-600 focus:ring-2 focus:ring-[#2c8184] outline-none bg-slate-50 cursor-pointer"
+              >
+                <option value="">Todas las ONGs</option>
+                {ongs.map(ong => (
+                  <option key={ong.id} value={ong.id}>{ong.nombre}</option>
+                ))}
+              </select>
+
+              <select
+                value={bondaStatusFilter}
+                onChange={(e) => setBondaStatusFilter(e.target.value)}
+                className="px-3 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-600 focus:ring-2 focus:ring-[#2c8184] outline-none bg-slate-50 cursor-pointer"
+              >
+                <option value="">Cualquier estado</option>
+                <option value="activo">Bonda Activo</option>
+                <option value="inactivo">Bonda Inactivo</option>
+              </select>
+
+              <button
+                onClick={handleExportExcel}
+                disabled={isExporting}
+                className="flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-semibold transition-all shadow-sm text-sm disabled:opacity-50"
+              >
+                <Download className="w-4 h-4" />
+                {isExporting ? 'Exportando...' : 'Exportar'}
+              </button>
+            </div>
+          </div>
+
           <div className="flex justify-end gap-3 mb-4">
             <button
               onClick={() => setIsBulkModalOpen(true)}
-              className="flex items-center gap-2 px-6 py-3 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-xl font-semibold transition-all shadow-sm"
+              className="flex items-center gap-2 px-6 py-3 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-xl font-semibold transition-all shadow-sm text-sm"
             >
-              <Users className="w-5 h-5" />
+              <Users className="w-4 h-4" />
               Carga Masiva (Bonda)
             </button>
             <button
               onClick={openCreateModal}
-              className="flex items-center gap-2 px-6 py-3 bg-[#2c8184] hover:bg-[#1e6063] text-white rounded-xl font-semibold transition-all shadow-md hover:shadow-lg"
+              className="flex items-center gap-2 px-6 py-3 bg-[#2c8184] hover:bg-[#1e6063] text-white rounded-xl font-semibold transition-all shadow-md hover:shadow-lg text-sm"
             >
-              <UserPlus className="w-5 h-5" />
+              <UserPlus className="w-4 h-4" />
               Nuevo Usuario
             </button>
           </div>
@@ -504,9 +594,10 @@ export default function SeccionAdmin() {
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200">
                   <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider">Usuario</th>
-                  <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider text-center">Datos del usuario</th>
+                  <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider">Registro</th>
                   <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider">Estado</th>
                   <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider">Afiliación Bonda</th>
+                  <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider">Aportes</th>
                   <th className="py-4 px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Acciones</th>
                 </tr>
               </thead>
@@ -515,30 +606,29 @@ export default function SeccionAdmin() {
                   <tr key={u.id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
-                        <div className="size-10 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center">
+                        <div className="size-10 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center flex-shrink-0">
                           {u.nombre.charAt(0).toUpperCase()}
                         </div>
-                        <div>
-                          <p className="font-semibold text-slate-900 flex items-center gap-2">
+                        <div className="flex flex-col min-w-0">
+                          <p className="font-semibold text-slate-900 flex items-center gap-2 truncate">
                             {u.nombre}
                             {u.role === 'admin' && (
-                              <span title="Administrador" className="flex items-center">
+                              <span title="Administrador" className="flex items-center flex-shrink-0">
                                 <Shield className="w-3.5 h-3.5 text-purple-600 fill-purple-600" />
                               </span>
                             )}
                           </p>
-                          <p className="text-xs text-slate-500">DNI: {u.dni || 'N/A'}</p>
+                          <p className="text-xs text-slate-500 truncate" title={u.email}>{u.email}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="py-4 px-6 text-center">
-                      <button
-                        onClick={() => setSelectedUserForDetails(u)}
-                        className="p-2 bg-slate-50 hover:bg-[#2c8184]/10 text-slate-400 hover:text-[#2c8184] rounded-lg transition-colors inline-flex items-center justify-center border border-slate-200 hover:border-[#2c8184]/30"
-                        title="Ver datos del usuario"
-                      >
-                        <BookUser className="w-5 h-5" />
-                      </button>
+                    <td className="py-4 px-6">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-sm font-medium text-slate-700">
+                          {new Date(u.created_at).toLocaleDateString()}
+                        </span>
+                        <span className="text-xs text-slate-500">DNI: {u.dni || 'N/A'}</span>
+                      </div>
                     </td>
                     <td className="py-4 px-6">
                       <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
@@ -574,6 +664,22 @@ export default function SeccionAdmin() {
                       ) : (
                         <span className="text-slate-400 italic text-xs">Sin afiliación</span>
                       )}
+                    </td>
+                    <td className="py-4 px-6">
+                      {(() => {
+                        const donaciones = u.donaciones || [];
+                        const completed = donaciones.filter((d: any) => d.estado === 'COMPLETED');
+                        if (completed.length === 0) {
+                          return <span className="text-xs text-slate-400 italic">Sin aportes</span>;
+                        }
+                        const last = completed.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+                        return (
+                          <div className="flex flex-col gap-0.5">
+                            <span className="text-sm font-semibold text-emerald-600">${last.monto} {last.moneda}</span>
+                            <span className="text-[10px] text-slate-500">{new Date(last.created_at).toLocaleDateString()}</span>
+                          </div>
+                        );
+                      })()}
                     </td>
                     <td className="py-4 px-6 text-right">
                       <div className="flex justify-end gap-2">

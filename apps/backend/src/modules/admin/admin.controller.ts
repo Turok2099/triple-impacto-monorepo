@@ -15,8 +15,27 @@ export class AdminController {
   async getUsers(
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '20',
+    @Query('search') search?: string,
+    @Query('ongId') ongId?: string,
+    @Query('bondaStatus') bondaStatus?: string,
   ) {
-    return this.adminService.getUsers(Number(page), Number(limit));
+    return this.adminService.getUsers(Number(page), Number(limit), search, ongId, bondaStatus);
+  }
+
+  @Get('users/export')
+  async exportUsers(
+    @Req() req: any,
+    @Res() res: Response,
+    @Query('search') search?: string,
+    @Query('ongId') ongId?: string,
+    @Query('bondaStatus') bondaStatus?: string,
+  ) {
+    const adminId = req.user?.userId;
+    const buffer = await this.adminService.exportUsersToExcel(adminId, search, ongId, bondaStatus);
+    
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=usuarios_registrados.xlsx');
+    res.send(buffer);
   }
 
   @Get('users/:id/payments')

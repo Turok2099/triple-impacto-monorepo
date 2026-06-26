@@ -436,7 +436,7 @@ export default function DashboardPage() {
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 w-full min-w-0 flex flex-col md:h-screen md:overflow-y-auto">
+      <div className="flex-1 w-full min-w-0 flex flex-col md:h-screen md:overflow-y-scroll">
       {/* Secciones Perfil, Mis Cupones y Mis pagos */}
       {activeTab === "perfil" && (
         <SeccionPerfil 

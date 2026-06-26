@@ -375,7 +375,7 @@ export default function SeccionAdminOngs() {
                 <Building2 className="w-5 h-5 text-[#2c8184]" />
                 {editingOng ? "Editar ONG" : "Nueva ONG"}
               </h2>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200 transition-colors">
+              <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-500 hover:text-slate-700 rounded-full hover:bg-slate-200 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -413,14 +413,14 @@ export default function SeccionAdminOngs() {
                     <div className="col-span-2">
                       <label className="block text-sm font-semibold text-slate-700 mb-1">Slug de Donación Exclusivo (amigable)</label>
                       <input placeholder="ej: fundacion-padres (dejar vacío para deshabilitar exclusive link)" value={formData.slug} onChange={e => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, '') })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
-                      <p className="text-[11px] text-slate-400 mt-1">
+                      <p className="text-xs text-slate-500 mt-1">
                         Si se define, la URL exclusiva será:{" "}
                         {formData.slug ? (
                           <span className="font-bold text-[#2c8184]">
                             /donar/{formData.slug}
                           </span>
                         ) : (
-                          <span className="italic">/donar/nombre-slug</span>
+                          <span className="italic text-slate-500">/donar/nombre-slug</span>
                         )}
                       </p>
                     </div>
@@ -447,7 +447,7 @@ export default function SeccionAdminOngs() {
                             </div>
                             <input type="file" className="hidden" accept="image/png, image/jpeg, image/jpg" onChange={handleFileChange} />
                           </label>
-                          <p className="text-xs text-slate-400 mt-2">La imagen se subirá automáticamente a Supabase al guardar.</p>
+                          <p className="text-xs text-slate-500 mt-2 font-medium">La imagen se subirá automáticamente a Supabase al guardar.</p>
                         </div>
                       </div>
                     </div>
@@ -482,8 +482,8 @@ export default function SeccionAdminOngs() {
                   </div>
 
                   <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-3 mt-6">
-                    <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1781652396/Fiserv_logo.svg_veglfg.png" alt="Fiserv" className="h-5 object-contain select-none" />
-                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pasarela de Pagos</span>
+                    <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1781652396/Fiserv_logo.svg_veglfg.png" alt="Fiserv" className="h-10 object-contain select-none" />
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Pasarela de Pagos</span>
                   </h3>
                   <div className="bg-orange-50/50 p-4 rounded-xl border border-orange-100 flex flex-col gap-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -495,7 +495,7 @@ export default function SeccionAdminOngs() {
                         <label className="block text-sm font-semibold text-orange-950 mb-1">Fiserv Shared Secret</label>
                         <div className="relative">
                           <input placeholder="Sin información" autoComplete="new-password" type={showSecrets ? "text" : "password"} value={formData.fiserv_shared_secret} onChange={e => setFormData({ ...formData, fiserv_shared_secret: e.target.value })} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-orange-200 focus:ring-2 focus:ring-orange-500 outline-none font-mono text-sm" />
-                          <button type="button" onClick={() => setShowSecrets(!showSecrets)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
+                          <button type="button" onClick={() => setShowSecrets(!showSecrets)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 focus:outline-none">
                             {showSecrets ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
                         </div>
@@ -511,8 +511,8 @@ export default function SeccionAdminOngs() {
                 {/* 3. Integración Bonda */}
                 <section>
                   <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2 mt-6">
-                    <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1781655035/bonda_ujsbcf.png" alt="Bonda" className="h-6 object-contain select-none" />
-                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Beneficios corporativos</span>
+                    <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1781655035/bonda_ujsbcf.png" alt="Bonda" className="h-12 object-contain select-none" />
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Beneficios corporativos</span>
                   </h3>
                   <div className="bg-rose-50/50 p-4 rounded-xl border border-rose-100 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="col-span-2">
@@ -524,7 +524,7 @@ export default function SeccionAdminOngs() {
                       <p className="text-xs text-rose-600 mb-2">Usada para consultar el catálogo de beneficios.</p>
                       <div className="relative">
                         <input type={showSecrets ? "text" : "password"} placeholder="Token API Cupones" value={formData.bonda_api_token} onChange={e => setFormData({ ...formData, bonda_api_token: e.target.value })} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-rose-200 focus:ring-2 focus:ring-rose-500 outline-none font-mono text-sm" />
-                        <button type="button" onClick={() => setShowSecrets(!showSecrets)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
+                        <button type="button" onClick={() => setShowSecrets(!showSecrets)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 focus:outline-none">
                           {showSecrets ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
@@ -534,7 +534,7 @@ export default function SeccionAdminOngs() {
                       <p className="text-xs text-rose-600 mb-2">Usada para crear/eliminar afiliados desde nuestro sistema.</p>
                       <div className="relative">
                         <input type={showSecrets ? "text" : "password"} placeholder="Token API Nóminas" value={formData.bonda_api_token_nominas} onChange={e => setFormData({ ...formData, bonda_api_token_nominas: e.target.value })} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-rose-200 focus:ring-2 focus:ring-rose-500 outline-none font-mono text-sm" />
-                        <button type="button" onClick={() => setShowSecrets(!showSecrets)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
+                        <button type="button" onClick={() => setShowSecrets(!showSecrets)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 focus:outline-none">
                           {showSecrets ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>

@@ -626,8 +626,16 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Desktop: card vertical (oculta en móvil) */}
-                  <div className="hidden md:flex bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 relative flex-col h-full">
-                    <div className="relative h-44 overflow-hidden bg-gray-100 shrink-0">
+                  <div 
+                    onClick={() => setCuponSeleccionado(cupon)}
+                    className="hidden md:flex flex-col bg-white rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300 overflow-hidden border border-slate-100/80 relative cursor-pointer h-full"
+                  >
+                    {yaSolicitado && (
+                      <div className="absolute top-3 right-3 z-10 px-3 py-1 rounded-full bg-emerald-100 border border-emerald-200 text-emerald-700 text-[11px] font-bold shadow-sm">
+                        ✓ Activo
+                      </div>
+                    )}
+                    <div className="relative h-32 overflow-hidden bg-slate-50 shrink-0">
                       <img
                         src={
                           cupon.imagen_url ||
@@ -641,16 +649,14 @@ export default function DashboardPage() {
                             "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='190' viewBox='0 0 280 190'%3E%3Crect fill='%2310b981' width='280' height='190'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-size='16' fill='%23fff' text-anchor='middle' dy='.3em'%3ECupón%3C/text%3E%3C/svg%3E";
                         }}
                       />
-                      <div className="absolute top-3 right-3 z-10 px-3 py-1.5 rounded-full bg-white text-black text-sm font-medium shadow-md">
-                        {cupon.empresa || "Marca"}
-                      </div>
                     </div>
 
-                    <div className="absolute left-1/2 top-32 sm:top-28 -translate-x-1/2 z-10 w-36 h-36 sm:w-42 sm:h-42 rounded-xl bg-white shadow-lg flex items-center justify-center p-1 ring-2 ring-white overflow-hidden">
+                    {/* Floating Overlapping Logo Container */}
+                    <div className="absolute left-1/2 top-32 -translate-x-1/2 -translate-y-1/2 z-10 w-24 h-24 rounded-2xl bg-white shadow-[0_8px_24px_rgba(0,0,0,0.08)] flex items-center justify-center p-2 border border-slate-50 overflow-hidden">
                       <img
                         src={cupon.logo_empresa || defaultLogo}
                         alt={cupon.empresa || "Logo"}
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-contain p-1.5"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.src = defaultLogo;
@@ -658,30 +664,22 @@ export default function DashboardPage() {
                       />
                     </div>
 
-                    <div className="relative z-0 pt-24 sm:pt-28 pb-5 px-5 text-center flex-col flex flex-1 justify-between">
-                      <div>
-                        <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
-                          {cupon.descuento || "Descuento especial"}
-                        </p>
-                        <p className="text-sm text-gray-500 line-clamp-3 min-h-[3.6rem]">
-                          {cupon.descripcion || cupon.titulo}
-                        </p>
+                    {/* Card Body */}
+                    <div className="relative z-0 pt-16 pb-6 px-5 text-center flex flex-col items-center justify-between flex-1">
+                      {/* Pill Badge with Company Name */}
+                      <div className="px-4 py-1.5 border border-slate-200/60 rounded-full text-[11px] font-bold tracking-wider text-slate-700 bg-white mb-4 shadow-sm uppercase leading-none">
+                        {cupon.empresa || "Marca"}
                       </div>
-                      {yaSolicitado ? (
-                        <button
-                          onClick={() => setCuponSeleccionado(cupon)}
-                          className="mt-4 w-full py-2.5 bg-teal-100 hover:bg-teal-200 text-teal-700 font-semibold rounded-xl transition-colors text-sm flex items-center justify-center gap-1.5"
-                        >
-                          ✓ Ver mi código
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => setCuponSeleccionado(cupon)}
-                          className="mt-4 w-full py-2.5 bg-[#2c8184] hover:bg-[#1e6063] text-white font-semibold rounded-xl transition-colors text-sm"
-                        >
-                          Obtener descuento
-                        </button>
-                      )}
+
+                      {/* Discount Headline */}
+                      <p className="text-3xl font-black text-slate-900 mb-2 leading-none">
+                        {cupon.descuento || "Descuento especial"}
+                      </p>
+
+                      {/* Benefit Detail */}
+                      <p className="text-[13px] text-slate-500 font-medium leading-relaxed line-clamp-3 min-h-[3rem] px-2 mb-1">
+                        {cupon.descripcion || cupon.titulo}
+                      </p>
                     </div>
                   </div>
                 </div>

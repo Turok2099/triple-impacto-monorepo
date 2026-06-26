@@ -93,8 +93,11 @@ export default function CuponCard({ cupon }: CuponCardProps) {
       </div>
 
       {/* Desktop: card vertical (oculta en móvil) */}
-      <div className="hidden md:block bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 relative">
-        <div className="relative h-44 overflow-hidden bg-gray-100">
+      <div 
+        onClick={handleObtenerDescuento}
+        className="hidden md:flex flex-col bg-white rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300 overflow-hidden border border-slate-100/80 relative cursor-pointer h-full"
+      >
+        <div className="relative h-32 overflow-hidden bg-slate-50 shrink-0">
           <ImageWithFallback
             src={imagenPrincipal}
             fallbackSrc={defaultImage}
@@ -103,33 +106,36 @@ export default function CuponCard({ cupon }: CuponCardProps) {
             sizes="(max-width: 768px) 100vw, 400px"
             className="object-cover"
           />
-          <div className="absolute top-3 right-3 z-10 px-3 py-1.5 rounded-full bg-white text-black text-sm font-medium shadow-md">
-            {cupon.empresa.nombre}
-          </div>
         </div>
 
-        <div className="absolute left-1/2 top-[8rem] sm:top-[7rem] -translate-x-1/2 z-10 w-36 h-36 sm:w-[10.5rem] sm:h-[10.5rem] rounded-xl bg-white shadow-lg flex items-center justify-center p-1 ring-2 ring-white overflow-hidden relative">
+        {/* Floating Overlapping Logo Container */}
+        <div className="absolute left-1/2 top-32 -translate-x-1/2 -translate-y-1/2 z-10 w-24 h-24 rounded-2xl bg-white shadow-[0_8px_24px_rgba(0,0,0,0.08)] flex items-center justify-center p-2 border border-slate-50 overflow-hidden">
           <ImageWithFallback
             src={logoEmpresa}
             fallbackSrc={defaultLogo}
             alt={cupon.empresa.nombre}
             fill
-            sizes="168px"
-            className="object-contain p-2"
+            sizes="96px"
+            className="object-contain p-1.5"
           />
         </div>
 
-        <div className="relative z-0 pt-24 sm:pt-32 pb-5 px-5 text-center">
-          <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
+        {/* Card Body */}
+        <div className="relative z-0 pt-16 pb-6 px-5 text-center flex flex-col items-center justify-between flex-1">
+          {/* Pill Badge with Company Name */}
+          <div className="px-4 py-1.5 border border-slate-200/60 rounded-full text-[11px] font-bold tracking-wider text-slate-700 bg-white mb-4 shadow-sm uppercase leading-none">
+            {cupon.empresa.nombre}
+          </div>
+
+          {/* Discount Headline */}
+          <p className="text-3xl font-black text-slate-900 mb-2 leading-none">
             {cupon.descuento}
           </p>
-          <p className="text-sm text-gray-500 line-clamp-3 min-h-[3.6rem]">{descripcion}</p>
-          <button 
-            onClick={handleObtenerDescuento}
-            className="mt-4 w-full py-2.5 bg-[#2c8184] hover:bg-[#1e6063] text-white font-semibold rounded-xl transition-colors text-sm"
-          >
-            Obtener descuento
-          </button>
+
+          {/* Benefit Detail */}
+          <p className="text-[13px] text-slate-500 font-medium leading-relaxed line-clamp-3 min-h-[3rem] px-2 mb-1">
+            {descripcion}
+          </p>
         </div>
       </div>
     </>

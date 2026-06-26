@@ -273,36 +273,48 @@ export default function SeccionAdminOngs() {
                 <tr key={ong.id} className="hover:bg-slate-50/50 transition-colors">
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-3">
-                      <div className="size-10 rounded-xl bg-slate-100 overflow-hidden shrink-0 flex items-center justify-center">
-                        {ong.logo_url ? <img src={ong.logo_url} alt="" className="w-full h-full object-contain" /> : <Building2 className="w-5 h-5 text-slate-400" />}
+                      <div className="size-20 rounded-xl bg-slate-100 overflow-hidden shrink-0 flex items-center justify-center border border-slate-200">
+                        {ong.logo_url ? <img src={ong.logo_url} alt="" className="w-full h-full object-contain" /> : <Building2 className="w-10 h-10 text-slate-400" />}
                       </div>
                       <div>
                         <p className="font-semibold text-slate-900">{ong.nombre}</p>
-                        <p className="text-xs text-slate-500 line-clamp-1 max-w-[200px] mb-1">{ong.descripcion || "Sin descripción"}</p>
-                        {ong.slug && (
-                          <div className="flex items-center gap-1 text-[11px] text-[#2c8184] font-bold">
-                            <LinkIcon className="w-3 h-3" />
-                            <a
-                              href={`/donar/${ong.slug}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="hover:underline"
-                            >
-                              /donar/{ong.slug}
-                            </a>
-                          </div>
-                        )}
+                        <p className="text-xs text-slate-500 line-clamp-2 max-w-[200px]">{ong.descripcion || "Sin descripción"}</p>
                       </div>
                     </div>
                   </td>
                   <td className="py-4 px-6">
-                    <div className="flex flex-col gap-1">
+                    <div className="flex flex-col gap-1.5 items-start">
                       <div className="flex items-center gap-1 text-xs">
-                        {(ong.fiserv_store_id && ong.fiserv_shared_secret) ? <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-medium">FISERV OK</span> : <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded">SIN STORE PARA PAGO</span>}
+                        {(ong.fiserv_store_id && ong.fiserv_shared_secret) ? <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-medium">FISERV OK</span> : <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-medium">SIN STORE PARA PAGO</span>}
                       </div>
                       <div className="flex items-center gap-1 text-xs">
-                        {bonda ? <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded font-medium">Bonda: {bonda.slug}</span> : <span className="bg-red-50 text-red-500 px-2 py-0.5 rounded">Sin Bonda</span>}
+                        {bonda ? (
+                          <a
+                            href={bonda.slug.startsWith('http') ? bonda.slug : `https://${bonda.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-purple-100 text-purple-700 hover:bg-purple-200 px-2 py-0.5 rounded font-semibold transition-colors flex items-center gap-1"
+                          >
+                            <LinkIcon className="w-2.5 h-2.5" />
+                            Bonda: {bonda.slug.replace(/^https?:\/\//, '')}
+                          </a>
+                        ) : (
+                          <span className="bg-red-50 text-red-500 px-2 py-0.5 rounded font-medium">Sin Bonda</span>
+                        )}
                       </div>
+                      {ong.slug && (
+                        <div className="flex items-center gap-1 text-xs">
+                          <a
+                            href={`/donar/${ong.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-teal-50 text-[#2c8184] hover:bg-teal-100 px-2 py-0.5 rounded font-semibold transition-colors flex items-center gap-1"
+                          >
+                            <LinkIcon className="w-2.5 h-2.5" />
+                            Donación: /{ong.slug}
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </td>
                   <td className="py-4 px-6">
@@ -470,7 +482,7 @@ export default function SeccionAdminOngs() {
                   </div>
 
                   <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-3 mt-6">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Fiserv_logo.svg" alt="Fiserv" className="h-5 object-contain select-none" />
+                    <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1781652396/Fiserv_logo.svg_veglfg.png" alt="Fiserv" className="h-5 object-contain select-none" />
                     <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pasarela de Pagos</span>
                   </h3>
                   <div className="bg-orange-50/50 p-4 rounded-xl border border-orange-100 flex flex-col gap-4">
@@ -499,21 +511,7 @@ export default function SeccionAdminOngs() {
                 {/* 3. Integración Bonda */}
                 <section>
                   <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2 mt-6">
-                    <svg viewBox="0 0 200 200" className="w-5 h-5 shrink-0 select-none">
-                      <defs>
-                        <linearGradient id="bondaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#e11d48" />
-                          <stop offset="100%" stopColor="#701a75" />
-                        </linearGradient>
-                      </defs>
-                      <rect width="200" height="200" rx="50" fill="url(#bondaGrad)" />
-                      <rect x="55" y="45" width="20" height="110" rx="5" fill="white" />
-                      <circle cx="115" cy="72" r="27" fill="white" />
-                      <circle cx="115" cy="72" r="12" fill="url(#bondaGrad)" />
-                      <circle cx="115" cy="122" r="27" fill="white" />
-                      <circle cx="115" cy="122" r="12" fill="url(#bondaGrad)" />
-                    </svg>
-                    <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#701a75] tracking-tight">bonda</span>
+                    <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1781655035/bonda_ujsbcf.png" alt="Bonda" className="h-6 object-contain select-none" />
                     <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Beneficios corporativos</span>
                   </h3>
                   <div className="bg-rose-50/50 p-4 rounded-xl border border-rose-100 grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -51,23 +51,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "res.cloudinary.com",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "faibhrhrassmrokvzqeu.supabase.co",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "cuponstar-ar.s3.amazonaws.com",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "via.placeholder.com",
-        pathname: "/**",
+        hostname: "**",
       },
     ],
   },

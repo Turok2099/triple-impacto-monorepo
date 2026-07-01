@@ -165,6 +165,9 @@ export class FiservRestService {
       },
       order: {
         orderId: orderId,
+        installmentOptions: {
+          numberOfInstallments: 1
+        }
       },
       // Habilitar tokenización (Card on File) si así se desea
       createToken: {

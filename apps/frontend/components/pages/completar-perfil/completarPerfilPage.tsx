@@ -8,6 +8,33 @@ import { User, Phone, MapPin, AlertCircle, Gift } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
+const PROVINCIAS = [
+  "Buenos Aires",
+  "CABA",
+  "Catamarca",
+  "Chaco",
+  "Chubut",
+  "Córdoba",
+  "Corrientes",
+  "Entre Ríos",
+  "Formosa",
+  "Jujuy",
+  "La Pampa",
+  "La Rioja",
+  "Mendoza",
+  "Misiones",
+  "Neuquén",
+  "Río Negro",
+  "Salta",
+  "San Juan",
+  "San Luis",
+  "Santa Cruz",
+  "Santa Fe",
+  "Santiago del Estero",
+  "Tierra del Fuego",
+  "Tucumán",
+];
+
 export default function CompletarPerfilPage() {
   const router = useRouter();
   const { login: loginContext } = useAuth();
@@ -23,6 +50,55 @@ export default function CompletarPerfilPage() {
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Localidad Autocomplete States
+  const [sugerencias, setSugerencias] = useState<{ nombre: string; provincia: string }[]>([]);
+  const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
+  const [buscandoLocalidad, setBuscandoLocalidad] = useState(false);
+
+  // Cerrar sugerencias al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setMostrarSugerencias(false);
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  // Fetch localidades con debouncing
+  useEffect(() => {
+    if (localidad.trim().length < 3) {
+      setSugerencias([]);
+      return;
+    }
+
+    const delayDebounceFn = setTimeout(async () => {
+      setBuscandoLocalidad(true);
+      try {
+        let url = `https://apis.datos.gob.ar/georef/api/localidades?nombre=${encodeURIComponent(localidad)}&max=10`;
+        if (provincia) {
+          url += `&provincia=${encodeURIComponent(provincia)}`;
+        }
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("API error");
+        const data = await res.json();
+        
+        if (data.localidades) {
+          const items = data.localidades.map((loc: any) => ({
+            nombre: loc.nombre,
+            provincia: loc.provincia.nombre,
+          }));
+          setSugerencias(items);
+        }
+      } catch (err) {
+        console.error("Error al buscar localidades:", err);
+      } finally {
+        setBuscandoLocalidad(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [localidad, provincia]);
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -210,28 +286,75 @@ export default function CompletarPerfilPage() {
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <MapPin className="h-5 w-5 text-gray-400" />
                   </div>
-                  <input
-                    type="text"
+                  <select
                     value={provincia}
-                    onChange={(e) => setProvincia(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    placeholder="Tu provincia"
+                    onChange={(e) => {
+                      setProvincia(e.target.value);
+                      setLocalidad(""); // Reset localidad al cambiar de provincia
+                    }}
+                    className="block w-full pl-10 pr-3 py-3 text-sm md:text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
                     disabled={loading}
-                  />
+                  >
+                    <option value="">Selecciona provincia</option>
+                    {PROVINCIAS.map((prov) => (
+                      <option key={prov} value={prov}>
+                        {prov}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
-              <div>
+              
+              <div className="relative" onClick={(e) => e.stopPropagation()}>
                 <label className="block text-sm md:text-base font-semibold text-gray-700 mb-2">
                   Localidad (Opcional)
                 </label>
                 <input
                   type="text"
                   value={localidad}
-                  onChange={(e) => setLocalidad(e.target.value)}
-                  className="block w-full px-4 py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  onChange={(e) => {
+                    setLocalidad(e.target.value);
+                    setMostrarSugerencias(true);
+                  }}
+                  onFocus={() => setMostrarSugerencias(true)}
+                  className="block w-full px-4 py-3 text-sm md:text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   placeholder="Tu ciudad"
                   disabled={loading}
+                  autoComplete="off"
                 />
+                
+                {/* Dropdown de Sugerencias */}
+                {mostrarSugerencias && (localidad.trim().length >= 3 || buscandoLocalidad) && (
+                  <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                    {buscandoLocalidad && (
+                      <div className="p-3 text-sm text-gray-500 text-center">Buscando...</div>
+                    )}
+                    {!buscandoLocalidad && sugerencias.length === 0 && (
+                      <div className="p-3 text-sm text-gray-500 text-center">No se encontraron localidades</div>
+                    )}
+                    {!buscandoLocalidad && sugerencias.map((sug, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => {
+                          setLocalidad(sug.nombre);
+                          // Mapeo inteligente: si la provincia devuelta por el API está en nuestra lista, la seleccionamos
+                          const matchingProv = PROVINCIAS.find(
+                            (p) => p.toLowerCase() === sug.provincia.toLowerCase()
+                          );
+                          if (matchingProv) {
+                            setProvincia(matchingProv);
+                          }
+                          setMostrarSugerencias(false);
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-sm hover:bg-teal-50 transition-colors border-b border-gray-50 last:border-0 block"
+                      >
+                        <div className="font-medium text-gray-800">{sug.nombre}</div>
+                        <div className="text-xs text-gray-400">{sug.provincia}</div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 

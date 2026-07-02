@@ -83,6 +83,11 @@ export default function DashboardPage() {
       return;
     }
 
+    if (!user.dni) {
+      router.push("/completar-perfil");
+      return;
+    }
+
     if (initEmpezado.current) return;
     initEmpezado.current = true;
 

@@ -23,6 +23,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
+import { SsoSyncDto } from './dto/sso-sync.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
@@ -83,6 +84,20 @@ export class AuthController {
     return {
       user: req.user,
     };
+  }
+
+  /**
+   * POST /api/auth/sso-sync
+   * Sincronizar usuario de SSO con la base de datos pública y crear afiliado Bonda
+   */
+  @Post('sso-sync')
+  async ssoSync(@Request() req, @Body() dto: SsoSyncDto) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new BadRequestException('Falta el token de autorización');
+    }
+    const token = authHeader.replace('Bearer ', '');
+    return this.authService.ssoSync(token, dto);
   }
 
   /**

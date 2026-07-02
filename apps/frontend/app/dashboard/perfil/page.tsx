@@ -60,6 +60,11 @@ export default function PerfilPage() {
       return;
     }
 
+    if (!user.dni) {
+      router.push("/completar-perfil");
+      return;
+    }
+
     // Cargar datos del usuario
     setNombre(user.nombre || "");
     setEmail(user.email || "");

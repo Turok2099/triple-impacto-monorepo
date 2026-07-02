@@ -18,6 +18,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
+import { SsoSyncDto } from './dto/sso-sync.dto';
 import { NewsletterService } from '../newsletter/newsletter.service';
 import * as crypto from 'crypto';
 
@@ -436,5 +437,88 @@ export class AuthService {
     }
 
     return usuario.data;
+  }
+
+  /**
+   * Sincronizar usuario de SSO (Google) asegurando que exista en public.usuarios.
+   */
+  async ssoSync(token: string, dto: SsoSyncDto) {
+    // 1. Obtener usuario desde Supabase con el token JWT del frontend
+    const { data: authData, error: authError } = await this.supabaseService.getClient().auth.getUser(token);
+    
+    if (authError || !authData.user) {
+      this.logger.error('Error al validar token de SSO:', authError);
+      throw new UnauthorizedException('Token de sesión inválido');
+    }
+
+    const authUser = authData.user;
+    const { dni, telefono, provincia, localidad } = dto;
+
+    // Verificar si el DNI ya está en uso por otro usuario
+    const existingDni = await this.supabaseService.findUserByDni(dni);
+    if (existingDni && existingDni.id !== authUser.id) {
+      throw new BadRequestException('El DNI ya se encuentra registrado por otro usuario');
+    }
+
+    // 2. Comprobar si ya existe en public.usuarios
+    let publicUser = await this.supabaseService.findUserById(authUser.id);
+    
+    if (!publicUser) {
+      // Si no existe, crearlo. Usar el metadata para extraer nombre si es posible, o dejar string vacío/default.
+      const userMetadata = authUser.user_metadata || {};
+      const nombre = userMetadata.full_name || userMetadata.name || 'Usuario';
+      
+      try {
+        const result = await this.supabaseService.getClient().from('usuarios').insert({
+          id: authUser.id,
+          email: authUser.email,
+          nombre,
+          dni,
+          telefono,
+          provincia,
+          localidad,
+          is_email_verified: true,
+          avatar_url: userMetadata.avatar_url || userMetadata.picture || null
+        }).select().single();
+        
+        if (result.error) throw result.error;
+        publicUser = result.data;
+      } catch (err) {
+        this.logger.error('Error al insertar usuario SSO en public.usuarios:', err);
+        throw new InternalServerErrorException('Error al sincronizar el perfil');
+      }
+    } else {
+      // Si existe, actualizar DNI y los otros campos
+      try {
+        const updateData: any = { dni };
+        if (telefono) updateData.telefono = telefono;
+        if (provincia) updateData.provincia = provincia;
+        if (localidad) updateData.localidad = localidad;
+        
+        publicUser = await this.supabaseService.updateUserProfile(authUser.id, updateData);
+      } catch (err) {
+        this.logger.error('Error al actualizar usuario SSO en public.usuarios:', err);
+        throw new InternalServerErrorException('Error al actualizar el perfil');
+      }
+    }
+
+    // 3. Devolver los datos del perfil
+    const role = await this.supabaseService.getUserRole(authUser.id);
+    
+    return {
+      success: true,
+      user: {
+        id: publicUser.id,
+        nombre: publicUser.nombre,
+        email: publicUser.email,
+        bondaCode: publicUser.bonda_affiliate_code ?? null,
+        telefono: publicUser.telefono ?? null,
+        dni: publicUser.dni ?? null,
+        provincia: publicUser.provincia ?? null,
+        localidad: publicUser.localidad ?? null,
+        avatar_url: publicUser.avatar_url ?? null,
+        role,
+      }
+    };
   }
 }

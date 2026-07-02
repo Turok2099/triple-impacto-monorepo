@@ -18,6 +18,7 @@ export default function MisCuponesPage() {
   useEffect(() => {
     if (authLoading) return;
     if (!user) { router.push('/login'); return; }
+    if (!user.dni) { router.push('/completar-perfil'); return; }
     cargarCupones();
   }, [user, authLoading, router]);
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserPlus, Mail } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
@@ -150,6 +151,21 @@ export default function RegisterPage() {
       console.error("Error en registro:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        }
+      });
+      if (error) throw error;
+    } catch (err: any) {
+      setError(err.message || "Error al registrarse con Google.");
+      console.error("Error en Google register:", err);
     }
   };
 
@@ -516,14 +532,16 @@ export default function RegisterPage() {
             </div>
 
             {/* Social Register */}
-            <div className="mt-6 grid grid-cols-2 gap-3">
+            <div className="mt-6 flex justify-center">
               <button
                 type="button"
+                onClick={handleGoogleLogin}
                 className="w-full inline-flex justify-center items-center gap-2 py-2.5 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm md:text-base font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
               >
-                <span className="text-xl">G</span>
-                Google
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+                Continuar con Google
               </button>
+              {/* Facebook SSO oculto por ahora
               <button
                 type="button"
                 className="w-full inline-flex justify-center items-center gap-2 py-2.5 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm md:text-base font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
@@ -531,6 +549,7 @@ export default function RegisterPage() {
                 <span className="text-xl">f</span>
                 Facebook
               </button>
+              */}
             </div>
           </div>
         </div>

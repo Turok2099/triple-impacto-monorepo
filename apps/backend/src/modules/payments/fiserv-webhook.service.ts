@@ -335,6 +335,31 @@ export class FiservWebhookService {
 
       if (res?.success === false && (isCodeDuplicated || isDniDuplicated)) {
         this.logger.warn(`DNI o Código ${activeCode} ya en uso en Bonda. Se asume que el usuario ya estaba registrado y se procede a habilitarlo en nuestra base.`);
+        
+        try {
+          this.logger.log(
+            `Fiserv webhook: DNI o Código ${activeCode} ya en uso en Bonda. Actualizando perfil de afiliado con nuevos datos...`,
+          );
+          await this.bonda.actualizarAfiliado(
+            activeCode,
+            {
+              nombre: user.nombre ?? undefined,
+              email: activeEmail,
+              telefono: user.telefono ?? undefined,
+              provincia: user.provincia ?? undefined,
+              localidad: user.localidad ?? undefined,
+            },
+            { organizacionId },
+          );
+          this.logger.log(
+            `Fiserv webhook: Datos de afiliado ${activeCode} actualizados correctamente en Bonda.`,
+          );
+        } catch (updateErr: any) {
+          this.logger.error(
+            `Fiserv webhook: Error al intentar actualizar afiliado duplicado ${activeCode} en Bonda: ${updateErr.message}`,
+          );
+        }
+
         // En lugar de crear un usuario fantasma con sufijo, lo consideramos un éxito usando el código original
         res = {
           success: true,

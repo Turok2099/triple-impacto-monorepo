@@ -18,6 +18,8 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CrearTransaccionDto } from './dto/crear-transaccion.dto';
 import { FiservRestService } from './fiserv-rest/fiserv-rest.service';
 import { BondaService } from '../bonda/bonda.service';
+import { FiservQrService } from './fiserv-qr/fiserv-qr.service';
+import { MailService } from '../mail/mail.service';
 
 /** Respuesta de crear-transaccion: params para el form POST a Fiserv + URL del gateway */
 export interface CrearTransaccionResponseDto {
@@ -44,6 +46,8 @@ export class PaymentsController {
     private readonly supabase: SupabaseService,
     private readonly fiservRest: FiservRestService,
     private readonly bondaService: BondaService,
+    private readonly fiservQr: FiservQrService,
+    private readonly mailService: MailService,
   ) {}
 
   /**
@@ -307,6 +311,123 @@ export class PaymentsController {
     await this.fiservWebhook.handleDeclined(body.oid, body.failReason, body.responseCode);
     return { ok: true };
   }
+
+  /**
+   * Webhook de notificaciones en tiempo real para pagos con QR de Fiserv.
+   * Maneja tanto notificaciones estándar como personalizadas.
+   */
+  @Post('qr')
+  @HttpCode(HttpStatus.OK)
+  async handleFiservQrNotification(@Body() body: any): Promise<{ ok: boolean }> {
+    this.logger.log(`Recibido Webhook QR de Fiserv: ${JSON.stringify(body)}`);
+
+    let uuid = body.id || body.uuid;
+    let qrString = body.qr;
+    let orderId = body.idTransaccionExterno || body.idc;
+
+    // Si es notificación estándar, el body tiene uuid pero no detalles de la transacción.
+    // Consultamos la API oficial de Fiserv para validar y obtener detalles de pago de forma segura.
+    if (uuid && (!orderId || !qrString)) {
+      try {
+        this.logger.log(`Consultando detalles de pago en Fiserv para UUID: ${uuid}`);
+        const details = await this.fiservQr.getPaymentStatus(uuid);
+        this.logger.debug(`Detalles obtenidos de Fiserv: ${JSON.stringify(details)}`);
+        
+        qrString = details.qr || qrString;
+        orderId = details.idTransaccionExterno || details.idc || orderId;
+
+        // Si obtenemos el QR de la consulta, podemos parsear el order_id
+        if (qrString && !orderId) {
+          orderId = this.fiservQr.extractOrderIdFromQr(qrString);
+        }
+      } catch (err) {
+        this.logger.error(`Error consultando detalles del pago QR para UUID ${uuid}:`, err);
+        throw new BadRequestException('No se pudo validar el pago QR con la API de Fiserv');
+      }
+    }
+
+    // Si aún no tenemos el orderId pero tenemos el qr en el body
+    if (qrString && !orderId) {
+      orderId = this.fiservQr.extractOrderIdFromQr(qrString);
+    }
+
+    if (!orderId) {
+      this.logger.warn('No se pudo determinar el order_id para la notificación QR. Cuerpo recibido:', body);
+      throw new BadRequestException('No se pudo identificar el ID de la transacción');
+    }
+
+    // Buscar el intento de pago en Supabase.
+    // Como el orderId puede estar truncado a 25 caracteres, buscamos por prefijo.
+    const { data: attempt, error: attemptError } = await this.supabase
+      .getClient()
+      .from('payment_attempts')
+      .select('*')
+      .like('order_id', `${orderId}%`)
+      .maybeSingle();
+
+    if (attemptError || !attempt) {
+      this.logger.warn(`No se encontró intento de pago para orderId=${orderId}`);
+      throw new BadRequestException('Intento de pago no encontrado');
+    }
+
+    if (attempt.status === 'completed') {
+      this.logger.log(`Intento de pago ${attempt.id} ya completado. Ignorando.`);
+      return { ok: true };
+    }
+
+    // Actualizar intento de pago a completado
+    await this.supabase.updatePaymentAttempt(attempt.id, {
+      status: 'completed',
+      fiserv_raw_response: body,
+    });
+
+    // Registrar la donación exitosa
+    const { data: orgData } = await this.supabase
+      .from('organizaciones')
+      .select('nombre')
+      .eq('id', attempt.organizacion_id)
+      .maybeSingle();
+
+    const monto = parseFloat(body.montoPagado) || parseFloat(attempt.amount) || 0;
+
+    await this.supabase.createDonacion({
+      usuario_id: attempt.user_id,
+      monto,
+      moneda: attempt.currency || 'ARS',
+      metodo_pago: 'fiserv-qr',
+      organizacion_id: attempt.organizacion_id || undefined,
+      organizacion_nombre: orgData?.nombre || 'AYNI',
+      estado: 'completada',
+      payment_id: uuid || undefined,
+      payment_status: 'APPROVED',
+    });
+
+    // Registrar la afiliación a Bonda para el usuario
+    if (attempt.organizacion_id) {
+      await this.fiservWebhook.ensureBondaAffiliateForUserAndOrganisation(
+        attempt.user_id,
+        attempt.organizacion_id,
+      );
+    }
+
+    // Obtener información del usuario para enviar comprobante de éxito
+    const user = await this.supabase.findUserById(attempt.user_id);
+    if (user && user.email) {
+      this.mailService.sendPaymentReceiptEmail(user.email, user.nombre || 'Donante', {
+        status: 'approved',
+        amount: String(monto),
+        currency: attempt.currency || 'ARS',
+        approvalCode: 'QR-PAID',
+        oid: attempt.order_id, // Usamos el UUID completo original guardado en BD
+      }).catch(err => {
+        this.logger.error(`Error enviando correo de éxito para orden QR ${attempt.order_id}:`, err);
+      });
+    }
+
+    this.logger.log(`✅ Pago QR conciliado exitosamente para order_id=${attempt.order_id}`);
+    return { ok: true };
+  }
+
 
   @Post('posauth')
   @UseGuards(JwtAuthGuard)

@@ -7,6 +7,7 @@ import { FiservConnectService } from './fiserv-connect/fiserv-connect.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { BondaService } from './../bonda/bonda.service';
 import { MailService } from '../mail/mail.service';
+import { FiservQrService } from './fiserv-qr/fiserv-qr.service';
 
 /**
  * Payload de la notificación servidor a servidor de Fiserv Connect.
@@ -27,6 +28,7 @@ export class FiservWebhookService {
     private readonly supabase: SupabaseService,
     private readonly bonda: BondaService,
     private readonly mailService: MailService,
+    private readonly fiservQrService: FiservQrService,
   ) {}
 
   /**
@@ -222,15 +224,53 @@ export class FiservWebhookService {
 
     this.logger.log(`Fiserv order ${oid} marcada como failed.`);
 
-    // Enviar correo de notificación de declinado
+    // Obtener información del usuario
     const user = await this.supabase.findUserById(attempt.user_id);
-    if (user && user.email) {
+    if (!user || !user.email) {
+      this.logger.warn(`Fiserv declined: usuario o correo no encontrado para el intento de pago ${attempt.id}`);
+      return;
+    }
+
+    try {
+      // Intentar enviar el correo con el QR dinámico de fallback
+      const orgName = attempt.organizacion_id
+        ? (await this.getOrganizacionNombre(attempt.organizacion_id)) || 'AYNI'
+        : 'AYNI';
+
+      const amountNum = parseFloat(attempt.amount) || 0;
+      if (amountNum <= 0) {
+        throw new Error('Monto inválido para generación de QR');
+      }
+
+      // 1. Generar la cadena EMVCo
+      const qrString = this.fiservQrService.generateDynamicQr(amountNum, oid, orgName);
+
+      // 2. Generar el código QR en Base64
+      const qrImageBase64 = await this.fiservQrService.generateQrImage(qrString);
+
+      // 3. Enviar el correo de fallback
+      await this.mailService.sendPaymentFallbackQrEmail(
+        user.email,
+        user.nombre || 'Donante',
+        {
+          amount: String(amountNum),
+          currency: attempt.currency || 'ARS',
+          oid: oid,
+          orgName: orgName,
+        },
+        qrImageBase64,
+      );
+      this.logger.log(`✅ Correo de fallback QR enviado exitosamente para oid=${oid}`);
+    } catch (qrError) {
+      this.logger.error(`Error al generar o enviar QR de fallback para oid=${oid}. Enviando correo de rechazo estándar.`, qrError);
+      
+      // Fallback: Si falla la generación del QR, enviar el correo de rechazo estándar
       this.mailService.sendPaymentReceiptEmail(user.email, user.nombre || 'Donante', {
         status: 'declined',
         oid: oid,
         failReason: failReason || responseCode || 'Rechazado por el procesador de pagos',
       }).catch(err => {
-        this.logger.error(`Error enviando correo de rechazo para oid=${oid}:`, err);
+        this.logger.error(`Error enviando correo de rechazo estándar para oid=${oid}:`, err);
       });
     }
   }

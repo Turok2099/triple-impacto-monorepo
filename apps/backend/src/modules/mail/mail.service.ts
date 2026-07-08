@@ -330,4 +330,89 @@ export class MailService {
       return false;
     }
   }
+
+  /**
+   * Envía un correo con el código QR dinámico cuando un pago con tarjeta falla.
+   */
+  async sendPaymentFallbackQrEmail(
+    userEmail: string,
+    userName: string,
+    orderDetails: {
+      amount: string;
+      currency: string;
+      oid: string;
+      orgName: string;
+    },
+    qrImageBase64: string,
+  ) {
+    try {
+      const subject = '⚠️ Completa tu donación mediante QR - AYNI';
+      const formattedAmount = parseFloat(orderDetails.amount).toLocaleString('es-AR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+      const { data, error } = await this.resend.emails.send({
+        from: `${this.defaultSenderName} <${this.defaultSenderEmail}>`,
+        to: [userEmail],
+        subject: subject,
+        html: `
+          <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
+            <div style="background-color: #40a8ab; padding: 30px; text-align: center;">
+              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto/f_auto/v1775685229/ISOLOGOTIPO_AYNI_FONDO_TRANSPARENTE_iwyuaw.png" alt="AYNI Logo" style="height: 50px;" />
+            </div>
+            <div style="padding: 40px 30px; text-align: center;">
+              <h1 style="color: #40a8ab; font-size: 22px; margin-bottom: 20px; text-align: left;">¡Hola, ${userName}! 👋</h1>
+              <p style="font-size: 15px; line-height: 1.6; color: #555; text-align: left; margin-bottom: 25px;">
+                Notamos que hubo un inconveniente al procesar tu pago con tarjeta para colaborar con <strong>${orderDetails.orgName}</strong>. 
+                ¡No te preocupes! Para facilitarte el proceso, hemos generado un **código QR de pago dinámico** para que puedas completar tu donación de forma simple y segura desde tu celular.
+              </p>
+
+              <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 25px; display: inline-block; width: 80%; box-sizing: border-box; text-align: left;">
+                <div style="margin-bottom: 8px;"><strong>Destinatario:</strong> ${orderDetails.orgName}</div>
+                <div style="margin-bottom: 8px;"><strong>Monto a pagar:</strong> $${formattedAmount} ${orderDetails.currency}</div>
+                <div><strong>Referencia:</strong> <span style="font-family: monospace; font-size: 13px; color: #666;">${orderDetails.oid}</span></div>
+              </div>
+
+              <div style="margin: 30px 0; text-align: center;">
+                <div style="display: inline-block; padding: 15px; border: 2px dashed #40a8ab; border-radius: 12px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
+                  <img src="${qrImageBase64}" alt="Código QR Fiserv" style="width: 240px; height: 240px; display: block;" />
+                </div>
+                <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;">Este QR expira automáticamente en 7 días.</p>
+              </div>
+
+              <div style="background-color: #f1f5f9; border-radius: 8px; padding: 20px; text-align: left; margin-bottom: 30px;">
+                <h4 style="margin-top: 0; margin-bottom: 10px; color: #334155; font-size: 14px;">¿Cómo pagar?</h4>
+                <ol style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.6; color: #475569;">
+                  <li style="margin-bottom: 6px;">Abre la aplicación de tu billetera virtual preferida (Mercado Pago, MODO, Cuenta DNI, Ualá, etc.) o la app de tu banco.</li>
+                  <li style="margin-bottom: 6px;">Selecciona la opción para <strong>Pagar con QR</strong> (escanear).</li>
+                  <li style="margin-bottom: 6px;">Escanea el código QR que se muestra arriba.</li>
+                  <li>Verifica que el monto coincida y confirma el pago.</li>
+                </ol>
+              </div>
+
+              <p style="font-size: 13px; line-height: 1.5; color: #64748b; text-align: left; margin-bottom: 0;">
+                Si tienes alguna consulta o necesitas ayuda, puedes responder directamente a este correo electrónico. ¡Muchas gracias por tu compromiso con el triple impacto!
+              </p>
+            </div>
+            <div style="background-color: #f7f9fc; padding: 20px; text-align: center; color: #718096; font-size: 12px;">
+              <p style="margin: 0;">AYNI - Plataforma Fintech de Reciprocidad</p>
+            </div>
+          </div>
+        `,
+      });
+
+      if (error) {
+        this.logger.error(`Error enviando QR de fallback a ${userEmail}:`, error);
+        return false;
+      }
+
+      this.logger.log(`✅ Correo de QR de fallback enviado a ${userEmail}. Job ID: ${data?.id}`);
+      return true;
+    } catch (err) {
+      this.logger.error(`Excepción enviando QR de fallback a ${userEmail}:`, err);
+      return false;
+    }
+  }
 }
+

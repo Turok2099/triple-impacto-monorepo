@@ -6,11 +6,11 @@ const withAnalyzer = withBundleAnalyzer({
 });
 const cspHeader = `
   default-src 'self';
-  script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://static.cloudflareinsights.com;
+  script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://static.cloudflareinsights.com https://www.googletagmanager.com;
   style-src 'self' 'unsafe-inline';
   img-src 'self' blob: data: https://res.cloudinary.com https:;
   font-src 'self' data:;
-  connect-src 'self' http://localhost:* ws://localhost:* https://*.vercel.live wss://*.vercel.live https://*.up.railway.app https://*.supabase.co https://cloudflareinsights.com;
+  connect-src 'self' http://localhost:* ws://localhost:* https://*.vercel.live wss://*.vercel.live https://*.up.railway.app https://*.supabase.co https://cloudflareinsights.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com;
   object-src 'none';
   base-uri 'self';
   form-action 'self' https://*.ipg-online.com https://*.fiserv.com;

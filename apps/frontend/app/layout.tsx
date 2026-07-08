@@ -4,7 +4,7 @@ import Navbar from "@/components/sections/Navbar/navbar";
 import dynamic from "next/dynamic";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import { GoogleTagManager } from "@next/third-parties/google";
 import "./globals.css";
 
 const Footer = dynamic(() => import("@/components/sections/Footer/footer"));
@@ -51,7 +51,7 @@ export default function RootLayout({
           <CookieConsent />
         </AuthProvider>
         <SpeedInsights />
-        <GoogleAnalytics gaId="G-M5TG1BR274" />
+        <GoogleTagManager gtmId="GTM-P4XBH88X" />
       </body>
     </html>
   );

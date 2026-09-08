@@ -374,41 +374,74 @@ export class FiservWebhookService {
         res?.error?.detail?.dni?.[0]?.includes('único');
 
       if (res?.success === false && (isCodeDuplicated || isDniDuplicated)) {
-        this.logger.warn(`DNI o Código ${activeCode} ya en uso en Bonda. Se asume que el usuario ya estaba registrado y se procede a habilitarlo en nuestra base.`);
-        
-        try {
-          this.logger.log(
-            `Fiserv webhook: DNI o Código ${activeCode} ya en uso en Bonda. Actualizando perfil de afiliado con nuevos datos...`,
-          );
-          await this.bonda.actualizarAfiliado(
-            activeCode,
-            {
-              nombre: user.nombre ?? undefined,
-              email: activeEmail,
-              telefono: user.telefono ?? undefined,
-              provincia: user.provincia ?? undefined,
-              localidad: user.localidad ?? undefined,
-            },
-            { organizacionId },
-          );
-          this.logger.log(
-            `Fiserv webhook: Datos de afiliado ${activeCode} actualizados correctamente en Bonda.`,
-          );
-        } catch (updateErr: any) {
-          this.logger.error(
-            `Fiserv webhook: Error al intentar actualizar afiliado duplicado ${activeCode} en Bonda: ${updateErr.message}`,
-          );
-        }
+        this.logger.warn(
+          `DNI o Código ${activeCode} ya en uso en Bonda. Verificando si corresponde al mismo usuario antes de vincular...`,
+        );
 
-        // En lugar de crear un usuario fantasma con sufijo, lo consideramos un éxito usando el código original
-        res = {
-          success: true,
-          data: {
-            member: {
-              code: activeCode
-            }
+        // Antes de asumir que es el mismo usuario, confirmamos contra Bonda que el
+        // afiliado existente con ese código realmente le pertenece (mismo email).
+        // Sin esta verificación, un DNI/código coincidente por error podría vincular
+        // a este usuario con la identidad Bonda de otra persona.
+        const existingAffiliate = await this.bonda
+          .obtenerAfiliado(activeCode, { organizacionId })
+          .catch((lookupErr: any) => {
+            this.logger.error(
+              `Fiserv webhook: no se pudo obtener el afiliado existente ${activeCode} en Bonda para verificar identidad: ${lookupErr.message}`,
+            );
+            return null;
+          });
+
+        const existingEmail = existingAffiliate?.data?.member?.email
+          ?.toString()
+          .toLowerCase()
+          .trim();
+        const currentEmail = user.email.toLowerCase().trim();
+        const belongsToSameUser =
+          existingAffiliate?.success !== false &&
+          !!existingEmail &&
+          existingEmail === currentEmail;
+
+        if (!belongsToSameUser) {
+          this.logger.error(
+            `Fiserv webhook: DNI o Código ${activeCode} ya está en uso en Bonda por un email (${existingEmail ?? 'desconocido'}) distinto al del usuario actual (${currentEmail}). No se vincula ni se sobrescribe el perfil existente; requiere revisión manual.`,
+          );
+        } else {
+          try {
+            this.logger.log(
+              `Fiserv webhook: DNI o Código ${activeCode} ya en uso en Bonda por el mismo usuario. Actualizando perfil de afiliado con nuevos datos...`,
+            );
+            await this.bonda.actualizarAfiliado(
+              activeCode,
+              {
+                nombre: user.nombre ?? undefined,
+                email: activeEmail,
+                telefono: user.telefono ?? undefined,
+                provincia: user.provincia ?? undefined,
+                localidad: user.localidad ?? undefined,
+              },
+              { organizacionId },
+            );
+            this.logger.log(
+              `Fiserv webhook: Datos de afiliado ${activeCode} actualizados correctamente en Bonda.`,
+            );
+
+            // En lugar de crear un usuario fantasma con sufijo, lo consideramos un éxito usando el código original
+            res = {
+              success: true,
+              data: {
+                member: {
+                  code: activeCode,
+                },
+              },
+            };
+          } catch (updateErr: any) {
+            this.logger.error(
+              `Fiserv webhook: Error al intentar actualizar afiliado duplicado ${activeCode} en Bonda: ${updateErr.message}`,
+            );
+            // No se marca como éxito: si la actualización falla, res permanece con el
+            // error original de Bonda y no se vincula al usuario en Supabase.
           }
-        };
+        }
       }
 
       if (res?.success && res?.data?.member?.code) {

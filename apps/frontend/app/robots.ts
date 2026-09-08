@@ -14,6 +14,6 @@ export default function robots(): MetadataRoute.Robots {
         '/reset-password/'
       ],
     },
-    sitemap: 'https://www.ayni.ar/sitemap.xml',
+    sitemap: 'https://www.clubtripleimpacto.com/sitemap.xml',
   };
 }

@@ -53,8 +53,8 @@ export class FiservHomologationController {
             order: { orderId: saleOrderId },
             authenticationRequest: {
               authenticationType: 'Secure3DAuthenticationRequest',
-              methodNotificationURL: 'https://tripleimpacto.site',
-              termURL: 'https://tripleimpacto.site',
+              methodNotificationURL: 'https://www.clubtripleimpacto.com',
+              termURL: 'https://www.clubtripleimpacto.com',
               messageCategory: '80'
             }
           };

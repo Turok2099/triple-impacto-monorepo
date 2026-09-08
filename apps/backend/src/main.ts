@@ -27,7 +27,9 @@ async function bootstrap() {
         origin.endsWith('.vercel.app') ||
         origin.endsWith('.tripleimpacto.site') ||
         origin.endsWith('.ayni.ar') ||
-        origin === 'https://ayni.ar'
+        origin === 'https://ayni.ar' ||
+        origin.endsWith('.clubtripleimpacto.com') ||
+        origin === 'https://clubtripleimpacto.com'
       ) {
         callback(null, true);
       } else {

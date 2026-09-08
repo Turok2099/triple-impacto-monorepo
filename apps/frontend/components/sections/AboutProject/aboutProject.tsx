@@ -25,7 +25,7 @@ export default function AboutProjectSection() {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight drop-shadow-sm cursor-default mb-6">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2c8184] to-teal-400">
-              AYNI.
+              CLUB TRIPLE IMPACTO.
             </span>
             {" "}
             <span className="text-gray-800">
@@ -34,7 +34,7 @@ export default function AboutProjectSection() {
           </h2>
 
           <p className="text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
-            AYNI es una plataforma que conecta a ONGs, empresas y personas en un ecosistema colaborativo.
+            Club Triple Impacto es una plataforma que conecta a ONGs, empresas y personas en un ecosistema colaborativo.
             Queremos que donar a una causa justa deje de ser un esfuerzo y pase a ser una decisión <span className="font-semibold text-slate-800">inteligente</span> para vos.
           </p>
         </div>

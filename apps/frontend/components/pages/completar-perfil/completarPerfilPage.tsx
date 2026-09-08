@@ -184,8 +184,8 @@ export default function CompletarPerfilPage() {
         
         <div className="bg-[#2c8184] p-8 text-center flex flex-col items-center">
           <img
-            src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto,f_auto,w_200,c_limit/v1775685229/ISOLOGOTIPO_AYNI_FONDO_TRANSPARENTE_iwyuaw.png"
-            alt="AYNI"
+            src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1768059717/LOGO_CLUB_TRIPLE_IMPACTO_jztcqa.png"
+            alt="Club Triple Impacto"
             className="h-12 w-auto object-contain mb-3"
           />
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Completar perfil</h2>
@@ -197,7 +197,7 @@ export default function CompletarPerfilPage() {
           <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3">
             <Gift className="w-6 h-6 text-amber-600 shrink-0" />
             <p className="text-sm text-amber-900 leading-relaxed font-medium">
-              Para el uso de los beneficios de AYNI es <strong>indispensable contar con tu DNI</strong>. ¡Esto te dará acceso a más de 1.700 cupones de descuento!
+              Para el uso de los beneficios de Club Triple Impacto es <strong>indispensable contar con tu DNI</strong>. ¡Esto te dará acceso a más de 1.700 cupones de descuento!
             </p>
           </div>
 

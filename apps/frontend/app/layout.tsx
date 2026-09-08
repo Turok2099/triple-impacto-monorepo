@@ -23,7 +23,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AYNI - Doná y recibí descuentos exclusivos",
+  title: "Club Triple Impacto - Doná y recibí descuentos exclusivos",
   description:
     "Tu donación apoya proyectos sociales y te da acceso a cupones de Bonda. Impacto real, beneficios reales.",
 };

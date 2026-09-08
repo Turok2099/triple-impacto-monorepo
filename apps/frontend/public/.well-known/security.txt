@@ -1,4 +1,4 @@
 Contact: https://www.clubtripleimpacto.com/contact
-Contact: admin@tripleimpacto.site
+Contact: hola@clubtripleimpacto.com
 Preferred-Languages: es
 Canonical: https://www.clubtripleimpacto.com/.well-known/security.txt

@@ -59,8 +59,8 @@ function NavbarContent() {
             {isDonarSlugPage ? (
               <div className="flex items-center">
                 <Image
-                  src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto,f_auto,w_200,c_limit/v1775685229/ISOLOGOTIPO_AYNI_VERDE_FONDO_TRANSPARENTE_lx4yvh.png"
-                  alt="AYNI"
+                  src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1768059717/LOGO_CLUB_TRIPLE_IMPACTO_jztcqa.png"
+                  alt="Club Triple Impacto"
                   width={140}
                   height={46}
                   className="h-14 w-auto object-contain"
@@ -74,8 +74,8 @@ function NavbarContent() {
                 className="flex items-center group transition-transform hover:scale-110"
               >
                 <Image
-                  src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto,f_auto,w_200,c_limit/v1775685229/ISOLOGOTIPO_AYNI_VERDE_FONDO_TRANSPARENTE_lx4yvh.png"
-                  alt="AYNI"
+                  src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1768059717/LOGO_CLUB_TRIPLE_IMPACTO_jztcqa.png"
+                  alt="Club Triple Impacto"
                   width={140}
                   height={46}
                   className="h-14 w-auto object-contain"
@@ -189,11 +189,11 @@ function NavbarContent() {
           <div className="flex items-center justify-between p-5 border-b border-gray-100 shrink-0">
             <div className="flex items-center gap-3">
               <div className="size-10 rounded-xl flex items-center justify-center overflow-hidden bg-white border border-slate-100 p-1.5 shadow-sm">
-                <img src="/icon.png" alt="AYNI" className="w-full h-full object-contain" />
+                <img src="/icon.png" alt="Club Triple Impacto" className="w-full h-full object-contain" />
               </div>
               <div>
                 <div className="text-gray-900 font-black text-lg tracking-tight">
-                  AYNI
+                  Club Triple Impacto
                 </div>
               </div>
             </div>

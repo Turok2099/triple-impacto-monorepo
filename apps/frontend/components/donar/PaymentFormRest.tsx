@@ -239,7 +239,7 @@ export default function PaymentFormRest({ onSuccess, onError }: PaymentFormRestP
           onClick={() => window.location.href = '/dashboard'}
           className="w-full py-4 bg-[#2c8184] text-white rounded-2xl font-semibold hover:bg-teal-600 transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
-          Ir al Dashboard de AYNI <ArrowRight className="w-4 h-4" />
+          Ir al Dashboard de Club Triple Impacto <ArrowRight className="w-4 h-4" />
         </button>
       </div>
     );

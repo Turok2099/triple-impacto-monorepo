@@ -96,10 +96,10 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
                     <a
-                      href="mailto:contacto@ayni.ar"
+                      href="mailto:hola@clubtripleimpacto.com"
                       className="text-[#2c8184] hover:text-[#1e6063] transition-colors"
                     >
-                      contacto@ayni.ar
+                      hola@clubtripleimpacto.com
                     </a>
                     <p className="text-sm text-gray-600 mt-1">
                       Atención 24 horas

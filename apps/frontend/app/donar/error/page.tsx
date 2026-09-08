@@ -61,7 +61,7 @@ function PagoErrorContent() {
             {/* Aviso central de seguridad */}
             <div className="bg-rose-50/50 border border-rose-100 rounded-xl p-5 mb-8 flex gap-3 text-sm text-rose-800">
               <ShieldAlert className="w-5 h-5 flex-shrink-0 text-rose-500" />
-              <p className="font-medium">Ningún débito ha sido aplicado. Al tratarse de Fiserv Connect, tus credenciales ni siquiera transitaron por tu perfil en AYNI.</p>
+              <p className="font-medium">Ningún débito ha sido aplicado. Al tratarse de Fiserv Connect, tus credenciales ni siquiera transitaron por tu perfil en Club Triple Impacto.</p>
             </div>
 
             {/* Botones de acción */}
@@ -82,7 +82,7 @@ function PagoErrorContent() {
 
             <div className="mt-6 flex flex-col items-center justify-center gap-1.5 text-xs text-slate-400">
               <Mail className="w-4 h-4 text-slate-400" />
-              <p>Si la falla persiste, reportala a <a href="mailto:contacto@ayni.ar" className="font-semibold text-slate-500 hover:text-slate-700">contacto@ayni.ar</a></p>
+              <p>Si la falla persiste, reportala a <a href="mailto:hola@clubtripleimpacto.com" className="font-semibold text-slate-500 hover:text-slate-700">hola@clubtripleimpacto.com</a></p>
             </div>
           </div>
         </div>

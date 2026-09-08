@@ -85,7 +85,7 @@ export default function SponsorsSection() {
             <p className="max-w-2xl mx-auto text-xl text-gray-600">
               Empresas comprometidas con{" "}
               <span className="font-bold text-teal-600">
-                AYNI
+                Club Triple Impacto
               </span>{" "}
               que ofrecen beneficios exclusivos a nuestra comunidad
             </p>
@@ -109,7 +109,7 @@ export default function SponsorsSection() {
           <p className="max-w-2xl mx-auto text-xl text-gray-600">
             Empresas comprometidas con{" "}
             <span className="font-bold text-teal-600">
-              AYNI
+              Club Triple Impacto
             </span>{" "}
             que ofrecen beneficios exclusivos a nuestra comunidad
           </p>

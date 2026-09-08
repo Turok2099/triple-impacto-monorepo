@@ -29,7 +29,7 @@ export default function FounderQuote() {
                 Mariano Leguizamón
               </h1>
               <p className="text-gray-600 text-sm text-center">
-                Co Fundador, AYNI
+                Co Fundador, Club Triple Impacto
               </p>
               <p className="text-center text-gray-700 text-base pt-6 font-normal leading-relaxed italic">
                 "La solidaridad es un acto de amor, es un acto de justicia, es un acto de humanidad.{" "}

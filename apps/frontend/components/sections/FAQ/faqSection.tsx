@@ -22,7 +22,7 @@ const faqs: FAQItem[] = [
     id: 1,
     question: "¿Por qué recibo descuentos por donar?",
     answer:
-      "Nuestro modelo de AYNI conecta tu generosidad con comercios aliados que creen en la responsabilidad social. Ellos ofrecen descuentos exclusivos como reconocimiento a tu compromiso con el cambio social. Así, tu donación genera impacto positivo y vos recibís beneficios tangibles.",
+      "Nuestro modelo de Club Triple Impacto conecta tu generosidad con comercios aliados que creen en la responsabilidad social. Ellos ofrecen descuentos exclusivos como reconocimiento a tu compromiso con el cambio social. Así, tu donación genera impacto positivo y vos recibís beneficios tangibles.",
     icon: Gift,
   },
   {
@@ -78,7 +78,7 @@ export default function FAQSection() {
             Preguntas frecuentes
           </h2>
           <p className="text-xl text-gray-600">
-            Todo lo que necesitás saber sobre cómo funciona AYNI
+            Todo lo que necesitás saber sobre cómo funciona Club Triple Impacto
           </p>
         </div>
 

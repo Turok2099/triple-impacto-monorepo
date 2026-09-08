@@ -36,7 +36,7 @@ export default function AboutPage() {
               <div className="w-16 h-1.5 bg-[#2c8184] mx-auto rounded-full"></div>
             </div>
             <p className="text-lg md:text-2xl text-gray-700 leading-relaxed text-center font-medium">
-              <strong className="text-teal-700 font-bold">AYNI</strong> es una plataforma que promueve la reciprocidad y el apoyo mutuo, inspirada en el concepto ancestral andino de &quot;ayni&quot;, que significa &quot;reciprocidad&quot; o &quot;intercambio mutuo&quot;. La plataforma conecta a personas con ONGs y causas socioambientales, permitiendo donaciones, voluntariado digital y acceso a descuentos exclusivos, con el objetivo de crear una comunidad que genere un impacto positivo en la sociedad y el ambiente, promoviendo la solidaridad, la empatía y la reciprocidad.
+              <strong className="text-teal-700 font-bold">Club Triple Impacto</strong> es una plataforma que promueve la reciprocidad y el apoyo mutuo, inspirada en el concepto ancestral andino de &quot;ayni&quot;, que significa &quot;reciprocidad&quot; o &quot;intercambio mutuo&quot;. La plataforma conecta a personas con ONGs y causas socioambientales, permitiendo donaciones, voluntariado digital y acceso a descuentos exclusivos, con el objetivo de crear una comunidad que genere un impacto positivo en la sociedad y el ambiente, promoviendo la solidaridad, la empatía y la reciprocidad.
             </p>
           </div>
         </section>
@@ -56,7 +56,7 @@ export default function AboutPage() {
               Imaginate un mundo donde cada acción cuenta, donde el bien que hacés a otros regresa de manera multiplicada.
             </p>
             <p>
-              En AYNI, creemos en la filosofía ancestral andina de <strong className="text-teal-700 font-bold">&quot;Ayni&quot;</strong>, que significa &quot;el bien que vuelve&quot;.
+              En Club Triple Impacto, creemos en la filosofía ancestral andina de <strong className="text-teal-700 font-bold">&quot;Ayni&quot;</strong>, que significa &quot;el bien que vuelve&quot;.
             </p>
             <p className="font-medium text-gray-900">
               Nuestra plataforma <span className="text-[#2c8184] font-bold">Fintech de Reciprocidad</span> combina tecnología y propósito para revolucionar la forma en que las personas y empresas generan impacto socioambiental.

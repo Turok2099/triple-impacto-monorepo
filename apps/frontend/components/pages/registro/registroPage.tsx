@@ -199,12 +199,12 @@ export default function RegisterPage() {
         {/* Header Similar a PaymentForm */}
         <div className="bg-[#2c8184] p-8 text-center flex flex-col items-center">
           <img
-            src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto,f_auto,w_200,c_limit/v1775685229/ISOLOGOTIPO_AYNI_FONDO_TRANSPARENTE_iwyuaw.png"
-            alt="AYNI"
+            src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1768059717/LOGO_CLUB_TRIPLE_IMPACTO_jztcqa.png"
+            alt="Club Triple Impacto"
             className="h-12 w-auto object-contain mb-3"
           />
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Creá tu cuenta</h2>
-          <p className="text-teal-50 text-sm md:text-base">Unite a AYNI y comenzá a generar impacto</p>
+          <p className="text-teal-50 text-sm md:text-base">Unite a Club Triple Impacto y comenzá a generar impacto</p>
         </div>
 
         <div className="p-8">

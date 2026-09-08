@@ -75,7 +75,7 @@ const testimonials: Testimonial[] = [
     name: "Micaela Romano",
     role: "Analista de Marketing",
     avatar: "👩",
-    text: "Desde el inicio me pareció un beneficio que genera un verdadero círculo virtuoso: impulsa las economías locales, acompaña a una ONG, ofrece valor directo a quienes la utilizamos y permite a las empresas brindar a sus colaboradores un beneficio que hace más eficiente su presupuesto. Gracias a AYNI por trabajar en la mejora continua.",
+    text: "Desde el inicio me pareció un beneficio que genera un verdadero círculo virtuoso: impulsa las economías locales, acompaña a una ONG, ofrece valor directo a quienes la utilizamos y permite a las empresas brindar a sus colaboradores un beneficio que hace más eficiente su presupuesto. Gracias a Club Triple Impacto por trabajar en la mejora continua.",
     rating: 5,
   },
   {
@@ -171,7 +171,7 @@ export default function WhyDonateSection() {
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
-            ¿Por qué donar con AYNI?
+            ¿Por qué donar con Club Triple Impacto?
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Somos el puente entre tu generosidad y el cambio real. Cada donación
@@ -218,7 +218,7 @@ export default function WhyDonateSection() {
         <div className="mb-20">
           <div className="text-center mb-12 px-4">
             <p className="text-xl md:text-2xl font-medium text-gray-800 max-w-4xl mx-auto leading-relaxed">
-              AYNI aborda los 17 ODS, generando beneficios económicos, sociales y ambientales, y promoviendo la sostenibilidad y el desarrollo equitativo.
+              Club Triple Impacto aborda los 17 ODS, generando beneficios económicos, sociales y ambientales, y promoviendo la sostenibilidad y el desarrollo equitativo.
             </p>
           </div>
 

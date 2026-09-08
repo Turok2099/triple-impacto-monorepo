@@ -9,7 +9,7 @@ export default function FAQCTASection() {
           </h2>
           <p className="text-xl text-gray-600 mb-8 max-w-xl mx-auto">
             Encontrá respuestas a las preguntas más frecuentes sobre cómo
-            funciona AYNI
+            funciona Club Triple Impacto
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a

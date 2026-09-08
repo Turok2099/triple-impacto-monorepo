@@ -105,7 +105,7 @@ export default function DonarExclusivePage() {
           <div className="lg:col-span-7 flex justify-center">
             {!isAuthenticated ? (
               <div className="max-w-2xl w-full bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-md">
-                {/* Banner superior estilo AYNI */}
+                {/* Banner superior estilo Club Triple Impacto */}
                 <div className="bg-[#2c8184] p-6 text-center text-white">
                   <h3 className="text-lg font-bold tracking-wide uppercase">
                     {organizacion.nombre?.toUpperCase().startsWith("CLUB")
@@ -122,17 +122,17 @@ export default function DonarExclusivePage() {
                       )}
                       <span className="text-3xl md:text-5xl font-light text-slate-300">+</span>
                       <img
-                        src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto,f_auto,w_200,c_limit/v1775685229/ISOLOGOTIPO_AYNI_VERDE_FONDO_TRANSPARENTE_lx4yvh.png"
-                        alt="AYNI"
+                        src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1768059717/LOGO_CLUB_TRIPLE_IMPACTO_jztcqa.png"
+                        alt="Club Triple Impacto"
                         className="h-14 md:h-24 w-auto object-contain"
                       />
                     </div>
                     <h2 className="sr-only">
-                      {organizacion.nombre} y AYNI - CLUB TRIPLE IMPACTO
+                      {organizacion.nombre} y Club Triple Impacto
                     </h2>
                     <p className="text-slate-500 text-sm md:text-base leading-relaxed text-center max-w-xl mx-auto">
                       {organizacion.nombre?.toUpperCase().includes("PLATO LLENO") ? (
-                        "AYNI y Plato Lleno colaboran para llevar a sus donantes una plataforma de triple impacto única. Con tu aporte mensual, ayudás directamente a sostener el programa de rescate de alimentos de Plato Lleno y, al mismo tiempo, accedés de forma exclusiva a la Red de Beneficios de Club Triple Impacto como agradecimiento por tu compromiso."
+                        "Club Triple Impacto y Plato Lleno colaboran para llevar a sus donantes una plataforma de triple impacto única. Con tu aporte mensual, ayudás directamente a sostener el programa de rescate de alimentos de Plato Lleno y, al mismo tiempo, accedés de forma exclusiva a la Red de Beneficios de Club Triple Impacto como agradecimiento por tu compromiso."
                       ) : (
                         organizacion.descripcion || `¡Sumate y sé parte del Triple Impacto! Con tu aporte mensual, nos ayudás a sostener proyectos de impacto y como agradecimiento accedés a nuestra red de beneficios y descuentos exclusivos.`
                       )}
@@ -287,7 +287,7 @@ export default function DonarExclusivePage() {
               )}
               
               <div className="pt-2 text-center text-[10px] text-slate-400">
-                Donaciones seguras procesadas por AYNI.
+                Donaciones seguras procesadas por Club Triple Impacto.
               </div>
             </div>
           </div>

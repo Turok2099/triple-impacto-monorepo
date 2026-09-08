@@ -33,7 +33,7 @@ export default function PoliticaCookiesPage() {
               Configuración de tu Consentimiento
             </h2>
             <p className="text-sm text-gray-600">
-              Podés modificar las cookies que permitís en AYNI en cualquier momento. Al hacer clic en el botón de la derecha, se abrirá el panel de control.
+              Podés modificar las cookies que permitís en Club Triple Impacto en cualquier momento. Al hacer clic en el botón de la derecha, se abrirá el panel de control.
             </p>
           </div>
           <button
@@ -58,10 +58,10 @@ export default function PoliticaCookiesPage() {
 
           <section className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-100 shadow-sm">
             <h3 className="text-xl font-bold text-gray-900 mb-4 border-b border-gray-100 pb-2">
-              2. ¿Cómo y por qué utilizamos cookies en AYNI?
+              2. ¿Cómo y por qué utilizamos cookies en Club Triple Impacto?
             </h3>
             <p className="text-sm leading-relaxed text-gray-600 mb-4">
-              En AYNI utilizamos cookies por razones técnicas, analíticas y de personalización de beneficios. Nos permiten reconocerte cuando iniciás sesión, asegurar que tus donaciones se procesen correctamente y ofrecerte cupones de descuentos de Bonda ajustados a tu perfil.
+              En Club Triple Impacto utilizamos cookies por razones técnicas, analíticas y de personalización de beneficios. Nos permiten reconocerte cuando iniciás sesión, asegurar que tus donaciones se procesen correctamente y ofrecerte cupones de descuentos de Bonda ajustados a tu perfil.
             </p>
             <div className="grid md:grid-cols-3 gap-6 mt-6">
               <div className="p-4 bg-teal-50/50 rounded-xl border border-teal-50">
@@ -208,8 +208,8 @@ export default function PoliticaCookiesPage() {
               <h4 className="font-bold text-gray-900 text-sm mb-1">Contacto</h4>
               <p className="text-xs text-gray-600 leading-relaxed">
                 Si tenés dudas o querés realizar alguna consulta sobre el manejo de tus datos de navegación, escribinos a{" "}
-                <a href="mailto:contacto@ayni.ar" className="text-[#2c8184] hover:underline font-medium">
-                  contacto@ayni.ar
+                <a href="mailto:hola@clubtripleimpacto.com" className="text-[#2c8184] hover:underline font-medium">
+                  hola@clubtripleimpacto.com
                 </a>
                 . Estaremos encantados de ayudarte.
               </p>

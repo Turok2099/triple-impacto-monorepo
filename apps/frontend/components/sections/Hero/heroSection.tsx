@@ -6,7 +6,7 @@ const cloudinaryLoader = ({ src, width, quality }: { src: string; width: number;
 
 export default function HeroSection() {
   const common = { 
-    alt: "AYNI Hero Background", 
+    alt: "Club Triple Impacto - Fondo del Hero",
     fill: true, 
     priority: true, 
     fetchPriority: "high" as const,
@@ -23,7 +23,7 @@ const desktopUrl = cloudinaryLoader({ src: "v1768268779/Fondo_hero_yzustd.png", 
         <source media="(max-width: 767px)" srcSet={mobileUrl} />
         <img 
           src={desktopUrl}
-          alt="AYNI Hero Background"
+          alt="Club Triple Impacto - Fondo del Hero"
           className="object-cover object-center w-full h-full absolute inset-0"
           loading="eager"
           fetchPriority="high"

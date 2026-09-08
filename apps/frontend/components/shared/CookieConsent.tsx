@@ -103,7 +103,7 @@ export default function CookieConsent() {
             Valoramos tu privacidad
           </h3>
           <p className="text-xs text-gray-600 mt-1 leading-relaxed">
-            Utilizamos cookies para optimizar tu experiencia en AYNI, analizar el tráfico y personalizar los beneficios. Podés configurar tus preferencias en cualquier momento.
+            Utilizamos cookies para optimizar tu experiencia en Club Triple Impacto, analizar el tráfico y personalizar los beneficios. Podés configurar tus preferencias en cualquier momento.
           </p>
         </div>
       </div>

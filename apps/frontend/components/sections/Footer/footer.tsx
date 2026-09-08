@@ -114,8 +114,8 @@ function FooterContent() {
             <div className="flex items-center gap-3 mb-4">
               <Link href="/">
                 <Image
-                  src="https://res.cloudinary.com/dxbtafe9u/image/upload/q_auto,f_auto,w_200,c_limit/v1775685229/ISOLOGOTIPO_AYNI_FONDO_TRANSPARENTE_iwyuaw.png"
-                  alt="AYNI"
+                  src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1768059717/LOGO_CLUB_TRIPLE_IMPACTO_jztcqa.png"
+                  alt="Club Triple Impacto"
                   width={140}
                   height={50}
                   className="object-contain w-[70px] sm:w-[140px] h-auto"
@@ -170,10 +170,10 @@ function FooterContent() {
               <li className="flex items-start gap-3">
                 <Mail className="text-[#2c8184] w-6 h-6 shrink-0 mt-0.5" />
                 <a
-                  href="mailto:contacto@ayni.ar"
+                  href="mailto:hola@clubtripleimpacto.com"
                   className="text-gray-400 hover:text-teal-400 transition-colors"
                 >
-                  contacto@ayni.ar
+                  hola@clubtripleimpacto.com
                 </a>
               </li>
               <li className="flex items-start gap-3">
@@ -249,7 +249,7 @@ function FooterContent() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             {/* Copyright */}
             <div className="text-sm text-gray-400 text-center md:text-left">
-              © {currentYear} AYNI. Todos los derechos
+              © {currentYear} Club Triple Impacto. Todos los derechos
               reservados.
             </div>
 

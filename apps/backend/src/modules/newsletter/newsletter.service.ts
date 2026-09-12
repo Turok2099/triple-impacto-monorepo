@@ -32,10 +32,16 @@ export class NewsletterService {
             .update({ activo: true })
             .eq('id', existingUser.id);
           this.logger.log(`Reactivado suscriptor de newsletter: ${email}`);
-          return { status: 'reactivado', message: '¡Qué bueno tenerte de vuelta en nuestra lista!' };
+          return {
+            status: 'reactivado',
+            message: '¡Qué bueno tenerte de vuelta en nuestra lista!',
+          };
         }
         // Ya está activo
-        return { status: 'existente', message: '¡Ya estás suscrito al Newsletter de AYNI!' };
+        return {
+          status: 'existente',
+          message: '¡Ya estás suscrito al Newsletter de AYNI!',
+        };
       }
 
       // 2. Si no existe, lo insertamos
@@ -44,7 +50,10 @@ export class NewsletterService {
         .insert({ email, activo: true });
 
       if (insertError) {
-        this.logger.error('Error insertando en newsletter_suscriptores:', insertError);
+        this.logger.error(
+          'Error insertando en newsletter_suscriptores:',
+          insertError,
+        );
         throw new Error('Error al registrar la suscripción.');
       }
 
@@ -52,7 +61,10 @@ export class NewsletterService {
       await this.mailService.sendNewsletterWelcomeEmail(email);
 
       this.logger.log(`Nuevo suscriptor de newsletter registrado: ${email}`);
-      return { status: 'exito', message: 'Suscripción exitosa. ¡Revisá tu bandeja de entrada!' };
+      return {
+        status: 'exito',
+        message: 'Suscripción exitosa. ¡Revisá tu bandeja de entrada!',
+      };
     } catch (error) {
       this.logger.error('Excepción en suscripción de newsletter:', error);
       throw new Error('No se pudo procesar tu suscripción en este momento.');

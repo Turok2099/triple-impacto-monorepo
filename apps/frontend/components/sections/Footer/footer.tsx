@@ -7,8 +7,6 @@ import {
   Linkedin,
   Mail,
   Phone,
-  MapPin,
-  Clock,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -31,16 +29,21 @@ function FooterContent() {
   const searchParams = useSearchParams();
   const redirectParam = searchParams?.get("redirect");
 
-  const isDonarSlugPage = 
-    (pathname?.startsWith("/donar/") && !["/donar/success", "/donar/error", "/donar"].includes(pathname)) ||
-    (redirectParam?.startsWith("/donar/") && !["/donar/success", "/donar/error", "/donar"].includes(redirectParam));
+  const isDonarSlugPage =
+    (pathname?.startsWith("/donar/") &&
+      !["/donar/success", "/donar/error", "/donar"].includes(pathname)) ||
+    (redirectParam?.startsWith("/donar/") &&
+      !["/donar/success", "/donar/error", "/donar"].includes(redirectParam));
 
   const currentYear = new Date().getFullYear();
 
   // Newsletter State
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState<{ type: "success" | "error" | null; message: string }>({ type: null, message: "" });
+  const [status, setStatus] = useState<{
+    type: "success" | "error" | null;
+    message: string;
+  }>({ type: null, message: "" });
 
   if (isDonarSlugPage) return null;
 
@@ -52,7 +55,8 @@ function FooterContent() {
     setStatus({ type: null, message: "" });
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+      const baseUrl =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
       const res = await fetch(`${baseUrl}/newsletter/subscribe`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -65,7 +69,10 @@ function FooterContent() {
         throw new Error(data.message || "Error al procesar la suscripción.");
       }
 
-      setStatus({ type: "success", message: data.message || "¡Suscripción exitosa!" });
+      setStatus({
+        type: "success",
+        message: data.message || "¡Suscripción exitosa!",
+      });
       setEmail("");
     } catch (err: any) {
       setStatus({ type: "error", message: err.message || "Ocurrió un error." });
@@ -114,7 +121,7 @@ function FooterContent() {
             <div className="flex items-center gap-3 mb-4">
               <Link href="/">
                 <Image
-                  src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1768059717/LOGO_CLUB_TRIPLE_IMPACTO_jztcqa.png"
+                  src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1789230698/ISOLOGOTIPO_BLANCO_CLUB_TRIPLE_IMPACTO_FONDO_TRANSPARENTE_wxyw9l.png"
                   alt="Club Triple Impacto"
                   width={140}
                   height={50}
@@ -124,7 +131,8 @@ function FooterContent() {
               </Link>
             </div>
             <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-            Transformamos tu generosidad en impacto social y ambiental real real y en beneficios exclusivos. Doná, ayudá y ahorrá.
+              Transformamos tu generosidad en impacto social y ambiental real
+              real y en beneficios exclusivos. Doná, ayudá y ahorrá.
             </p>
             {/* Redes sociales */}
             <div className="flex gap-3">
@@ -153,7 +161,8 @@ function FooterContent() {
               ONGs Aliadas
             </div>
             <p className="text-sm text-gray-400 mb-4 leading-relaxed">
-              Conocé todas las organizaciones que forman parte de nuestra comunidad.
+              Conocé todas las organizaciones que forman parte de nuestra
+              comunidad.
             </p>
             <Link
               href="/ongs"
@@ -165,7 +174,9 @@ function FooterContent() {
 
           {/* Columna 4: Contacto */}
           <div>
-            <div className="text-white font-semibold text-lg mb-4">Contacto</div>
+            <div className="text-white font-semibold text-lg mb-4">
+              Contacto
+            </div>
             <ul className="space-y-4 text-sm mb-6">
               <li className="flex items-start gap-3">
                 <Mail className="text-[#2c8184] w-6 h-6 shrink-0 mt-0.5" />
@@ -187,16 +198,6 @@ function FooterContent() {
                   +54 11 5639-3261 (WhatsApp)
                 </a>
               </li>
-              <li className="flex items-start gap-3">
-                <MapPin className="text-[#2c8184] w-6 h-6 shrink-0 mt-0.5" />
-                <span className="text-gray-400">
-                  Caseros 1213, San Isidro, Buenos Aires
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <Clock className="text-[#2c8184] w-6 h-6 shrink-0 mt-0.5" />
-                <span className="text-gray-400">Atención 24 horas</span>
-              </li>
             </ul>
 
             <a
@@ -208,7 +209,9 @@ function FooterContent() {
 
             {/* Newsletter */}
             <div className="mt-6">
-              <div className="text-white font-medium text-sm mb-3">Newsletter</div>
+              <div className="text-white font-medium text-sm mb-3">
+                Newsletter
+              </div>
               <form onSubmit={handleSubscribe} className="flex flex-col gap-2">
                 <div className="flex gap-2">
                   <input
@@ -220,20 +223,22 @@ function FooterContent() {
                     disabled={loading}
                     className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2c8184] disabled:opacity-50"
                   />
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     disabled={loading}
                     className="px-4 py-2 bg-[#2c8184] hover:bg-[#1e6063] text-white rounded-lg transition-colors text-sm font-medium disabled:opacity-50 flex items-center justify-center shrink-0 w-12"
                   >
                     {loading ? (
-                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                     ) : (
                       "→"
                     )}
                   </button>
                 </div>
                 {status.type && (
-                  <div className={`text-xs px-2 py-1.5 rounded-lg border ${status.type === 'success' ? 'bg-[#2c8184]/10 text-teal-400 border-[#2c8184]/20' : 'bg-red-500/10 text-red-400 border-red-500/20'} animate-in fade-in slide-in-from-top-1`}>
+                  <div
+                    className={`text-xs px-2 py-1.5 rounded-lg border ${status.type === "success" ? "bg-[#2c8184]/10 text-teal-400 border-[#2c8184]/20" : "bg-red-500/10 text-red-400 border-red-500/20"} animate-in fade-in slide-in-from-top-1`}
+                  >
                     {status.message}
                   </div>
                 )}

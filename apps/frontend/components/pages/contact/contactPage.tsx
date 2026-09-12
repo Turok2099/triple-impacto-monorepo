@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Phone, MapPin, Send, Clock, Loader2 } from "lucide-react";
+import { Mail, Phone, Send, Loader2 } from "lucide-react";
 import Swal from "sweetalert2";
 
 export default function ContactPage() {
@@ -133,46 +133,6 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              {/* Ubicación */}
-              <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-                <div className="flex items-start gap-4">
-                  <div className="shrink-0 w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                    <MapPin className="w-6 h-6 text-purple-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">
-                      Ubicación
-                    </h3>
-                    <p className="text-gray-600">Caseros 1213</p>
-                    <p className="text-gray-600">San Isidro, Buenos Aires</p>
-                    <p className="text-sm text-gray-600 mt-1">Argentina</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Horarios de atención */}
-              <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-                <div className="flex items-start gap-4">
-                  <div className="shrink-0 w-12 h-12 bg-sky-100 rounded-xl flex items-center justify-center">
-                    <Clock className="w-6 h-6 text-sky-600" />
-                  </div>
-                  <div className="w-full">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-semibold text-gray-900">
-                        Horarios
-                      </h3>
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#2c8184] mr-1.5 animate-pulse"></span>
-                        En línea
-                      </span>
-                    </div>
-                    <p className="text-gray-600">Disponibles 24/7</p>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Todos los días de la semana
-                    </p>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Preguntas frecuentes */}

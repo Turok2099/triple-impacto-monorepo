@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { getOrganizaciones, createOrganizacion, updateOrganizacion, deleteOrganizacion, uploadLogo, Ong, permanentDeleteOrganizacion } from "@/lib/admin-ongs";
-import { Plus, Edit2, Trash2, X, Building2, Link as LinkIcon, DollarSign, ShieldAlert, Key, Upload, Eye, EyeOff } from "lucide-react";
+import { Plus, Edit2, Trash2, X, Building2, Link as LinkIcon, DollarSign, ShieldAlert, Key, Upload, Eye, EyeOff, Copy, Check } from "lucide-react";
 
 export default function SeccionAdminOngs() {
   const [ongs, setOngs] = useState<Ong[]>([]);
@@ -17,6 +17,17 @@ export default function SeccionAdminOngs() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showSecrets, setShowSecrets] = useState(false);
+  const [copiedLink, setCopiedLink] = useState<string | null>(null);
+
+  const handleCopyLink = async (url: string, key: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedLink(key);
+      setTimeout(() => setCopiedLink(current => (current === key ? null : current)), 1500);
+    } catch (err) {
+      Swal.fire("Error", "No se pudo copiar el link", "error");
+    }
+  };
 
 
 
@@ -118,21 +129,6 @@ export default function SeccionAdminOngs() {
       await updateOrganizacion(token, ong.id, { activa: newStatus });
     } catch (err: any) {
       Swal.fire("Error", "No se pudo cambiar el estado: " + err.message, "error");
-      fetchOngs(); // revertir si falla
-    }
-  };
-
-  const handleToggleFiservStatus = async (ong: Ong) => {
-    try {
-      const token = localStorage.getItem("auth_token") || "";
-      const newStatus = !ong.fiserv_activo;
-
-      // Actualización optimista de UI
-      setOngs(ongs.map(o => o.id === ong.id ? { ...o, fiserv_activo: newStatus } : o));
-
-      await updateOrganizacion(token, ong.id, { fiserv_activo: newStatus });
-    } catch (err: any) {
-      Swal.fire("Error", "No se pudo cambiar el estado Fiserv: " + err.message, "error");
       fetchOngs(); // revertir si falla
     }
   };
@@ -269,8 +265,11 @@ export default function SeccionAdminOngs() {
           <tbody className="divide-y divide-slate-100">
             {ongs.map((ong) => {
               const bonda = ong.bonda_microsites && ong.bonda_microsites.length > 0 ? ong.bonda_microsites[0] : null;
+              const fiservOk = !!(ong.fiserv_activo && ong.fiserv_store_id && ong.fiserv_shared_secret);
+              const bondaUrl = bonda ? (bonda.slug.startsWith('http') ? bonda.slug : `https://${bonda.slug}`) : null;
+              const donacionUrl = ong.slug ? `${typeof window !== "undefined" ? window.location.origin : ""}/donar/${ong.slug}` : null;
               return (
-                <tr key={ong.id} className="hover:bg-slate-50/50 transition-colors">
+                <tr key={ong.id} className={`transition-colors ${fiservOk && ong.activa ? 'bg-blue-50/60 hover:bg-blue-50' : 'hover:bg-slate-50/50'}`}>
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-3">
                       <div className="size-20 rounded-xl bg-slate-100 overflow-hidden shrink-0 flex items-center justify-center border border-slate-200">
@@ -285,24 +284,33 @@ export default function SeccionAdminOngs() {
                   <td className="py-4 px-6">
                     <div className="flex flex-col gap-1.5 items-start">
                       <div className="flex items-center gap-1 text-xs">
-                        {(ong.fiserv_store_id && ong.fiserv_shared_secret) ? <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-medium">FISERV OK</span> : <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-medium">SIN STORE PARA PAGO</span>}
+                        {fiservOk ? <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-medium">FISERV OK</span> : <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-medium">SIN STORE PARA PAGO</span>}
                       </div>
                       <div className="flex items-center gap-1 text-xs">
-                        {bonda ? (
-                          <a
-                            href={bonda.slug.startsWith('http') ? bonda.slug : `https://${bonda.slug}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="bg-purple-100 text-purple-700 hover:bg-purple-200 px-2 py-0.5 rounded font-semibold transition-colors flex items-center gap-1"
-                          >
-                            <LinkIcon className="w-2.5 h-2.5" />
-                            Bonda: {bonda.slug.replace(/^https?:\/\//, '')}
-                          </a>
+                        {bonda && bondaUrl ? (
+                          <>
+                            <a
+                              href={bondaUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="bg-purple-100 text-purple-700 hover:bg-purple-200 px-2 py-0.5 rounded font-semibold transition-colors flex items-center gap-1"
+                            >
+                              <LinkIcon className="w-2.5 h-2.5" />
+                              Bonda: {bonda.slug.replace(/^https?:\/\//, '')}
+                            </a>
+                            <button
+                              onClick={() => handleCopyLink(bondaUrl, `bonda-${ong.id}`)}
+                              className="p-1 text-slate-400 hover:text-purple-700 hover:bg-purple-50 rounded transition-colors"
+                              title="Copiar link de Bonda"
+                            >
+                              {copiedLink === `bonda-${ong.id}` ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                            </button>
+                          </>
                         ) : (
                           <span className="bg-red-50 text-red-500 px-2 py-0.5 rounded font-medium">Sin Bonda</span>
                         )}
                       </div>
-                      {ong.slug && (
+                      {ong.slug && donacionUrl && (
                         <div className="flex items-center gap-1 text-xs">
                           <a
                             href={`/donar/${ong.slug}`}
@@ -313,6 +321,13 @@ export default function SeccionAdminOngs() {
                             <LinkIcon className="w-2.5 h-2.5" />
                             Donación: /{ong.slug}
                           </a>
+                          <button
+                            onClick={() => handleCopyLink(donacionUrl, `donacion-${ong.id}`)}
+                            className="p-1 text-slate-400 hover:text-[#2c8184] hover:bg-teal-50 rounded transition-colors"
+                            title="Copiar link de donación"
+                          >
+                            {copiedLink === `donacion-${ong.id}` ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                          </button>
                         </div>
                       )}
                     </div>
@@ -331,21 +346,6 @@ export default function SeccionAdminOngs() {
                         >
                           <span className="sr-only">Habilitar ONG</span>
                           <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${ong.activa ? 'translate-x-6' : 'translate-x-1'}`} />
-                        </button>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <span className={`text-xs font-medium w-16 ${ong.fiserv_activo ? 'text-blue-600' : 'text-slate-400'}`}>
-                          Fiserv
-                        </span>
-                        <button
-                          onClick={() => handleToggleFiservStatus(ong)}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${ong.fiserv_activo ? 'bg-blue-500' : 'bg-slate-200'}`}
-                          role="switch"
-                          aria-checked={ong.fiserv_activo}
-                        >
-                          <span className="sr-only">Habilitar Fiserv</span>
-                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${ong.fiserv_activo ? 'translate-x-6' : 'translate-x-1'}`} />
                         </button>
                       </div>
                     </div>
@@ -412,7 +412,7 @@ export default function SeccionAdminOngs() {
                     </div>
                     <div className="col-span-2">
                       <label className="block text-sm font-semibold text-slate-700 mb-1">Slug de Donación Exclusivo (amigable)</label>
-                      <input placeholder="ej: fundacion-padres (dejar vacío para deshabilitar exclusive link)" value={formData.slug} onChange={e => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, '') })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
+                      <input placeholder="ej: fundacion-padres (dejar vacío para deshabilitar exclusive link)" value={formData.slug} onChange={e => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, '') })} onBlur={e => setFormData({ ...formData, slug: e.target.value.replace(/^[-_]+|[-_]+$/g, '') })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none" />
                       <p className="text-xs text-slate-500 mt-1">
                         Si se define, la URL exclusiva será:{" "}
                         {formData.slug ? (

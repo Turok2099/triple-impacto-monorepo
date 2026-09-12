@@ -1,4 +1,19 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards, Req, UseInterceptors, UploadedFile, BadRequestException, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  Query,
+  UseGuards,
+  Req,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
+  Res,
+} from '@nestjs/common';
 import type { Response } from 'express';
 import { AdminService } from './admin.service';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -19,7 +34,13 @@ export class AdminController {
     @Query('ongId') ongId?: string,
     @Query('bondaStatus') bondaStatus?: string,
   ) {
-    return this.adminService.getUsers(Number(page), Number(limit), search, ongId, bondaStatus);
+    return this.adminService.getUsers(
+      Number(page),
+      Number(limit),
+      search,
+      ongId,
+      bondaStatus,
+    );
   }
 
   @Get('users/export')
@@ -31,10 +52,61 @@ export class AdminController {
     @Query('bondaStatus') bondaStatus?: string,
   ) {
     const adminId = req.user?.userId;
-    const buffer = await this.adminService.exportUsersToExcel(adminId, search, ongId, bondaStatus);
-    
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename=usuarios_registrados.xlsx');
+    const buffer = await this.adminService.exportUsersToExcel(
+      adminId,
+      search,
+      ongId,
+      bondaStatus,
+    );
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename=usuarios_registrados.xlsx',
+    );
+    res.send(buffer);
+  }
+
+  @Get('reportes/bonda-mensual')
+  async getReporteBondaMensual(
+    @Query('desde') desde?: string,
+    @Query('hasta') hasta?: string,
+    @Query('organizacionId') organizacionId?: string,
+  ) {
+    return this.adminService.getReporteBondaMensual(
+      desde,
+      hasta,
+      organizacionId,
+    );
+  }
+
+  @Get('reportes/bonda-mensual/export')
+  async exportReporteBondaMensual(
+    @Req() req: any,
+    @Res() res: Response,
+    @Query('desde') desde?: string,
+    @Query('hasta') hasta?: string,
+    @Query('organizacionId') organizacionId?: string,
+  ) {
+    const adminId = req.user?.userId;
+    const buffer = await this.adminService.exportReporteBondaMensual(
+      adminId,
+      desde,
+      hasta,
+      organizacionId,
+    );
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename=reporte_bonda_mensual.xlsx',
+    );
     res.send(buffer);
   }
 
@@ -50,14 +122,22 @@ export class AdminController {
   }
 
   @Patch('users/:id')
-  async updateUser(@Req() req: any, @Param('id') userId: string, @Body() payload: any) {
+  async updateUser(
+    @Req() req: any,
+    @Param('id') userId: string,
+    @Body() payload: any,
+  ) {
     const adminId = req.user?.userId;
     return this.adminService.updateUser(adminId, userId, payload);
   }
 
   @Patch('users/:id/role')
   @Roles('admin')
-  async updateUserRole(@Req() req: any, @Param('id') userId: string, @Body() payload: { role: string }) {
+  async updateUserRole(
+    @Req() req: any,
+    @Param('id') userId: string,
+    @Body() payload: { role: string },
+  ) {
     const adminId = req.user?.userId;
     return this.adminService.updateUserRole(adminId, userId, payload.role);
   }
@@ -70,20 +150,31 @@ export class AdminController {
 
   @Delete('users/:id/affiliate/:bondaCode/microsite/:micrositeId')
   async deleteAffiliate(
-    @Req() req: any, 
-    @Param('id') userId: string, 
+    @Req() req: any,
+    @Param('id') userId: string,
     @Param('bondaCode') bondaCode: string,
-    @Param('micrositeId') micrositeId: string
+    @Param('micrositeId') micrositeId: string,
   ) {
     const adminId = req.user?.userId;
-    return this.adminService.deleteAffiliate(adminId, userId, bondaCode, micrositeId);
+    return this.adminService.deleteAffiliate(
+      adminId,
+      userId,
+      bondaCode,
+      micrositeId,
+    );
   }
 
   @Get('users/bulk-upload-template')
   async downloadBulkUploadTemplate(@Res() res: Response) {
     const buffer = await this.adminService.generateBulkUploadTemplate();
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename=plantilla_usuarios_bonda.xlsx');
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename=plantilla_usuarios_bonda.xlsx',
+    );
     res.send(buffer);
   }
 
@@ -122,7 +213,11 @@ export class AdminController {
   }
 
   @Patch('organizaciones/:id')
-  async updateOrganizacion(@Req() req: any, @Param('id') id: string, @Body() payload: any) {
+  async updateOrganizacion(
+    @Req() req: any,
+    @Param('id') id: string,
+    @Body() payload: any,
+  ) {
     const adminId = req.user?.userId;
     return this.adminService.updateOrganizacion(adminId, id, payload);
   }
@@ -164,7 +259,11 @@ export class AdminController {
   }
 
   @Patch('banners/:id')
-  async updateBanner(@Req() req: any, @Param('id') id: string, @Body() payload: any) {
+  async updateBanner(
+    @Req() req: any,
+    @Param('id') id: string,
+    @Body() payload: any,
+  ) {
     const adminId = req.user?.userId;
     return this.adminService.updateBanner(adminId, id, payload);
   }

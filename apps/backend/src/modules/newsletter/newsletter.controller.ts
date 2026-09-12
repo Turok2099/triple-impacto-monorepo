@@ -1,4 +1,11 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  BadRequestException,
+} from '@nestjs/common';
 import { NewsletterService } from './newsletter.service';
 import { SubscribeDto } from './dtos/subscribe.dto';
 

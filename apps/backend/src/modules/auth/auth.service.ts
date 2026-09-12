@@ -42,8 +42,16 @@ export class AuthService {
    * 4. Genera JWT
    */
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
-    const { email, password, nombre, telefono, dni, provincia, localidad, acceptsNewsletter } =
-      registerDto;
+    const {
+      email,
+      password,
+      nombre,
+      telefono,
+      dni,
+      provincia,
+      localidad,
+      acceptsNewsletter,
+    } = registerDto;
 
     // 1. Verificar si el DNI ya existe (si es que enviaron uno)
     if (dni) {
@@ -86,17 +94,25 @@ export class AuthService {
     // Usamos el token autogenerado por Supabase en la columna email_verification_token
     const verificationToken = usuario.email_verification_token;
     if (verificationToken) {
-      this.mailService.sendVerificationEmail(email, nombre, verificationToken).catch((err) => {
-        this.logger.error('Fallo no crítico: no se pudo enviar correo de bienvenida', err);
-      });
+      this.mailService
+        .sendVerificationEmail(email, nombre, verificationToken)
+        .catch((err) => {
+          this.logger.error(
+            'Fallo no crítico: no se pudo enviar correo de bienvenida',
+            err,
+          );
+        });
     } else {
       this.logger.warn(`No se encontró token de verificación para ${email}`);
     }
 
     // 5. Suscribir al newsletter si aceptó
     if (acceptsNewsletter) {
-      this.newsletterService.subscribe({ email }).catch(err => {
-        this.logger.error(`Fallo no crítico: no se pudo suscribir al newsletter a ${email}`, err);
+      this.newsletterService.subscribe({ email }).catch((err) => {
+        this.logger.error(
+          `Fallo no crítico: no se pudo suscribir al newsletter a ${email}`,
+          err,
+        );
       });
     }
 
@@ -131,7 +147,9 @@ export class AuthService {
 
     // 2. Verificar si está verificado el correo electrónico
     if (usuario.is_email_verified === false) {
-      throw new UnauthorizedException('Debes confirmar tu correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada.');
+      throw new UnauthorizedException(
+        'Debes confirmar tu correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada.',
+      );
     }
 
     // 3. Verificar contraseña
@@ -174,7 +192,9 @@ export class AuthService {
       .single();
 
     if (findError || !usuario) {
-      throw new BadRequestException('Token de verificación inválido o expirado.');
+      throw new BadRequestException(
+        'Token de verificación inválido o expirado.',
+      );
     }
 
     if (usuario.is_email_verified) {
@@ -190,7 +210,10 @@ export class AuthService {
       .eq('id', usuario.id);
 
     if (updateError) {
-      this.logger.error('Error al actualizar verificación de correo:', updateError);
+      this.logger.error(
+        'Error al actualizar verificación de correo:',
+        updateError,
+      );
       throw new InternalServerErrorException('No se pudo verificar la cuenta.');
     }
 
@@ -201,14 +224,21 @@ export class AuthService {
   /**
    * Reenviar correo de verificación
    */
-  async resendVerification(dto: ResendVerificationDto): Promise<{ message: string }> {
+  async resendVerification(
+    dto: ResendVerificationDto,
+  ): Promise<{ message: string }> {
     const { email } = dto;
     const usuario = await this.supabaseService.findUserByEmail(email);
 
     // Retorna éxito encubierto para no permitir enumeración de cuentas
     if (!usuario) {
-      this.logger.warn(`resendVerification solicitado para correo inexistente: ${email}`);
-      return { message: 'Si tu cuenta existe y no está verificada, te hemos enviado un nuevo enlace.' };
+      this.logger.warn(
+        `resendVerification solicitado para correo inexistente: ${email}`,
+      );
+      return {
+        message:
+          'Si tu cuenta existe y no está verificada, te hemos enviado un nuevo enlace.',
+      };
     }
 
     if (usuario.is_email_verified) {
@@ -226,16 +256,29 @@ export class AuthService {
       .eq('id', usuario.id);
 
     if (updateError) {
-      this.logger.error('Error al generar nuevo token de verificación:', updateError);
-      throw new InternalServerErrorException('No se pudo procesar tu solicitud.');
+      this.logger.error(
+        'Error al generar nuevo token de verificación:',
+        updateError,
+      );
+      throw new InternalServerErrorException(
+        'No se pudo procesar tu solicitud.',
+      );
     }
 
     // Enviar correo
-    this.mailService.sendVerificationEmail(email, usuario.nombre, newVerificationToken).catch((err) => {
-      this.logger.error('Fallo no crítico al reenviar correo de bienvenida', err);
-    });
+    this.mailService
+      .sendVerificationEmail(email, usuario.nombre, newVerificationToken)
+      .catch((err) => {
+        this.logger.error(
+          'Fallo no crítico al reenviar correo de bienvenida',
+          err,
+        );
+      });
 
-    return { message: 'Si tu cuenta existe y no está verificada, te hemos enviado un nuevo enlace.' };
+    return {
+      message:
+        'Si tu cuenta existe y no está verificada, te hemos enviado un nuevo enlace.',
+    };
   }
 
   /**
@@ -247,8 +290,13 @@ export class AuthService {
 
     // Retorna éxito encubierto para no permitir enumeración de cuentas
     if (!usuario) {
-      this.logger.warn(`forgotPassword solicitado para correo inexistente: ${email}`);
-      return { message: 'Si el correo existe en nuestra base de datos, te hemos enviado un enlace de recuperación.' };
+      this.logger.warn(
+        `forgotPassword solicitado para correo inexistente: ${email}`,
+      );
+      return {
+        message:
+          'Si el correo existe en nuestra base de datos, te hemos enviado un enlace de recuperación.',
+      };
     }
 
     // Generar token UUID y Fecha de Expiración (1 hora)
@@ -266,15 +314,22 @@ export class AuthService {
 
     if (updateError) {
       this.logger.error('Error al guardar token de reseteo:', updateError);
-      throw new InternalServerErrorException('No se pudo procesar la solicitud.');
+      throw new InternalServerErrorException(
+        'No se pudo procesar la solicitud.',
+      );
     }
 
     // Enviar correo electrónico
-    this.mailService.sendPasswordResetEmail(email, usuario.nombre, resetToken).catch((err) => {
-      this.logger.error('Fallo no crítico al enviar correo de reseteo', err);
-    });
+    this.mailService
+      .sendPasswordResetEmail(email, usuario.nombre, resetToken)
+      .catch((err) => {
+        this.logger.error('Fallo no crítico al enviar correo de reseteo', err);
+      });
 
-    return { message: 'Si el correo existe en nuestra base de datos, te hemos enviado un enlace de recuperación.' };
+    return {
+      message:
+        'Si el correo existe en nuestra base de datos, te hemos enviado un enlace de recuperación.',
+    };
   }
 
   /**
@@ -290,13 +345,17 @@ export class AuthService {
       .single();
 
     if (findError || !usuario) {
-      throw new BadRequestException('El enlace es inválido o el usuario no existe.');
+      throw new BadRequestException(
+        'El enlace es inválido o el usuario no existe.',
+      );
     }
 
     // Validar expiración (Timestamptz vs Date.now)
     const expiresAt = new Date(usuario.password_reset_expires).getTime();
     if (expiresAt < Date.now()) {
-      throw new BadRequestException('Este enlace ha caducado. Solicita uno nuevo.');
+      throw new BadRequestException(
+        'Este enlace ha caducado. Solicita uno nuevo.',
+      );
     }
 
     // Hashear y guardar nueva clave limpiando tokens
@@ -313,11 +372,18 @@ export class AuthService {
       .eq('id', usuario.id);
 
     if (updateError) {
-      this.logger.error('Error al actualizar la contraseña del usuario:', updateError);
-      throw new InternalServerErrorException('Hubo un problema actualizando la contraseña.');
+      this.logger.error(
+        'Error al actualizar la contraseña del usuario:',
+        updateError,
+      );
+      throw new InternalServerErrorException(
+        'Hubo un problema actualizando la contraseña.',
+      );
     }
 
-    this.logger.log(`✅ Contraseña restablaciada con token: usuario ID ${usuario.id}`);
+    this.logger.log(
+      `✅ Contraseña restablaciada con token: usuario ID ${usuario.id}`,
+    );
     return { message: 'Tu contraseña ha sido actualizada con éxito.' };
   }
 
@@ -329,7 +395,7 @@ export class AuthService {
       sub: usuario.id,
       email: usuario.email,
       bondaCode: usuario.bonda_affiliate_code ?? null,
-      app_metadata: { role }
+      app_metadata: { role },
     };
 
     return this.jwtService.sign(payload);
@@ -416,8 +482,13 @@ export class AuthService {
     if (!file) {
       throw new BadRequestException('No se proporcionó ningún archivo');
     }
-    const publicUrl = await this.supabaseService.uploadAvatar(userId, file.buffer, file.mimetype, file.originalname);
-    
+    const publicUrl = await this.supabaseService.uploadAvatar(
+      userId,
+      file.buffer,
+      file.mimetype,
+      file.originalname,
+    );
+
     this.logger.log(`✅ Foto de perfil actualizada para usuario ID: ${userId}`);
     return { success: true, avatar_url: publicUrl };
   }
@@ -444,8 +515,10 @@ export class AuthService {
    */
   async ssoSync(token: string, dto: SsoSyncDto) {
     // 1. Obtener usuario desde Supabase con el token JWT del frontend
-    const { data: authData, error: authError } = await this.supabaseService.getClient().auth.getUser(token);
-    
+    const { data: authData, error: authError } = await this.supabaseService
+      .getClient()
+      .auth.getUser(token);
+
     if (authError || !authData.user) {
       this.logger.error('Error al validar token de SSO:', authError);
       throw new UnauthorizedException('Token de sesión inválido');
@@ -457,35 +530,47 @@ export class AuthService {
     // Verificar si el DNI ya está en uso por otro usuario
     const existingDni = await this.supabaseService.findUserByDni(dni);
     if (existingDni && existingDni.id !== authUser.id) {
-      throw new BadRequestException('El DNI ya se encuentra registrado por otro usuario');
+      throw new BadRequestException(
+        'El DNI ya se encuentra registrado por otro usuario',
+      );
     }
 
     // 2. Comprobar si ya existe en public.usuarios
     let publicUser = await this.supabaseService.findUserById(authUser.id);
-    
+
     if (!publicUser) {
       // Si no existe, crearlo. Usar el metadata para extraer nombre si es posible, o dejar string vacío/default.
       const userMetadata = authUser.user_metadata || {};
       const nombre = userMetadata.full_name || userMetadata.name || 'Usuario';
-      
+
       try {
-        const result = await this.supabaseService.getClient().from('usuarios').insert({
-          id: authUser.id,
-          email: authUser.email,
-          nombre,
-          dni,
-          telefono,
-          provincia,
-          localidad,
-          is_email_verified: true,
-          avatar_url: userMetadata.avatar_url || userMetadata.picture || null
-        }).select().single();
-        
+        const result = await this.supabaseService
+          .getClient()
+          .from('usuarios')
+          .insert({
+            id: authUser.id,
+            email: authUser.email,
+            nombre,
+            dni,
+            telefono,
+            provincia,
+            localidad,
+            is_email_verified: true,
+            avatar_url: userMetadata.avatar_url || userMetadata.picture || null,
+          })
+          .select()
+          .single();
+
         if (result.error) throw result.error;
         publicUser = result.data;
       } catch (err) {
-        this.logger.error('Error al insertar usuario SSO en public.usuarios:', err);
-        throw new InternalServerErrorException('Error al sincronizar el perfil');
+        this.logger.error(
+          'Error al insertar usuario SSO en public.usuarios:',
+          err,
+        );
+        throw new InternalServerErrorException(
+          'Error al sincronizar el perfil',
+        );
       }
     } else {
       // Si existe, actualizar DNI y los otros campos
@@ -494,17 +579,23 @@ export class AuthService {
         if (telefono) updateData.telefono = telefono;
         if (provincia) updateData.provincia = provincia;
         if (localidad) updateData.localidad = localidad;
-        
-        publicUser = await this.supabaseService.updateUserProfile(authUser.id, updateData);
+
+        publicUser = await this.supabaseService.updateUserProfile(
+          authUser.id,
+          updateData,
+        );
       } catch (err) {
-        this.logger.error('Error al actualizar usuario SSO en public.usuarios:', err);
+        this.logger.error(
+          'Error al actualizar usuario SSO en public.usuarios:',
+          err,
+        );
         throw new InternalServerErrorException('Error al actualizar el perfil');
       }
     }
 
     // 3. Devolver los datos del perfil
     const role = await this.supabaseService.getUserRole(authUser.id);
-    
+
     return {
       success: true,
       user: {
@@ -518,7 +609,7 @@ export class AuthService {
         localidad: publicUser.localidad ?? null,
         avatar_url: publicUser.avatar_url ?? null,
         role,
-      }
+      },
     };
   }
 }

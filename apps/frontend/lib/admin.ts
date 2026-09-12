@@ -155,6 +155,86 @@ export const getUserAdminPayments = async (token: string, userId: string) => {
 };
 
 // ==========================================
+// REPORTE MENSUAL BONDA
+// ==========================================
+
+export interface ReporteBondaResumenFila {
+  mes: string;
+  organizacion_id: string | null;
+  organizacion_nombre: string;
+  altas_bonda: number;
+  pagos_completados: number;
+  monto_total: number;
+}
+
+export interface ReporteBondaDetalleFila {
+  usuario_id: string;
+  nombre: string;
+  email: string;
+  dni: string;
+  organizacion_id: string | null;
+  organizacion_nombre: string;
+  micrositio_slug: string | null;
+  fecha_alta_bonda: string;
+  affiliate_code: string;
+  activo_local: boolean;
+  ultimo_pago_monto: number | null;
+  ultimo_pago_moneda: string | null;
+  ultimo_pago_fecha: string | null;
+}
+
+export interface ReporteBondaMensualResponse {
+  resumen: ReporteBondaResumenFila[];
+  detalle: ReporteBondaDetalleFila[];
+}
+
+export const getReporteBondaMensual = async (
+  token: string,
+  desde?: string,
+  hasta?: string,
+  organizacionId?: string
+): Promise<ReporteBondaMensualResponse> => {
+  const params = new URLSearchParams();
+  if (desde) params.append('desde', desde);
+  if (hasta) params.append('hasta', hasta);
+  if (organizacionId) params.append('organizacionId', organizacionId);
+
+  const url = `${API_URL}/admin/reportes/bonda-mensual?${params.toString()}`;
+  const res = await fetch(url, { headers: getHeaders(token) });
+  if (!res.ok) throw new Error('Error recuperando el reporte de Bonda. Status: ' + res.status);
+  return await res.json();
+};
+
+export const exportReporteBondaMensual = async (
+  token: string,
+  desde?: string,
+  hasta?: string,
+  organizacionId?: string
+): Promise<void> => {
+  const params = new URLSearchParams();
+  if (desde) params.append('desde', desde);
+  if (hasta) params.append('hasta', hasta);
+  if (organizacionId) params.append('organizacionId', organizacionId);
+
+  const url = `${API_URL}/admin/reportes/bonda-mensual/export?${params.toString()}`;
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  if (!res.ok) throw new Error('Error exportando el reporte de Bonda. Status: ' + res.status);
+
+  const blob = await res.blob();
+  const downloadUrl = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = downloadUrl;
+  a.download = 'reporte_bonda_mensual.xlsx';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(downloadUrl);
+};
+
+// ==========================================
 // BANNERS
 // ==========================================
 

@@ -150,15 +150,16 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                 className="bg-white rounded-2xl p-4 flex items-center justify-between shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-50 cursor-pointer hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center gap-4 min-w-0 pointer-events-none">
-                  <div className="size-16 rounded-full bg-transparent shrink-0 overflow-hidden flex items-center justify-center p-1 relative">
+                  <div className="h-16 w-16 rounded-full bg-transparent shrink-0 flex items-center justify-center p-1">
                     {logoUrl ? (
-                      <Image 
+                      <Image
                         loader={supabaseLoader}
-                        src={logoUrl} 
-                        alt={org.nombre} 
-                        fill 
-                        sizes="64px" 
-                        className="object-contain p-1" 
+                        src={logoUrl}
+                        alt={org.nombre}
+                        width={160}
+                        height={64}
+                        sizes="64px"
+                        className="h-full w-auto max-w-full object-contain"
                       />
                     ) : (
                       <span className="w-full h-full flex items-center justify-center text-lg font-bold text-[#2c8184]">
@@ -200,15 +201,16 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                 className="group bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300 flex flex-col items-center cursor-pointer"
               >
                 <div className="p-8 pb-4 flex flex-col items-center grow text-center pointer-events-none">
-                  <div className="h-28 w-full bg-transparent mb-6 shrink-0 overflow-hidden flex items-center justify-center p-2 relative">
+                  <div className="h-28 w-full bg-transparent mb-6 shrink-0 flex items-center justify-center p-2">
                     {logoUrl ? (
-                      <Image 
+                      <Image
                         loader={supabaseLoader}
-                        src={logoUrl} 
-                        alt={org.nombre} 
-                        fill 
-                        sizes="120px" 
-                        className="object-contain p-2" 
+                        src={logoUrl}
+                        alt={org.nombre}
+                        width={320}
+                        height={112}
+                        sizes="280px"
+                        className="h-full w-auto max-w-full object-contain"
                       />
                     ) : (
                       <span className="w-full h-full flex items-center justify-center text-2xl font-bold text-[#2c8184]">
@@ -258,17 +260,18 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
 
             <div className="p-8 md:p-10">
               <div className="flex flex-col sm:flex-row items-center gap-6 mb-8 text-center sm:text-left">
-                <div className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center shrink-0 p-3 shadow-md border border-slate-100 relative overflow-hidden">
+                <div className="h-24 w-auto max-w-56 bg-white rounded-2xl flex items-center justify-center shrink-0 p-3 shadow-md border border-slate-100">
                   {(() => {
                     const logoUrl = selectedOrg.logo_url;
                     return logoUrl ? (
-                      <Image 
+                      <Image
                         loader={supabaseLoader}
-                        src={logoUrl} 
-                        alt={selectedOrg.nombre} 
-                        fill 
-                        sizes="96px" 
-                        className="object-contain p-3" 
+                        src={logoUrl}
+                        alt={selectedOrg.nombre}
+                        width={320}
+                        height={96}
+                        sizes="220px"
+                        className="h-full w-auto max-w-full object-contain"
                       />
                     ) : (
                       <span className="text-4xl font-bold text-[#2c8184]">{selectedOrg.nombre.charAt(0)}</span>

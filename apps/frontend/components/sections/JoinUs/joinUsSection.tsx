@@ -9,10 +9,12 @@ export default function JoinUsSection() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Sé parte del ecosistema Club Triple Impacto
+            Viví el Bienestar Circular
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Buscamos potenciar el impacto. Ya sea que representes a una organización o a una empresa, tenemos un espacio para vos.
+            Disfrutá beneficios reales en tu día a día mientras acompañás a la
+            ONG que elijas. Ayudarte a vos y ayudar a otros dejan de ser cosas
+            distintas.
           </p>
         </div>
 
@@ -22,9 +24,12 @@ export default function JoinUsSection() {
             <div className="w-14 h-14 bg-teal-100/50 rounded-2xl flex items-center justify-center mb-6 text-teal-600 group-hover:scale-110 group-hover:bg-teal-100 transition-transform">
               <HeartHandshake className="w-7 h-7" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">Sumá tu ONG</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+              Sumá tu ONG
+            </h3>
             <p className="text-gray-600 mb-8 leading-relaxed">
-              Multiplicá el alcance de tu organización. Recibí donaciones recurrentes y formá parte de nuestra red de impacto validado.
+              Multiplicá el alcance de tu organización. Recibí aportes
+              recurrentes y formá parte de nuestra red de impacto validado.
             </p>
             <Link
               href="/contact"
@@ -40,9 +45,13 @@ export default function JoinUsSection() {
             <div className="w-14 h-14 bg-blue-100/50 rounded-2xl flex items-center justify-center mb-6 text-blue-600 group-hover:scale-110 group-hover:bg-blue-100 transition-transform">
               <Building2 className="w-7 h-7" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">Club Triple Impacto para Empresas</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+              Club Triple Impacto para Empresas
+            </h3>
             <p className="text-gray-600 mb-8 leading-relaxed">
-              Fidelizá a tus colaboradores con beneficios únicos que generan un triple impacto. Potenciá la Responsabilidad Social de tu corporación.
+              Fidelizá a tus colaboradores con beneficios únicos que generan un
+              triple impacto y fortalecen el compromiso genuino de tu empresa
+              con su comunidad y el planeta.
             </p>
             <Link
               href="/contact"

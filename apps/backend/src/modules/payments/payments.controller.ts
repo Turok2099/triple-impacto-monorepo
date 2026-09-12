@@ -97,16 +97,24 @@ export class PaymentsController {
     // ESTRATEGIA PRODUCTIVO FISERV: Proxy según organización dinámico
     let finalStoreId: string;
     let finalSharedSecret: string;
-    
+
     if (body.organizacion_id) {
       const org = await this.supabase.getOrganizacionById(body.organizacion_id);
-      if (!org || !org.fiserv_store_id || (org.fiserv_store_id as string).trim() === '') {
-        throw new BadRequestException('La organización seleccionada no tiene configuración de pagos habilitada.');
+      if (
+        !org ||
+        !org.fiserv_store_id ||
+        (org.fiserv_store_id as string).trim() === ''
+      ) {
+        throw new BadRequestException(
+          'La organización seleccionada no tiene configuración de pagos habilitada.',
+        );
       }
       finalStoreId = org.fiserv_store_id as string;
       finalSharedSecret = org.fiserv_shared_secret as string;
     } else {
-      throw new BadRequestException('Se requiere seleccionar una organización.');
+      throw new BadRequestException(
+        'Se requiere seleccionar una organización.',
+      );
     }
     body.storename = finalStoreId;
 
@@ -176,17 +184,25 @@ export class PaymentsController {
     if (!userId) throw new BadRequestException('Se requiere autenticación');
 
     let finalStoreId: string;
-    
+
     if (body.organizacion_id) {
       const org = await this.supabase.getOrganizacionById(body.organizacion_id);
-      if (!org || !org.fiserv_store_id || (org.fiserv_store_id as string).trim() === '') {
-        throw new BadRequestException('La organización seleccionada no tiene configuración de pagos habilitada.');
+      if (
+        !org ||
+        !org.fiserv_store_id ||
+        (org.fiserv_store_id as string).trim() === ''
+      ) {
+        throw new BadRequestException(
+          'La organización seleccionada no tiene configuración de pagos habilitada.',
+        );
       }
       finalStoreId = org.fiserv_store_id as string;
     } else {
-      throw new BadRequestException('Se requiere seleccionar una organización.');
+      throw new BadRequestException(
+        'Se requiere seleccionar una organización.',
+      );
     }
-    
+
     // Asignar el store id resuelto al body para que fiservRestService lo use
     body.storeId = finalStoreId;
 
@@ -257,9 +273,14 @@ export class PaymentsController {
               frecuencia: 'mensual',
               fecha_proximo_cobro: fechaProximoCobro,
             });
-            this.logger.log(`Suscripción creada exitosamente para orden ${orderId}`);
+            this.logger.log(
+              `Suscripción creada exitosamente para orden ${orderId}`,
+            );
           } catch (subError) {
-            this.logger.error('Error al crear suscripción en rest-sale:', subError);
+            this.logger.error(
+              'Error al crear suscripción en rest-sale:',
+              subError,
+            );
             // No fallamos el pago completo si la suscripción falla, ya cobramos.
           }
         }
@@ -271,9 +292,11 @@ export class PaymentsController {
           status: 'failed',
           fiserv_raw_response: result as Record<string, unknown>,
         });
-        
+
         throw new BadRequestException(
-          result.processor?.responseMessage || result.error?.message || 'Pago rechazado por el procesador'
+          result.processor?.responseMessage ||
+            result.error?.message ||
+            'Pago rechazado por el procesador',
         );
       }
     } catch (error: any) {
@@ -304,11 +327,17 @@ export class PaymentsController {
    */
   @Post('notification/declined')
   @HttpCode(HttpStatus.OK)
-  async handleFiservDeclined(@Body() body: { oid: string; failReason?: string; responseCode?: string }) {
+  async handleFiservDeclined(
+    @Body() body: { oid: string; failReason?: string; responseCode?: string },
+  ) {
     if (!body.oid) {
       throw new BadRequestException('Falta oid');
     }
-    await this.fiservWebhook.handleDeclined(body.oid, body.failReason, body.responseCode);
+    await this.fiservWebhook.handleDeclined(
+      body.oid,
+      body.failReason,
+      body.responseCode,
+    );
     return { ok: true };
   }
 
@@ -318,10 +347,12 @@ export class PaymentsController {
    */
   @Post('qr')
   @HttpCode(HttpStatus.OK)
-  async handleFiservQrNotification(@Body() body: any): Promise<{ ok: boolean }> {
+  async handleFiservQrNotification(
+    @Body() body: any,
+  ): Promise<{ ok: boolean }> {
     this.logger.log(`Recibido Webhook QR de Fiserv: ${JSON.stringify(body)}`);
 
-    let uuid = body.id || body.uuid;
+    const uuid = body.id || body.uuid;
     let qrString = body.qr;
     let orderId = body.idTransaccionExterno || body.idc;
 
@@ -329,10 +360,14 @@ export class PaymentsController {
     // Consultamos la API oficial de Fiserv para validar y obtener detalles de pago de forma segura.
     if (uuid && (!orderId || !qrString)) {
       try {
-        this.logger.log(`Consultando detalles de pago en Fiserv para UUID: ${uuid}`);
+        this.logger.log(
+          `Consultando detalles de pago en Fiserv para UUID: ${uuid}`,
+        );
         const details = await this.fiservQr.getPaymentStatus(uuid);
-        this.logger.debug(`Detalles obtenidos de Fiserv: ${JSON.stringify(details)}`);
-        
+        this.logger.debug(
+          `Detalles obtenidos de Fiserv: ${JSON.stringify(details)}`,
+        );
+
         qrString = details.qr || qrString;
         orderId = details.idTransaccionExterno || details.idc || orderId;
 
@@ -341,8 +376,13 @@ export class PaymentsController {
           orderId = this.fiservQr.extractOrderIdFromQr(qrString);
         }
       } catch (err) {
-        this.logger.error(`Error consultando detalles del pago QR para UUID ${uuid}:`, err);
-        throw new BadRequestException('No se pudo validar el pago QR con la API de Fiserv');
+        this.logger.error(
+          `Error consultando detalles del pago QR para UUID ${uuid}:`,
+          err,
+        );
+        throw new BadRequestException(
+          'No se pudo validar el pago QR con la API de Fiserv',
+        );
       }
     }
 
@@ -352,8 +392,13 @@ export class PaymentsController {
     }
 
     if (!orderId) {
-      this.logger.warn('No se pudo determinar el order_id para la notificación QR. Cuerpo recibido:', body);
-      throw new BadRequestException('No se pudo identificar el ID de la transacción');
+      this.logger.warn(
+        'No se pudo determinar el order_id para la notificación QR. Cuerpo recibido:',
+        body,
+      );
+      throw new BadRequestException(
+        'No se pudo identificar el ID de la transacción',
+      );
     }
 
     // Buscar el intento de pago en Supabase.
@@ -366,12 +411,16 @@ export class PaymentsController {
       .maybeSingle();
 
     if (attemptError || !attempt) {
-      this.logger.warn(`No se encontró intento de pago para orderId=${orderId}`);
+      this.logger.warn(
+        `No se encontró intento de pago para orderId=${orderId}`,
+      );
       throw new BadRequestException('Intento de pago no encontrado');
     }
 
     if (attempt.status === 'completed') {
-      this.logger.log(`Intento de pago ${attempt.id} ya completado. Ignorando.`);
+      this.logger.log(
+        `Intento de pago ${attempt.id} ya completado. Ignorando.`,
+      );
       return { ok: true };
     }
 
@@ -388,7 +437,8 @@ export class PaymentsController {
       .eq('id', attempt.organizacion_id)
       .maybeSingle();
 
-    const monto = parseFloat(body.montoPagado) || parseFloat(attempt.amount) || 0;
+    const monto =
+      parseFloat(body.montoPagado) || parseFloat(attempt.amount) || 0;
 
     await this.supabase.createDonacion({
       usuario_id: attempt.user_id,
@@ -413,21 +463,27 @@ export class PaymentsController {
     // Obtener información del usuario para enviar comprobante de éxito
     const user = await this.supabase.findUserById(attempt.user_id);
     if (user && user.email) {
-      this.mailService.sendPaymentReceiptEmail(user.email, user.nombre || 'Donante', {
-        status: 'approved',
-        amount: String(monto),
-        currency: attempt.currency || 'ARS',
-        approvalCode: 'QR-PAID',
-        oid: attempt.order_id, // Usamos el UUID completo original guardado en BD
-      }).catch(err => {
-        this.logger.error(`Error enviando correo de éxito para orden QR ${attempt.order_id}:`, err);
-      });
+      this.mailService
+        .sendPaymentReceiptEmail(user.email, user.nombre || 'Donante', {
+          status: 'approved',
+          amount: String(monto),
+          currency: attempt.currency || 'ARS',
+          approvalCode: 'QR-PAID',
+          oid: attempt.order_id, // Usamos el UUID completo original guardado en BD
+        })
+        .catch((err) => {
+          this.logger.error(
+            `Error enviando correo de éxito para orden QR ${attempt.order_id}:`,
+            err,
+          );
+        });
     }
 
-    this.logger.log(`✅ Pago QR conciliado exitosamente para order_id=${attempt.order_id}`);
+    this.logger.log(
+      `✅ Pago QR conciliado exitosamente para order_id=${attempt.order_id}`,
+    );
     return { ok: true };
   }
-
 
   @Post('posauth')
   @UseGuards(JwtAuthGuard)
@@ -462,7 +518,8 @@ export class PaymentsController {
 
     try {
       // 1. Cancelar suscripción activa local para evitar futuros cobros
-      const { data: suscripciones, error: subError } = await this.supabase.getClient()
+      const { data: suscripciones, error: subError } = await this.supabase
+        .getClient()
         .from('suscripciones')
         .update({ estado: 'cancelada' })
         .eq('usuario_id', userId)
@@ -472,23 +529,35 @@ export class PaymentsController {
 
       if (subError) {
         this.logger.error('Error cancelando suscripción local:', subError);
-        throw new BadRequestException('No se pudo cancelar la suscripción local');
+        throw new BadRequestException(
+          'No se pudo cancelar la suscripción local',
+        );
       }
 
       // 2. Desactivar afiliación a Bonda (API + Local DB)
       try {
-        const bondaMicrosite = await this.supabase.getBondaMicrositeByOrganizacionId(body.organizacionId);
+        const bondaMicrosite =
+          await this.supabase.getBondaMicrositeByOrganizacionId(
+            body.organizacionId,
+          );
         if (bondaMicrosite) {
-          const affiliate = await this.supabase.getAffiliateForUserAndMicrosite(userId, bondaMicrosite.id);
+          const affiliate = await this.supabase.getAffiliateForUserAndMicrosite(
+            userId,
+            bondaMicrosite.id,
+          );
           if (affiliate && affiliate.affiliate_code) {
-             // Llama a Bonda para eliminar el afiliado (soft delete por 30 días)
-             await this.bondaService.eliminarAfiliado(affiliate.affiliate_code, { organizacionId: body.organizacionId });
-             
-             // Actualizar DB local
-             await this.supabase.getClient().from('usuarios_bonda_afiliados')
-               .update({ is_active: false })
-               .eq('user_id', userId)
-               .eq('bonda_microsite_id', bondaMicrosite.id);
+            // Llama a Bonda para eliminar el afiliado (soft delete por 30 días)
+            await this.bondaService.eliminarAfiliado(affiliate.affiliate_code, {
+              organizacionId: body.organizacionId,
+            });
+
+            // Actualizar DB local
+            await this.supabase
+              .getClient()
+              .from('usuarios_bonda_afiliados')
+              .update({ is_active: false })
+              .eq('user_id', userId)
+              .eq('bonda_microsite_id', bondaMicrosite.id);
           }
         }
       } catch (bondaError) {
@@ -499,11 +568,13 @@ export class PaymentsController {
       return {
         ok: true,
         message: 'Suscripción y afiliación canceladas exitosamente',
-        canceladas: suscripciones?.length || 0
+        canceladas: suscripciones?.length || 0,
       };
     } catch (err: any) {
       this.logger.error('Error general cancelando suscripción:', err);
-      throw new BadRequestException(err.message || 'Error al cancelar la suscripción');
+      throw new BadRequestException(
+        err.message || 'Error al cancelar la suscripción',
+      );
     }
   }
 

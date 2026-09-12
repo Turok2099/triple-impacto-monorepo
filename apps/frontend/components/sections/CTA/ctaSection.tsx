@@ -1,6 +1,6 @@
 "use client";
 
-import { Zap, Gift, ShieldCheck } from "lucide-react";
+import { Zap, ShieldCheck, Unlock } from "lucide-react";
 
 export default function CTASection() {
   return (
@@ -16,7 +16,7 @@ export default function CTASection() {
 
         {/* Título Principal */}
         <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6 leading-tight">
-          Transformá tu donación en{" "}
+          Viví el Bienestar Circular: transformá tu aporte en {" "}
           <span className="inline-block bg-black/20 backdrop-blur-sm px-4 py-2 rounded-2xl mt-2">
             impacto y beneficios
           </span>
@@ -24,63 +24,30 @@ export default function CTASection() {
 
         {/* Subtítulo */}
         <p className="text-xl text-teal-50 mb-10 leading-relaxed max-w-2xl mx-auto">
-          Cada donación transforma vidas y te recompensa.
+          Cada aporte transforma vidas y te recompensa. Sumate hoy, cambiá el futuro. 
           <span className="block mt-2 font-semibold">
-            Doná hoy, cambia el futuro. Lo que das, vuelve!
+            Todo lo que das, vuelve multiplicado.
           </span>
         </p>
 
         {/* Propuesta de valor rápida */}
-        <div className="flex flex-wrap justify-center gap-6 mb-10 text-white">
-          <div className="flex items-center gap-2 bg-black/20 backdrop-blur-sm px-4 py-3 rounded-full">
-            <Zap className="w-6 h-6" strokeWidth={2} />
-            <span className="font-medium">Impacto inmediato</span>
+        <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto text-white">
+          <div className="flex flex-col items-center gap-2 bg-black/20 backdrop-blur-sm px-5 py-5 rounded-2xl">
+            <Zap className="w-7 h-7" strokeWidth={2} />
+            <span className="font-bold">Impacto inmediato</span>
+            <span className="text-sm text-teal-50">Descuentos al instante</span>
           </div>
-          <div className="flex items-center gap-2 bg-black/20 backdrop-blur-sm px-4 py-3 rounded-full">
-            <Gift className="w-6 h-6" strokeWidth={2} />
-            <span className="font-medium">Descuentos al instante</span>
+          <div className="flex flex-col items-center gap-2 bg-black/20 backdrop-blur-sm px-5 py-5 rounded-2xl">
+            <ShieldCheck className="w-7 h-7" strokeWidth={2} />
+            <span className="font-bold">100% transparente</span>
+            <span className="text-sm text-teal-50">Sin comisiones ocultas</span>
           </div>
-          <div className="flex items-center gap-2 bg-black/20 backdrop-blur-sm px-4 py-3 rounded-full">
-            <ShieldCheck className="w-6 h-6" strokeWidth={2} />
-            <span className="font-medium">100% transparente</span>
-          </div>
-        </div>
-
-        {/* Trust elements */}
-        <div className="flex flex-wrap justify-center gap-4 text-white font-medium text-sm">
-          <div className="flex items-center gap-2">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <span>Sin comisiones ocultas</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <span>Cancela cuando quieras</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <span>Seguro y confiable</span>
+          <div className="flex flex-col items-center gap-2 bg-black/20 backdrop-blur-sm px-5 py-5 rounded-2xl">
+            <Unlock className="w-7 h-7" strokeWidth={2} />
+            <span className="font-bold">Cancelá cuando quieras</span>
+            <span className="text-sm text-teal-50">Seguro y confiable</span>
           </div>
         </div>
-
-
       </div>
     </section>
   );

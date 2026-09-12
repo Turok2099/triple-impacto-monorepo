@@ -35,7 +35,9 @@ export default () => ({
   fiserv: {
     apiKey: process.env.FISERV_API_KEY || '',
     apiSecret: process.env.FISERV_API_SECRET || '',
-    baseUrl: process.env.FISERV_BASE_URL || 'https://cert.api.firstdata.com/gateway/v2',
+    baseUrl:
+      process.env.FISERV_BASE_URL ||
+      'https://cert.api.firstdata.com/gateway/v2',
     qrServiceSubcode: process.env.FISERV_QR_SERVICE_SUBCODE || 'Y1234567',
     qrCommerceCuit: process.env.FISERV_QR_COMMERCE_CUIT || '30692264785',
     qrMcc: process.env.FISERV_QR_MCC || '7399',

@@ -14,13 +14,17 @@ export class MailService {
     const rawEnv = process.env.RESEND_API_KEY;
     const configEnv = this.configService.get<string>('RESEND_API_KEY');
     const apiKey = configEnv || rawEnv;
-    
+
     if (!apiKey) {
-      this.logger.warn('RESEND_API_KEY no está configurada ni en ConfigService ni en process.env.');
+      this.logger.warn(
+        'RESEND_API_KEY no está configurada ni en ConfigService ni en process.env.',
+      );
       // Inicializamos con un valor falso para evitar que la app crashee en el arranque.
       this.resend = new Resend('re_dummy_para_evitar_crasheo');
     } else {
-      this.logger.log(`Resend API Key leída exitosamente: ${apiKey.substring(0, 5)}...`);
+      this.logger.log(
+        `Resend API Key leída exitosamente: ${apiKey.substring(0, 5)}...`,
+      );
       this.resend = new Resend(apiKey);
     }
   }
@@ -29,10 +33,17 @@ export class MailService {
    * Envia un correo de bienvenida con el botón de verificación.
    * Utiliza el e-mail del remitente del onboarding si el dominio oficial no está validado.
    */
-  async sendVerificationEmail(userEmail: string, userName: string, token: string) {
+  async sendVerificationEmail(
+    userEmail: string,
+    userName: string,
+    token: string,
+  ) {
     // La URL debe apuntar al Backend, que procesa y luego redirecciona al Front
     // Priorizamos API_BASE_URL (produccion/ngrok) sobre API_URL o localhost:3000
-    const baseUrl = this.configService.get<string>('API_BASE_URL') || this.configService.get<string>('API_URL') || 'http://localhost:3000';
+    const baseUrl =
+      this.configService.get<string>('API_BASE_URL') ||
+      this.configService.get<string>('API_URL') ||
+      'http://localhost:3000';
     const verifyLink = `${baseUrl}/api/auth/verify-email?token=${token}`;
 
     try {
@@ -69,14 +80,22 @@ export class MailService {
       });
 
       if (error) {
-        this.logger.error(`Error de envío de Resend hacia ${userEmail}:`, error);
+        this.logger.error(
+          `Error de envío de Resend hacia ${userEmail}:`,
+          error,
+        );
         return false;
       }
 
-      this.logger.log(`✅ Correo de bienvenida enviado exitosamente a: ${userEmail}. Job ID: ${data?.id}`);
+      this.logger.log(
+        `✅ Correo de bienvenida enviado exitosamente a: ${userEmail}. Job ID: ${data?.id}`,
+      );
       return true;
     } catch (err) {
-      this.logger.error(`Excepción al intentar enviar correo a ${userEmail}:`, err);
+      this.logger.error(
+        `Excepción al intentar enviar correo a ${userEmail}:`,
+        err,
+      );
       return false;
     }
   }
@@ -84,9 +103,14 @@ export class MailService {
   /**
    * Envia un correo de restablecimiento de contraseña.
    */
-  async sendPasswordResetEmail(userEmail: string, userName: string, token: string) {
+  async sendPasswordResetEmail(
+    userEmail: string,
+    userName: string,
+    token: string,
+  ) {
     // La URL debe apuntar al Frontend, donde estará dibujado el formulario con los inputs nuevos
-    const frontUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001';
+    const frontUrl =
+      this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001';
     const resetLink = `${frontUrl}/reset-password?token=${token}`;
 
     try {
@@ -125,14 +149,22 @@ export class MailService {
       });
 
       if (error) {
-        this.logger.error(`Error de envío de Resend hacia ${userEmail}:`, error);
+        this.logger.error(
+          `Error de envío de Resend hacia ${userEmail}:`,
+          error,
+        );
         return false;
       }
 
-      this.logger.log(`✅ Correo de reseteo enviado exitosamente a: ${userEmail}. Job ID: ${data?.id}`);
+      this.logger.log(
+        `✅ Correo de reseteo enviado exitosamente a: ${userEmail}. Job ID: ${data?.id}`,
+      );
       return true;
     } catch (err) {
-      this.logger.error(`Excepción al intentar enviar correo de reseteo a ${userEmail}:`, err);
+      this.logger.error(
+        `Excepción al intentar enviar correo de reseteo a ${userEmail}:`,
+        err,
+      );
       return false;
     }
   }
@@ -141,7 +173,8 @@ export class MailService {
    * Envia un correo de bienvenida al Newsletter.
    */
   async sendNewsletterWelcomeEmail(userEmail: string) {
-    const frontUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001';
+    const frontUrl =
+      this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001';
 
     try {
       const { data, error } = await this.resend.emails.send({
@@ -180,17 +213,28 @@ export class MailService {
         return false;
       }
 
-      this.logger.log(`✅ Correo Newsletter enviado a: ${userEmail}. Job ID: ${data?.id}`);
+      this.logger.log(
+        `✅ Correo Newsletter enviado a: ${userEmail}. Job ID: ${data?.id}`,
+      );
       return true;
     } catch (err) {
-      this.logger.error(`Excepción al intentar enviar Newsletter a ${userEmail}:`, err);
+      this.logger.error(
+        `Excepción al intentar enviar Newsletter a ${userEmail}:`,
+        err,
+      );
       return false;
     }
   }
   /**
    * Envia el correo desde el formulario de contacto.
    */
-  async sendContactEmail(nombre: string, email: string, telefono: string, asunto: string, mensaje: string) {
+  async sendContactEmail(
+    nombre: string,
+    email: string,
+    telefono: string,
+    asunto: string,
+    mensaje: string,
+  ) {
     try {
       const { data, error } = await this.resend.emails.send({
         from: `${this.defaultSenderName} <${this.defaultSenderEmail}>`,
@@ -220,14 +264,20 @@ export class MailService {
       });
 
       if (error) {
-        this.logger.error(`Error enviando correo de contacto de ${email}:`, error);
+        this.logger.error(
+          `Error enviando correo de contacto de ${email}:`,
+          error,
+        );
         return false;
       }
 
       this.logger.log(`✅ Correo de contacto enviado. Job ID: ${data?.id}`);
       return true;
     } catch (err) {
-      this.logger.error(`Excepción enviando correo de contacto de ${email}:`, err);
+      this.logger.error(
+        `Excepción enviando correo de contacto de ${email}:`,
+        err,
+      );
       return false;
     }
   }
@@ -245,16 +295,18 @@ export class MailService {
       approvalCode?: string;
       oid?: string;
       failReason?: string;
-    }
+    },
   ) {
     try {
       const isApproved = transactionData.status === 'approved';
-      const subject = isApproved 
+      const subject = isApproved
         ? '✅ Comprobante de Donación Exitosa - Club Triple Impacto'
         : '❌ Actualización sobre tu intento de Donación - Club Triple Impacto';
-      
-      const titulo = isApproved ? '¡Donación Exitosa!' : 'Tu pago fue rechazado';
-      const descripcion = isApproved 
+
+      const titulo = isApproved
+        ? '¡Donación Exitosa!'
+        : 'Tu pago fue rechazado';
+      const descripcion = isApproved
         ? 'Queremos agradecerte por tu aporte. Tu donación ha sido procesada de forma segura y exitosa. A continuación te enviamos el comprobante de la transacción.'
         : 'Te informamos que hubo un problema al procesar tu pago. Tu banco procesador o Fiserv declinaron la transacción, por lo que <strong>no se ha realizado ningún débito</strong> en tu cuenta.';
 
@@ -307,9 +359,11 @@ export class MailService {
                 ${detallesHtml}
               </div>
 
-              ${isApproved 
-                ? '<p style="font-size: 15px; color: #40a8ab; font-weight: bold; text-align: center;">¡Tus beneficios exclusivos en la red Club Triple Impacto ya están activos!</p>'
-                : '<p style="font-size: 14px; color: #e11d48; text-align: center; font-weight: bold;">Por favor, verifica tus datos o intenta con otro medio de pago desde la plataforma.</p>'}
+              ${
+                isApproved
+                  ? '<p style="font-size: 15px; color: #40a8ab; font-weight: bold; text-align: center;">¡Tus beneficios exclusivos en la red Club Triple Impacto ya están activos!</p>'
+                  : '<p style="font-size: 14px; color: #e11d48; text-align: center; font-weight: bold;">Por favor, verifica tus datos o intenta con otro medio de pago desde la plataforma.</p>'
+              }
             </div>
             <div style="background-color: #f7f9fc; padding: 20px; text-align: center; color: #718096; font-size: 12px;">
               <p style="margin: 0;">Club Triple Impacto - Plataforma Fintech de Reciprocidad</p>
@@ -319,11 +373,16 @@ export class MailService {
       });
 
       if (error) {
-        this.logger.error(`Error enviando recibo de pago a ${userEmail}:`, error);
+        this.logger.error(
+          `Error enviando recibo de pago a ${userEmail}:`,
+          error,
+        );
         return false;
       }
 
-      this.logger.log(`✅ Recibo de pago (${transactionData.status}) enviado a ${userEmail}. Job ID: ${data?.id}`);
+      this.logger.log(
+        `✅ Recibo de pago (${transactionData.status}) enviado a ${userEmail}. Job ID: ${data?.id}`,
+      );
       return true;
     } catch (err) {
       this.logger.error(`Excepción enviando recibo a ${userEmail}:`, err);
@@ -346,11 +405,15 @@ export class MailService {
     qrImageBase64: string,
   ) {
     try {
-      const subject = '⚠️ Completa tu donación mediante QR - Club Triple Impacto';
-      const formattedAmount = parseFloat(orderDetails.amount).toLocaleString('es-AR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
+      const subject =
+        '⚠️ Completa tu donación mediante QR - Club Triple Impacto';
+      const formattedAmount = parseFloat(orderDetails.amount).toLocaleString(
+        'es-AR',
+        {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        },
+      );
 
       const { data, error } = await this.resend.emails.send({
         from: `${this.defaultSenderName} <${this.defaultSenderEmail}>`,
@@ -403,16 +466,23 @@ export class MailService {
       });
 
       if (error) {
-        this.logger.error(`Error enviando QR de fallback a ${userEmail}:`, error);
+        this.logger.error(
+          `Error enviando QR de fallback a ${userEmail}:`,
+          error,
+        );
         return false;
       }
 
-      this.logger.log(`✅ Correo de QR de fallback enviado a ${userEmail}. Job ID: ${data?.id}`);
+      this.logger.log(
+        `✅ Correo de QR de fallback enviado a ${userEmail}. Job ID: ${data?.id}`,
+      );
       return true;
     } catch (err) {
-      this.logger.error(`Excepción enviando QR de fallback a ${userEmail}:`, err);
+      this.logger.error(
+        `Excepción enviando QR de fallback a ${userEmail}:`,
+        err,
+      );
       return false;
     }
   }
 }
-

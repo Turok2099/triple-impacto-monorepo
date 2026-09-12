@@ -4,19 +4,22 @@ export default function AboutProjectSection() {
   const cards = [
     {
       icon: <HeartHandshake className="w-8 h-8 text-[#2c8184]" />,
-      title: "Reciprocidad (Ayni)",
-      description: "Inspirados en la filosofía ancestral andina, creemos que toda la ayuda que dás te tiene que volver multiplicada en beneficios para tu día a día."
+      title: "Bienestar Circular",
+      description:
+        "Creemos que todo el bienestar que das —a una ONG, a una comunidad, al planeta— te tiene que volver multiplicado en beneficios para tu día a día. Nada se pierde: todo circula y crece.",
     },
     {
       icon: <Ticket className="w-8 h-8 text-[#2c8184]" />,
       title: "Aporte con Beneficios",
-      description: "Al donar no solo ayudás a tu ONG favorita, sino podrás usar descuentos exclusivos en las mejores marcas."
+      description:
+        "Al sumarte, no solo acompañás a la ONG que elegiste y hacés posible que continúe con su propósito: también accedés a descuentos exclusivos en las mejores marcas del país.",
     },
     {
       icon: <TrendingUp className="w-8 h-8 text-[#2c8184]" />,
       title: "Impacto Circular",
-      description: "Las ONGs logran cumplir sus objetivos, las marcas potencian sus ventas y vos ahorrás miles de pesos todos los meses usando tus cupones. ¡Ganamos todos!"
-    }
+      description:
+        "Las ONGs logran sostener su misión, las empresas viven un compromiso genuino con su comunidad y vos ahorrás todos los meses usando tus beneficios. Un impacto económico, social y ambiental. ¡Ganamos todos!",
+    },
   ];
 
   return (
@@ -26,16 +29,17 @@ export default function AboutProjectSection() {
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight drop-shadow-sm cursor-default mb-6">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2c8184] to-teal-400">
               CLUB TRIPLE IMPACTO.
-            </span>
-            {" "}
+            </span>{" "}
             <span className="text-gray-800">
-              LO QUE DAS, VUELVE!
+              TODO LO QUE DAS, VUELVE MULTIPLICADO.
             </span>
           </h2>
 
           <p className="text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
-            Club Triple Impacto es una plataforma que conecta a ONGs, empresas y personas en un ecosistema colaborativo.
-            Queremos que donar a una causa justa deje de ser un esfuerzo y pase a ser una decisión <span className="font-semibold text-slate-800">inteligente</span> para vos.
+            Club Triple Impacto es una plataforma que conecta a ONGs, empresas y
+            personas en un ecosistema colaborativo. Queremos que aportar a una
+            causa justa deje de ser un esfuerzo y pase a ser una decisión
+            inteligente para vos.
           </p>
         </div>
 
@@ -48,7 +52,9 @@ export default function AboutProjectSection() {
               <div className="w-14 h-14 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                 {card.icon}
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">{card.title}</h3>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">
+                {card.title}
+              </h3>
               <p className="text-slate-600 leading-relaxed">
                 {card.description}
               </p>

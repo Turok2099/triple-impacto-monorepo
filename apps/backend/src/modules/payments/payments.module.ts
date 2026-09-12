@@ -10,7 +10,13 @@ import { SubscriptionsCronService } from './subscriptions.cron';
 import { FiservQrService } from './fiserv-qr/fiserv-qr.service';
 
 @Module({
-  imports: [FiservConnectModule, BondaModule, AuthModule, MailModule, FiservRestModule],
+  imports: [
+    FiservConnectModule,
+    BondaModule,
+    AuthModule,
+    MailModule,
+    FiservRestModule,
+  ],
   controllers: [PaymentsController],
   providers: [FiservWebhookService, SubscriptionsCronService, FiservQrService],
   exports: [FiservQrService],

@@ -478,10 +478,13 @@ export class SyncService {
     timeZone: 'UTC',
   })
   async suspenderUsuariosExpirados() {
-    this.logger.log('⏰ Iniciando Suspensión de Usuarios Expirados (Regla de 1 Mes)');
+    this.logger.log(
+      '⏰ Iniciando Suspensión de Usuarios Expirados (Regla de 1 Mes)',
+    );
     try {
       // 1. Obtener usuarios afiliados que figuran is_active=true
-      const { data: afiliados } = await this.supabaseService.getClient()
+      const { data: afiliados } = await this.supabaseService
+        .getClient()
         .from('usuarios_bonda_afiliados')
         .select('user_id, bonda_microsite_id, affiliate_code, is_active')
         .eq('is_active', true);
@@ -494,85 +497,111 @@ export class SyncService {
 
       for (const aff of afiliados) {
         try {
-           // Obtener el último pago completado para el usuario/micrositio
-           // (El bonda_microsite_id se conecta con el organizacion_id en la tabla bonda_microsites)
-           const { data: microsite } = await this.supabaseService.from('bonda_microsites').select('organizacion_id, slug').eq('id', aff.bonda_microsite_id).maybeSingle();
-           
-           if (!microsite?.organizacion_id) continue;
-           
-           const { data: donacion } = await this.supabaseService.from('donaciones')
-             .select('created_at')
-             .eq('usuario_id', aff.user_id)
-             .eq('organizacion_id', microsite.organizacion_id)
-             .eq('estado', 'completada')
-             .order('created_at', { ascending: false })
-             .limit(1)
-             .maybeSingle();
-             
-           // Si no tiene pagos o su último pago expiró
-           let isExpired = true;
-           if (donacion?.created_at) {
-              const fechaUltimoPago = new Date(donacion.created_at);
-              const fechaVencimiento = new Date(fechaUltimoPago);
-              
-              const expectedMonth = fechaVencimiento.getMonth() + 1;
-              fechaVencimiento.setMonth(expectedMonth);
-              
-              // Ajuste en caso de saltar el mes
-              if (fechaVencimiento.getMonth() > expectedMonth % 12) {
-                fechaVencimiento.setDate(0); 
+          // Obtener el último pago completado para el usuario/micrositio
+          // (El bonda_microsite_id se conecta con el organizacion_id en la tabla bonda_microsites)
+          const { data: microsite } = await this.supabaseService
+            .from('bonda_microsites')
+            .select('organizacion_id, slug')
+            .eq('id', aff.bonda_microsite_id)
+            .maybeSingle();
+
+          if (!microsite?.organizacion_id) continue;
+
+          const { data: donacion } = await this.supabaseService
+            .from('donaciones')
+            .select('created_at')
+            .eq('usuario_id', aff.user_id)
+            .eq('organizacion_id', microsite.organizacion_id)
+            .eq('estado', 'completada')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          // Si no tiene pagos o su último pago expiró
+          let isExpired = true;
+          if (donacion?.created_at) {
+            const fechaUltimoPago = new Date(donacion.created_at);
+            const fechaVencimiento = new Date(fechaUltimoPago);
+
+            const expectedMonth = fechaVencimiento.getMonth() + 1;
+            fechaVencimiento.setMonth(expectedMonth);
+
+            // Ajuste en caso de saltar el mes
+            if (fechaVencimiento.getMonth() > expectedMonth % 12) {
+              fechaVencimiento.setDate(0);
+            }
+
+            fechaVencimiento.setHours(23, 59, 59, 999);
+            isExpired = ahora > fechaVencimiento;
+          }
+
+          // Verificar si el usuario tiene una suscripción activa
+          if (isExpired) {
+            const hasSubscription =
+              await this.supabaseService.hasActiveSubscription(aff.user_id);
+            if (hasSubscription) {
+              // El usuario tiene una suscripción activa, el cron de pagos se encargará
+              isExpired = false;
+              this.logger.log(
+                `Usuario ${aff.user_id} tiene una suscripción activa. Mantenido activo.`,
+              );
+            }
+          }
+
+          if (isExpired) {
+            this.logger.log(
+              `Usuario ${aff.user_id} expirado para ONG. Suspendiendo en Bonda...`,
+            );
+
+            // Soft delete en Bonda
+            try {
+              await this.bondaService.eliminarAfiliado(aff.affiliate_code, {
+                slug: microsite.slug,
+              });
+            } catch (bondaError: any) {
+              // Si retorna 404 o Not Found se asume que ya estaba borrado
+              if (
+                !bondaError?.message?.includes('404') &&
+                !bondaError?.message?.includes('Not Found')
+              ) {
+                this.logger.warn(`Aviso Bonda Delete: ${bondaError?.message}`);
               }
-              
-              fechaVencimiento.setHours(23, 59, 59, 999);
-              isExpired = ahora > fechaVencimiento;
-           }
+            }
 
-           // Verificar si el usuario tiene una suscripción activa
-           if (isExpired) {
-             const hasSubscription = await this.supabaseService.hasActiveSubscription(aff.user_id);
-             if (hasSubscription) {
-                // El usuario tiene una suscripción activa, el cron de pagos se encargará
-                isExpired = false;
-                this.logger.log(`Usuario ${aff.user_id} tiene una suscripción activa. Mantenido activo.`);
-             }
-           }
+            // Actualizar localmente a inactivo
+            await this.supabaseService
+              .getClient()
+              .from('usuarios_bonda_afiliados')
+              .update({ is_active: false })
+              .eq('user_id', aff.user_id)
+              .eq('bonda_microsite_id', aff.bonda_microsite_id);
 
-           if (isExpired) {
-              this.logger.log(`Usuario ${aff.user_id} expirado para ONG. Suspendiendo en Bonda...`);
-              
-              // Soft delete en Bonda
-              try {
-                await this.bondaService.eliminarAfiliado(aff.affiliate_code, { slug: microsite.slug });
-              } catch (bondaError: any) {
-                // Si retorna 404 o Not Found se asume que ya estaba borrado
-                if (!bondaError?.message?.includes('404') && !bondaError?.message?.includes('Not Found')) {
-                   this.logger.warn(`Aviso Bonda Delete: ${bondaError?.message}`);
-                }
-              }
-              
-              // Actualizar localmente a inactivo
-              await this.supabaseService.getClient().from('usuarios_bonda_afiliados')
-                 .update({ is_active: false })
-                 .eq('user_id', aff.user_id)
-                 .eq('bonda_microsite_id', aff.bonda_microsite_id);
+            await this.supabaseService
+              .getClient()
+              .from('usuarios')
+              .update({ is_active: false })
+              .eq('id', aff.user_id);
 
-              await this.supabaseService.getClient().from('usuarios')
-                 .update({ is_active: false })
-                 .eq('id', aff.user_id);
-                 
-              expirados++;
-           }
+            expirados++;
+          }
         } catch (e: any) {
-           this.logger.error(`Error procesando expiración para usuario ${aff.user_id}: ${e.message}`);
-           fallos++;
+          this.logger.error(
+            `Error procesando expiración para usuario ${aff.user_id}: ${e.message}`,
+          );
+          fallos++;
         }
         // Evitar rate-limit Bonda
         await this.delay(100);
       }
 
-      this.logger.log(`✅ Job Soft-Delete Expirados completado: ${expirados} suspendidos. Fallos: ${fallos}`);
+      this.logger.log(
+        `✅ Job Soft-Delete Expirados completado: ${expirados} suspendidos. Fallos: ${fallos}`,
+      );
     } catch (e: any) {
-      this.logger.error('❌ Error general en job de suspensión de expirados:', e.message);
+      this.logger.error(
+        '❌ Error general en job de suspensión de expirados:',
+        e.message,
+      );
     }
   }
 
@@ -588,9 +617,12 @@ export class SyncService {
     this.logger.log('⏰ Iniciando Reconciliación de Usuarios (Local vs Bonda)');
     try {
       // 1. Obtener batch de usuarios locales activos
-      const { data: usuarios } = await this.supabaseService.getClient()
+      const { data: usuarios } = await this.supabaseService
+        .getClient()
         .from('usuarios')
-        .select('id, dni, email, is_active, usuarios_bonda_afiliados(affiliate_code, bonda_microsite_id)')
+        .select(
+          'id, dni, email, is_active, usuarios_bonda_afiliados(affiliate_code, bonda_microsite_id)',
+        )
         .eq('is_active', true)
         .limit(100);
 
@@ -601,29 +633,46 @@ export class SyncService {
 
       for (const usuario of usuarios) {
         if (!usuario.usuarios_bonda_afiliados?.length) continue;
-        
+
         for (const aff of usuario.usuarios_bonda_afiliados as any[]) {
           try {
-             const bondaUser = await this.bondaService.obtenerAfiliado(aff.affiliate_code, { slug: aff.bonda_microsite_id || 'ctfin' });
-             
-             // Si retorna null (soft-deleteado) o error
-             if (bondaUser === null || bondaUser?.error?.code === 'USER_NOT_FOUND') {
-                this.logger.warn(`Desincronización detectada: Usuario ${usuario.id} está Activo Local pero Soft-Deleteado/No Encontrado en Bonda.`);
-                // Marcar alerta o desactivar
-                await this.supabaseService.getClient().from('usuarios').update({ is_active: false }).eq('id', usuario.id);
-                desincronizados++;
-             }
+            const bondaUser = await this.bondaService.obtenerAfiliado(
+              aff.affiliate_code,
+              { slug: aff.bonda_microsite_id || 'ctfin' },
+            );
+
+            // Si retorna null (soft-deleteado) o error
+            if (
+              bondaUser === null ||
+              bondaUser?.error?.code === 'USER_NOT_FOUND'
+            ) {
+              this.logger.warn(
+                `Desincronización detectada: Usuario ${usuario.id} está Activo Local pero Soft-Deleteado/No Encontrado en Bonda.`,
+              );
+              // Marcar alerta o desactivar
+              await this.supabaseService
+                .getClient()
+                .from('usuarios')
+                .update({ is_active: false })
+                .eq('id', usuario.id);
+              desincronizados++;
+            }
           } catch (e) {
-             fallos++;
+            fallos++;
           }
           // Evitar rate-limit Bonda
           await this.delay(300);
         }
       }
 
-      this.logger.log(`✅ Reconciliación completada: ${desincronizados} usuarios desactivados tras revisión. Fallos/Throttles: ${fallos}`);
+      this.logger.log(
+        `✅ Reconciliación completada: ${desincronizados} usuarios desactivados tras revisión. Fallos/Throttles: ${fallos}`,
+      );
     } catch (e: any) {
-      this.logger.error('❌ Error general en job de reconciliación:', e.message);
+      this.logger.error(
+        '❌ Error general en job de reconciliación:',
+        e.message,
+      );
     }
   }
 }

@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleInit, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  BadRequestException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
@@ -150,7 +155,12 @@ export class SupabaseService implements OnModuleInit {
   /**
    * Sube o actualiza la foto de perfil en Storage y guarda la URL en 'usuarios'
    */
-  async uploadAvatar(userId: string, fileBuffer: Buffer, mimetype: string, originalname: string): Promise<string> {
+  async uploadAvatar(
+    userId: string,
+    fileBuffer: Buffer,
+    mimetype: string,
+    originalname: string,
+  ): Promise<string> {
     const ext = originalname.split('.').pop() || 'png';
     const filePath = `${userId}-${Date.now()}.${ext}`;
 
@@ -165,9 +175,7 @@ export class SupabaseService implements OnModuleInit {
         const parts = userRecord.avatar_url.split('/avatars/');
         if (parts.length > 1) {
           const oldFileName = parts[1];
-          await this.getClient().storage
-            .from('avatars')
-            .remove([oldFileName]);
+          await this.getClient().storage.from('avatars').remove([oldFileName]);
           this.logger.log(`Old avatar deleted: ${oldFileName}`);
         }
       } catch (err) {
@@ -175,8 +183,8 @@ export class SupabaseService implements OnModuleInit {
       }
     }
 
-    const { data: uploadData, error: uploadError } = await this.getClient().storage
-      .from('avatars')
+    const { data: uploadData, error: uploadError } = await this.getClient()
+      .storage.from('avatars')
       .upload(filePath, fileBuffer, {
         contentType: mimetype,
         upsert: true,
@@ -188,9 +196,9 @@ export class SupabaseService implements OnModuleInit {
       throw new BadRequestException('No se pudo subir la foto de perfil');
     }
 
-    const { data: { publicUrl } } = this.getClient().storage
-      .from('avatars')
-      .getPublicUrl(filePath);
+    const {
+      data: { publicUrl },
+    } = this.getClient().storage.from('avatars').getPublicUrl(filePath);
 
     const { error: updateError } = await this.from('usuarios')
       .update({ avatar_url: publicUrl })
@@ -251,9 +259,12 @@ export class SupabaseService implements OnModuleInit {
    * Obtener el rol de un usuario desde el sistema de Auth   */
   async getUserRole(userId: string): Promise<string> {
     try {
-      const { data, error } = await this.from('usuarios').select('role').eq('id', userId).single();
+      const { data, error } = await this.from('usuarios')
+        .select('role')
+        .eq('id', userId)
+        .single();
       if (!error && data?.role) {
-         return data.role;
+        return data.role;
       }
       return 'user';
     } catch (e) {
@@ -270,13 +281,20 @@ export class SupabaseService implements OnModuleInit {
       .eq('id', localUserId)
       .select()
       .single();
-    
+
     if (error) {
-      this.logger.error(`Error actualizando rol en DB local para UUID: ${localUserId}`, error);
-      throw new BadRequestException('Error actualizando rol en base de datos local');
+      this.logger.error(
+        `Error actualizando rol en DB local para UUID: ${localUserId}`,
+        error,
+      );
+      throw new BadRequestException(
+        'Error actualizando rol en base de datos local',
+      );
     }
-    
-    this.logger.log(`✅ Usuario local ${localUserId} fue promovido a rol: ${role}`);
+
+    this.logger.log(
+      `✅ Usuario local ${localUserId} fue promovido a rol: ${role}`,
+    );
     return data;
   }
 
@@ -302,7 +320,9 @@ export class SupabaseService implements OnModuleInit {
       this.logger.error('Error al obtener afiliado usuario+micrositio:', error);
       throw error;
     }
-    return data ? { affiliate_code: data.affiliate_code, is_active: data.is_active } : null;
+    return data
+      ? { affiliate_code: data.affiliate_code, is_active: data.is_active }
+      : null;
   }
 
   /**
@@ -566,6 +586,7 @@ export class SupabaseService implements OnModuleInit {
    * Obtener una organización por Slug amigable (activa).
    */
   async getOrganizacionBySlug(slug: string) {
+    const normalizedSlug = slug.trim().toLowerCase();
     const { data, error } = await this.from('organizaciones')
       .select(
         `
@@ -594,9 +615,9 @@ export class SupabaseService implements OnModuleInit {
           slug,
           activo
         )
-      `
+      `,
       )
-      .eq('slug', slug)
+      .eq('slug', normalizedSlug)
       .eq('activa', true)
       .maybeSingle();
 
@@ -609,9 +630,14 @@ export class SupabaseService implements OnModuleInit {
 
     const bonda = Array.isArray(data.bonda_microsites)
       ? data.bonda_microsites.find((m: any) => m.activo)
-      : (data.bonda_microsites as any)?.activo ? data.bonda_microsites : null;
+      : (data.bonda_microsites as any)?.activo
+        ? data.bonda_microsites
+        : null;
 
-    const has_fiserv_config = !!data.fiserv_activo && !!data.fiserv_store_id && !!data.fiserv_shared_secret;
+    const has_fiserv_config =
+      !!data.fiserv_activo &&
+      !!data.fiserv_store_id &&
+      !!data.fiserv_shared_secret;
 
     return {
       id: data.id,
@@ -641,7 +667,7 @@ export class SupabaseService implements OnModuleInit {
    * Obtener organizaciones activas (incluye monto_minimo y su integración Bonda si existe).
    */
   async getOrganizacionesActivas(requireFiserv: boolean = false) {
-    // Obtener organizaciones activas directamente de la tabla organizaciones, 
+    // Obtener organizaciones activas directamente de la tabla organizaciones,
     // y traer sus micrositios de Bonda si tienen
     const { data, error } = await this.from('organizaciones')
       .select(
@@ -684,11 +710,16 @@ export class SupabaseService implements OnModuleInit {
     // Mapear los datos para retornar en el formato esperado por el frontend
     const organizacionesMapeadas = data.map((org: any) => {
       // Buscar si tiene una integración de Bonda activa
-      const bonda = Array.isArray(org.bonda_microsites) 
-        ? org.bonda_microsites.find((m: any) => m.activo) 
-        : org.bonda_microsites?.activo ? org.bonda_microsites : null;
+      const bonda = Array.isArray(org.bonda_microsites)
+        ? org.bonda_microsites.find((m: any) => m.activo)
+        : org.bonda_microsites?.activo
+          ? org.bonda_microsites
+          : null;
 
-      const has_fiserv_config = !!org.fiserv_activo && !!org.fiserv_store_id && !!org.fiserv_shared_secret;
+      const has_fiserv_config =
+        !!org.fiserv_activo &&
+        !!org.fiserv_store_id &&
+        !!org.fiserv_shared_secret;
 
       return {
         id: org.id,
@@ -716,9 +747,9 @@ export class SupabaseService implements OnModuleInit {
 
     // REQUERIMIENTO: Si requireFiserv es true, devolver solo aquellas con fiserv_activo configurado y activado.
     if (requireFiserv) {
-      return organizacionesMapeadas.filter(org => org.has_fiserv_config);
+      return organizacionesMapeadas.filter((org) => org.has_fiserv_config);
     }
-    
+
     // Si no requiere Fiserv, devuelve todas las organizaciones mapeadas
     return organizacionesMapeadas;
   }
@@ -1108,7 +1139,7 @@ export class SupabaseService implements OnModuleInit {
 
     if (error || !data || !data.fiserv_raw_response) return null;
 
-    const raw = data.fiserv_raw_response as any;
+    const raw = data.fiserv_raw_response;
     const ccbin = raw.ccbin || '';
     const last4 = raw.ccard_last4 || raw.last4 || '';
     const brand = raw.brand || raw.paymentMethod || 'Tarjeta';
@@ -1142,7 +1173,12 @@ export class SupabaseService implements OnModuleInit {
     // Agrupar por organizacion_id: sumar montos y conservar primera fecha y nombre
     const porOrg: Record<
       string,
-      { organizacion_nombre: string; created_at: string; ultimo_pago_at: string; totalDonado: number }
+      {
+        organizacion_nombre: string;
+        created_at: string;
+        ultimo_pago_at: string;
+        totalDonado: number;
+      }
     > = {};
     for (const dono of donaciones || []) {
       if (!dono.organizacion_id) continue;
@@ -1179,25 +1215,26 @@ export class SupabaseService implements OnModuleInit {
       if (agg.ultimo_pago_at) {
         const fechaUltimoPago = new Date(agg.ultimo_pago_at);
         const fechaVencimiento = new Date(fechaUltimoPago);
-        
+
         const expectedMonth = fechaVencimiento.getMonth() + 1;
         fechaVencimiento.setMonth(expectedMonth);
-        
+
         // Ajuste en caso de saltar el mes (ej. 31 Ene -> 3 Mar en vez de 28 Feb)
         if (fechaVencimiento.getMonth() > expectedMonth % 12) {
           fechaVencimiento.setDate(0); // Último día del mes esperado
         }
-        
+
         // Extender el vencimiento hasta el final del día (23:59:59.999)
         fechaVencimiento.setHours(23, 59, 59, 999);
-        
+
         const ahora = new Date();
         isActivoDinamico = ahora <= fechaVencimiento;
         fechaVencimientoObj = fechaVencimiento;
       }
 
       // El usuario se reporta activo sólo si localmente lo marca la DB Y dinámicamente no ha expirado su mes.
-      const isActivoFinal = (afiliado ? afiliado.is_active : false) && isActivoDinamico;
+      const isActivoFinal =
+        (afiliado ? afiliado.is_active : false) && isActivoDinamico;
 
       fundacionesUnicas.push({
         bonda_microsite_id: microsite?.id || organizacionId,
@@ -1504,12 +1541,14 @@ export class SupabaseService implements OnModuleInit {
   async getDueSubscriptions() {
     const hoy = new Date().toISOString().split('T')[0];
     const { data, error } = await this.from('suscripciones')
-      .select(`
+      .select(
+        `
         *,
         usuarios ( nombre, email ),
         organizaciones ( nombre, slug, fiserv_store_id, fiserv_shared_secret ),
         user_payment_methods (*)
-      `)
+      `,
+      )
       .eq('estado', 'activa')
       .lte('fecha_proximo_cobro', hoy);
 

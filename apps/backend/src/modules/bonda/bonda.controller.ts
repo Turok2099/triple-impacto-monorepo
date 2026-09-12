@@ -96,11 +96,13 @@ export class BondaController {
     let fundacionActiva: any = null;
 
     if (microsite) {
-      fundacionActiva = fundaciones.find(f => f.micrositio_slug === microsite && f.is_active);
+      fundacionActiva = fundaciones.find(
+        (f) => f.micrositio_slug === microsite && f.is_active,
+      );
     }
-    
+
     if (!fundacionActiva) {
-      fundacionActiva = fundaciones.find(f => f.is_active);
+      fundacionActiva = fundaciones.find((f) => f.is_active);
     }
 
     if (!fundacionActiva) {
@@ -176,11 +178,13 @@ export class BondaController {
     let fundacionActiva: any = null;
 
     if (microsite) {
-      fundacionActiva = fundaciones.find(f => f.micrositio_slug === microsite && f.is_active);
+      fundacionActiva = fundaciones.find(
+        (f) => f.micrositio_slug === microsite && f.is_active,
+      );
     }
-    
+
     if (!fundacionActiva) {
-      fundacionActiva = fundaciones.find(f => f.is_active);
+      fundacionActiva = fundaciones.find((f) => f.is_active);
     }
 
     if (!fundacionActiva) {
@@ -311,17 +315,21 @@ export class BondaController {
 
     // Obtener las fundaciones del usuario con su estado real calculado
     const fundaciones = await this.supabase.getFundacionesUsuario(userId);
-    
+
     // Buscar primero si el slug que manda el frontend está activo
-    let fundacionActiva = fundaciones.find(f => f.micrositio_slug === solicitarDto.micrositioSlug && f.is_active);
+    let fundacionActiva = fundaciones.find(
+      (f) => f.micrositio_slug === solicitarDto.micrositioSlug && f.is_active,
+    );
 
     // Si no está activo o no existe, tomar CUALQUIER fundación que esté activa
     if (!fundacionActiva) {
-      fundacionActiva = fundaciones.find(f => f.is_active);
+      fundacionActiva = fundaciones.find((f) => f.is_active);
     }
 
     if (!fundacionActiva) {
-      throw new NotFoundException('Afiliado no encontrado o inactivo para solicitar cupones. Debes tener al menos una donación al día.');
+      throw new NotFoundException(
+        'Afiliado no encontrado o inactivo para solicitar cupones. Debes tener al menos una donación al día.',
+      );
     }
 
     const codigoAfiliadoReal = fundacionActiva.affiliate_code;
@@ -486,9 +494,11 @@ export class BondaController {
       // Obtener suscripciones activas
       let suscripciones: any[] = [];
       try {
-        const { data, error } = await this.supabase.getClient()
+        const { data, error } = await this.supabase
+          .getClient()
           .from('suscripciones')
-          .select(`
+          .select(
+            `
             id,
             monto,
             moneda,
@@ -497,25 +507,36 @@ export class BondaController {
             estado,
             organizacion:organizaciones!inner (id, nombre),
             metodo_pago:user_payment_methods (card_brand, last_4)
-          `)
+          `,
+          )
           .eq('usuario_id', userId)
           .eq('estado', 'activa');
-          
+
         if (!error && data) {
-           suscripciones = (data as any[]).map(sub => ({
-              id: sub.id,
-              monto: sub.monto,
-              moneda: sub.moneda,
-              frecuencia: sub.frecuencia,
-              fechaProximoCobro: sub.fecha_proximo_cobro,
-              estado: sub.estado,
-              organizacionId: Array.isArray(sub.organizacion) ? sub.organizacion[0]?.id : sub.organizacion?.id,
-              organizacionNombre: Array.isArray(sub.organizacion) ? sub.organizacion[0]?.nombre : sub.organizacion?.nombre,
-              metodoPago: sub.metodo_pago ? {
-                 brand: Array.isArray(sub.metodo_pago) ? sub.metodo_pago[0]?.card_brand : sub.metodo_pago.card_brand,
-                 last4: Array.isArray(sub.metodo_pago) ? sub.metodo_pago[0]?.last_4 : sub.metodo_pago.last_4
-              } : null
-           }));
+          suscripciones = (data as any[]).map((sub) => ({
+            id: sub.id,
+            monto: sub.monto,
+            moneda: sub.moneda,
+            frecuencia: sub.frecuencia,
+            fechaProximoCobro: sub.fecha_proximo_cobro,
+            estado: sub.estado,
+            organizacionId: Array.isArray(sub.organizacion)
+              ? sub.organizacion[0]?.id
+              : sub.organizacion?.id,
+            organizacionNombre: Array.isArray(sub.organizacion)
+              ? sub.organizacion[0]?.nombre
+              : sub.organizacion?.nombre,
+            metodoPago: sub.metodo_pago
+              ? {
+                  brand: Array.isArray(sub.metodo_pago)
+                    ? sub.metodo_pago[0]?.card_brand
+                    : sub.metodo_pago.card_brand,
+                  last4: Array.isArray(sub.metodo_pago)
+                    ? sub.metodo_pago[0]?.last_4
+                    : sub.metodo_pago.last_4,
+                }
+              : null,
+          }));
         }
       } catch (error) {
         console.warn('Error al obtener suscripciones:', error);
@@ -603,7 +624,9 @@ export class BondaController {
 
     const donacion = await this.supabase.getDonacionById(donacionId);
     if (!donacion || donacion.usuario_id !== userId) {
-      throw new NotFoundException('Donación no encontrada o no pertenece a tu usuario');
+      throw new NotFoundException(
+        'Donación no encontrada o no pertenece a tu usuario',
+      );
     }
 
     const usuario = await this.supabase.findUserById(userId);
@@ -620,11 +643,13 @@ export class BondaController {
         currency: donacion.moneda,
         approvalCode: donacion.payment_status || 'APROBADO',
         oid: donacion.payment_id || donacion.id,
-      }
+      },
     );
 
     if (!res) {
-      throw new BadRequestException('No se pudo reenviar el comprobante, intenta de nuevo más tarde');
+      throw new BadRequestException(
+        'No se pudo reenviar el comprobante, intenta de nuevo más tarde',
+      );
     }
 
     return { success: true, message: 'Comprobante reenviado con éxito' };

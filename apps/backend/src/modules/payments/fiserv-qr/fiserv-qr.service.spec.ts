@@ -15,7 +15,7 @@ describe('FiservQrService', () => {
         'fiserv.qrCity': 'Buenos Aires',
         'fiserv.qrPostalCode': 'C1000AAB',
         'fiserv.qrDomain': 'ar.com.ayni',
-        'environment': 'development',
+        environment: 'development',
       };
       return config[key];
     }),
@@ -51,7 +51,7 @@ describe('FiservQrService', () => {
 
   describe('generateDynamicQr and extractOrderIdFromQr', () => {
     it('should generate a valid EMVCo QR string and correctly extract the order ID', () => {
-      const amount = 1500.50;
+      const amount = 1500.5;
       const orderId = 'test-order-id-12345';
       const merchantName = 'Fundación Ayni';
 
@@ -75,7 +75,8 @@ describe('FiservQrService', () => {
 
     it('should handle order ID truncation safely (limit of 25 characters)', () => {
       const amount = 500;
-      const longOrderId = 'this-is-a-very-long-order-id-that-exceeds-twenty-five';
+      const longOrderId =
+        'this-is-a-very-long-order-id-that-exceeds-twenty-five';
       const expectedTruncatedId = longOrderId.substring(0, 25); // 'this-is-a-very-long-order'
 
       const qrString = service.generateDynamicQr(amount, longOrderId);

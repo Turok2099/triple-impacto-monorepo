@@ -141,7 +141,9 @@ export class BondaService {
         `Error al obtener cupones de Bonda: ${error.message}`,
         error.response?.data,
       );
-      throw new Error(`Error al obtener cupones de Bonda: ${JSON.stringify(error.response?.data || error.message)}`);
+      throw new Error(
+        `Error al obtener cupones de Bonda: ${JSON.stringify(error.response?.data || error.message)}`,
+      );
     }
   }
 
@@ -186,7 +188,9 @@ export class BondaService {
   ): Promise<CuponesResponseDto> {
     const config = await this.resolveConfig(options);
     if (this.useMocks) {
-      this.logger.warn('obtenerCuponesRecibidos: usando respuesta vacía (mock)');
+      this.logger.warn(
+        'obtenerCuponesRecibidos: usando respuesta vacía (mock)',
+      );
       return { count: 0, cupones: [], next: null, previous: null };
     }
     if (!config) {

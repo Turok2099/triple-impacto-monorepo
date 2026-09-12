@@ -71,18 +71,10 @@ const testimonials: Testimonial[] = [
     rating: 5,
   },
   {
-    id: 4,
-    name: "Micaela Romano",
-    role: "Analista de Marketing",
-    avatar: "👩",
-    text: "Desde el inicio me pareció un beneficio que genera un verdadero círculo virtuoso: impulsa las economías locales, acompaña a una ONG, ofrece valor directo a quienes la utilizamos y permite a las empresas brindar a sus colaboradores un beneficio que hace más eficiente su presupuesto. Gracias a Club Triple Impacto por trabajar en la mejora continua.",
-    rating: 5,
-  },
-  {
     id: 5,
     name: "Carolina Casares",
     role: "Directora Ejecutiva - Proyectar ONG",
-    avatar: "https://res.cloudinary.com/dxbtafe9u/image/upload/v1772639410/PROYECTARR_fkylyp.jpg",
+    avatar: "👩",
     text: "El verdadero triple impacto ocurre cuando el propósito se vuelve acción compartida y crecemos juntos, en este caso Proyectar ONG, CORIPA y sus colaboradores",
     rating: 5,
   },
@@ -182,35 +174,61 @@ export default function WhyDonateSection() {
         {/* Ventajas & Impacto */}
         <div className="mx-auto max-w-6xl px-4 py-8 mb-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            
             {/* Personas Beneficiadas (Stat principal) */}
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:border-teal-300 hover:shadow-xl transition-all text-center flex flex-col items-center justify-center">
-              <Users className="w-12 h-12 text-[#2c8184] mb-4" strokeWidth={1.5} />
-              <div className="font-bold text-4xl text-[#2c8184] mb-2">+ 15.000</div>
-              <p className="font-bold text-sm tracking-wide uppercase text-gray-800">Personas beneficiadas</p>
+              <Users
+                className="w-12 h-12 text-[#2c8184] mb-4"
+                strokeWidth={1.5}
+              />
+              <div className="font-bold text-4xl text-[#2c8184] mb-2">
+                + 15.000
+              </div>
+              <p className="font-bold text-sm tracking-wide uppercase text-gray-800">
+                Personas beneficiadas
+              </p>
             </div>
 
             {/* Transparencia */}
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:border-teal-300 hover:shadow-xl transition-all text-center flex flex-col items-center justify-center">
-              <ShieldCheck className="w-12 h-12 text-[#2c8184] mb-4" strokeWidth={1.5} />
-              <div className="font-bold text-xl text-gray-900 mb-2">Transparencia garantizada</div>
-              <p className="text-sm text-gray-600">Cada donación es auditada, trazable y verificable.</p>
+              <ShieldCheck
+                className="w-12 h-12 text-[#2c8184] mb-4"
+                strokeWidth={1.5}
+              />
+              <div className="font-bold text-xl text-gray-900 mb-2">
+                Transparencia garantizada
+              </div>
+              <p className="text-sm text-gray-600">
+                Cada donación es auditada, trazable y verificable.
+              </p>
             </div>
 
             {/* Descuentos */}
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:border-teal-300 hover:shadow-xl transition-all text-center flex flex-col items-center justify-center">
-              <Gift className="w-12 h-12 text-[#2c8184] mb-4" strokeWidth={1.5} />
-              <div className="font-bold text-xl text-gray-900 mb-2">Descuentos al instante</div>
-              <p className="text-sm text-gray-600">Accedé a cientos de beneficios sumando impacto.</p>
+              <Gift
+                className="w-12 h-12 text-[#2c8184] mb-4"
+                strokeWidth={1.5}
+              />
+              <div className="font-bold text-xl text-gray-900 mb-2">
+                Descuentos al instante
+              </div>
+              <p className="text-sm text-gray-600">
+                Accedé a cientos de beneficios sumando impacto.
+              </p>
             </div>
 
             {/* Cancelación */}
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:border-teal-300 hover:shadow-xl transition-all text-center flex flex-col items-center justify-center">
-              <XCircle className="w-12 h-12 text-[#2c8184] mb-4" strokeWidth={1.5} />
-              <div className="font-bold text-xl text-gray-900 mb-2">Cancela cuando quieras</div>
-              <p className="text-sm text-gray-600">Pausá o cancelá tu donación online y sin ataduras.</p>
+              <XCircle
+                className="w-12 h-12 text-[#2c8184] mb-4"
+                strokeWidth={1.5}
+              />
+              <div className="font-bold text-xl text-gray-900 mb-2">
+                Cancela cuando quieras
+              </div>
+              <p className="text-sm text-gray-600">
+                Pausá o cancelá tu donación online y sin ataduras.
+              </p>
             </div>
-
           </div>
         </div>
 
@@ -218,7 +236,9 @@ export default function WhyDonateSection() {
         <div className="mb-20">
           <div className="text-center mb-12 px-4">
             <p className="text-xl md:text-2xl font-medium text-gray-800 max-w-4xl mx-auto leading-relaxed">
-              Club Triple Impacto aborda los 17 ODS, generando beneficios económicos, sociales y ambientales, y promoviendo la sostenibilidad y el desarrollo equitativo.
+              Club Triple Impacto aborda los 17 ODS, generando beneficios
+              económicos, sociales y ambientales, y promoviendo la
+              sostenibilidad y el desarrollo equitativo.
             </p>
           </div>
 
@@ -244,12 +264,13 @@ export default function WhyDonateSection() {
             </p>
           </div>
 
-          <div className="relative max-w-6xl mx-auto" 
-               onMouseEnter={() => setIsHovered(true)}
-               onMouseLeave={() => setIsHovered(false)}>
-            
+          <div
+            className="relative max-w-6xl mx-auto"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
             {/* Controles del Carrusel */}
-            <button 
+            <button
               onClick={scrollLeftClick}
               className="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 p-3 bg-white border-2 border-gray-100 rounded-full shadow-lg text-[#2c8184] hover:bg-teal-50 hover:scale-110 transition-all sm:-ml-6"
               aria-label="Testimonio anterior"
@@ -257,7 +278,7 @@ export default function WhyDonateSection() {
               <ChevronLeft className="w-6 h-6" />
             </button>
 
-            <button 
+            <button
               onClick={scrollRightClick}
               className="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 p-3 bg-white border-2 border-gray-100 rounded-full shadow-lg text-[#2c8184] hover:bg-teal-50 hover:scale-110 transition-all sm:-mr-6"
               aria-label="Testimonio siguiente"
@@ -267,10 +288,10 @@ export default function WhyDonateSection() {
 
             {/* Contenedor principal con recorte de desborde */}
             <div className="overflow-hidden pb-8 -mx-3">
-              <div 
+              <div
                 className="flex flex-row flex-nowrap w-full transition-transform duration-500 ease-out"
-                style={{ 
-                  transform: `translate3d(-${currentIndex * (isMobile ? 100 : 33.33333)}%, 0, 0)` 
+                style={{
+                  transform: `translate3d(-${currentIndex * (isMobile ? 100 : 33.33333)}%, 0, 0)`,
                 }}
               >
                 {testimonials.map((testimonial, index) => (
@@ -301,8 +322,12 @@ export default function WhyDonateSection() {
                       {/* Autor */}
                       <div className="flex items-center gap-3 pt-4 border-t border-gray-200 mt-auto">
                         <div className="w-12 h-12 bg-linear-to-br from-purple-400 to-blue-400 rounded-full flex items-center justify-center overflow-hidden text-2xl shrink-0">
-                          {testimonial.avatar.startsWith('http') ? (
-                            <img src={testimonial.avatar} alt={testimonial.name} className="w-full h-full object-cover" />
+                          {testimonial.avatar.startsWith("http") ? (
+                            <img
+                              src={testimonial.avatar}
+                              alt={testimonial.name}
+                              className="w-full h-full object-cover"
+                            />
                           ) : (
                             testimonial.avatar
                           )}
@@ -321,7 +346,7 @@ export default function WhyDonateSection() {
                 ))}
               </div>
             </div>
-            
+
             {/* Pequeña capa invisible para esconder barra de scroll webkit en CSS si no aplica lo de style */}
             <style jsx>{`
               .hide-scrollbar::-webkit-scrollbar {
@@ -340,8 +365,6 @@ export default function WhyDonateSection() {
             `}</style>
           </div>
         </div>
-
-
       </div>
     </section>
   );

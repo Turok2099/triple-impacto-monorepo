@@ -4,13 +4,13 @@
  */
 export function computeCRC16(value: string): string {
   const data = Buffer.from(value, 'utf-8');
-  let crcValue = 0xFFFF;
+  let crcValue = 0xffff;
 
   for (const b of data) {
     for (let i = 0; i < 8; i++) {
       const bit = ((b >> (7 - i)) & 1) === 1;
       const c15 = ((crcValue >> 15) & 1) === 1;
-      crcValue = (crcValue << 1) & 0xFFFF;
+      crcValue = (crcValue << 1) & 0xffff;
       if (c15 !== bit) {
         crcValue ^= 0x1021;
       }

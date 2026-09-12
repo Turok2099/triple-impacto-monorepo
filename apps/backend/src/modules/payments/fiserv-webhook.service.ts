@@ -74,13 +74,16 @@ export class FiservWebhookService {
     }
 
     const statusStr = str(body.status);
-    
+
     // Si la transacción fue declinada o cancelada, el approval_code empieza con N o ?, o el status es FAILED/DECLINED
     const isApproved = approvalCode.startsWith('Y') || statusStr === 'APPROVED';
-    
+
     if (!isApproved) {
-      this.logger.warn(`Fiserv notification: pago declinado o cancelado (approvalCode=${approvalCode}, status=${statusStr}).`);
-      const failReason = str(body.fail_reason) || str(body.failReason) || approvalCode;
+      this.logger.warn(
+        `Fiserv notification: pago declinado o cancelado (approvalCode=${approvalCode}, status=${statusStr}).`,
+      );
+      const failReason =
+        str(body.fail_reason) || str(body.failReason) || approvalCode;
       await this.handleDeclined(oid, failReason);
       return;
     }
@@ -105,7 +108,9 @@ export class FiservWebhookService {
     // ESTRATEGIA PRODUCTIVO FISERV: Fetch shared_secret dinámico
     let sharedSecret = config.sharedSecret;
     if (attempt.organizacion_id) {
-      const org = await this.supabase.getOrganizacionById(attempt.organizacion_id);
+      const org = await this.supabase.getOrganizacionById(
+        attempt.organizacion_id,
+      );
       if (org && org.fiserv_shared_secret) {
         sharedSecret = org.fiserv_shared_secret as string;
       }
@@ -151,7 +156,7 @@ export class FiservWebhookService {
 
     await this.supabase.updatePaymentAttempt(attempt.id, {
       status: 'completed',
-      fiserv_raw_response: body as Record<string, unknown>,
+      fiserv_raw_response: body,
     });
 
     const monto = parseFloat(chargetotal) || Number(attempt.amount) || 0;
@@ -182,15 +187,20 @@ export class FiservWebhookService {
     // Obtener info del usuario para enviar el correo
     const user = await this.supabase.findUserById(attempt.user_id);
     if (user && user.email) {
-      this.mailService.sendPaymentReceiptEmail(user.email, user.nombre || 'Donante', {
-        status: 'approved',
-        amount: chargetotal || String(attempt.amount),
-        currency: currency || attempt.currency || 'ARS',
-        approvalCode: approvalCode,
-        oid: oid,
-      }).catch(err => {
-        this.logger.error(`Error enviando correo de éxito para oid=${oid}:`, err);
-      });
+      this.mailService
+        .sendPaymentReceiptEmail(user.email, user.nombre || 'Donante', {
+          status: 'approved',
+          amount: chargetotal || String(attempt.amount),
+          currency: currency || attempt.currency || 'ARS',
+          approvalCode: approvalCode,
+          oid: oid,
+        })
+        .catch((err) => {
+          this.logger.error(
+            `Error enviando correo de éxito para oid=${oid}:`,
+            err,
+          );
+        });
     }
 
     this.logger.log(
@@ -202,24 +212,34 @@ export class FiservWebhookService {
    * Maneja el flujo de pagos declinados desde la redirección del frontend (o webhook si Fiserv lo envía).
    * Marca el intento de pago como fallido y envía un correo informando el rechazo.
    */
-  async handleDeclined(oid: string, failReason?: string, responseCode?: string): Promise<void> {
+  async handleDeclined(
+    oid: string,
+    failReason?: string,
+    responseCode?: string,
+  ): Promise<void> {
     if (!oid) return;
 
     const attempt = await this.supabase.getPaymentAttemptByOrderId(oid);
     if (!attempt) {
-      this.logger.warn(`Fiserv declined: attempt no encontrado para oid=${oid}`);
+      this.logger.warn(
+        `Fiserv declined: attempt no encontrado para oid=${oid}`,
+      );
       return;
     }
 
     // Si ya está completado (ej: webhook llegó antes y fue éxito), no hacer nada
     if (attempt.status === 'completed') {
-      this.logger.log(`Fiserv declined: ignorado porque la orden ${oid} ya está completada.`);
+      this.logger.log(
+        `Fiserv declined: ignorado porque la orden ${oid} ya está completada.`,
+      );
       return;
     }
 
     // Marcar como failed si no lo estaba
     if (attempt.status !== 'failed') {
-      await this.supabase.updatePaymentAttempt(attempt.id, { status: 'failed' });
+      await this.supabase.updatePaymentAttempt(attempt.id, {
+        status: 'failed',
+      });
     }
 
     this.logger.log(`Fiserv order ${oid} marcada como failed.`);
@@ -227,7 +247,9 @@ export class FiservWebhookService {
     // Obtener información del usuario
     const user = await this.supabase.findUserById(attempt.user_id);
     if (!user || !user.email) {
-      this.logger.warn(`Fiserv declined: usuario o correo no encontrado para el intento de pago ${attempt.id}`);
+      this.logger.warn(
+        `Fiserv declined: usuario o correo no encontrado para el intento de pago ${attempt.id}`,
+      );
       return;
     }
 
@@ -243,10 +265,15 @@ export class FiservWebhookService {
       }
 
       // 1. Generar la cadena EMVCo
-      const qrString = this.fiservQrService.generateDynamicQr(amountNum, oid, orgName);
+      const qrString = this.fiservQrService.generateDynamicQr(
+        amountNum,
+        oid,
+        orgName,
+      );
 
       // 2. Generar el código QR en Base64
-      const qrImageBase64 = await this.fiservQrService.generateQrImage(qrString);
+      const qrImageBase64 =
+        await this.fiservQrService.generateQrImage(qrString);
 
       // 3. Enviar el correo de fallback
       await this.mailService.sendPaymentFallbackQrEmail(
@@ -260,18 +287,31 @@ export class FiservWebhookService {
         },
         qrImageBase64,
       );
-      this.logger.log(`✅ Correo de fallback QR enviado exitosamente para oid=${oid}`);
+      this.logger.log(
+        `✅ Correo de fallback QR enviado exitosamente para oid=${oid}`,
+      );
     } catch (qrError) {
-      this.logger.error(`Error al generar o enviar QR de fallback para oid=${oid}. Enviando correo de rechazo estándar.`, qrError);
-      
+      this.logger.error(
+        `Error al generar o enviar QR de fallback para oid=${oid}. Enviando correo de rechazo estándar.`,
+        qrError,
+      );
+
       // Fallback: Si falla la generación del QR, enviar el correo de rechazo estándar
-      this.mailService.sendPaymentReceiptEmail(user.email, user.nombre || 'Donante', {
-        status: 'declined',
-        oid: oid,
-        failReason: failReason || responseCode || 'Rechazado por el procesador de pagos',
-      }).catch(err => {
-        this.logger.error(`Error enviando correo de rechazo estándar para oid=${oid}:`, err);
-      });
+      this.mailService
+        .sendPaymentReceiptEmail(user.email, user.nombre || 'Donante', {
+          status: 'declined',
+          oid: oid,
+          failReason:
+            failReason ||
+            responseCode ||
+            'Rechazado por el procesador de pagos',
+        })
+        .catch((err) => {
+          this.logger.error(
+            `Error enviando correo de rechazo estándar para oid=${oid}:`,
+            err,
+          );
+        });
     }
   }
 
@@ -330,10 +370,14 @@ export class FiservWebhookService {
       : this.generateAffiliateCode(user.email);
 
     let activeEmail = user.email;
-    let activeCode = initialCode;
-    let activeDni = safeDni;
+    const activeCode = initialCode;
+    const activeDni = safeDni;
 
-    const attemptCreation = async (codeToTry: string, emailToTry: string, dniToTry?: number) => {
+    const attemptCreation = async (
+      codeToTry: string,
+      emailToTry: string,
+      dniToTry?: number,
+    ) => {
       return this.bonda.crearAfiliado(
         {
           code: codeToTry,
@@ -353,23 +397,26 @@ export class FiservWebhookService {
 
       // Fallback 1: Email duplicado en Bonda
       if (
-        res?.success === false && 
+        res?.success === false &&
         res?.error?.detail?.email?.[0]?.includes('único')
       ) {
         activeEmail = user.email.replace('@', `+bonda${Date.now()}@`);
-        this.logger.warn(`Email ${user.email} en uso en Bonda. Reintentando con ${activeEmail}`);
+        this.logger.warn(
+          `Email ${user.email} en uso en Bonda. Reintentando con ${activeEmail}`,
+        );
         res = await attemptCreation(activeCode, activeEmail, activeDni);
       }
 
       // Fallback 2: Código o DNI duplicado en Bonda (El usuario ya existe en esta ONG)
-      const isCodeDuplicated = 
-        res?.error?.detail?.code?.[0]?.includes('ya lo está utilizando') || 
+      const isCodeDuplicated =
+        res?.error?.detail?.code?.[0]?.includes('ya lo está utilizando') ||
         res?.error?.detail?.code?.[0]?.includes('uso') ||
         res?.error?.detail?.code?.[0]?.includes('único') ||
-        (res?.error?.code === 'HttpPublicResponseException' && res?.error?.detail?.code?.[0]?.includes('ya lo está utilizando'));
+        (res?.error?.code === 'HttpPublicResponseException' &&
+          res?.error?.detail?.code?.[0]?.includes('ya lo está utilizando'));
 
-      const isDniDuplicated = 
-        res?.error?.detail?.dni?.[0]?.includes('ya lo está utilizando') || 
+      const isDniDuplicated =
+        res?.error?.detail?.dni?.[0]?.includes('ya lo está utilizando') ||
         res?.error?.detail?.dni?.[0]?.includes('uso') ||
         res?.error?.detail?.dni?.[0]?.includes('único');
 

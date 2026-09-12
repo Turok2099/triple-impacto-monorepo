@@ -16,13 +16,17 @@ describe('FiservWebhookService - ensureBondaAffiliateForUserAndOrganisation', ()
 
   const duplicatedCodeResponse = {
     success: false,
-    error: { detail: { code: ['El código ya lo está utilizando otro afiliado'] } },
+    error: {
+      detail: { code: ['El código ya lo está utilizando otro afiliado'] },
+    },
   };
 
-  function buildService(overrides: {
-    bonda?: Partial<Record<string, jest.Mock>>;
-    supabase?: Partial<Record<string, jest.Mock>>;
-  } = {}) {
+  function buildService(
+    overrides: {
+      bonda?: Partial<Record<string, jest.Mock>>;
+      supabase?: Partial<Record<string, jest.Mock>>;
+    } = {},
+  ) {
     const bonda = {
       crearAfiliado: jest.fn().mockResolvedValue(duplicatedCodeResponse),
       actualizarAfiliado: jest.fn().mockResolvedValue({ success: true }),
@@ -59,7 +63,10 @@ describe('FiservWebhookService - ensureBondaAffiliateForUserAndOrganisation', ()
       },
     });
 
-    await service.ensureBondaAffiliateForUserAndOrganisation(userId, organizacionId);
+    await service.ensureBondaAffiliateForUserAndOrganisation(
+      userId,
+      organizacionId,
+    );
 
     expect(bonda.obtenerAfiliado).toHaveBeenCalledWith(String(30111222), {
       organizacionId,
@@ -82,7 +89,10 @@ describe('FiservWebhookService - ensureBondaAffiliateForUserAndOrganisation', ()
       },
     });
 
-    await service.ensureBondaAffiliateForUserAndOrganisation(userId, organizacionId);
+    await service.ensureBondaAffiliateForUserAndOrganisation(
+      userId,
+      organizacionId,
+    );
 
     expect(bonda.actualizarAfiliado).not.toHaveBeenCalled();
     expect(supabase.upsertAffiliateForUser).not.toHaveBeenCalled();
@@ -95,7 +105,10 @@ describe('FiservWebhookService - ensureBondaAffiliateForUserAndOrganisation', ()
       },
     });
 
-    await service.ensureBondaAffiliateForUserAndOrganisation(userId, organizacionId);
+    await service.ensureBondaAffiliateForUserAndOrganisation(
+      userId,
+      organizacionId,
+    );
 
     expect(bonda.actualizarAfiliado).not.toHaveBeenCalled();
     expect(supabase.upsertAffiliateForUser).not.toHaveBeenCalled();
@@ -108,11 +121,16 @@ describe('FiservWebhookService - ensureBondaAffiliateForUserAndOrganisation', ()
           success: true,
           data: { member: { email: user.email } },
         }),
-        actualizarAfiliado: jest.fn().mockRejectedValue(new Error('Bonda caído')),
+        actualizarAfiliado: jest
+          .fn()
+          .mockRejectedValue(new Error('Bonda caído')),
       },
     });
 
-    await service.ensureBondaAffiliateForUserAndOrganisation(userId, organizacionId);
+    await service.ensureBondaAffiliateForUserAndOrganisation(
+      userId,
+      organizacionId,
+    );
 
     expect(supabase.upsertAffiliateForUser).not.toHaveBeenCalled();
   });

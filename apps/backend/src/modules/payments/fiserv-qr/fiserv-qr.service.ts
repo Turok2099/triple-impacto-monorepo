@@ -24,7 +24,11 @@ export class FiservQrService {
    * @param orderId ID de la orden o transacción.
    * @param merchantName Nombre del comercio (máximo 25 caracteres, sin acentos).
    */
-  generateDynamicQr(amount: number, orderId: string, merchantName?: string): string {
+  generateDynamicQr(
+    amount: number,
+    orderId: string,
+    merchantName?: string,
+  ): string {
     const config = {
       subcode: this.configService.get<string>('fiserv.qrServiceSubcode'),
       cuit: this.configService.get<string>('fiserv.qrCommerceCuit'),
@@ -53,7 +57,7 @@ export class FiservQrService {
     // 4. Campos de Transacción
     const f52 = this.formatField('52', config.mcc || '7399'); // MCC (Rubro)
     const f53 = this.formatField('53', '032'); // Moneda: ARS (Peso Argentino)
-    
+
     // El monto debe tener obligatoriamente dos decimales delimitados por punto
     const amountStr = amount.toFixed(2);
     const f54 = this.formatField('54', amountStr); // Monto del QR
@@ -70,8 +74,14 @@ export class FiservQrService {
       .trim();
     const f59 = this.formatField('59', cleanName);
 
-    const f60 = this.formatField('60', (config.city || 'Buenos Aires').substring(0, 15));
-    const f61 = this.formatField('61', (config.postalCode || 'C1000AAB').substring(0, 8));
+    const f60 = this.formatField(
+      '60',
+      (config.city || 'Buenos Aires').substring(0, 15),
+    );
+    const f61 = this.formatField(
+      '61',
+      (config.postalCode || 'C1000AAB').substring(0, 8),
+    );
 
     // 6. Campo 62: Campo adicional transparente para enviar el order_id
     // Subcampo 01 es de valor libre
@@ -102,7 +112,9 @@ export class FiservQrService {
     const crc = computeCRC16(qrWithoutCRC);
     const finalQr = `${qrWithoutCRC.slice(0, -4)}${this.formatField('63', crc)}`;
 
-    this.logger.log(`Generado QR EMVCo para OrderId=${orderId}, Monto=${amountStr}`);
+    this.logger.log(
+      `Generado QR EMVCo para OrderId=${orderId}, Monto=${amountStr}`,
+    );
     this.logger.debug(`QR String: ${finalQr}`);
 
     return finalQr;
@@ -156,7 +168,10 @@ export class FiservQrService {
         index += 4 + len;
       }
     } catch (e) {
-      this.logger.error('Error al parsear el string EMVCo para extraer order_id:', e);
+      this.logger.error(
+        'Error al parsear el string EMVCo para extraer order_id:',
+        e,
+      );
     }
     return null;
   }
@@ -165,29 +180,35 @@ export class FiservQrService {
    * Consulta el estado de un pago QR a partir de su UUID.
    */
   async getPaymentStatus(uuid: string): Promise<any> {
-    const apiKey = this.configService.get<string>('fiserv.apiKey') || process.env.FISERV_API_KEY;
-    const isProd = this.configService.get<string>('environment') === 'production';
-    
+    const apiKey =
+      this.configService.get<string>('fiserv.apiKey') ||
+      process.env.FISERV_API_KEY;
+    const isProd =
+      this.configService.get<string>('environment') === 'production';
+
     if (!apiKey) {
       throw new Error('Fiserv API Key not configured');
     }
 
-    const host = isProd 
-      ? 'https://connect.latam.fiservapis.com' 
+    const host = isProd
+      ? 'https://connect.latam.fiservapis.com'
       : 'https://connect-cert.latam.fiservapis.com';
-      
+
     const url = `${host}/qr-latam-api/v1/operations-managment/payments?uuid=${uuid}`;
 
     try {
       const response = await axios.get(url, {
         headers: {
-          'Authorization': apiKey,
-          'Accept': 'application/json',
-        }
+          Authorization: apiKey,
+          Accept: 'application/json',
+        },
       });
       return response.data;
     } catch (error: any) {
-      this.logger.error(`Error querying Fiserv QR payment status for uuid=${uuid}:`, error.response?.data || error.message);
+      this.logger.error(
+        `Error querying Fiserv QR payment status for uuid=${uuid}:`,
+        error.response?.data || error.message,
+      );
       throw error.response?.data || error;
     }
   }

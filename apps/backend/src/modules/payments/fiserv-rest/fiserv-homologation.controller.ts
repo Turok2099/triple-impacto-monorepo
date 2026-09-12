@@ -4,14 +4,29 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Controller('test/fiserv-rest/homologation')
 export class FiservHomologationController {
-  constructor(private readonly fiservRestService: FiservRestService) { }
+  constructor(private readonly fiservRestService: FiservRestService) {}
 
   @Post('run-matrix')
   async runMatrix(@Body() data: any) {
-    const { cardNumber, expiryMonth, expiryYear, securityCode, cardholderName, cardType } = data;
+    const {
+      cardNumber,
+      expiryMonth,
+      expiryYear,
+      securityCode,
+      cardholderName,
+      cardType,
+    } = data;
 
-    if (!cardNumber || !expiryMonth || !expiryYear || !securityCode || !cardType) {
-      throw new BadRequestException('Faltan datos de la tarjeta o el tipo de prueba');
+    if (
+      !cardNumber ||
+      !expiryMonth ||
+      !expiryYear ||
+      !securityCode ||
+      !cardType
+    ) {
+      throw new BadRequestException(
+        'Faltan datos de la tarjeta o el tipo de prueba',
+      );
     }
 
     // Usaremos el store principal configurado globalmente (ej. Concentrador)
@@ -32,12 +47,21 @@ export class FiservHomologationController {
           expiryDate: { month: expiryMonth, year: expiryYear },
           cardholderName: cardholderName || 'Test Fiserv',
         },
-        createToken: { reusable: true }
+        createToken: { reusable: true },
       };
 
-      const tokenResult = await this.fiservRestService.makeRequest('POST', '/payment-tokens', tokenPayload);
-      tokenValue = tokenResult.paymentToken?.value || tokenResult.ipgTransactionId;
-      results.push({ step: '1. Tokenization', status: 'SUCCESS', data: tokenResult });
+      const tokenResult = await this.fiservRestService.makeRequest(
+        'POST',
+        '/payment-tokens',
+        tokenPayload,
+      );
+      tokenValue =
+        tokenResult.paymentToken?.value || tokenResult.ipgTransactionId;
+      results.push({
+        step: '1. Tokenization',
+        status: 'SUCCESS',
+        data: tokenResult,
+      });
 
       if (cardType === 'mastercard') {
         // --- MATRIZ MASTERCARD ---
@@ -55,28 +79,56 @@ export class FiservHomologationController {
               authenticationType: 'Secure3DAuthenticationRequest',
               methodNotificationURL: 'https://www.clubtripleimpacto.com',
               termURL: 'https://www.clubtripleimpacto.com',
-              messageCategory: '80'
-            }
+              messageCategory: '80',
+            },
           };
-          saleResult = await this.fiservRestService.makeRequest('POST', '/payments', salePayload);
-          results.push({ step: '2. SALE + Data Only', status: 'SUCCESS', data: saleResult, orderId: saleOrderId });
+          saleResult = await this.fiservRestService.makeRequest(
+            'POST',
+            '/payments',
+            salePayload,
+          );
+          results.push({
+            step: '2. SALE + Data Only',
+            status: 'SUCCESS',
+            data: saleResult,
+            orderId: saleOrderId,
+          });
         } catch (e: any) {
-          results.push({ step: '2. SALE + Data Only', status: 'ERROR', error: e.response?.data || e.message });
-          return { success: false, partialResults: results, error: 'Fallo en SALE' };
+          results.push({
+            step: '2. SALE + Data Only',
+            status: 'ERROR',
+            error: e.response?.data || e.message,
+          });
+          return {
+            success: false,
+            partialResults: results,
+            error: 'Fallo en SALE',
+          };
         }
 
         // 3. VOID del SALE
         if (saleResult?.ipgTransactionId) {
           try {
             const voidPayload = { requestType: 'VoidTransaction', storeId };
-            const voidResult = await this.fiservRestService.makeRequest('POST', `/payments/${saleResult.ipgTransactionId}`, voidPayload);
-            results.push({ step: '3. VOID', status: 'SUCCESS', data: voidResult });
+            const voidResult = await this.fiservRestService.makeRequest(
+              'POST',
+              `/payments/${saleResult.ipgTransactionId}`,
+              voidPayload,
+            );
+            results.push({
+              step: '3. VOID',
+              status: 'SUCCESS',
+              data: voidResult,
+            });
           } catch (e: any) {
-            results.push({ step: '3. VOID', status: 'ERROR', error: e.response?.data || e.message });
+            results.push({
+              step: '3. VOID',
+              status: 'ERROR',
+              error: e.response?.data || e.message,
+            });
             // Continuamos aunque falle el void para no perder los datos
           }
         }
-
       } else if (cardType === 'visa') {
         // --- MATRIZ VISA ---
         // 2. PreAuth con Token (3 Cuotas)
@@ -88,13 +140,33 @@ export class FiservHomologationController {
             storeId,
             transactionAmount: { total: '100.00', currency: 'ARS' },
             paymentMethod: { paymentToken: { value: tokenValue } },
-            order: { orderId: preAuthOrderId, installmentOptions: { numberOfInstallments: 3 } }
+            order: {
+              orderId: preAuthOrderId,
+              installmentOptions: { numberOfInstallments: 3 },
+            },
           };
-          preAuthResult = await this.fiservRestService.makeRequest('POST', '/payments', preAuthPayload);
-          results.push({ step: '2. PreAuth (Cuotas)', status: 'SUCCESS', data: preAuthResult, orderId: preAuthOrderId });
+          preAuthResult = await this.fiservRestService.makeRequest(
+            'POST',
+            '/payments',
+            preAuthPayload,
+          );
+          results.push({
+            step: '2. PreAuth (Cuotas)',
+            status: 'SUCCESS',
+            data: preAuthResult,
+            orderId: preAuthOrderId,
+          });
         } catch (e: any) {
-          results.push({ step: '2. PreAuth (Cuotas)', status: 'ERROR', error: e.response?.data || e.message });
-          return { success: false, partialResults: results, error: 'Fallo en PreAuth' };
+          results.push({
+            step: '2. PreAuth (Cuotas)',
+            status: 'ERROR',
+            error: e.response?.data || e.message,
+          });
+          return {
+            success: false,
+            partialResults: results,
+            error: 'Fallo en PreAuth',
+          };
         }
 
         // 3. PostAuth (Captura)
@@ -106,12 +178,25 @@ export class FiservHomologationController {
               requestType: 'PostAuthTransaction',
               storeId,
               transactionAmount: { total: '100.00', currency: 'ARS' },
-              order: { orderId: preAuthOrderId }
+              order: { orderId: preAuthOrderId },
             };
-            postAuthResult = await this.fiservRestService.makeRequest('POST', `/payments/${preAuthResult.ipgTransactionId}`, postAuthPayload);
-            results.push({ step: '3. PostAuth', status: 'SUCCESS', data: postAuthResult, orderId: preAuthOrderId });
+            postAuthResult = await this.fiservRestService.makeRequest(
+              'POST',
+              `/payments/${preAuthResult.ipgTransactionId}`,
+              postAuthPayload,
+            );
+            results.push({
+              step: '3. PostAuth',
+              status: 'SUCCESS',
+              data: postAuthResult,
+              orderId: preAuthOrderId,
+            });
           } catch (e: any) {
-            results.push({ step: '3. PostAuth', status: 'ERROR', error: e.response?.data || e.message });
+            results.push({
+              step: '3. PostAuth',
+              status: 'ERROR',
+              error: e.response?.data || e.message,
+            });
           }
         }
 
@@ -121,12 +206,24 @@ export class FiservHomologationController {
             const returnPayload = {
               requestType: 'ReturnTransaction',
               storeId,
-              transactionAmount: { total: '100.00', currency: 'ARS' }
+              transactionAmount: { total: '100.00', currency: 'ARS' },
             };
-            const returnResult = await this.fiservRestService.makeRequest('POST', `/payments/${postAuthResult.ipgTransactionId}`, returnPayload);
-            results.push({ step: '4. RETURN', status: 'SUCCESS', data: returnResult });
+            const returnResult = await this.fiservRestService.makeRequest(
+              'POST',
+              `/payments/${postAuthResult.ipgTransactionId}`,
+              returnPayload,
+            );
+            results.push({
+              step: '4. RETURN',
+              status: 'SUCCESS',
+              data: returnResult,
+            });
           } catch (e: any) {
-            results.push({ step: '4. RETURN', status: 'ERROR', error: e.response?.data || e.message });
+            results.push({
+              step: '4. RETURN',
+              status: 'ERROR',
+              error: e.response?.data || e.message,
+            });
           }
         }
       }
@@ -145,7 +242,7 @@ export class FiservHomologationController {
       return {
         success: false,
         error: errorDetail,
-        partialResults: results
+        partialResults: results,
       };
     }
   }

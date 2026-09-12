@@ -84,7 +84,9 @@ export class PublicController {
     // Inicializar configuración del Bot desde variables de entorno
     this.PUBLIC_BOT_CONFIG = {
       dni: this.configService.get<string>('bonda.publicBot.dni') || '10101010',
-      masterSlug: this.configService.get<string>('bonda.publicBot.masterSlug') || 'https://clubplatolleno.bonda.com',
+      masterSlug:
+        this.configService.get<string>('bonda.publicBot.masterSlug') ||
+        'https://clubplatolleno.bonda.com',
     };
 
     // Validar que el DNI del Bot esté configurado
@@ -133,19 +135,19 @@ export class PublicController {
     { id: number; nombre: string; parent_id?: number | null }[]
   > {
     const todo = { id: 0, nombre: 'Todo' };
-    
+
     try {
       // 1. Intentar extraer categorías dinámicamente desde el catálogo en caché (lo más fiable)
       if (this.catalogCache && this.catalogCache.data.length > 0) {
         const uniqueCategories = Array.from(
-          new Set(this.catalogCache.data.map(c => c.categoria_principal))
+          new Set(this.catalogCache.data.map((c) => c.categoria_principal)),
         )
-        .filter(Boolean)
-        .sort()
-        .map((nombre, index) => ({
-          id: index + 1000, // IDs temporales para el front
-          nombre: nombre as string
-        }));
+          .filter(Boolean)
+          .sort()
+          .map((nombre, index) => ({
+            id: index + 1000, // IDs temporales para el front
+            nombre: nombre as string,
+          }));
 
         if (uniqueCategories.length > 0) {
           return [todo, ...uniqueCategories];
@@ -158,10 +160,10 @@ export class PublicController {
       });
 
       const rootCategories = bondaCategorias
-        .filter(c => !c.parent_id)
-        .map(c => ({
+        .filter((c) => !c.parent_id)
+        .map((c) => ({
           id: c.id,
-          nombre: c.nombre
+          nombre: c.nombre,
         }));
 
       if (rootCategories.length > 0) {
@@ -211,8 +213,10 @@ export class PublicController {
     @Query('deduplicate') deduplicate?: string,
   ): Promise<any> {
     try {
-      this.logger.log('🔄 Obteniendo cupones desde Supabase (public_coupons_v2)...');
-      
+      this.logger.log(
+        '🔄 Obteniendo cupones desde Supabase (public_coupons_v2)...',
+      );
+
       // Obtenemos TODOS los cupones que coincidan con los filtros básicos (categoría y búsqueda)
       // para poder hacer la deduplicación por marca en memoria (o paginamos si no se requiere deduplicar).
       // Sin embargo, si traemos todos, podemos aplicar la paginación final aquí de manera segura.
@@ -241,7 +245,7 @@ export class PublicController {
       const shouldDeduplicate = deduplicate !== 'false';
       if (shouldDeduplicate) {
         const seen = new Set();
-        cuponesFiltrados = cuponesFiltrados.filter(c => {
+        cuponesFiltrados = cuponesFiltrados.filter((c) => {
           if (!c.empresa.nombre) return true; // Si no tiene empresa, lo dejamos
           if (seen.has(c.empresa.nombre)) return false;
           seen.add(c.empresa.nombre);
@@ -273,7 +277,9 @@ export class PublicController {
    * Para que el front obtenga montos por ONG (donaciones).
    */
   @Get('organizaciones')
-  async getOrganizaciones(@Query('forPayment') forPayment?: string): Promise<OrganizacionPublicDto[]> {
+  async getOrganizaciones(
+    @Query('forPayment') forPayment?: string,
+  ): Promise<OrganizacionPublicDto[]> {
     const requireFiserv = forPayment === 'true';
     return this.supabase.getOrganizacionesActivas(requireFiserv);
   }
@@ -286,7 +292,9 @@ export class PublicController {
   async getOrganizacionBySlug(@Param('slug') slug: string) {
     const org = await this.supabase.getOrganizacionBySlug(slug);
     if (!org) {
-      throw new NotFoundException(`Organización con slug "${slug}" no encontrada`);
+      throw new NotFoundException(
+        `Organización con slug "${slug}" no encontrada`,
+      );
     }
     return org;
   }
@@ -297,7 +305,8 @@ export class PublicController {
    */
   @Get('banners')
   async getBanners(): Promise<any[]> {
-    const { data, error } = await this.supabase.getClient()
+    const { data, error } = await this.supabase
+      .getClient()
       .from('banners')
       .select('id, title, image_url, device_type, link_url, order')
       .eq('is_active', true)
@@ -345,7 +354,14 @@ export class PublicController {
    */
   @Post('contact')
   async contactForm(
-    @Body() body: { nombre: string; email: string; telefono?: string; asunto: string; mensaje: string }
+    @Body()
+    body: {
+      nombre: string;
+      email: string;
+      telefono?: string;
+      asunto: string;
+      mensaje: string;
+    },
   ) {
     if (!body.nombre || !body.email || !body.asunto || !body.mensaje) {
       throw new BadRequestException('Faltan campos obligatorios');
@@ -356,7 +372,7 @@ export class PublicController {
       body.email,
       body.telefono || '',
       body.asunto,
-      body.mensaje
+      body.mensaje,
     );
 
     if (!success) {

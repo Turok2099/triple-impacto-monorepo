@@ -136,7 +136,10 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('profile/avatar')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadAvatar(@Request() req, @UploadedFile() file: Express.Multer.File) {
+  async uploadAvatar(
+    @Request() req,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
     if (!file) {
       throw new BadRequestException('Se requiere una imagen');
     }

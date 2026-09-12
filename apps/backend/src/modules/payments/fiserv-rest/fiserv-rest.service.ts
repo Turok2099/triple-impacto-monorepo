@@ -19,11 +19,17 @@ export class FiservRestService {
    * @param payload Cuerpo de la petición (JSON string)
    */
   private getHeaders(payload: string) {
-    const apiKey = this.configService.get<string>('fiserv.apiKey') || process.env.FISERV_API_KEY;
-    const apiSecret = this.configService.get<string>('fiserv.apiSecret') || process.env.FISERV_API_SECRET;
+    const apiKey =
+      this.configService.get<string>('fiserv.apiKey') ||
+      process.env.FISERV_API_KEY;
+    const apiSecret =
+      this.configService.get<string>('fiserv.apiSecret') ||
+      process.env.FISERV_API_SECRET;
 
     if (!apiKey || !apiSecret) {
-      throw new Error(`Fiserv API credentials (apiKey or apiSecret) are not configured.`);
+      throw new Error(
+        `Fiserv API credentials (apiKey or apiSecret) are not configured.`,
+      );
     }
 
     const clientRequestId = uuidv4();
@@ -40,7 +46,7 @@ export class FiservRestService {
       'Content-Type': 'application/json',
       'Api-Key': apiKey,
       'Client-Request-Id': clientRequestId,
-      'Timestamp': timestamp,
+      Timestamp: timestamp,
       'Message-Signature': signature,
     };
   }
@@ -49,7 +55,9 @@ export class FiservRestService {
    * Ejecuta una petición directa (útil para la matriz de homologación)
    */
   async makeRequest(method: 'POST' | 'GET', path: string, payload: any = null) {
-    const baseUrl = this.configService.get<string>('fiserv.baseUrl') || process.env.FISERV_BASE_URL;
+    const baseUrl =
+      this.configService.get<string>('fiserv.baseUrl') ||
+      process.env.FISERV_BASE_URL;
     const url = `${baseUrl}${path}`;
     const payloadString = payload ? JSON.stringify(payload) : '';
     const headers = this.getHeaders(payloadString);
@@ -57,11 +65,14 @@ export class FiservRestService {
     try {
       const config: any = { method, url, headers };
       if (payload) config.data = payloadString;
-      
+
       const response = await axios(config);
       return response.data;
     } catch (error: any) {
-      this.logger.error(`Error en makeRequest ${path}:`, error.response?.data || error.message);
+      this.logger.error(
+        `Error en makeRequest ${path}:`,
+        error.response?.data || error.message,
+      );
       throw error.response?.data || error;
     }
   }
@@ -95,22 +106,27 @@ export class FiservRestService {
         reusable: true,
       },
       // Inyección para 3DS DataOnly
-      ...(paymentData.authenticationRequest ? { authenticationRequest: paymentData.authenticationRequest } : {})
+      ...(paymentData.authenticationRequest
+        ? { authenticationRequest: paymentData.authenticationRequest }
+        : {}),
     };
 
     const payloadString = JSON.stringify(payload);
     const headers = this.getHeaders(payloadString);
 
     try {
-      this.logger.log(`Enviando VERIFICACIÓN (Tokenización) a Fiserv para usuario ${userId} en tienda ${storeId}`);
+      this.logger.log(
+        `Enviando VERIFICACIÓN (Tokenización) a Fiserv para usuario ${userId} en tienda ${storeId}`,
+      );
       const response = await axios.post(endpoint, payload, { headers });
-      
+
       const result = response.data;
 
       // Si la verificación es aprobada, guardamos el token
       if (result.transactionStatus === 'APPROVED') {
-        const tokenValue = result.paymentToken?.value || result.ipgTransactionId;
-        
+        const tokenValue =
+          result.paymentToken?.value || result.ipgTransactionId;
+
         await this.supabaseService.from('user_payment_methods').insert({
           user_id: userId,
           fiserv_token: tokenValue,
@@ -123,12 +139,17 @@ export class FiservRestService {
           is_active: true,
         });
 
-        this.logger.log(`✅ Tarjeta verificada y token guardado para usuario ${userId}`);
+        this.logger.log(
+          `✅ Tarjeta verificada y token guardado para usuario ${userId}`,
+        );
       }
 
       return result;
     } catch (error) {
-      this.logger.error('Error en verificación de tarjeta Fiserv REST:', error.response?.data || error.message);
+      this.logger.error(
+        'Error en verificación de tarjeta Fiserv REST:',
+        error.response?.data || error.message,
+      );
       throw error.response?.data || error;
     }
   }
@@ -140,9 +161,14 @@ export class FiservRestService {
     const baseUrl = this.configService.get<string>('fiserv.baseUrl');
     const endpoint = `${baseUrl}/payments`;
     // Si no se envía storeId, usamos el predeterminado
-    const storeId = paymentData.storeId || this.configService.get<string>('fiserv.storeId') || process.env.FISERV_STORE_MAIN || '5927306113254';
+    const storeId =
+      paymentData.storeId ||
+      this.configService.get<string>('fiserv.storeId') ||
+      process.env.FISERV_STORE_MAIN ||
+      '5927306113254';
 
-    const orderId = paymentData.orderId || `REST-SALE-${uuidv4().substring(0, 6)}`;
+    const orderId =
+      paymentData.orderId || `REST-SALE-${uuidv4().substring(0, 6)}`;
 
     // Construir el payload para Sale con tarjeta de crédito
     const payload = {
@@ -166,8 +192,8 @@ export class FiservRestService {
       order: {
         orderId: orderId,
         installmentOptions: {
-          numberOfInstallments: 1
-        }
+          numberOfInstallments: 1,
+        },
       },
       // Habilitar tokenización (Card on File) si así se desea
       createToken: {
@@ -179,31 +205,41 @@ export class FiservRestService {
     const headers = this.getHeaders(payloadString);
 
     try {
-      this.logger.debug(`[DEBUG-FISERV] Datos recibidos en rest-sale - month: "${paymentData.expiryMonth}", year: "${paymentData.expiryYear}", CVV_length: ${paymentData.securityCode ? paymentData.securityCode.toString().length : 0}`);
-      
-      this.logger.log(`Enviando SALE a Fiserv para usuario ${userId} en tienda ${storeId}`);
+      this.logger.debug(
+        `[DEBUG-FISERV] Datos recibidos en rest-sale - month: "${paymentData.expiryMonth}", year: "${paymentData.expiryYear}", CVV_length: ${paymentData.securityCode ? paymentData.securityCode.toString().length : 0}`,
+      );
+
+      this.logger.log(
+        `Enviando SALE a Fiserv para usuario ${userId} en tienda ${storeId}`,
+      );
       const response = await axios.post(endpoint, payload, { headers });
-      
+
       const result = response.data;
 
       // Si el pago es aprobado, guardamos el token
       if (result.transactionStatus === 'APPROVED' && result.paymentToken) {
         const tokenValue = result.paymentToken.value;
-        
-        const { data: insertedMethod } = await this.supabaseService.from('user_payment_methods').insert({
-          user_id: userId,
-          fiserv_token: tokenValue,
-          scheme_transaction_id: result.schemeTransactionId || null,
-          card_brand: result.paymentMethodDetails?.paymentCard?.brand,
-          last_4: result.paymentMethodDetails?.paymentCard?.last4,
-          exp_month: paymentData.expiryMonth,
-          exp_year: paymentData.expiryYear,
-          cardholder_name: paymentData.cardholderName,
-          is_active: true,
-        }).select().single();
 
-        this.logger.log(`✅ Pago exitoso y token guardado para usuario ${userId}`);
-        
+        const { data: insertedMethod } = await this.supabaseService
+          .from('user_payment_methods')
+          .insert({
+            user_id: userId,
+            fiserv_token: tokenValue,
+            scheme_transaction_id: result.schemeTransactionId || null,
+            card_brand: result.paymentMethodDetails?.paymentCard?.brand,
+            last_4: result.paymentMethodDetails?.paymentCard?.last4,
+            exp_month: paymentData.expiryMonth,
+            exp_year: paymentData.expiryYear,
+            cardholder_name: paymentData.cardholderName,
+            is_active: true,
+          })
+          .select()
+          .single();
+
+        this.logger.log(
+          `✅ Pago exitoso y token guardado para usuario ${userId}`,
+        );
+
         // Devolvemos el paymentMethodId para poder suscribirlo si es necesario
         return { ...result, orderId, paymentMethodId: insertedMethod?.id };
       }
@@ -211,7 +247,10 @@ export class FiservRestService {
       // Devolvemos tanto el resultado de Fiserv como el orderId original para poder validarlo luego
       return { ...result, orderId };
     } catch (error: any) {
-      this.logger.error('Error en pago directo Fiserv REST:', error.response?.data || error.message);
+      this.logger.error(
+        'Error en pago directo Fiserv REST:',
+        error.response?.data || error.message,
+      );
       throw error.response?.data || error;
     }
   }
@@ -219,7 +258,12 @@ export class FiservRestService {
   /**
    * Procesa un pago recurrente (REPEAT) usando un token guardado
    */
-  async processRecurringPayment(userId: string, paymentMethodId: string, amount: number, storeId: string = '5926012006') {
+  async processRecurringPayment(
+    userId: string,
+    paymentMethodId: string,
+    amount: number,
+    storeId: string = '5926012006',
+  ) {
     // ... codigo anterior resumido (el original del archivo) ...
     const { data: paymentMethod, error } = await this.supabaseService
       .from('user_payment_methods')
@@ -234,7 +278,7 @@ export class FiservRestService {
 
     const baseUrl = this.configService.get<string>('fiserv.baseUrl');
     const endpoint = `${baseUrl}/payments`;
-    
+
     // Payload para REPEAT usando el token
     const payload = {
       requestType: 'PaymentTokenSaleTransaction',
@@ -254,13 +298,17 @@ export class FiservRestService {
           recurringType: 'REPEAT',
         },
       },
-      ...(paymentMethod.card_brand?.toUpperCase() === 'VISA' && paymentMethod.scheme_transaction_id ? {
-        storedCredentials: {
-          sequence: 'SUBSEQUENT',
-          scheduled: false,
-          referencedSchemeTransactionId: paymentMethod.scheme_transaction_id,
-        }
-      } : {})
+      ...(paymentMethod.card_brand?.toUpperCase() === 'VISA' &&
+      paymentMethod.scheme_transaction_id
+        ? {
+            storedCredentials: {
+              sequence: 'SUBSEQUENT',
+              scheduled: false,
+              referencedSchemeTransactionId:
+                paymentMethod.scheme_transaction_id,
+            },
+          }
+        : {}),
     };
 
     const payloadString = JSON.stringify(payload);
@@ -271,7 +319,10 @@ export class FiservRestService {
       const response = await axios.post(endpoint, payload, { headers });
       return response.data;
     } catch (error) {
-      this.logger.error('Error en pago recurrente Fiserv REST:', error.response?.data || error.message);
+      this.logger.error(
+        'Error en pago recurrente Fiserv REST:',
+        error.response?.data || error.message,
+      );
       throw error.response?.data || error;
     }
   }
@@ -285,21 +336,26 @@ export class FiservRestService {
     const path = isOrder ? 'orders' : 'payments';
     const baseUrl = this.configService.get<string>('fiserv.baseUrl');
     const endpoint = `${baseUrl}/${path}/${id}`;
-    
+
     const payload = {
       requestType: 'VoidTransaction',
-      storeId: storeId
+      storeId: storeId,
     };
 
     const payloadString = JSON.stringify(payload);
     const headers = this.getHeaders(payloadString);
 
     try {
-      this.logger.log(`Anulando ${isOrder ? 'Pedido' : 'Transacción'} ${id} en tienda ${storeId}`);
+      this.logger.log(
+        `Anulando ${isOrder ? 'Pedido' : 'Transacción'} ${id} en tienda ${storeId}`,
+      );
       const response = await axios.post(endpoint, payload, { headers });
       return response.data;
     } catch (error) {
-      this.logger.error(`Error en Void (${path}):`, error.response?.data || error.message);
+      this.logger.error(
+        `Error en Void (${path}):`,
+        error.response?.data || error.message,
+      );
       throw error.response?.data || error;
     }
   }
@@ -312,25 +368,30 @@ export class FiservRestService {
     const path = isOrder ? 'orders' : 'payments';
     const baseUrl = this.configService.get<string>('fiserv.baseUrl');
     const endpoint = `${baseUrl}/${path}/${id}`;
-    
+
     const payload = {
       requestType: 'ReturnTransaction',
       storeId: storeId,
       transactionAmount: {
         total: amount.toFixed(2), // Forzar 2 decimales para evitar error 10601
-        currency: 'ARS'
-      }
+        currency: 'ARS',
+      },
     };
 
     const payloadString = JSON.stringify(payload);
     const headers = this.getHeaders(payloadString);
 
     try {
-      this.logger.log(`Devolviendo ${isOrder ? 'Pedido' : 'Transacción'} ${id} en tienda ${storeId} (Monto: ${amount.toFixed(2)})`);
+      this.logger.log(
+        `Devolviendo ${isOrder ? 'Pedido' : 'Transacción'} ${id} en tienda ${storeId} (Monto: ${amount.toFixed(2)})`,
+      );
       const response = await axios.post(endpoint, payload, { headers });
       return response.data;
     } catch (error) {
-      this.logger.error(`Error en Return (${path}):`, error.response?.data || error.message);
+      this.logger.error(
+        `Error en Return (${path}):`,
+        error.response?.data || error.message,
+      );
       throw error.response?.data || error;
     }
   }

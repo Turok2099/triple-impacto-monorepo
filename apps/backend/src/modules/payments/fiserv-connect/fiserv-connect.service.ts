@@ -61,14 +61,15 @@ export class FiservConnectService implements OnModuleInit {
   private config: ConnectConfig | null = null;
 
   onModuleInit() {
-    const url = process.env.FISERV_CONNECT_URL || 'https://www5.ipg-online.com/connect/gateway/processing';
+    const url =
+      process.env.FISERV_CONNECT_URL ||
+      'https://www5.ipg-online.com/connect/gateway/processing';
     const storeId = process.env.FISERV_CONNECT_STORE_ID_1 || '5927306113254'; // Club Triple Impacto by default
-    const sharedSecret = process.env.FISERV_CONNECT_SHARED_SECRET || 'Triple_2026';
+    const sharedSecret =
+      process.env.FISERV_CONNECT_SHARED_SECRET || 'Triple_2026';
 
     if (!url || !storeId || !sharedSecret) {
-      this.logger.warn(
-        'Fiserv Connect: faltan variables, usando defaults.',
-      );
+      this.logger.warn('Fiserv Connect: faltan variables, usando defaults.');
     }
 
     this.config = {
@@ -107,7 +108,9 @@ export class FiservConnectService implements OnModuleInit {
       this.logger.error(
         'Fiserv Connect: La ONG no tiene configurado un Store ID o Shared Secret. Las credenciales globales están deshabilitadas.',
       );
-      throw new Error('La organización no tiene credenciales de pago configuradas.');
+      throw new Error(
+        'La organización no tiene credenciales de pago configuradas.',
+      );
     }
 
     const txndatetime = getTxndatetime();

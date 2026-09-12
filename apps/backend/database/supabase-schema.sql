@@ -143,7 +143,15 @@ CREATE TABLE IF NOT EXISTS organizaciones (
   -- Estado
   activa BOOLEAN DEFAULT true,
   verificada BOOLEAN DEFAULT false,
-  
+
+  -- Donación exclusiva (link propio /donar/{slug})
+  slug VARCHAR(80), -- minúsculas, [a-z0-9-]; NULL = sin link exclusivo. Ver idx_organizaciones_slug para la constraint de unicidad.
+
+  -- Fiserv (pasarela de pago)
+  fiserv_activo BOOLEAN DEFAULT false,
+  fiserv_store_id VARCHAR(100),
+  fiserv_shared_secret TEXT,
+
   -- Metadatos
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -151,10 +159,13 @@ CREATE TABLE IF NOT EXISTS organizaciones (
 
 CREATE INDEX IF NOT EXISTS idx_organizaciones_activa ON organizaciones(activa);
 CREATE INDEX IF NOT EXISTS idx_organizaciones_nombre ON organizaciones(nombre);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_organizaciones_slug ON organizaciones(slug) WHERE slug IS NOT NULL;
 
 COMMENT ON TABLE organizaciones IS 'Organizaciones no gubernamentales beneficiarias de donaciones';
 COMMENT ON COLUMN organizaciones.monto_minimo IS 'Mínimo aceptado para donar a esta ONG; NULL = sin mínimo';
 COMMENT ON COLUMN organizaciones.monto_sugerido IS 'Monto sugerido que muestra el front; NULL = usar default en front';
+COMMENT ON COLUMN organizaciones.slug IS 'Slug de donación exclusivo, único (case-insensitive) y opcional; habilita la URL /donar/{slug}';
+COMMENT ON COLUMN organizaciones.fiserv_shared_secret IS 'Secreto compartido de Fiserv para esta ONG (no exponer al frontend)';
 
 -- ============================================
 -- Tabla: bonda_microsites

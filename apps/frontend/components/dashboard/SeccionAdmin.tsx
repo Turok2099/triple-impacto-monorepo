@@ -5,9 +5,10 @@ import Swal from 'sweetalert2';
 import { getAdminUsers, deleteAdminUser, AdminUser, createAdminUser, updateAdminUser, deleteAffiliation, getUserAdminPayments, toggleUserAdminRole, exportAdminUsersToExcel } from "@/lib/admin";
 import { getOrganizaciones } from "@/lib/admin-ongs";
 import { useAuth } from "@/contexts/AuthContext";
-import { Users, MoreVertical, Edit2, Trash2, UserPlus, X, ShieldAlert, Shield, CheckCircle, XCircle, Receipt, UserSearch, ArrowLeft, Mail, Phone, BookUser, Building2, Image as ImageIcon, Upload, Download } from "lucide-react";
+import { Users, MoreVertical, Edit2, Trash2, UserPlus, X, ShieldAlert, Shield, CheckCircle, XCircle, Receipt, UserSearch, ArrowLeft, Mail, Phone, BookUser, Building2, Image as ImageIcon, Upload, Download, BarChart3 } from "lucide-react";
 import SeccionAdminOngs from "./SeccionAdminOngs";
 import SeccionAdminBanners from "./SeccionAdminBanners";
+import SeccionAdminReporteBonda from "./SeccionAdminReporteBonda";
 
 export default function SeccionAdmin() {
   const { user } = useAuth();
@@ -332,7 +333,7 @@ export default function SeccionAdmin() {
     }
   };
 
-  const [adminTab, setAdminTab] = useState<"usuarios" | "ongs" | "banners">("ongs"); // Default to ONGs as it's the new feature
+  const [adminTab, setAdminTab] = useState<"usuarios" | "ongs" | "banners" | "reporteria">("ongs"); // Default to ONGs as it's the new feature
 
   if (selectedUserForDetails) {
     const u = selectedUserForDetails;
@@ -506,6 +507,15 @@ export default function SeccionAdmin() {
           <ImageIcon className="w-4 h-4" />
           Banners Home
         </button>
+        <button
+          onClick={() => setAdminTab("reporteria")}
+          className={`pb-4 px-2 font-semibold text-sm flex items-center gap-2 border-b-2 transition-colors ${
+            adminTab === "reporteria" ? "border-[#2c8184] text-[#2c8184]" : "border-transparent text-slate-500 hover:text-slate-700"
+          }`}
+        >
+          <BarChart3 className="w-4 h-4" />
+          Reportería Bonda
+        </button>
       </div>
 
       <div className="min-h-[600px]">
@@ -513,6 +523,8 @@ export default function SeccionAdmin() {
         <SeccionAdminOngs />
       ) : adminTab === "banners" ? (
         <SeccionAdminBanners />
+      ) : adminTab === "reporteria" ? (
+        <SeccionAdminReporteBonda />
       ) : (
         <>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">

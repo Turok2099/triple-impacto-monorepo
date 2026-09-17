@@ -283,6 +283,68 @@ export class MailService {
   }
 
   /**
+   * Envia un correo de confirmación al remitente del formulario de contacto.
+   */
+  async sendContactConfirmationEmail(
+    nombre: string,
+    email: string,
+    asunto: string,
+    mensaje: string,
+  ) {
+    try {
+      const { data, error } = await this.resend.emails.send({
+        from: `${this.defaultSenderName} <${this.defaultSenderEmail}>`,
+        to: [email],
+        subject: 'Recibimos tu mensaje - Club Triple Impacto',
+        html: `
+          <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
+            <div style="background-color: #40a8ab; padding: 30px; text-align: center;">
+              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1768059717/LOGO_CLUB_TRIPLE_IMPACTO_jztcqa.png" alt="Club Triple Impacto" style="height: 50px;" />
+            </div>
+            <div style="padding: 40px 30px;">
+              <h1 style="color: #40a8ab; font-size: 24px; margin-bottom: 20px;">¡Hola, ${nombre}! 👋</h1>
+              <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                Gracias por escribirnos. Recibimos tu mensaje y nuestro equipo te va a responder a la brevedad.
+              </p>
+              <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
+                <h3 style="margin-top: 0; color: #40a8ab; font-size: 14px; text-transform: uppercase;">Resumen de tu consulta</h3>
+                <p style="margin: 0 0 10px 0;"><strong>Asunto:</strong> ${asunto}</p>
+                <p style="margin: 0; white-space: pre-wrap;">${mensaje}</p>
+              </div>
+              <p style="font-size: 14px; line-height: 1.6; color: #666; margin-bottom: 0;">
+                Si necesitás agregar información adicional, podés responder directamente a este correo.
+              </p>
+            </div>
+            <div style="background-color: #f7f9fc; padding: 20px; text-align: center; color: #718096; font-size: 12px;">
+              <p style="margin: 0;">Club Triple Impacto - Plataforma Fintech de Reciprocidad</p>
+              <p style="margin: 5px 0 0 0;">Este es un correo automático de confirmación.</p>
+            </div>
+          </div>
+        `,
+      });
+
+      if (error) {
+        this.logger.error(
+          `Error enviando confirmación de contacto a ${email}:`,
+          error,
+        );
+        return false;
+      }
+
+      this.logger.log(
+        `✅ Correo de confirmación de contacto enviado a: ${email}. Job ID: ${data?.id}`,
+      );
+      return true;
+    } catch (err) {
+      this.logger.error(
+        `Excepción enviando confirmación de contacto a ${email}:`,
+        err,
+      );
+      return false;
+    }
+  }
+
+  /**
    * Envia un correo de recibo/comprobante de transacción aprobada o declinada.
    */
   async sendPaymentReceiptEmail(

@@ -379,6 +379,19 @@ export class PublicController {
       throw new BadRequestException('Ocurrió un error al enviar el mensaje');
     }
 
+    // Confirmación al remitente: no debe hacer fallar la respuesta si el mensaje
+    // principal ya se envió correctamente.
+    this.mailService
+      .sendContactConfirmationEmail(
+        body.nombre,
+        body.email,
+        body.asunto,
+        body.mensaje,
+      )
+      .catch((error) =>
+        this.logger.error('Error enviando confirmación de contacto:', error),
+      );
+
     return {
       success: true,
       message: 'Mensaje enviado exitosamente',

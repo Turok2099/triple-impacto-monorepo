@@ -54,7 +54,7 @@ export class MailService {
         html: `
           <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
             <div style="background-color: #40a8ab; padding: 30px; text-align: center;">
-              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1768059717/LOGO_CLUB_TRIPLE_IMPACTO_jztcqa.png" alt="Club Triple Impacto" style="height: 50px;" />
+              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1789230698/ISOLOGOTIPO_BLANCO_CLUB_TRIPLE_IMPACTO_FONDO_TRANSPARENTE_wxyw9l.png" alt="Club Triple Impacto" style="height: 50px;" />
             </div>
             <div style="padding: 40px 30px;">
               <h1 style="color: #40a8ab; font-size: 24px; margin-bottom: 20px;">¡Hola, ${userName}! 👋</h1>
@@ -121,7 +121,7 @@ export class MailService {
         html: `
           <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
             <div style="background-color: #40a8ab; padding: 30px; text-align: center;">
-              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1768059717/LOGO_CLUB_TRIPLE_IMPACTO_jztcqa.png" alt="Club Triple Impacto" style="height: 50px;" />
+              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1789230698/ISOLOGOTIPO_BLANCO_CLUB_TRIPLE_IMPACTO_FONDO_TRANSPARENTE_wxyw9l.png" alt="Club Triple Impacto" style="height: 50px;" />
             </div>
             <div style="padding: 40px 30px;">
               <h1 style="color: #40a8ab; font-size: 24px; margin-bottom: 20px;">¡Hola, ${userName}!</h1>
@@ -184,7 +184,7 @@ export class MailService {
         html: `
           <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
             <div style="background-color: #40a8ab; padding: 30px; text-align: center;">
-              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1768059717/LOGO_CLUB_TRIPLE_IMPACTO_jztcqa.png" alt="Club Triple Impacto" style="height: 50px;" />
+              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1789230698/ISOLOGOTIPO_BLANCO_CLUB_TRIPLE_IMPACTO_FONDO_TRANSPARENTE_wxyw9l.png" alt="Club Triple Impacto" style="height: 50px;" />
             </div>
             <div style="padding: 40px 30px;">
               <h1 style="color: #40a8ab; font-size: 24px; margin-bottom: 20px;">¡Gracias por sumarte!</h1>
@@ -244,7 +244,7 @@ export class MailService {
         html: `
           <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
             <div style="background-color: #40a8ab; padding: 30px; text-align: center;">
-              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1768059717/LOGO_CLUB_TRIPLE_IMPACTO_jztcqa.png" alt="Club Triple Impacto" style="height: 50px;" />
+              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1789230698/ISOLOGOTIPO_BLANCO_CLUB_TRIPLE_IMPACTO_FONDO_TRANSPARENTE_wxyw9l.png" alt="Club Triple Impacto" style="height: 50px;" />
             </div>
             <div style="padding: 40px 30px;">
               <h1 style="color: #40a8ab; font-size: 24px; margin-bottom: 20px;">Nuevo Mensaje de Contacto</h1>
@@ -299,7 +299,7 @@ export class MailService {
         html: `
           <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
             <div style="background-color: #40a8ab; padding: 30px; text-align: center;">
-              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1768059717/LOGO_CLUB_TRIPLE_IMPACTO_jztcqa.png" alt="Club Triple Impacto" style="height: 50px;" />
+              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1789230698/ISOLOGOTIPO_BLANCO_CLUB_TRIPLE_IMPACTO_FONDO_TRANSPARENTE_wxyw9l.png" alt="Club Triple Impacto" style="height: 50px;" />
             </div>
             <div style="padding: 40px 30px;">
               <h1 style="color: #40a8ab; font-size: 24px; margin-bottom: 20px;">¡Hola, ${nombre}! 👋</h1>
@@ -405,7 +405,7 @@ export class MailService {
         html: `
           <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
             <div style="background-color: #40a8ab; padding: 30px; text-align: center;">
-              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1768059717/LOGO_CLUB_TRIPLE_IMPACTO_jztcqa.png" alt="Club Triple Impacto" style="height: 50px;" />
+              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1789230698/ISOLOGOTIPO_BLANCO_CLUB_TRIPLE_IMPACTO_FONDO_TRANSPARENTE_wxyw9l.png" alt="Club Triple Impacto" style="height: 50px;" />
             </div>
             <div style="padding: 40px 30px;">
               <h1 style="color: #40a8ab; font-size: 24px; margin-bottom: 20px;">${titulo}</h1>
@@ -484,7 +484,7 @@ export class MailService {
         html: `
           <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
             <div style="background-color: #40a8ab; padding: 30px; text-align: center;">
-              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1768059717/LOGO_CLUB_TRIPLE_IMPACTO_jztcqa.png" alt="Club Triple Impacto" style="height: 50px;" />
+              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1789230698/ISOLOGOTIPO_BLANCO_CLUB_TRIPLE_IMPACTO_FONDO_TRANSPARENTE_wxyw9l.png" alt="Club Triple Impacto" style="height: 50px;" />
             </div>
             <div style="padding: 40px 30px; text-align: center;">
               <h1 style="color: #40a8ab; font-size: 22px; margin-bottom: 20px; text-align: left;">¡Hola, ${userName}! 👋</h1>

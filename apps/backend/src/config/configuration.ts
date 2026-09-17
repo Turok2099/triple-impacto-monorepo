@@ -44,5 +44,7 @@ export default () => ({
     qrCity: process.env.FISERV_QR_CITY || 'Buenos Aires',
     qrPostalCode: process.env.FISERV_QR_POSTAL_CODE || 'C1000AAB',
     qrDomain: process.env.FISERV_QR_DOMAIN || 'ar.com.ayni',
+    // Deshabilitado desde la baja del dominio ayni.ar; poner en 'true' cuando se retome el flujo de QR.
+    qrEnabled: process.env.FISERV_QR_ENABLED === 'true',
   },
 });

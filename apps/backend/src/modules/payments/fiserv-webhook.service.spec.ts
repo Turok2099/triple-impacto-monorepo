@@ -48,6 +48,7 @@ describe('FiservWebhookService - ensureBondaAffiliateForUserAndOrganisation', ()
       bonda as any,
       {} as any, // mailService
       {} as any, // fiservQrService
+      {} as any, // configService
     );
 
     return { service, bonda, supabase };

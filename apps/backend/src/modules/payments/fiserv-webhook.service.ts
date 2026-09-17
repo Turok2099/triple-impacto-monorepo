@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   validateNotificationHash,
   validateResponseHash,
@@ -29,6 +30,7 @@ export class FiservWebhookService {
     private readonly bonda: BondaService,
     private readonly mailService: MailService,
     private readonly fiservQrService: FiservQrService,
+    private readonly configService: ConfigService,
   ) {}
 
   /**
@@ -250,6 +252,26 @@ export class FiservWebhookService {
       this.logger.warn(
         `Fiserv declined: usuario o correo no encontrado para el intento de pago ${attempt.id}`,
       );
+      return;
+    }
+
+    if (!this.configService.get<boolean>('fiserv.qrEnabled')) {
+      this.logger.log(
+        `QR de fallback deshabilitado (FISERV_QR_ENABLED != 'true'). Enviando correo de rechazo estándar para oid=${oid}.`,
+      );
+      await this.mailService
+        .sendPaymentReceiptEmail(user.email, user.nombre || 'Donante', {
+          status: 'declined',
+          oid: oid,
+          failReason:
+            failReason || responseCode || 'Rechazado por el procesador de pagos',
+        })
+        .catch((err) => {
+          this.logger.error(
+            `Error enviando correo de rechazo estándar para oid=${oid}:`,
+            err,
+          );
+        });
       return;
     }
 

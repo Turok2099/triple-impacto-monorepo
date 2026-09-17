@@ -257,6 +257,25 @@ export class PaymentsController {
           );
         }
 
+        // Enviar correo de agradecimiento/comprobante
+        const user = await this.supabase.findUserById(userId);
+        if (user && user.email) {
+          this.mailService
+            .sendPaymentReceiptEmail(user.email, user.nombre || 'Donante', {
+              status: 'approved',
+              amount: String(body.amount),
+              currency: body.currency || 'ARS',
+              approvalCode: result.transactionStatus,
+              oid: orderId,
+            })
+            .catch((err) => {
+              this.logger.error(
+                `Error enviando correo de éxito para oid=${orderId}:`,
+                err,
+              );
+            });
+        }
+
         // Si es pago recurrente, registrar la suscripción
         if (body.isRecurring && result.paymentMethodId) {
           try {
@@ -293,11 +312,29 @@ export class PaymentsController {
           fiserv_raw_response: result as Record<string, unknown>,
         });
 
-        throw new BadRequestException(
+        const failReason =
           result.processor?.responseMessage ||
-            result.error?.message ||
-            'Pago rechazado por el procesador',
-        );
+          result.error?.message ||
+          'Pago rechazado por el procesador';
+
+        // Enviar correo de aviso de rechazo
+        const user = await this.supabase.findUserById(userId);
+        if (user && user.email) {
+          this.mailService
+            .sendPaymentReceiptEmail(user.email, user.nombre || 'Donante', {
+              status: 'declined',
+              oid: orderId,
+              failReason,
+            })
+            .catch((err) => {
+              this.logger.error(
+                `Error enviando correo de rechazo para oid=${orderId}:`,
+                err,
+              );
+            });
+        }
+
+        throw new BadRequestException(failReason);
       }
     } catch (error: any) {
       this.logger.error('Error en rest-sale:', error);

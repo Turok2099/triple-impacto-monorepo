@@ -2,6 +2,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { SupabaseService } from '../supabase/supabase.service';
 import { FiservRestService } from './fiserv-rest/fiserv-rest.service';
+import { MailService } from '../mail/mail.service';
+
+const MAX_REINTENTOS = 3;
 
 @Injectable()
 export class SubscriptionsCronService {
@@ -10,7 +13,39 @@ export class SubscriptionsCronService {
   constructor(
     private readonly supabaseService: SupabaseService,
     private readonly fiservRestService: FiservRestService,
+    private readonly mailService: MailService,
   ) {}
+
+  /**
+   * Suspende los beneficios de Bonda del usuario para esa organización sin
+   * eliminar al afiliado en Bonda: el usuario permanece dado de alta ahí,
+   * solo se marca inactivo localmente (es lo que usa el resto de la app para
+   * habilitar/bloquear el uso de cupones).
+   */
+  private async suspenderBeneficiosBonda(
+    usuarioId: string,
+    organizacionId: string,
+  ) {
+    const bondaMicrosite =
+      await this.supabaseService.getBondaMicrositeByOrganizacionId(
+        organizacionId,
+      );
+    if (!bondaMicrosite) return;
+
+    const { error } = await this.supabaseService
+      .getClient()
+      .from('usuarios_bonda_afiliados')
+      .update({ is_active: false })
+      .eq('user_id', usuarioId)
+      .eq('bonda_microsite_id', bondaMicrosite.id);
+
+    if (error) {
+      this.logger.error(
+        `Error suspendiendo beneficios locales de Bonda para usuario ${usuarioId}:`,
+        error,
+      );
+    }
+  }
 
   @Cron(CronExpression.EVERY_DAY_AT_4AM)
   async procesarSuscripcionesDiarias() {
@@ -85,21 +120,58 @@ export class SubscriptionsCronService {
             error.message || error,
           );
 
-          const maxReintentos = 3;
           const nuevosReintentos = (sub.reintentos || 0) + 1;
+          const userEmail = sub.usuarios?.email;
+          const userName = sub.usuarios?.nombre || 'Donante';
+          const orgName = sub.organizaciones?.nombre || 'la organización';
 
-          if (nuevosReintentos >= maxReintentos) {
+          if (nuevosReintentos >= MAX_REINTENTOS) {
             this.logger.warn(
-              `Suscripción ${sub.id} suspendida tras ${maxReintentos} intentos fallidos.`,
+              `Suscripción ${sub.id} suspendida tras ${MAX_REINTENTOS} intentos fallidos.`,
             );
             await this.supabaseService.updateSuscripcion(sub.id, {
               estado: 'fallida',
               reintentos: nuevosReintentos,
             });
+
+            // Impago definitivo: se suspenden los beneficios de Bonda.
+            // El afiliado NO se borra de Bonda, solo se marca inactivo localmente.
+            await this.suspenderBeneficiosBonda(
+              sub.usuario_id,
+              sub.organizacion_id,
+            );
+
+            if (userEmail) {
+              this.mailService
+                .sendSubscriptionCancelledEmail(userEmail, userName, orgName)
+                .catch((err) =>
+                  this.logger.error(
+                    `Error enviando correo de suspensión para suscripción ${sub.id}:`,
+                    err,
+                  ),
+                );
+            }
           } else {
             await this.supabaseService.updateSuscripcion(sub.id, {
               reintentos: nuevosReintentos,
             });
+
+            if (userEmail) {
+              this.mailService
+                .sendSubscriptionPaymentFailedEmail(
+                  userEmail,
+                  userName,
+                  orgName,
+                  nuevosReintentos,
+                  MAX_REINTENTOS,
+                )
+                .catch((err) =>
+                  this.logger.error(
+                    `Error enviando aviso de cobro fallido para suscripción ${sub.id}:`,
+                    err,
+                  ),
+                );
+            }
           }
         }
       }

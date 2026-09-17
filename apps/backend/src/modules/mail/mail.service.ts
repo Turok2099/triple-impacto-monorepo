@@ -283,6 +283,126 @@ export class MailService {
   }
 
   /**
+   * Avisa al donante que el cobro automático de su suscripción mensual falló.
+   * Se envía en cada intento fallido antes de llegar al límite de reintentos.
+   */
+  async sendSubscriptionPaymentFailedEmail(
+    userEmail: string,
+    userName: string,
+    orgName: string,
+    intento: number,
+    maxIntentos: number,
+  ) {
+    try {
+      const { data, error } = await this.resend.emails.send({
+        from: `${this.defaultSenderName} <${this.defaultSenderEmail}>`,
+        to: [userEmail],
+        subject: '⚠️ No pudimos procesar tu donación mensual',
+        html: `
+          <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
+            <div style="background-color: #40a8ab; padding: 30px; text-align: center;">
+              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1789230698/ISOLOGOTIPO_BLANCO_CLUB_TRIPLE_IMPACTO_FONDO_TRANSPARENTE_wxyw9l.png" alt="Club Triple Impacto" style="height: 50px;" />
+            </div>
+            <div style="padding: 40px 30px;">
+              <h1 style="color: #40a8ab; font-size: 24px; margin-bottom: 20px;">Hola, ${userName}</h1>
+              <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                Intentamos procesar el cobro mensual de tu donación a <strong>${orgName}</strong>, pero tu banco o tarjeta lo rechazaron.
+              </p>
+              <p style="font-size: 15px; line-height: 1.6; color: #666; margin-bottom: 20px;">
+                Este fue el intento <strong>${intento} de ${maxIntentos}</strong>. Vamos a volver a intentarlo automáticamente en los próximos días; si el problema persiste hasta agotar los reintentos, tus beneficios de Club Triple Impacto se suspenderán hasta regularizar el pago.
+              </p>
+              <p style="font-size: 14px; line-height: 1.6; color: #666; margin-bottom: 0;">
+                Te recomendamos verificar que tu tarjeta tenga fondos disponibles y no esté vencida. Si necesitás ayuda, respondé a este correo.
+              </p>
+            </div>
+            <div style="background-color: #f7f9fc; padding: 20px; text-align: center; color: #718096; font-size: 12px;">
+              <p style="margin: 0;">Club Triple Impacto - Plataforma Fintech de Reciprocidad</p>
+            </div>
+          </div>
+        `,
+      });
+
+      if (error) {
+        this.logger.error(
+          `Error enviando aviso de cobro fallido a ${userEmail}:`,
+          error,
+        );
+        return false;
+      }
+
+      this.logger.log(
+        `✅ Aviso de cobro fallido enviado a: ${userEmail}. Job ID: ${data?.id}`,
+      );
+      return true;
+    } catch (err) {
+      this.logger.error(
+        `Excepción enviando aviso de cobro fallido a ${userEmail}:`,
+        err,
+      );
+      return false;
+    }
+  }
+
+  /**
+   * Confirma al donante que su suscripción y sus beneficios fueron suspendidos
+   * tras agotar los reintentos de cobro.
+   */
+  async sendSubscriptionCancelledEmail(
+    userEmail: string,
+    userName: string,
+    orgName: string,
+  ) {
+    try {
+      const { data, error } = await this.resend.emails.send({
+        from: `${this.defaultSenderName} <${this.defaultSenderEmail}>`,
+        to: [userEmail],
+        subject: 'Tu suscripción y beneficios fueron suspendidos',
+        html: `
+          <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
+            <div style="background-color: #40a8ab; padding: 30px; text-align: center;">
+              <img src="https://res.cloudinary.com/dxbtafe9u/image/upload/v1789230698/ISOLOGOTIPO_BLANCO_CLUB_TRIPLE_IMPACTO_FONDO_TRANSPARENTE_wxyw9l.png" alt="Club Triple Impacto" style="height: 50px;" />
+            </div>
+            <div style="padding: 40px 30px;">
+              <h1 style="color: #40a8ab; font-size: 24px; margin-bottom: 20px;">Hola, ${userName}</h1>
+              <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                No pudimos concretar el cobro mensual de tu donación a <strong>${orgName}</strong> después de varios intentos, así que dimos de baja tu suscripción y suspendimos tus beneficios de Club Triple Impacto hasta que se regularice el pago.
+              </p>
+              <p style="font-size: 15px; line-height: 1.6; color: #666; margin-bottom: 20px;">
+                Si querés volver a acceder a los cupones y beneficios, podés iniciar una nueva donación mensual desde tu cuenta cuando quieras.
+              </p>
+              <p style="font-size: 14px; line-height: 1.6; color: #666; margin-bottom: 0;">
+                Ante cualquier duda, respondé a este correo y te ayudamos.
+              </p>
+            </div>
+            <div style="background-color: #f7f9fc; padding: 20px; text-align: center; color: #718096; font-size: 12px;">
+              <p style="margin: 0;">Club Triple Impacto - Plataforma Fintech de Reciprocidad</p>
+            </div>
+          </div>
+        `,
+      });
+
+      if (error) {
+        this.logger.error(
+          `Error enviando aviso de suspensión a ${userEmail}:`,
+          error,
+        );
+        return false;
+      }
+
+      this.logger.log(
+        `✅ Aviso de suspensión enviado a: ${userEmail}. Job ID: ${data?.id}`,
+      );
+      return true;
+    } catch (err) {
+      this.logger.error(
+        `Excepción enviando aviso de suspensión a ${userEmail}:`,
+        err,
+      );
+      return false;
+    }
+  }
+
+  /**
    * Envia un correo de confirmación al remitente del formulario de contacto.
    */
   async sendContactConfirmationEmail(

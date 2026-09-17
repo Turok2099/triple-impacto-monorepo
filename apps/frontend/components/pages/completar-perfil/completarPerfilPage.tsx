@@ -155,8 +155,9 @@ export default function CompletarPerfilPage() {
         throw new Error(data.message || "Error al guardar los datos.");
       }
 
-      // Iniciar sesión en el contexto usando el token y los datos devueltos
-      loginContext(token, data.user);
+      // Iniciar sesión en el contexto usando el JWT propio del backend
+      // (no el token de Supabase, que no sirve para el resto de la API)
+      loginContext(data.token, data.user);
       
       const localRedirect = localStorage.getItem("redirectAfterLogin");
       if (localRedirect) {

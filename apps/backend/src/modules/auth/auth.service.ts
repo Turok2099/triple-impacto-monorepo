@@ -527,22 +527,44 @@ export class AuthService {
     const authUser = authData.user;
     const { dni, telefono, provincia, localidad } = dto;
 
-    // Verificar si el DNI ya está en uso por otro usuario
-    const existingDni = await this.supabaseService.findUserByDni(dni);
-    if (existingDni && existingDni.id !== authUser.id) {
-      throw new BadRequestException(
-        'El DNI ya se encuentra registrado por otro usuario',
-      );
+    // Verificar si el DNI ya está en uso por otro usuario (solo si se envió uno)
+    if (dni) {
+      const existingDni = await this.supabaseService.findUserByDni(dni);
+      if (existingDni && existingDni.id !== authUser.id) {
+        throw new BadRequestException(
+          'El DNI ya se encuentra registrado por otro usuario',
+        );
+      }
     }
 
     // 2. Comprobar si ya existe en public.usuarios
     let publicUser = await this.supabaseService.findUserById(authUser.id);
+    const userMetadata = authUser.user_metadata || {};
 
     if (!publicUser) {
-      // Si no existe, crearlo. Usar el metadata para extraer nombre si es posible, o dejar string vacío/default.
-      const userMetadata = authUser.user_metadata || {};
-      const nombre = userMetadata.full_name || userMetadata.name || 'Usuario';
+      if (!dni) {
+        // Usuario nuevo de Google sin DNI todavía: no podemos crear el perfil
+        // (el DNI es obligatorio). El frontend debe pedirlo en /completar-perfil
+        // y volver a llamar a este endpoint con el dato.
+        return {
+          success: true,
+          token: null,
+          user: {
+            id: authUser.id,
+            nombre: userMetadata.full_name || userMetadata.name || 'Usuario',
+            email: authUser.email,
+            bondaCode: null,
+            telefono: null,
+            dni: null,
+            provincia: null,
+            localidad: null,
+            avatar_url: userMetadata.avatar_url || userMetadata.picture || null,
+            role: 'user',
+          },
+        };
+      }
 
+      // Si no existe y ya tenemos DNI, crearlo.
       try {
         const result = await this.supabaseService
           .getClient()
@@ -550,7 +572,7 @@ export class AuthService {
           .insert({
             id: authUser.id,
             email: authUser.email,
-            nombre,
+            nombre: userMetadata.full_name || userMetadata.name || 'Usuario',
             dni,
             telefono,
             provincia,
@@ -572,10 +594,11 @@ export class AuthService {
           'Error al sincronizar el perfil',
         );
       }
-    } else {
-      // Si existe, actualizar DNI y los otros campos
+    } else if (dni || telefono || provincia || localidad) {
+      // Si existe y llegaron datos nuevos, actualizar solo lo enviado
       try {
-        const updateData: any = { dni };
+        const updateData: any = {};
+        if (dni) updateData.dni = dni;
         if (telefono) updateData.telefono = telefono;
         if (provincia) updateData.provincia = provincia;
         if (localidad) updateData.localidad = localidad;
@@ -593,11 +616,13 @@ export class AuthService {
       }
     }
 
-    // 3. Devolver los datos del perfil
+    // 3. Emitir el JWT propio del backend (no el token de Supabase) y devolver el perfil
     const role = await this.supabaseService.getUserRole(authUser.id);
+    const appToken = this.generarToken(publicUser, role);
 
     return {
       success: true,
+      token: appToken,
       user: {
         id: publicUser.id,
         nombre: publicUser.nombre,

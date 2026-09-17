@@ -22,24 +22,35 @@ export default function AuthCallbackPage() {
           throw new Error("No se encontró sesión activa.");
         }
 
-        const token = session.access_token;
+        const supabaseToken = session.access_token;
         const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
-        // 2. Comprobar si el usuario ya está en public.usuarios (perfil completo)
-        const response = await fetch(`${API_URL}/auth/profile`, {
-          headers: { Authorization: `Bearer ${token}` }
+        // 2. Sincronizar/consultar el perfil en public.usuarios.
+        // Usamos sso-sync (no /auth/profile) porque este es el único endpoint
+        // que sabe validar el token de Supabase; el resto de la API exige el
+        // JWT propio del backend, que recién se obtiene en esta respuesta.
+        const response = await fetch(`${API_URL}/auth/sso-sync`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${supabaseToken}`,
+          },
+          body: JSON.stringify({}),
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          // Usuario sincronizado, loguear e ir al dashboard
-          loginContext(token, data.user);
-          router.push("/dashboard");
-        } else if (response.status === 401) {
-          // El token es válido pero validateUser falló -> No existe en public.usuarios (falta DNI)
-          router.push("/completar-perfil");
-        } else {
+        if (!response.ok) {
           throw new Error("Error inesperado al consultar perfil.");
+        }
+
+        const data = await response.json();
+
+        if (data.user?.dni && data.token) {
+          // Perfil completo: loguear con el JWT del backend e ir al dashboard
+          loginContext(data.token, data.user);
+          router.push("/dashboard");
+        } else {
+          // Falta el DNI: todavía no existe (o no está completo) en public.usuarios
+          router.push("/completar-perfil");
         }
       } catch (err: any) {
         console.error("Auth callback error:", err);

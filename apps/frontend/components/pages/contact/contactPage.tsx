@@ -119,12 +119,12 @@ export default function ContactPage() {
                       WhatsApp
                     </h3>
                     <a
-                      href="https://wa.me/5491156393261"
+                      href="https://wa.me/5491125707053"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-green-600 hover:text-green-700 transition-colors"
                     >
-                      +54 11 5639-3261
+                      +54 11 2570-7053
                     </a>
                     <p className="text-sm text-gray-600 mt-1">
                       Disponible 24 horas

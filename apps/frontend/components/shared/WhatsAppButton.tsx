@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 
 export default memo(function WhatsAppButton() {
   const pathname = usePathname();
-  const whatsappNumber = "5491156393261"; // +54 11 5639-3261
+  const whatsappNumber = "5491125707053"; // +54 11 2570-7053
   const whatsappURL = `https://wa.me/${whatsappNumber}`;
 
   const isDonarSlugPage = pathname?.startsWith("/donar/") && !["/donar/success", "/donar/error", "/donar"].includes(pathname);

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import HowItWorksSection from "@/components/sections/HowItWorks/howItWorksSection";
 import {
   ArrowLeft,
   ArrowRight,
@@ -8,7 +9,6 @@ import {
   Gift,
   Repeat,
   RefreshCw,
-  Heart,
   HeartHandshake,
   Sparkles,
   Building2,
@@ -19,24 +19,6 @@ import {
 } from "lucide-react";
 
 export default function AboutPage() {
-  const pasos = [
-    {
-      icon: Heart,
-      title: "Elegís una causa",
-      description: "Encontrás una ONG cuyo propósito te represente.",
-    },
-    {
-      icon: HeartHandshake,
-      title: "Te sumás al club",
-      description: "Tu aporte mensual ayuda a sostener su misión.",
-    },
-    {
-      icon: Gift,
-      title: "Disfrutás tus beneficios",
-      description: "Accedés a descuentos en marcas para tu día a día.",
-    },
-  ];
-
   const circuloBienestar = [
     { icon: HandCoins, label: "Vos aportás" },
     { icon: Handshake, label: "Una ONG recibe apoyo" },
@@ -215,53 +197,13 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* 3. Cómo funciona: aporte con beneficios */}
-        <section className="mb-16">
-          <div className="text-center mb-16 max-w-2xl mx-auto">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Aporte con beneficios
-            </h2>
-            <div className="w-16 h-1.5 bg-[#2c8184] mx-auto rounded-full" />
-          </div>
+        {/* 3. Cómo funciona */}
+        <HowItWorksSection className="mb-10" />
 
-          <ol className="relative grid md:grid-cols-3 gap-12 md:gap-10 max-w-6xl mx-auto">
-            <div
-              aria-hidden
-              className="hidden md:block absolute top-10 left-[16.6%] right-[16.6%] h-0.5 bg-teal-100"
-            />
-
-            {pasos.map((paso, index) => {
-              const IconComponent = paso.icon;
-              return (
-                <li
-                  key={index}
-                  className="relative flex flex-col items-center text-center"
-                >
-                  <div className="relative z-10 w-20 h-20 rounded-2xl bg-white border-2 border-teal-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-center mb-6">
-                    <IconComponent
-                      className="w-9 h-9 text-[#2c8184]"
-                      strokeWidth={1.5}
-                    />
-                    <span className="absolute -top-3 -right-3 w-7 h-7 rounded-full bg-[#2c8184] text-white text-sm font-bold flex items-center justify-center">
-                      {index + 1}
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">
-                    {paso.title}
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed max-w-xs">
-                    {paso.description}
-                  </p>
-                </li>
-              );
-            })}
-          </ol>
-
-          <p className="text-center text-gray-600 max-w-2xl mx-auto mt-14">
-            También podés ser parte a través de tu empresa, si ofrece el club
-            como beneficio para su equipo.
-          </p>
-        </section>
+        <p className="text-center text-gray-600 max-w-2xl mx-auto -mt-8 mb-16">
+          También podés ser parte a través de tu empresa, si ofrece el club
+          como beneficio para su equipo.
+        </p>
 
         {/* 4. El alcance: bienestar e impacto */}
         <section className="mb-16">

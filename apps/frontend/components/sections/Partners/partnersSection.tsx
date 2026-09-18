@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, X, ExternalLink, Mail, Globe, Phone, MapPin } from "lucide-react";
+import { Heart, X, ExternalLink, Mail, Globe, Phone, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 import { obtenerOrganizaciones, type Organizacion } from "@/lib/payments";
 
 const supabaseLoader = ({ src, width, quality }: { src: string; width: number; quality?: number }) => {
@@ -64,6 +64,30 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
   };
 
   const closeModal = () => setSelectedOrg(null);
+
+  // Carrusel móvil
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(true);
+
+  const updateCarouselEdges = useCallback(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    setCanScrollPrev(el.scrollLeft > 8);
+    setCanScrollNext(el.scrollLeft + el.clientWidth < el.scrollWidth - 8);
+  }, []);
+
+  useEffect(() => {
+    updateCarouselEdges();
+  }, [organizaciones, updateCarouselEdges]);
+
+  const scrollCarousel = (direction: 1 | -1) => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const card = el.firstElementChild as HTMLElement | null;
+    const step = card ? card.offsetWidth + 16 : el.clientWidth * 0.8;
+    el.scrollBy({ left: direction * step, behavior: "smooth" });
+  };
 
   if (loading) {
     return (
@@ -139,55 +163,78 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
           </div>
         )}
 
-        {/* Mobile: cards horizontales (solo visible en móvil) */}
-        <div className="space-y-4 md:hidden">
-          {organizaciones.map((org) => {
-            const logoUrl = org.logo_url;
-            return (
-              <div
-                key={org.id}
-                onClick={() => handleCardClick(org)}
-                className="bg-white rounded-2xl p-4 flex items-center justify-between shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-50 cursor-pointer hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-center gap-4 min-w-0 pointer-events-none">
-                  <div className="h-16 w-16 rounded-full bg-transparent shrink-0 flex items-center justify-center p-1">
-                    {logoUrl ? (
-                      <Image
-                        loader={supabaseLoader}
-                        src={logoUrl}
-                        alt={org.nombre}
-                        width={160}
-                        height={64}
-                        sizes="64px"
-                        className="h-full w-auto max-w-full object-contain"
-                      />
-                    ) : (
-                      <span className="w-full h-full flex items-center justify-center text-lg font-bold text-[#2c8184]">
-                        {org.nombre.charAt(0)}
-                      </span>
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <h2 className="font-bold text-[#1A202C] text-sm leading-tight line-clamp-2">
+        {/* Mobile: carrusel con flechas (solo visible en móvil) */}
+        <div className="relative md:hidden">
+          <button
+            type="button"
+            onClick={() => scrollCarousel(-1)}
+            disabled={!canScrollPrev}
+            aria-label="ONG anterior"
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 z-10 w-11 h-11 flex items-center justify-center bg-white border-2 border-teal-100 rounded-full shadow-lg text-[#2c8184] active:scale-95 transition-all disabled:opacity-0 disabled:pointer-events-none"
+          >
+            <ChevronLeft className="w-6 h-6" strokeWidth={2.5} />
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollCarousel(1)}
+            disabled={!canScrollNext}
+            aria-label="ONG siguiente"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 z-10 w-11 h-11 flex items-center justify-center bg-white border-2 border-teal-100 rounded-full shadow-lg text-[#2c8184] active:scale-95 transition-all disabled:opacity-0 disabled:pointer-events-none"
+          >
+            <ChevronRight className="w-6 h-6" strokeWidth={2.5} />
+          </button>
+
+          <div
+            ref={carouselRef}
+            onScroll={updateCarouselEdges}
+            className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth px-[10%] py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {organizaciones.map((org) => {
+              const logoUrl = org.logo_url;
+              return (
+                <div
+                  key={org.id}
+                  onClick={() => handleCardClick(org)}
+                  className="snap-center shrink-0 w-full bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.06)] flex flex-col items-center cursor-pointer"
+                >
+                  <div className="p-6 pb-4 flex flex-col items-center grow text-center w-full pointer-events-none">
+                    <div className="h-24 w-full mb-4 shrink-0 flex items-center justify-center p-2">
+                      {logoUrl ? (
+                        <Image
+                          loader={supabaseLoader}
+                          src={logoUrl}
+                          alt={org.nombre}
+                          width={320}
+                          height={96}
+                          sizes="70vw"
+                          className="h-full w-auto max-w-full object-contain"
+                        />
+                      ) : (
+                        <span className="w-full h-full flex items-center justify-center text-2xl font-bold text-[#2c8184]">
+                          {org.nombre.charAt(0)}
+                        </span>
+                      )}
+                    </div>
+                    <h2 className="text-base font-bold text-[#1A202C] leading-tight line-clamp-2">
                       {org.nombre}
                     </h2>
                     {org.descripcion && (
-                      <p className="text-[11px] text-slate-500 font-medium mt-0.5 line-clamp-1">
+                      <p className="text-xs text-slate-500 mt-3 leading-relaxed line-clamp-3">
                         {org.descripcion}
                       </p>
                     )}
                   </div>
+                  <Link
+                    href="/donar"
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full bg-[#2c8184] text-white py-3.5 font-bold text-sm tracking-wide text-center"
+                  >
+                    Donar
+                  </Link>
                 </div>
-                <Link
-                  href="/donar"
-                  onClick={(e) => e.stopPropagation()}
-                  className="bg-[#2c8184] text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-teal-500/20 active:scale-95 transition-transform shrink-0"
-                >
-                  Donar
-                </Link>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
         {/* Desktop: grid de cards verticales (oculto en móvil) */}

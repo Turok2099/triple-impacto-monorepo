@@ -8,13 +8,14 @@ import {
   Target,
   DollarSign,
   RefreshCw,
+  Ticket,
   ArrowLeft,
 } from "lucide-react";
 
 interface FAQItem {
   id: number;
   question: string;
-  answer: string;
+  answer: React.ReactNode;
   icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
 }
 
@@ -32,6 +33,47 @@ const faqs: FAQItem[] = [
     answer:
       "Los cupones se envían automáticamente a tu correo electrónico inmediatamente después de confirmar tu donación. También podés acceder a todos tus beneficios desde tu dashboard personal en cualquier momento. Los cupones incluyen códigos únicos y condiciones de uso claras.",
     icon: Mail,
+  },
+  {
+    id: 4,
+    question: "¿Cómo canjeo mis cupones de descuento?",
+    answer: (
+      <div className="space-y-4">
+        <ol className="space-y-3">
+          {[
+            "Elegí el cupón que quieras usar y hacé clic en él.",
+            "Vas a ver un código alfanumérico, tanto desde tu celular como desde la computadora.",
+          ].map((step, i) => (
+            <li key={i} className="flex gap-3">
+              <span className="shrink-0 w-6 h-6 rounded-full bg-[#2c8184] text-white text-sm font-semibold flex items-center justify-center">
+                {i + 1}
+              </span>
+              <span>{step}</span>
+            </li>
+          ))}
+          <li className="flex gap-3">
+            <span className="shrink-0 w-6 h-6 rounded-full bg-[#2c8184] text-white text-sm font-semibold flex items-center justify-center">
+              3
+            </span>
+            <div className="space-y-2">
+              <span>Presentá ese código según dónde estés comprando:</span>
+              <ul className="list-disc pl-5 space-y-1 marker:text-[#2c8184]">
+                <li>
+                  <strong>En un local físico:</strong> mostrá el código a quien te cobra.
+                </li>
+                <li>
+                  <strong>En una compra online:</strong> pegá el código donde el sitio te indique (generalmente en el campo &quot;cupón de descuento&quot; o &quot;código promocional&quot;).
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ol>
+        <p className="font-medium text-gray-800">
+          ¡Y listo! Así de fácil accedés a tu beneficio mientras generás Bienestar Circular.
+        </p>
+      </div>
+    ),
+    icon: Ticket,
   },
   {
     id: 3,
@@ -143,7 +185,7 @@ export default function FAQsPage() {
                 <div
                   className={`transition-all duration-300 ease-in-out ${
                     openId === faq.id
-                      ? "max-h-96 opacity-100"
+                      ? "max-h-[40rem] opacity-100"
                       : "max-h-0 opacity-0"
                   }`}
                 >

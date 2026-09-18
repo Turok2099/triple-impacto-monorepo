@@ -23,10 +23,10 @@ export default function HomePage() {
       <HomeBannersMobileCarousel />
       <AboutProjectSection />
       <HowItWorksSection />
+      <PartnersSection />
       <CuponesShowcase />
       <CouponCounter />
       <SponsorsSection />
-      <PartnersSection />
       <JoinUsSection />
       <FounderQuote />
       <WhyDonateSection />

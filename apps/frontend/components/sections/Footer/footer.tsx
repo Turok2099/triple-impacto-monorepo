@@ -190,12 +190,12 @@ function FooterContent() {
               <li className="flex items-start gap-3">
                 <Phone className="text-[#2c8184] w-6 h-6 shrink-0 mt-0.5" />
                 <a
-                  href="https://wa.me/5491156393261"
+                  href="https://wa.me/5491125707053"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-teal-400 transition-colors"
                 >
-                  +54 11 5639-3261 (WhatsApp)
+                  +54 11 2570-7053 (WhatsApp)
                 </a>
               </li>
             </ul>

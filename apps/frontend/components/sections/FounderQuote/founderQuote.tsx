@@ -94,7 +94,7 @@ export default function FounderQuote() {
                   </svg>
                 </a>
                 <a
-                  href="https://wa.me/5491156393261"
+                  href="https://wa.me/5491125707053"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mx-5 hover:scale-110 transition-transform"

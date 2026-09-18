@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { decryptSecret } from '../../common/crypto/cipher';
 
 @Injectable()
 export class SupabaseService implements OnModuleInit {
@@ -579,7 +580,34 @@ export class SupabaseService implements OnModuleInit {
       this.logger.error('Error al obtener organizacion por id:', error);
       throw error;
     }
+    if (data && data.fiserv_shared_secret) {
+      data.fiserv_shared_secret = this.decryptFiservSecret(
+        data.fiserv_shared_secret as string,
+      );
+    }
     return data;
+  }
+
+  /**
+   * Descifra fiserv_shared_secret con la ENCRYPTION_KEY configurada. Los valores
+   * legacy sin el prefijo "enc:v1:" (pre-migración) se devuelven tal cual.
+   */
+  private decryptFiservSecret(value: string): string {
+    const key = this.configService.get<string>(
+      'security.fiservSecretEncryptionKey',
+    );
+    return decryptSecret(value, key || '') || '';
+  }
+
+  /**
+   * Construye la URL pública del link de donación exclusivo de una ONG a partir de su slug.
+   */
+  private buildDonacionUrl(slug: string | null | undefined): string | null {
+    if (!slug) return null;
+    const frontendUrl = (
+      this.configService.get<string>('frontendUrl') || ''
+    ).replace(/\/$/, '');
+    return `${frontendUrl}/donar/${slug}`;
   }
 
   /**
@@ -654,6 +682,7 @@ export class SupabaseService implements OnModuleInit {
       monto_fijo_2: data.monto_fijo_2 || 20000,
       monto_fijo_3: data.monto_fijo_3 || 30000,
       slug: data.slug || null,
+      donacion_url: this.buildDonacionUrl(data.slug),
       bonda_slug: (bonda as any)?.slug || null,
       has_fiserv_config,
       activa: true,
@@ -661,6 +690,33 @@ export class SupabaseService implements OnModuleInit {
       created_at: data.created_at || new Date().toISOString(),
       updated_at: data.updated_at || new Date().toISOString(),
     };
+  }
+
+  /**
+   * Busca a qué organización apunta hoy un slug que ya no existe como slug
+   * vigente, para poder redirigir (301 lógico) a la URL de donación actual.
+   */
+  async resolverSlugRedirect(slugAnterior: string): Promise<string | null> {
+    const normalized = slugAnterior.trim().toLowerCase();
+    const { data, error } = await this.from('organizacion_slugs_historicos')
+      .select('organizaciones ( slug, activa )')
+      .ilike('slug_anterior', normalized)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      // Tabla puede no existir todavía en algunos entornos; no romper el flujo público.
+      this.logger.warn('No se pudo resolver historial de slugs:', error.message);
+      return null;
+    }
+
+    const org = Array.isArray(data?.organizaciones)
+      ? data?.organizaciones[0]
+      : (data?.organizaciones as any);
+
+    if (!org || !org.activa || !org.slug) return null;
+    return org.slug;
   }
 
   /**
@@ -736,6 +792,7 @@ export class SupabaseService implements OnModuleInit {
         monto_fijo_2: org.monto_fijo_2 || 20000,
         monto_fijo_3: org.monto_fijo_3 || 30000,
         slug: org.slug || null,
+        donacion_url: this.buildDonacionUrl(org.slug),
         bonda_slug: bonda?.slug || null,
         has_fiserv_config,
         activa: true,

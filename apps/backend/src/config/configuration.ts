@@ -47,4 +47,8 @@ export default () => ({
     // Deshabilitado desde la baja del dominio ayni.ar; poner en 'true' cuando se retome el flujo de QR.
     qrEnabled: process.env.FISERV_QR_ENABLED === 'true',
   },
+  security: {
+    // Passphrase usada para cifrar/descifrar fiserv_shared_secret en reposo (AES-256-GCM).
+    fiservSecretEncryptionKey: process.env.FISERV_SECRET_ENCRYPTION_KEY || '',
+  },
 });

@@ -173,7 +173,9 @@ export default function SeccionAdminOngs() {
       activa: ong.activa,
       fiserv_activo: ong.fiserv_activo || false,
       fiserv_store_id: ong.fiserv_store_id || "",
-      fiserv_shared_secret: ong.fiserv_shared_secret || "",
+      // El backend nunca devuelve el secreto guardado; se deja vacío y solo se
+      // envía si el admin escribe uno nuevo (ver fiserv_shared_secret_configurado).
+      fiserv_shared_secret: "",
       bonda_slug: bonda?.slug || "",
       bonda_api_token: bonda?.api_token || "",
       bonda_api_token_nominas: bonda?.api_token_nominas || "",
@@ -265,9 +267,9 @@ export default function SeccionAdminOngs() {
           <tbody className="divide-y divide-slate-100">
             {ongs.map((ong) => {
               const bonda = ong.bonda_microsites && ong.bonda_microsites.length > 0 ? ong.bonda_microsites[0] : null;
-              const fiservOk = !!(ong.fiserv_activo && ong.fiserv_store_id && ong.fiserv_shared_secret);
+              const fiservOk = ong.has_fiserv_config;
               const bondaUrl = bonda ? (bonda.slug.startsWith('http') ? bonda.slug : `https://${bonda.slug}`) : null;
-              const donacionUrl = ong.slug ? `${typeof window !== "undefined" ? window.location.origin : ""}/donar/${ong.slug}` : null;
+              const donacionUrl = ong.donacion_url;
               return (
                 <tr key={ong.id} className={`transition-colors ${fiservOk && ong.activa ? 'bg-blue-50/60 hover:bg-blue-50' : 'hover:bg-slate-50/50'}`}>
                   <td className="py-4 px-6">
@@ -328,6 +330,11 @@ export default function SeccionAdminOngs() {
                           >
                             {copiedLink === `donacion-${ong.id}` ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
                           </button>
+                          {!fiservOk && (
+                            <span className="text-amber-600 font-medium" title="El link ya existe pero todavía no procesa pagos: falta completar Fiserv (Store ID + Shared Secret) y activarlo.">
+                              ⚠ inactivo
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>
@@ -494,17 +501,26 @@ export default function SeccionAdminOngs() {
                       <div>
                         <label className="block text-sm font-semibold text-orange-950 mb-1">Fiserv Shared Secret</label>
                         <div className="relative">
-                          <input placeholder="Sin información" autoComplete="new-password" type={showSecrets ? "text" : "password"} value={formData.fiserv_shared_secret} onChange={e => setFormData({ ...formData, fiserv_shared_secret: e.target.value })} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-orange-200 focus:ring-2 focus:ring-orange-500 outline-none font-mono text-sm" />
+                          <input placeholder={editingOng?.fiserv_shared_secret_configurado ? "•••••••• (ya configurado, dejar vacío para no cambiarlo)" : "Sin información"} autoComplete="new-password" type={showSecrets ? "text" : "password"} value={formData.fiserv_shared_secret} onChange={e => setFormData({ ...formData, fiserv_shared_secret: e.target.value })} className="w-full px-4 py-2.5 pr-10 rounded-lg border border-orange-200 focus:ring-2 focus:ring-orange-500 outline-none font-mono text-sm" />
                           <button type="button" onClick={() => setShowSecrets(!showSecrets)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 focus:outline-none">
                             {showSecrets ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
                         </div>
+                        <p className="text-xs text-slate-500 mt-1">
+                          Por seguridad no se muestra el valor guardado. {editingOng?.fiserv_shared_secret_configurado ? "Ya hay uno configurado; escribí uno nuevo solo si querés reemplazarlo." : "Todavía no hay uno guardado."}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 mt-2 border-t border-orange-200/50 pt-4">
                       <input type="checkbox" id="fiserv_activo" checked={formData.fiserv_activo} onChange={e => setFormData({ ...formData, fiserv_activo: e.target.checked })} className="w-5 h-5 text-orange-600 rounded border-orange-300 focus:ring-orange-500" />
-                      <label htmlFor="fiserv_activo" className="font-semibold text-orange-950">Fiserv Activo (Habilita la ONG en el formulario de pago, requiere store id)</label>
+                      <label htmlFor="fiserv_activo" className="font-semibold text-orange-950">Fiserv Activo (Habilita la ONG en el formulario de pago, requiere Store ID y Shared Secret)</label>
                     </div>
+                    {formData.fiserv_activo && !formData.fiserv_store_id && (
+                      <p className="text-xs text-red-600 font-medium -mt-2">Falta el Store ID para poder activar Fiserv.</p>
+                    )}
+                    {formData.fiserv_activo && !formData.fiserv_shared_secret && !editingOng?.fiserv_shared_secret_configurado && (
+                      <p className="text-xs text-red-600 font-medium -mt-2">Falta el Shared Secret para poder activar Fiserv.</p>
+                    )}
                   </div>
                 </section>
 

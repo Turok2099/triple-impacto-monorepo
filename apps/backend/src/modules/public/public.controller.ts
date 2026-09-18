@@ -291,12 +291,22 @@ export class PublicController {
   @Get('organizaciones/slug/:slug')
   async getOrganizacionBySlug(@Param('slug') slug: string) {
     const org = await this.supabase.getOrganizacionBySlug(slug);
-    if (!org) {
-      throw new NotFoundException(
-        `Organización con slug "${slug}" no encontrada`,
+    if (org) return org;
+
+    // El slug pudo haber sido renombrado: buscar a dónde redirigir antes de dar 404.
+    const slugVigente = await this.supabase.resolverSlugRedirect(slug);
+    if (slugVigente) {
+      const orgRedirigida = await this.supabase.getOrganizacionBySlug(
+        slugVigente,
       );
+      if (orgRedirigida) {
+        return { ...orgRedirigida, redirected_from: slug };
+      }
     }
-    return org;
+
+    throw new NotFoundException(
+      `Organización con slug "${slug}" no encontrada`,
+    );
   }
 
   /**

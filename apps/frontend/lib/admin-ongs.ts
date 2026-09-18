@@ -26,8 +26,12 @@ export interface Ong {
   verificada: boolean;
   fiserv_activo: boolean;
   fiserv_store_id: string | null;
-  fiserv_shared_secret: string | null;
+  /** El backend nunca devuelve el secreto real; solo si hay uno guardado. */
+  fiserv_shared_secret_configurado: boolean;
+  has_fiserv_config: boolean;
   slug: string | null;
+  /** Link de donación (/donar/{slug}) calculado server-side; null si no hay slug. */
+  donacion_url: string | null;
   bonda_microsites?: BondaMicrosite[];
   created_at: string;
 }

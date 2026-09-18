@@ -53,7 +53,13 @@ export default function DonarExclusivePage() {
       }
 
       const data = await response.json();
-      
+
+      // El slug se renombró: reemplazar la URL por la vigente sin mostrar error al donante.
+      if (data.redirected_from && data.slug && data.slug !== ongSlug) {
+        router.replace(`/donar/${data.slug}`);
+        return;
+      }
+
       // Validar si tiene Fiserv configurado
       if (!data.has_fiserv_config) {
         throw new Error("Esta organización no tiene habilitado el canal de donación segura.");

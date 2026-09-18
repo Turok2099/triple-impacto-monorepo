@@ -19,7 +19,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "analizar-bonda": "ts-node -r tsconfig-paths/register scripts/analizar-cupones-bonda.ts",
     "test:fiserv-declined": "ts-node -r tsconfig-paths/register scripts/fiserv-declined-tests.ts",
-    "test:fiserv-connect": "ts-node -r tsconfig-paths/register scripts/fiserv-connect-test-cases.ts"
+    "test:fiserv-connect": "ts-node -r tsconfig-paths/register scripts/fiserv-connect-test-cases.ts",
+    "migrate-encrypt-fiserv-secrets": "ts-node -r tsconfig-paths/register scripts/migrate-encrypt-fiserv-secrets.ts"
   },
   "engines": {
     "node": ">=20.0.0"

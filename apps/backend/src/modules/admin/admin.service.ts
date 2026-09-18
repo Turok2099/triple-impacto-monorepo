@@ -4,9 +4,11 @@ import {
   InternalServerErrorException,
   BadRequestException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { SupabaseService } from '../supabase/supabase.service';
 import { BondaService } from '../bonda/bonda.service';
 import * as ExcelJS from 'exceljs';
+import { encryptSecret } from '../../common/crypto/cipher';
 
 const bondaAllowedFields = [
   'email',
@@ -27,6 +29,7 @@ export class AdminService {
   constructor(
     private readonly supabaseService: SupabaseService,
     private readonly bondaService: BondaService,
+    private readonly configService: ConfigService,
   ) {}
 
   async getUsers(
@@ -904,7 +907,60 @@ export class AdminService {
       this.logger.error('Error fetching organizaciones:', error);
       throw new InternalServerErrorException('Error al obtener ONGs');
     }
-    return data;
+    return (data || []).map((org: any) => this.toOrganizacionResponse(org));
+  }
+
+  /**
+   * Nunca devolver fiserv_shared_secret crudo al navegador del admin — solo un
+   * booleano de si está configurado, más el link de donación calculado server-side.
+   */
+  private toOrganizacionResponse(org: any) {
+    const { fiserv_shared_secret, ...rest } = org;
+    return {
+      ...rest,
+      fiserv_shared_secret_configurado: !!fiserv_shared_secret,
+      has_fiserv_config: !!(
+        org.fiserv_activo &&
+        org.fiserv_store_id &&
+        fiserv_shared_secret
+      ),
+      donacion_url: this.buildDonacionUrl(org.slug),
+    };
+  }
+
+  private buildDonacionUrl(slug: string | null | undefined): string | null {
+    if (!slug) return null;
+    const frontendUrl = (
+      this.configService.get<string>('frontendUrl') || ''
+    ).replace(/\/$/, '');
+    return `${frontendUrl}/donar/${slug}`;
+  }
+
+  private encryptFiservSecret(plainText: string): string {
+    const key = this.configService.get<string>(
+      'security.fiservSecretEncryptionKey',
+    );
+    if (!key) {
+      throw new InternalServerErrorException(
+        'FISERV_SECRET_ENCRYPTION_KEY no está configurada en el servidor.',
+      );
+    }
+    return encryptSecret(plainText, key);
+  }
+
+  private assertFiservCompleto(
+    fiservActivo: boolean,
+    storeId: string | null | undefined,
+    sharedSecret: string | null | undefined,
+  ) {
+    if (!fiservActivo) return;
+    const storeIdOk = !!storeId && storeId.trim() !== '';
+    const secretOk = !!sharedSecret && sharedSecret.trim() !== '';
+    if (!storeIdOk || !secretOk) {
+      throw new BadRequestException(
+        'Para activar Fiserv hay que completar el Store ID y el Shared Secret.',
+      );
+    }
   }
 
   private normalizeSlug(raw: string | null | undefined): string | null {
@@ -973,6 +1029,16 @@ export class AdminService {
       await this.assertSlugDisponible(client, slug);
     }
 
+    const fiservActivo = payload.fiserv_activo ?? false;
+    const fiservSharedSecretCifrado = payload.fiserv_shared_secret
+      ? this.encryptFiservSecret(payload.fiserv_shared_secret)
+      : null;
+    this.assertFiservCompleto(
+      fiservActivo,
+      payload.fiserv_store_id,
+      fiservSharedSecretCifrado,
+    );
+
     // 1. Crear Organización
     const { data: org, error: orgError } = await client
       .from('organizaciones')
@@ -990,9 +1056,9 @@ export class AdminService {
         monto_fijo_3: payload.monto_fijo_3 || 30000,
         activa: payload.activa ?? true,
         verificada: payload.verificada ?? false,
-        fiserv_activo: payload.fiserv_activo ?? false,
+        fiserv_activo: fiservActivo,
         fiserv_store_id: payload.fiserv_store_id,
-        fiserv_shared_secret: payload.fiserv_shared_secret,
+        fiserv_shared_secret: fiservSharedSecretCifrado,
         slug,
       })
       .select()
@@ -1024,7 +1090,7 @@ export class AdminService {
     }
 
     await this.logAudit(adminId, org.id, 'CREATE_ORG', 'SUCCESS');
-    return org;
+    return this.toOrganizacionResponse(org);
   }
 
   async updateOrganizacion(adminId: string, id: string, payload: any) {
@@ -1046,10 +1112,37 @@ export class AdminService {
 
     const client = this.supabaseService.getClient();
 
+    const { data: existing, error: existingError } = await client
+      .from('organizaciones')
+      .select('slug, fiserv_activo, fiserv_store_id, fiserv_shared_secret')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (existingError || !existing) {
+      throw new BadRequestException('Organización no encontrada.');
+    }
+
     const slug = this.normalizeSlug(payload.slug);
     if (slug) {
       await this.assertSlugDisponible(client, slug, id);
     }
+
+    // El admin deja el campo de secret en blanco cuando no quiere cambiarlo
+    // (nunca se le muestra el valor real); si escribió uno nuevo, se cifra acá.
+    const fiservSharedSecretCifrado = payload.fiserv_shared_secret
+      ? this.encryptFiservSecret(payload.fiserv_shared_secret)
+      : existing.fiserv_shared_secret;
+    const fiservActivo = payload.fiserv_activo ?? existing.fiserv_activo;
+    const fiservStoreId =
+      payload.fiserv_store_id !== undefined
+        ? payload.fiserv_store_id
+        : existing.fiserv_store_id;
+
+    this.assertFiservCompleto(
+      fiservActivo,
+      fiservStoreId,
+      fiservSharedSecretCifrado,
+    );
 
     const { data: org, error: orgError } = await client
       .from('organizaciones')
@@ -1067,9 +1160,9 @@ export class AdminService {
         monto_fijo_3: payload.monto_fijo_3,
         activa: payload.activa,
         verificada: payload.verificada,
-        fiserv_activo: payload.fiserv_activo,
-        fiserv_store_id: payload.fiserv_store_id,
-        fiserv_shared_secret: payload.fiserv_shared_secret,
+        fiserv_activo: fiservActivo,
+        fiserv_store_id: fiservStoreId,
+        fiserv_shared_secret: fiservSharedSecretCifrado,
         slug,
         updated_at: new Date().toISOString(),
       })
@@ -1081,6 +1174,22 @@ export class AdminService {
       throw new BadRequestException(
         'Error al actualizar organización: ' + orgError.message,
       );
+    }
+
+    // El slug cambió: dejar registro para poder redirigir el link viejo al nuevo.
+    if (existing.slug && slug && existing.slug !== slug) {
+      const { error: historialError } = await client
+        .from('organizacion_slugs_historicos')
+        .insert({
+          organizacion_id: id,
+          slug_anterior: existing.slug,
+        });
+      if (historialError) {
+        this.logger.warn(
+          'No se pudo registrar el historial de slug (¿falta la tabla organizacion_slugs_historicos?): ' +
+            historialError.message,
+        );
+      }
     }
 
     // Actualizar Bonda Microsite asociado si se pasaron datos
@@ -1117,7 +1226,7 @@ export class AdminService {
     }
 
     await this.logAudit(adminId, id, 'UPDATE_ORG', 'SUCCESS');
-    return org;
+    return this.toOrganizacionResponse(org);
   }
 
   async deleteOrganizacion(adminId: string, id: string) {

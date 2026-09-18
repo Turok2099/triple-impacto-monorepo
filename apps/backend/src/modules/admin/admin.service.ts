@@ -981,6 +981,50 @@ export class AdminService {
     return trimmed;
   }
 
+  private slugifyNombre(nombre: string): string {
+    const base = (nombre || '')
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '') // quitar acentos (á, ñ, etc.)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 80);
+    return base || 'ong';
+  }
+
+  /**
+   * Genera un slug único a partir del nombre de la ONG (agregando -2, -3...
+   * si hace falta) para habilitar el link de donación exclusivo sin que el
+   * admin tenga que escribirlo a mano.
+   */
+  private async generarSlugUnico(
+    client: ReturnType<SupabaseService['getClient']>,
+    nombre: string,
+    excludeId?: string,
+  ): Promise<string> {
+    const base = this.slugifyNombre(nombre);
+    let candidate = base;
+    let suffix = 2;
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      let query = client
+        .from('organizaciones')
+        .select('id')
+        .ilike('slug', candidate);
+      if (excludeId) query = query.neq('id', excludeId);
+      const { data, error } = await query.maybeSingle();
+      if (error) {
+        this.logger.error('Error generando slug único:', error);
+        throw new InternalServerErrorException(
+          'Error al generar el link de donación',
+        );
+      }
+      if (!data) return candidate;
+      candidate = `${base}-${suffix}`;
+      suffix++;
+    }
+  }
+
   private async assertSlugDisponible(
     client: ReturnType<SupabaseService['getClient']>,
     slug: string,
@@ -1024,20 +1068,29 @@ export class AdminService {
 
     const client = this.supabaseService.getClient();
 
-    const slug = this.normalizeSlug(payload.slug);
+    let slug = this.normalizeSlug(payload.slug);
     if (slug) {
       await this.assertSlugDisponible(client, slug);
     }
 
     const fiservActivo = payload.fiserv_activo ?? false;
+    const fiservStoreId =
+      typeof payload.fiserv_store_id === 'string'
+        ? payload.fiserv_store_id.trim()
+        : payload.fiserv_store_id;
     const fiservSharedSecretCifrado = payload.fiserv_shared_secret
       ? this.encryptFiservSecret(payload.fiserv_shared_secret)
       : null;
     this.assertFiservCompleto(
       fiservActivo,
-      payload.fiserv_store_id,
+      fiservStoreId,
       fiservSharedSecretCifrado,
     );
+
+    // Fiserv activo sin slug propio: generar el link de donación automáticamente.
+    if (!slug && fiservActivo) {
+      slug = await this.generarSlugUnico(client, payload.nombre);
+    }
 
     // 1. Crear Organización
     const { data: org, error: orgError } = await client
@@ -1057,7 +1110,7 @@ export class AdminService {
         activa: payload.activa ?? true,
         verificada: payload.verificada ?? false,
         fiserv_activo: fiservActivo,
-        fiserv_store_id: payload.fiserv_store_id,
+        fiserv_store_id: fiservStoreId,
         fiserv_shared_secret: fiservSharedSecretCifrado,
         slug,
       })
@@ -1114,7 +1167,7 @@ export class AdminService {
 
     const { data: existing, error: existingError } = await client
       .from('organizaciones')
-      .select('slug, fiserv_activo, fiserv_store_id, fiserv_shared_secret')
+      .select('nombre, slug, fiserv_activo, fiserv_store_id, fiserv_shared_secret')
       .eq('id', id)
       .maybeSingle();
 
@@ -1122,7 +1175,7 @@ export class AdminService {
       throw new BadRequestException('Organización no encontrada.');
     }
 
-    const slug = this.normalizeSlug(payload.slug);
+    let slug = this.normalizeSlug(payload.slug);
     if (slug) {
       await this.assertSlugDisponible(client, slug, id);
     }
@@ -1135,7 +1188,9 @@ export class AdminService {
     const fiservActivo = payload.fiserv_activo ?? existing.fiserv_activo;
     const fiservStoreId =
       payload.fiserv_store_id !== undefined
-        ? payload.fiserv_store_id
+        ? typeof payload.fiserv_store_id === 'string'
+          ? payload.fiserv_store_id.trim()
+          : payload.fiserv_store_id
         : existing.fiserv_store_id;
 
     this.assertFiservCompleto(
@@ -1143,6 +1198,16 @@ export class AdminService {
       fiservStoreId,
       fiservSharedSecretCifrado,
     );
+
+    // Se está activando Fiserv y la ONG todavía no tiene slug propio:
+    // generar el link de donación automáticamente en vez de dejarlo sin link.
+    if (!slug && !existing.slug && fiservActivo) {
+      slug = await this.generarSlugUnico(
+        client,
+        payload.nombre || existing.nombre,
+        id,
+      );
+    }
 
     const { data: org, error: orgError } = await client
       .from('organizaciones')

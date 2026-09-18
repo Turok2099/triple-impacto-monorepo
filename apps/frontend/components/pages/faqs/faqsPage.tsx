@@ -51,7 +51,7 @@ const faqs: FAQItem[] = [
     id: 6,
     question: "¿Cuál es el monto mínimo para donar?",
     answer:
-      "Podés donar desde $10.000 en adelante. Creemos que cada aporte cuenta y genera impacto. Los beneficios y descuentos están disponibles desde la primera donación, independientemente del monto.",
+      "Cada aporte cuenta y genera impacto. Podés elegir entre los montos disponibles para la ONG que quieras apoyar y acceder a beneficios y descuentos desde tu primera donación, independientemente del monto.",
     icon: DollarSign,
   },
   {
@@ -91,7 +91,8 @@ export default function FAQsPage() {
               Preguntas frecuentes
             </h1>
             <p className="text-xl text-gray-600">
-              Todo lo que necesitás saber sobre cómo funciona Club Triple Impacto
+              Todo lo que necesitás saber sobre cómo funciona Club Triple
+              Impacto
             </p>
           </div>
 

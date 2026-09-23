@@ -20,6 +20,7 @@ import { FiservRestService } from './fiserv-rest/fiserv-rest.service';
 import { BondaService } from '../bonda/bonda.service';
 import { FiservQrService } from './fiserv-qr/fiserv-qr.service';
 import { MailService } from '../mail/mail.service';
+import { addOneMonthClamped } from '../../common/utils/subscription-dates';
 
 /** Respuesta de crear-transaccion: params para el form POST a Fiserv + URL del gateway */
 export interface CrearTransaccionResponseDto {
@@ -279,8 +280,7 @@ export class PaymentsController {
         // Si es pago recurrente, registrar la suscripción
         if (body.isRecurring && result.paymentMethodId) {
           try {
-            const nextMonth = new Date();
-            nextMonth.setMonth(nextMonth.getMonth() + 1);
+            const nextMonth = addOneMonthClamped(new Date());
             const fechaProximoCobro = nextMonth.toISOString().split('T')[0];
 
             await this.supabase.createSuscripcion({

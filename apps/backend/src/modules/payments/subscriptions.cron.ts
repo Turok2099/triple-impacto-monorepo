@@ -3,6 +3,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { SupabaseService } from '../supabase/supabase.service';
 import { FiservRestService } from './fiserv-rest/fiserv-rest.service';
 import { MailService } from '../mail/mail.service';
+import { addOneMonthClamped } from '../../common/utils/subscription-dates';
 
 const MAX_REINTENTOS = 3;
 
@@ -96,13 +97,8 @@ export class SubscriptionsCronService {
               payment_status: result.transactionStatus,
             });
 
-            // Actualizar suscripción (sumar 1 mes)
-            const today = new Date();
-            const nextMonth = new Date(
-              today.getFullYear(),
-              today.getMonth() + 1,
-              today.getDate(),
-            );
+            // Actualizar suscripción (sumar 1 mes, con clamp de fin de mes)
+            const nextMonth = addOneMonthClamped(new Date());
             const fechaProximoCobro = nextMonth.toISOString().split('T')[0];
 
             await this.supabaseService.updateSuscripcion(sub.id, {

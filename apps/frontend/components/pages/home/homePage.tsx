@@ -4,6 +4,7 @@ import HomeBannersCarousel from "@/components/sections/HomeBanners/homeBannersCa
 import HomeBannersMobileCarousel from "@/components/sections/HomeBanners/homeBannersMobileCarousel";
 
 const AboutProjectSection = dynamic(() => import("@/components/sections/AboutProject/aboutProject"));
+const MembersCounter = dynamic(() => import("@/components/sections/MembersCounter/membersCounter"));
 const HowItWorksSection = dynamic(() => import("@/components/sections/HowItWorks/howItWorksSection"));
 const CuponesShowcase = dynamic(() => import("@/components/sections/Cupones/CuponesShowcase"));
 const CouponCounter = dynamic(() => import("@/components/sections/CouponCounter/couponCounter"));
@@ -22,6 +23,7 @@ export default function HomePage() {
       <HomeBannersCarousel />
       <HomeBannersMobileCarousel />
       <AboutProjectSection />
+      <MembersCounter />
       <HowItWorksSection />
       <PartnersSection />
       <CuponesShowcase />

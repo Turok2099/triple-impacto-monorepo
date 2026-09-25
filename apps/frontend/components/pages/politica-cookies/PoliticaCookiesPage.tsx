@@ -5,7 +5,7 @@ import { Cookie, ShieldAlert, CheckCircle2, Sliders, ExternalLink } from "lucide
 export default function PoliticaCookiesPage() {
   const handleOpenPreferences = () => {
     // Dispatch custom event to open the banner
-    window.dispatchEvent(new CustomEvent("ayni-open-cookie-preferences"));
+    window.dispatchEvent(new CustomEvent("ti-open-cookie-preferences"));
   };
 
   return (
@@ -110,13 +110,13 @@ export default function PoliticaCookiesPage() {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   <tr>
-                    <td className="px-4 py-3 font-medium text-gray-900">`ayni-auth-token`</td>
+                    <td className="px-4 py-3 font-medium text-gray-900">`auth_token`</td>
                     <td className="px-4 py-3"><span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-800 text-[10px] font-medium">Esencial</span></td>
                     <td className="px-4 py-3 text-gray-600">Mantiene activa la sesión de tu cuenta de forma segura.</td>
                     <td className="px-4 py-3 text-gray-600">30 días</td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-3 font-medium text-gray-900">`ayni-cookie-consent`</td>
+                    <td className="px-4 py-3 font-medium text-gray-900">`ti-cookie-consent`</td>
                     <td className="px-4 py-3"><span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-800 text-[10px] font-medium">Esencial</span></td>
                     <td className="px-4 py-3 text-gray-600">Guarda tu configuración de consentimiento de cookies.</td>
                     <td className="px-4 py-3 text-gray-600">1 año</td>

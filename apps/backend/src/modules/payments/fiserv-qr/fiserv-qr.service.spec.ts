@@ -14,7 +14,7 @@ describe('FiservQrService', () => {
         'fiserv.qrMcc': '7399',
         'fiserv.qrCity': 'Buenos Aires',
         'fiserv.qrPostalCode': 'C1000AAB',
-        'fiserv.qrDomain': 'ar.com.ayni',
+        'fiserv.qrDomain': 'ar.com.tripleimpacto',
         environment: 'development',
       };
       return config[key];
@@ -53,7 +53,7 @@ describe('FiservQrService', () => {
     it('should generate a valid EMVCo QR string and correctly extract the order ID', () => {
       const amount = 1500.5;
       const orderId = 'test-order-id-12345';
-      const merchantName = 'Fundación Ayni';
+      const merchantName = 'Club Triple Impacto';
 
       const qrString = service.generateDynamicQr(amount, orderId, merchantName);
 
@@ -66,7 +66,7 @@ describe('FiservQrService', () => {
       expect(qrString).toContain('54071500.50');
 
       // El campo 59 (nombre comercio sanitizado sin acentos)
-      expect(qrString).toContain('5914Fundacion Ayni');
+      expect(qrString).toContain('5919Club Triple Impacto');
 
       // Extraer el order ID de vuelta
       const extractedId = service.extractOrderIdFromQr(qrString);

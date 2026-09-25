@@ -40,7 +40,7 @@ export class NewsletterService {
         // Ya está activo
         return {
           status: 'existente',
-          message: '¡Ya estás suscrito al Newsletter de AYNI!',
+          message: '¡Ya estás suscrito al Newsletter de Club Triple Impacto!',
         };
       }
 

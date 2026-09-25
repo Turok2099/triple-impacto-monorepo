@@ -22,7 +22,7 @@ export default function CookieConsent() {
 
   useEffect(() => {
     setMounted(true);
-    const consent = localStorage.getItem("ayni-cookie-consent");
+    const consent = localStorage.getItem("ti-cookie-consent");
     if (!consent) {
       // Delay slightly for entry animation transition
       const timer = setTimeout(() => setIsVisible(true), 1500);
@@ -47,21 +47,21 @@ export default function CookieConsent() {
       setIsVisible(true);
     };
 
-    window.addEventListener("ayni-open-cookie-preferences", handleReopen);
+    window.addEventListener("ti-open-cookie-preferences", handleReopen);
     return () => {
-      window.removeEventListener("ayni-open-cookie-preferences", handleReopen);
+      window.removeEventListener("ti-open-cookie-preferences", handleReopen);
     };
   }, [mounted]);
 
   if (!mounted || !isVisible) return null;
 
   const saveConsent = (prefs: CookiePreferences) => {
-    localStorage.setItem("ayni-cookie-consent", JSON.stringify(prefs));
+    localStorage.setItem("ti-cookie-consent", JSON.stringify(prefs));
     setPreferences(prefs);
     setIsVisible(false);
     
     // Dispatch custom event for analytical scripts to know consent was updated
-    window.dispatchEvent(new CustomEvent("ayni-cookie-consent-updated", { detail: prefs }));
+    window.dispatchEvent(new CustomEvent("ti-cookie-consent-updated", { detail: prefs }));
   };
 
   const handleAcceptAll = () => {

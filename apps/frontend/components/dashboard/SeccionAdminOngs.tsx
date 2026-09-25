@@ -40,6 +40,10 @@ export default function SeccionAdminOngs() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showSecrets, setShowSecrets] = useState(false);
+  // Enmascarado por CSS (no type="password") para que Chrome no ofrezca guardar contraseña
+  const secretMaskStyle = (
+    showSecrets ? undefined : { WebkitTextSecurity: "disc" }
+  ) as React.CSSProperties | undefined;
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
 
   const handleCopyLink = async (url: string, key: string) => {
@@ -827,8 +831,11 @@ export default function SeccionAdminOngs() {
                                 ? "•••••••• (ya configurado, dejar vacío para no cambiarlo)"
                                 : "Sin información"
                             }
-                            autoComplete="new-password"
-                            type={showSecrets ? "text" : "password"}
+                            autoComplete="off"
+                            data-lpignore="true"
+                            data-1p-ignore
+                            type="text"
+                            style={secretMaskStyle}
                             value={formData.fiserv_shared_secret}
                             onChange={(e) =>
                               setFormData({
@@ -934,7 +941,11 @@ export default function SeccionAdminOngs() {
                       </p>
                       <div className="relative">
                         <input
-                          type={showSecrets ? "text" : "password"}
+                          autoComplete="off"
+                          data-lpignore="true"
+                          data-1p-ignore
+                          type="text"
+                          style={secretMaskStyle}
                           placeholder="Token API Cupones"
                           value={formData.bonda_api_token}
                           onChange={(e) =>
@@ -968,7 +979,11 @@ export default function SeccionAdminOngs() {
                       </p>
                       <div className="relative">
                         <input
-                          type={showSecrets ? "text" : "password"}
+                          autoComplete="off"
+                          data-lpignore="true"
+                          data-1p-ignore
+                          type="text"
+                          style={secretMaskStyle}
                           placeholder="Token API Nóminas"
                           value={formData.bonda_api_token_nominas}
                           onChange={(e) =>

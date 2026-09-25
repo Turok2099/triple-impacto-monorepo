@@ -483,7 +483,7 @@ export class PaymentsController {
       moneda: attempt.currency || 'ARS',
       metodo_pago: 'fiserv-qr',
       organizacion_id: attempt.organizacion_id || undefined,
-      organizacion_nombre: orgData?.nombre || 'AYNI',
+      organizacion_nombre: orgData?.nombre || 'Club Triple Impacto',
       estado: 'completada',
       payment_id: uuid || undefined,
       payment_status: 'APPROVED',

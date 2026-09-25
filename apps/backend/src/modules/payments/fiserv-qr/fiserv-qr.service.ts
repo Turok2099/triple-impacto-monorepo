@@ -65,7 +65,7 @@ export class FiservQrService {
 
     // 5. Datos de Identificación del Comercio
     // Sanitizar nombre: quitar acentos y caracteres especiales (máx 25 chars)
-    const rawName = merchantName || 'AYNI';
+    const rawName = merchantName || 'Club Triple Impacto';
     const cleanName = rawName
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '') // Quitar acentos

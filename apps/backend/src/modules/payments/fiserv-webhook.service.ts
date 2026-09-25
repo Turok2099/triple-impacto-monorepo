@@ -278,8 +278,9 @@ export class FiservWebhookService {
     try {
       // Intentar enviar el correo con el QR dinámico de fallback
       const orgName = attempt.organizacion_id
-        ? (await this.getOrganizacionNombre(attempt.organizacion_id)) || 'AYNI'
-        : 'AYNI';
+        ? (await this.getOrganizacionNombre(attempt.organizacion_id)) ||
+          'Club Triple Impacto'
+        : 'Club Triple Impacto';
 
       const amountNum = parseFloat(attempt.amount) || 0;
       if (amountNum <= 0) {

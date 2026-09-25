@@ -4,7 +4,6 @@ import Navbar from "@/components/sections/Navbar/navbar";
 import dynamic from "next/dynamic";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { GoogleTagManager } from "@next/third-parties/google";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/site";
 import "./globals.css";
 
@@ -98,7 +97,6 @@ export default function RootLayout({
           <CookieConsent />
         </AuthProvider>
         <SpeedInsights />
-        <GoogleTagManager gtmId="GTM-P4XBH88X" />
       </body>
     </html>
   );

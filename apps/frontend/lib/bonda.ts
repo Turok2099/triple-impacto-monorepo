@@ -1,6 +1,7 @@
 // Servicio para conectar con el API de Bonda (backend)
 
 import { CuponesResponseDto, PublicCouponDto, CategoriaDto, CuponDto } from "./types/cupon";
+import { fetchWithAuth, getAccessToken } from "./apiClient";
 
 // Re-export tipos para conveniencia
 export type { PublicCouponDto, CategoriaDto, CuponesResponseDto, CuponDto };
@@ -73,16 +74,10 @@ export async function obtenerCuponesPublicos(
       params.toString() ? `?${params.toString()}` : ""
     }`;
 
-    // Obtener token si existe (para filtrar por ONGs del usuario)
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
-
-    const response = await fetch(url, {
+    // fetchWithAuth adjunta el token si existe (para filtrar por ONGs del usuario)
+    const response = await fetchWithAuth(url, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers: { "Content-Type": "application/json" },
     });
 
     if (!response.ok) {
@@ -133,19 +128,14 @@ export async function obtenerCuponesPorUsuario(
   microsite?: string
 ): Promise<CuponesResponseDto> {
   const slug = microsite ?? DEFAULT_MICROSITE;
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
-  if (!token) {
+  if (!getAccessToken()) {
     throw new Error("Se requiere autenticación para obtener cupones");
   }
 
   const url = `${API_URL}/bonda/cupones?microsite=${encodeURIComponent(slug)}`;
-  const response = await fetch(url, {
+  const response = await fetchWithAuth(url, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { "Content-Type": "application/json" },
     credentials: "include",
   });
 
@@ -174,17 +164,12 @@ export async function obtenerCuponesConCodigo(
   microsite?: string
 ): Promise<CuponesResponseDto> {
   const slug = microsite ?? DEFAULT_MICROSITE;
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
   const url = `${API_URL}/bonda/cupones/${codigoAfiliado}?microsite=${encodeURIComponent(
     slug
   )}`;
-  const response = await fetch(url, {
+  const response = await fetchWithAuth(url, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
+    headers: { "Content-Type": "application/json" },
     credentials: "include",
   });
 
@@ -206,21 +191,16 @@ export async function obtenerCuponesRecibidos(
   microsite?: string
 ): Promise<CuponesResponseDto> {
   const slug = microsite ?? DEFAULT_MICROSITE;
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
-  
-  if (!token) {
+
+  if (!getAccessToken()) {
     throw new Error("Se requiere autenticación para obtener cupones recibidos");
   }
 
   const url = `${API_URL}/bonda/cupones-recibidos?microsite=${encodeURIComponent(slug)}`;
-  
-  const response = await fetch(url, {
+
+  const response = await fetchWithAuth(url, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { "Content-Type": "application/json" },
     credentials: "include",
   });
 

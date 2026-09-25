@@ -11,7 +11,12 @@ export default () => ({
   },
   jwt: {
     secret: process.env.JWT_SECRET || 'your-secret-key',
-    expiresIn: process.env.JWT_EXPIRES_IN || '12h',
+    expiresIn: process.env.JWT_EXPIRES_IN || '30m',
+    refreshSecret:
+      process.env.JWT_REFRESH_SECRET ||
+      process.env.JWT_SECRET ||
+      'your-refresh-secret-key',
+    refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   },
   bonda: {
     apiUrl: process.env.BONDA_API_URL || 'https://apiv1.cuponstar.com',

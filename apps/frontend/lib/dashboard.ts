@@ -3,6 +3,8 @@
  * Maneja todas las llamadas al backend para el dashboard del usuario
  */
 
+import { fetchWithAuth } from './apiClient';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
 // ============================================
@@ -120,10 +122,9 @@ export interface SolicitarCuponRequest {
  * Reenviar comprobante de donación por email
  */
 export async function reenviarComprobante(donacionId: string, token: string) {
-  const res = await fetch(`${API_URL}/bonda/mis-donaciones/${donacionId}/reenviar`, {
+  const res = await fetchWithAuth(`${API_URL}/bonda/mis-donaciones/${donacionId}/reenviar`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
   });
@@ -144,11 +145,10 @@ export async function solicitarCupon(
   data: SolicitarCuponRequest,
   token: string,
 ): Promise<CuponSolicitado> {
-  const response = await fetch(`${API_URL}/bonda/solicitar-cupon`, {
+  const response = await fetchWithAuth(`${API_URL}/bonda/solicitar-cupon`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
   });
@@ -168,10 +168,9 @@ export async function solicitarCupon(
 export async function obtenerMisCupones(
   token: string,
 ): Promise<CuponSolicitado[]> {
-  const response = await fetch(`${API_URL}/bonda/mis-cupones`, {
+  const response = await fetchWithAuth(`${API_URL}/bonda/mis-cupones`, {
     method: 'GET',
     headers: {
-      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -189,11 +188,10 @@ export async function obtenerMisCupones(
 export async function obtenerDashboard(
   token: string,
 ): Promise<DashboardUsuario> {
-  const response = await fetch(`${API_URL}/bonda/dashboard`, {
+  const response = await fetchWithAuth(`${API_URL}/bonda/dashboard`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -238,10 +236,9 @@ export async function obtenerHistorialCupones(
 
   const url = `${API_URL}/bonda/historial-cupones${params.toString() ? `?${params.toString()}` : ''}`;
 
-  const response = await fetch(url, {
+  const response = await fetchWithAuth(url, {
     method: 'GET',
     headers: {
-      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -258,10 +255,9 @@ export async function obtenerHistorialCupones(
 export async function obtenerMisDonaciones(
   token: string,
 ): Promise<DonacionResumen[]> {
-  const response = await fetch(`${API_URL}/bonda/mis-donaciones`, {
+  const response = await fetchWithAuth(`${API_URL}/bonda/mis-donaciones`, {
     method: 'GET',
     headers: {
-      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -279,10 +275,9 @@ export async function marcarCuponComoUsado(
   cuponId: string,
   token: string,
 ): Promise<{ success: boolean; message: string }> {
-  const response = await fetch(`${API_URL}/bonda/cupones/${cuponId}/usar`, {
+  const response = await fetchWithAuth(`${API_URL}/bonda/cupones/${cuponId}/usar`, {
     method: 'PATCH',
     headers: {
-      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -301,11 +296,10 @@ export async function cancelarSuscripcion(
   token: string,
   organizacionId: string,
 ): Promise<{ ok: boolean; message: string }> {
-  const response = await fetch(`${API_URL}/payments/fiserv/cancelar-suscripcion`, {
+  const response = await fetchWithAuth(`${API_URL}/payments/fiserv/cancelar-suscripcion`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ organizacionId }),
   });
@@ -348,11 +342,10 @@ export async function actualizarPerfil(
   data: UpdateProfileRequest,
   token: string,
 ): Promise<UpdateProfileResponse> {
-  const response = await fetch(`${API_URL}/auth/profile`, {
+  const response = await fetchWithAuth(`${API_URL}/auth/profile`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
   });
@@ -373,11 +366,10 @@ export async function cambiarContrasena(
   passwordNueva: string,
   token: string,
 ): Promise<{ success: boolean; message: string }> {
-  const response = await fetch(`${API_URL}/auth/change-password`, {
+  const response = await fetchWithAuth(`${API_URL}/auth/change-password`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ passwordActual, passwordNueva }),
   });

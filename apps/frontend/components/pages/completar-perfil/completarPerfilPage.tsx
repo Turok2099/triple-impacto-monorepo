@@ -157,7 +157,7 @@ export default function CompletarPerfilPage() {
 
       // Iniciar sesión en el contexto usando el JWT propio del backend
       // (no el token de Supabase, que no sirve para el resto de la API)
-      loginContext(data.token, data.user);
+      loginContext(data.token, data.refreshToken, data.user);
       
       const localRedirect = localStorage.getItem("redirectAfterLogin");
       if (localRedirect) {

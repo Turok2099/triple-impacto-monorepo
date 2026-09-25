@@ -13,8 +13,9 @@ export default function ONGsPage() {
             ONGs
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Trabajamos exclusivamente con organizaciones comprobadas y autorizadas
-            para recibir aportes a través de nuestra red de impacto social.
+            Trabajamos exclusivamente con organizaciones comprobadas y
+            autorizadas para recibir aportes a través de nuestra red de impacto
+            socioambiental.
           </p>
         </div>
 
@@ -32,8 +33,8 @@ export default function ONGsPage() {
             Transformá con nosotos
           </h2>
           <p className="text-teal-50 text-lg mb-8 max-w-2xl mx-auto relative z-10">
-            Tu apoyo marca la diferencia. Todas las organizaciones de nuestra red
-            han sido verificadas y garantizan un impacto real.
+            Tu apoyo marca la diferencia. Todas las organizaciones de nuestra
+            red han sido verificadas y garantizan un impacto real.
           </p>
           <div className="relative z-10 flex flex-col sm:flex-row gap-4 justify-center">
             <Link

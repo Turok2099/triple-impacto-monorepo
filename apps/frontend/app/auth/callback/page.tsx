@@ -46,7 +46,7 @@ export default function AuthCallbackPage() {
 
         if (data.user?.dni && data.token) {
           // Perfil completo: loguear con el JWT del backend e ir al dashboard
-          loginContext(data.token, data.user);
+          loginContext(data.token, data.refreshToken, data.user);
           router.push("/dashboard");
         } else {
           // Falta el DNI: todavía no existe (o no está completo) en public.usuarios

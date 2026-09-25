@@ -15,7 +15,7 @@ import { NewsletterModule } from '../newsletter/newsletter.module';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService): JwtModuleOptions => {
-        const expiresIn = configService.get<string>('jwt.expiresIn') || '12h';
+        const expiresIn = configService.get<string>('jwt.expiresIn') || '30m';
         return {
           secret:
             configService.get<string>('jwt.secret') || 'default-secret-key',

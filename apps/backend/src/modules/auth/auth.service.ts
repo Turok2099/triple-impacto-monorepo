@@ -7,6 +7,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { SupabaseService } from '../supabase/supabase.service';
 import { RegisterDto } from './dto/register.dto';
@@ -29,6 +30,7 @@ export class AuthService {
   constructor(
     private readonly supabaseService: SupabaseService,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
     private readonly mailService: MailService,
     private readonly newsletterService: NewsletterService,
   ) {}
@@ -160,7 +162,7 @@ export class AuthService {
 
     // 3. Generar JWT recuperando el rol de Supabase Auth
     const role = await this.supabaseService.getUserRole(usuario.id);
-    const token = this.generarToken(usuario, role);
+    const { token, refreshToken } = await this.emitirTokens(usuario, role);
 
     this.logger.log(`✅ Login exitoso: ${email} (Role: ${role})`);
 
@@ -178,6 +180,7 @@ export class AuthService {
         avatar_url: usuario.avatar_url ?? null,
       },
       token,
+      refreshToken,
     };
   }
 
@@ -388,7 +391,7 @@ export class AuthService {
   }
 
   /**
-   * Generar token JWT
+   * Generar token JWT (access token, corta duración)
    */
   private generarToken(usuario: any, role: string = 'user'): string {
     const payload = {
@@ -399,6 +402,142 @@ export class AuthService {
     };
 
     return this.jwtService.sign(payload);
+  }
+
+  /**
+   * Generar refresh token (larga duración, secreto propio) y persistir su hash
+   * para poder revocarlo server-side (logout, rotación).
+   */
+  private generarRefreshToken(usuario: any): string {
+    const payload = { sub: usuario.id, type: 'refresh' as const };
+    return this.jwtService.sign(payload, {
+      secret: this.configService.get<string>('jwt.refreshSecret'),
+      expiresIn: this.configService.get<string>('jwt.refreshExpiresIn') as any,
+    });
+  }
+
+  /**
+   * Emitir el par access/refresh token de una vez y guardar el hash del
+   * refresh token en la fila del usuario.
+   */
+  private async emitirTokens(
+    usuario: any,
+    role: string,
+  ): Promise<{ token: string; refreshToken: string }> {
+    const token = this.generarToken(usuario, role);
+    const refreshToken = this.generarRefreshToken(usuario);
+    await this.guardarRefreshToken(usuario.id, refreshToken);
+    return { token, refreshToken };
+  }
+
+  private async guardarRefreshToken(
+    userId: string,
+    refreshToken: string,
+  ): Promise<void> {
+    const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
+    const expiresInMs = this.parseDuracionAMs(
+      this.configService.get<string>('jwt.refreshExpiresIn') || '7d',
+    );
+    const refreshTokenExpires = new Date(Date.now() + expiresInMs);
+
+    const { error } = await this.supabaseService
+      .from('usuarios')
+      .update({
+        refresh_token_hash: refreshTokenHash,
+        refresh_token_expires: refreshTokenExpires.toISOString(),
+      })
+      .eq('id', userId);
+
+    if (error) {
+      this.logger.error('Error al guardar refresh token:', error);
+      throw new InternalServerErrorException(
+        'No se pudo iniciar la sesión. Intentá de nuevo.',
+      );
+    }
+  }
+
+  /** Convierte strings tipo '7d', '30m', '12h' a milisegundos. */
+  private parseDuracionAMs(duracion: string): number {
+    const match = /^(\d+)([smhd])$/.exec(duracion.trim());
+    if (!match) return 7 * 24 * 60 * 60 * 1000; // default 7 días
+    const valor = parseInt(match[1], 10);
+    const unidad = match[2];
+    const multiplicadores: Record<string, number> = {
+      s: 1000,
+      m: 60 * 1000,
+      h: 60 * 60 * 1000,
+      d: 24 * 60 * 60 * 1000,
+    };
+    return valor * multiplicadores[unidad];
+  }
+
+  /**
+   * Canjear un refresh token vigente por un access token nuevo, rotando
+   * también el refresh token (se invalida el anterior).
+   */
+  async refreshAccessToken(
+    refreshToken: string,
+  ): Promise<{ token: string; refreshToken: string }> {
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token requerido');
+    }
+
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(refreshToken, {
+        secret: this.configService.get<string>('jwt.refreshSecret'),
+      });
+    } catch {
+      throw new UnauthorizedException('Refresh token inválido o expirado');
+    }
+
+    if (payload.type !== 'refresh' || !payload.sub) {
+      throw new UnauthorizedException('Refresh token inválido');
+    }
+
+    const usuario = await this.validateUser(payload.sub);
+    if (!usuario || !usuario.refresh_token_hash) {
+      throw new UnauthorizedException('Sesión inválida, iniciá sesión de nuevo');
+    }
+
+    if (
+      usuario.refresh_token_expires &&
+      new Date(usuario.refresh_token_expires) < new Date()
+    ) {
+      throw new UnauthorizedException('La sesión expiró, iniciá sesión de nuevo');
+    }
+
+    const matches = await bcrypt.compare(
+      refreshToken,
+      usuario.refresh_token_hash,
+    );
+    if (!matches) {
+      throw new UnauthorizedException('Refresh token inválido');
+    }
+
+    const role = await this.supabaseService.getUserRole(usuario.id);
+    return this.emitirTokens(usuario, role);
+  }
+
+  /**
+   * Cerrar sesión: revoca el refresh token guardado para que no pueda
+   * volver a usarse aunque no haya expirado todavía.
+   */
+  async logout(userId: string): Promise<{ message: string }> {
+    const { error } = await this.supabaseService
+      .from('usuarios')
+      .update({
+        refresh_token_hash: null,
+        refresh_token_expires: null,
+      })
+      .eq('id', userId);
+
+    if (error) {
+      this.logger.error('Error al cerrar sesión:', error);
+      throw new InternalServerErrorException('No se pudo cerrar la sesión.');
+    }
+
+    return { message: 'Sesión cerrada correctamente.' };
   }
 
   /**
@@ -618,11 +757,15 @@ export class AuthService {
 
     // 3. Emitir el JWT propio del backend (no el token de Supabase) y devolver el perfil
     const role = await this.supabaseService.getUserRole(authUser.id);
-    const appToken = this.generarToken(publicUser, role);
+    const { token: appToken, refreshToken } = await this.emitirTokens(
+      publicUser,
+      role,
+    );
 
     return {
       success: true,
       token: appToken,
+      refreshToken,
       user: {
         id: publicUser.id,
         nombre: publicUser.nombre,

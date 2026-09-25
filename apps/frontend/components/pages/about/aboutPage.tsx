@@ -36,7 +36,7 @@ export default function AboutPage() {
     {
       icon: HeartHandshake,
       color: "rose",
-      title: "Bienestar social",
+      title: "Bienestar Socioambiental",
       description:
         "Apoyo sostenido a las ONGs y a las comunidades que acompañan.",
     },
@@ -60,7 +60,7 @@ export default function AboutPage() {
       icon: Users2,
       title: "Social",
       description:
-        "Más y mejor acompañamiento para las personas a las que asisten.",
+        "Más y mejor acompañamiento para las personas a las que acompañan.",
     },
     {
       icon: Leaf,
@@ -201,8 +201,8 @@ export default function AboutPage() {
         <HowItWorksSection className="mb-10" />
 
         <p className="text-center text-gray-600 max-w-2xl mx-auto -mt-8 mb-16">
-          También podés ser parte a través de tu empresa, si ofrece el club
-          como beneficio para su equipo.
+          También podés ser parte a través de tu empresa, si ofrece el club como
+          beneficio para su equipo.
         </p>
 
         {/* 4. El alcance: bienestar e impacto */}

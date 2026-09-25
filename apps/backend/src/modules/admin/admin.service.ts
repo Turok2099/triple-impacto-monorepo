@@ -1260,12 +1260,12 @@ export class AdminService {
     // Actualizar Bonda Microsite asociado si se pasaron datos
     if (payload.bonda_slug || payload.bonda_api_token) {
       const bondaData: any = {};
-      if (payload.bonda_slug) bondaData.slug = payload.bonda_slug;
-      if (payload.bonda_api_token)
+      if (payload.bonda_slug !== undefined) bondaData.slug = payload.bonda_slug;
+      if (payload.bonda_api_token !== undefined)
         bondaData.api_token = payload.bonda_api_token;
       if (payload.bonda_api_token_nominas !== undefined)
         bondaData.api_token_nominas = payload.bonda_api_token_nominas;
-      if (payload.bonda_microsite_id)
+      if (payload.bonda_microsite_id !== undefined)
         bondaData.microsite_id = payload.bonda_microsite_id;
 
       // Buscar si existe

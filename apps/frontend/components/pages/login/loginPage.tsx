@@ -42,6 +42,17 @@ export default function LoginPage() {
     if (params.get("check_email") || params.get("verified") || params.get("success") || params.get("error")) {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
+
+    // 3. Sesión cerrada automáticamente (token expirado o inactividad)
+    const sessionExpired = sessionStorage.getItem("session_expired");
+    if (sessionExpired === "inactivity") {
+      setError("Tu sesión se cerró por inactividad. Iniciá sesión de nuevo para continuar.");
+    } else if (sessionExpired === "true") {
+      setError("Tu sesión expiró. Iniciá sesión de nuevo para continuar.");
+    }
+    if (sessionExpired) {
+      sessionStorage.removeItem("session_expired");
+    }
   }, []);
 
   const handleResendVerification = async () => {
@@ -94,7 +105,7 @@ export default function LoginPage() {
       }
 
       // Usar el contexto de autenticación
-      loginContext(data.token, data.user);
+      loginContext(data.token, data.refreshToken, data.user);
 
       // Si "Recordarme" está activado, guardar email
       if (rememberMe) {

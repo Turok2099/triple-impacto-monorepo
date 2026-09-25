@@ -3,6 +3,8 @@
  * Maneja la creación de transacciones y el envío del formulario a Fiserv
  */
 
+import { fetchWithAuth } from './apiClient';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
 // ============================================
@@ -58,11 +60,10 @@ export async function crearTransaccion(
   data: CrearTransaccionRequest,
   token: string,
 ): Promise<CrearTransaccionResponse> {
-  const response = await fetch(`${API_URL}/payments/fiserv/crear-transaccion`, {
+  const response = await fetchWithAuth(`${API_URL}/payments/fiserv/crear-transaccion`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
   });

@@ -59,7 +59,9 @@ DATABASE_USERNAME=postgres
 DATABASE_PASSWORD=password
 DATABASE_NAME=triple_impacto
 JWT_SECRET=your-secret-key-change-in-production
-JWT_EXPIRES_IN=24h
+JWT_EXPIRES_IN=30m
+JWT_REFRESH_SECRET=another-secret-change-in-production
+JWT_REFRESH_EXPIRES_IN=7d
 ```
 
 ## 📦 Crear un Nuevo Módulo

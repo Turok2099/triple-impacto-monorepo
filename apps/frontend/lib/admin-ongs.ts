@@ -36,12 +36,12 @@ export interface Ong {
   created_at: string;
 }
 
+import { fetchWithAuth } from './apiClient';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function getOrganizaciones(token: string): Promise<Ong[]> {
-  const res = await fetch(`${API_URL}/admin/organizaciones`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  const res = await fetchWithAuth(`${API_URL}/admin/organizaciones`);
   if (!res.ok) {
     const error = await res.json();
     throw new Error(error.message || 'Error fetching organizaciones');
@@ -50,12 +50,9 @@ export async function getOrganizaciones(token: string): Promise<Ong[]> {
 }
 
 export async function createOrganizacion(token: string, data: any): Promise<Ong> {
-  const res = await fetch(`${API_URL}/admin/organizaciones`, {
+  const res = await fetchWithAuth(`${API_URL}/admin/organizaciones`, {
     method: 'POST',
-    headers: { 
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   });
   if (!res.ok) {
@@ -66,12 +63,9 @@ export async function createOrganizacion(token: string, data: any): Promise<Ong>
 }
 
 export async function updateOrganizacion(token: string, id: string, data: any): Promise<Ong> {
-  const res = await fetch(`${API_URL}/admin/organizaciones/${id}`, {
+  const res = await fetchWithAuth(`${API_URL}/admin/organizaciones/${id}`, {
     method: 'PATCH',
-    headers: { 
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   });
   if (!res.ok) {
@@ -85,9 +79,8 @@ export async function uploadLogo(token: string, file: File): Promise<string> {
   const formData = new FormData();
   formData.append('file', file);
 
-  const res = await fetch(`${API_URL}/admin/organizaciones/upload-logo`, {
+  const res = await fetchWithAuth(`${API_URL}/admin/organizaciones/upload-logo`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
     body: formData
   });
 
@@ -101,9 +94,8 @@ export async function uploadLogo(token: string, file: File): Promise<string> {
 }
 
 export async function deleteOrganizacion(token: string, id: string): Promise<void> {
-  const res = await fetch(`${API_URL}/admin/organizaciones/${id}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` }
+  const res = await fetchWithAuth(`${API_URL}/admin/organizaciones/${id}`, {
+    method: 'DELETE'
   });
   if (!res.ok) {
     const error = await res.json();
@@ -112,9 +104,8 @@ export async function deleteOrganizacion(token: string, id: string): Promise<voi
 }
 
 export async function permanentDeleteOrganizacion(token: string, id: string): Promise<void> {
-  const res = await fetch(`${API_URL}/admin/organizaciones/${id}/permanent`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` }
+  const res = await fetchWithAuth(`${API_URL}/admin/organizaciones/${id}/permanent`, {
+    method: 'DELETE'
   });
   if (!res.ok) {
     const error = await res.json();
@@ -126,9 +117,8 @@ export async function bulkUploadUsers(token: string, file: File): Promise<any> {
   const formData = new FormData();
   formData.append('file', file);
 
-  const res = await fetch(`${API_URL}/admin/users/bulk-upload`, {
+  const res = await fetchWithAuth(`${API_URL}/admin/users/bulk-upload`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
     body: formData
   });
 

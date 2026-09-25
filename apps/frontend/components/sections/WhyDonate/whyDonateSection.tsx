@@ -181,7 +181,7 @@ export default function WhyDonateSection() {
                 strokeWidth={1.5}
               />
               <div className="font-bold text-4xl text-teal-500 mb-2">
-                + 15.000
+                + 17.000
               </div>
               <p className="font-bold text-sm tracking-wide uppercase text-gray-800">
                 Personas beneficiadas
@@ -212,7 +212,7 @@ export default function WhyDonateSection() {
                 Descuentos al instante
               </div>
               <p className="text-sm text-gray-600">
-                Accedé a cientos de beneficios sumando impacto.
+                Accedé a miles de beneficios sumando impacto.
               </p>
             </div>
 
@@ -223,7 +223,7 @@ export default function WhyDonateSection() {
                 strokeWidth={1.5}
               />
               <div className="font-bold text-xl text-gray-900 mb-2">
-                Cancela cuando quieras
+                Cancelá cuando quieras
               </div>
               <p className="text-sm text-gray-600">
                 Pausá o cancelá tu donación online y sin ataduras.

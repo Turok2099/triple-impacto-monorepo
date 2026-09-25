@@ -12,6 +12,7 @@ export class AuthResponseDto {
     avatar_url?: string | null;
   };
   token: string;
+  refreshToken?: string;
   message?: string;
 }
 

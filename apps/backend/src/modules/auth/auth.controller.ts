@@ -49,6 +49,25 @@ export class AuthController {
   }
 
   /**
+   * POST /api/auth/refresh
+   * Canjear un refresh token vigente por un access token nuevo (rota el refresh token)
+   */
+  @Post('refresh')
+  async refresh(@Body('refreshToken') refreshToken: string) {
+    return this.authService.refreshAccessToken(refreshToken);
+  }
+
+  /**
+   * POST /api/auth/logout
+   * Revoca el refresh token del usuario autenticado
+   */
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  async logout(@Request() req) {
+    return this.authService.logout(req.user.userId);
+  }
+
+  /**
    * GET /api/auth/verify-email
    * Verificar correo electrónico con token
    */

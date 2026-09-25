@@ -13,7 +13,7 @@ export default function HeroSection() {
   };
 
 const desktopUrl = cloudinaryLoader({ src: "v1768268779/Fondo_hero_yzustd.png", width: 1920 });
-  const mobileUrl = cloudinaryLoader({ src: "v1781902898/ayni_o5dqqq.png", width: 768 });
+  const mobileUrl = cloudinaryLoader({ src: "v1790353886/club_triple_impacto_rioow5.png", width: 768 });
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">

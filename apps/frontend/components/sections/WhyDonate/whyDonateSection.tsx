@@ -245,7 +245,7 @@ export default function WhyDonateSection() {
           <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 flex justify-center">
             <div className="relative w-full aspect-[16/9] md:aspect-[2/1] rounded-3xl overflow-hidden shadow-lg border-2 border-slate-100 bg-white hover:border-teal-200 transition-colors duration-300">
               <img
-                src="/17ODS.png"
+                src="https://res.cloudinary.com/dxbtafe9u/image/upload/f_auto,q_auto,w_1600/v1790354277/17ODS_rdejmi.png"
                 alt="17 Objetivos de Desarrollo Sostenible"
                 className="w-full h-full object-contain p-4 md:p-8"
               />

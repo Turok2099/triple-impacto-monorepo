@@ -189,7 +189,7 @@ function NavbarContent() {
           <div className="flex items-center justify-between p-5 border-b border-gray-100 shrink-0">
             <div className="flex items-center gap-3">
               <div className="size-10 rounded-xl flex items-center justify-center overflow-hidden bg-white border border-slate-100 p-1.5 shadow-sm">
-                <img src="/icon.png" alt="Club Triple Impacto" className="w-full h-full object-contain" />
+                <img src="/icon.svg" alt="Club Triple Impacto" className="w-full h-full object-contain" />
               </div>
               <div>
                 <div className="text-gray-900 font-black text-lg tracking-tight">

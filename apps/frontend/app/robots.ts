@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { SITE_URL } from '@/lib/site';
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -7,13 +8,20 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: [
         '/api/',
+        '/auth/',
         '/dashboard/',
         '/login/',
         '/registro/',
         '/forgot-password/',
-        '/reset-password/'
+        '/reset-password/',
+        '/completar-perfil/',
+        '/donar/',
+        '/homologacion-fiserv/',
+        '/test-pagos-rest/',
+        '/ongs/ong-template/',
       ],
     },
-    sitemap: 'https://www.clubtripleimpacto.com/sitemap.xml',
+    sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_URL,
   };
 }

@@ -25,7 +25,6 @@ async function bootstrap() {
       if (
         allowedOrigins.includes(origin) ||
         origin.endsWith('.vercel.app') ||
-        origin.endsWith('.tripleimpacto.site') ||
         origin.endsWith('.clubtripleimpacto.com') ||
         origin === 'https://clubtripleimpacto.com'
       ) {

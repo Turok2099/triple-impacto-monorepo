@@ -21,9 +21,12 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
     organizacion.monto_fijo_3 || 30000
   ];
 
-  const [montoSeleccionado, setMontoSeleccionado] = useState<number | null>(montoMinimoActual);
-  const [montoCustom, setMontoCustom] = useState("");
-  const [usarMontoCustom, setUsarMontoCustom] = useState(false);
+  // Selección inicial: la primera opción sugerida que cumple el mínimo de la ONG.
+  // Si ninguna lo cumple, se arranca en "Otro" con el mínimo precargado.
+  const montoInicial = montosSugeridosActuales.find((m) => m >= montoMinimoActual);
+  const [montoSeleccionado, setMontoSeleccionado] = useState<number | null>(montoInicial ?? null);
+  const [montoCustom, setMontoCustom] = useState(montoInicial === undefined ? String(montoMinimoActual) : "");
+  const [usarMontoCustom, setUsarMontoCustom] = useState(montoInicial === undefined);
   const [isRecurring, setIsRecurring] = useState(true);
 
   const logoUrl = organizacion.logo_url || getOrganizationLogoUrl(organizacion.nombre, organizacion.slug) || "";
@@ -184,6 +187,7 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
   };
 
   const montoActualVisual = usarMontoCustom ? parseFloat(montoCustom) || 0 : montoSeleccionado || 0;
+  const montoValido = montoActualVisual >= montoMinimoActual && montoActualVisual <= MONTO_MAXIMO;
 
   if (status === 'success') {
     return (
@@ -293,7 +297,8 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                   key={monto}
                   type="button"
                   onClick={() => handleMontoSugeridoClick(monto)}
-                  className={`py-3 px-4 rounded-2xl text-sm md:text-base font-bold text-center transition-all cursor-pointer ${montoSeleccionado === monto && !usarMontoCustom
+                  disabled={monto < montoMinimoActual}
+                  className={`py-3 px-4 rounded-2xl text-sm md:text-base font-bold text-center transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${montoSeleccionado === monto && !usarMontoCustom
                     ? "bg-[#2c8184] text-white shadow-md"
                     : "bg-slate-50 text-slate-700 border-2 border-slate-200 hover:border-slate-300"
                     }`}
@@ -316,6 +321,10 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
                 Otro
               </button>
             </div>
+
+            <p className="text-xs text-slate-500 ml-1">
+              Monto mínimo: {formatearMonto(montoMinimoActual)}
+            </p>
 
             {usarMontoCustom && (
               <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -411,11 +420,17 @@ export default function PaymentFormExclusive({ organizacion, onSuccess, onError 
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-[#2c8184] hover:bg-teal-600 disabled:opacity-50 text-white text-sm md:text-base font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg shadow-teal-600/20"
+            disabled={loading || !montoValido}
+            className="w-full bg-[#2c8184] hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm md:text-base font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg shadow-teal-600/20"
           >
             {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Lock className="w-5 h-5" />}
-            <span>{loading ? 'Procesando...' : `Donar ${formatearMonto(montoActualVisual)} de forma segura`}</span>
+            <span>
+              {loading
+                ? 'Procesando...'
+                : montoValido
+                  ? `Donar ${formatearMonto(montoActualVisual)} de forma segura`
+                  : 'Elegí un monto para donar'}
+            </span>
           </button>
         </form>
 

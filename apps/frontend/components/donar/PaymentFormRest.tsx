@@ -35,7 +35,7 @@ export default function PaymentFormRest({
   const [organizacionId, setOrganizacionId] = useState<string>("");
 
   const [montoSeleccionado, setMontoSeleccionado] = useState<number | null>(
-    5000,
+    null,
   );
   const [montoCustom, setMontoCustom] = useState("");
   const [usarMontoCustom, setUsarMontoCustom] = useState(false);
@@ -68,14 +68,23 @@ export default function PaymentFormRest({
     cargarOrganizaciones();
   }, []);
 
+  // Al elegir/cambiar de ONG se reinicia la selección: primera opción sugerida que
+  // cumple el mínimo de esa ONG; si ninguna lo cumple, "Otro" con el mínimo precargado.
   useEffect(() => {
-    if (organizacionSeleccionada) {
-      const min = organizacionSeleccionada.monto_minimo || 5000;
-      setMontoSeleccionado(min);
-      if (!usarMontoCustom) {
-        setErrorMessage("");
-      }
+    if (!organizacionSeleccionada) return;
+    const inicial = montosSugeridosActuales.find((m) => m >= montoMinimoActual);
+    if (inicial !== undefined) {
+      setMontoSeleccionado(inicial);
+      setUsarMontoCustom(false);
+      setMontoCustom("");
+    } else {
+      setMontoSeleccionado(null);
+      setUsarMontoCustom(true);
+      setMontoCustom(String(montoMinimoActual));
     }
+    setErrorMessage("");
+    setStatus("idle");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [organizacionId, organizaciones]);
 
   const cargarOrganizaciones = async () => {
@@ -281,6 +290,8 @@ export default function PaymentFormRest({
   const montoActualVisual = usarMontoCustom
     ? parseFloat(montoCustom) || 0
     : montoSeleccionado || 0;
+  const montoValido =
+    montoActualVisual >= montoMinimoActual && montoActualVisual <= MONTO_MAXIMO;
 
   if (status === "success") {
     return (
@@ -401,7 +412,8 @@ export default function PaymentFormRest({
                   key={monto}
                   type="button"
                   onClick={() => handleMontoSugeridoClick(monto)}
-                  className={`py-3 px-4 rounded-2xl text-sm md:text-base font-bold text-center transition-all cursor-pointer ${
+                  disabled={monto < montoMinimoActual}
+                  className={`py-3 px-4 rounded-2xl text-sm md:text-base font-bold text-center transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
                     montoSeleccionado === monto && !usarMontoCustom
                       ? "bg-slate-900 text-white shadow-md"
                       : "bg-slate-50 text-slate-700 border-2 border-slate-200 hover:border-slate-300"
@@ -426,6 +438,10 @@ export default function PaymentFormRest({
                 Otro
               </button>
             </div>
+
+            <p className="text-xs text-slate-500 ml-1">
+              Monto mínimo: {formatearMonto(montoMinimoActual)}
+            </p>
 
             {usarMontoCustom && (
               <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -538,8 +554,8 @@ export default function PaymentFormRest({
 
           <button
             type="submit"
-            disabled={loading || loadingOrgs || !organizacionId}
-            className="w-full bg-[#2c8184] hover:bg-teal-600 disabled:opacity-50 text-white text-sm md:text-base font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-teal-600/20 cursor-pointer"
+            disabled={loading || loadingOrgs || !organizacionId || !montoValido}
+            className="w-full bg-[#2c8184] hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm md:text-base font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-teal-600/20 cursor-pointer"
           >
             {loading ? (
               <Loader2 className="w-6 h-6 animate-spin" />
@@ -549,7 +565,9 @@ export default function PaymentFormRest({
             <span>
               {loading
                 ? "Procesando..."
-                : `Donar ${formatearMonto(montoActualVisual)} de forma segura`}
+                : montoValido
+                  ? `Donar ${formatearMonto(montoActualVisual)} de forma segura`
+                  : "Elegí un monto para donar"}
             </span>
           </button>
         </form>

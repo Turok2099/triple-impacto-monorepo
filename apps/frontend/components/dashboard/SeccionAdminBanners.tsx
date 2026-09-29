@@ -426,7 +426,32 @@ export default function SeccionAdminBanners() {
 
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-1">Imagen del Banner</label>
-                  <div className="mt-1 flex flex-col gap-3">
+                  <div className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-xs text-sky-900 space-y-1.5">
+                    <p className="font-semibold text-sm">
+                      Medidas para banner de {formData.device_type === 'desktop' ? 'escritorio' : 'móvil'}
+                    </p>
+                    <ul className="list-disc pl-4 space-y-0.5">
+                      <li>
+                        <strong>Tamaño:</strong>{' '}
+                        {formData.device_type === 'desktop' ? '1800 × 600 px (proporción 3:1, horizontal)' : '1080 × 1350 px (proporción 4:5, vertical)'}
+                      </li>
+                      <li><strong>Formato:</strong> WebP o JPG (PNG solo si necesita transparencia)</li>
+                      <li><strong>Peso máximo:</strong> 300 KB. Comprimí la imagen antes de subirla.</li>
+                      <li>
+                        <strong>Zona segura:</strong> dejá textos y logos al menos un 8% alejados de cada borde; los bordes pueden recortarse según la pantalla y los puntos del carrusel tapan la parte inferior.
+                      </li>
+                      <li>
+                        <strong>Texto:</strong>{' '}
+                        {formData.device_type === 'desktop'
+                          ? 'usá letra grande y pocas palabras; el banner se ve a unos 1230 px de ancho en pantallas grandes.'
+                          : 'debe leerse en un celular de 375 px de ancho (el banner se ve a unos 340 px).'}
+                      </li>
+                    </ul>
+                    <p className="text-sky-700">
+                      Si la imagen tiene otra proporción, se recorta automáticamente para llenar el espacio.
+                    </p>
+                  </div>
+                  <div className="mt-3 flex flex-col gap-3">
                     {formData.image_url && (
                       <div className={`relative w-full overflow-hidden border border-slate-200 rounded-xl mx-auto ${formData.device_type === 'desktop' ? 'aspect-[3/1]' : 'aspect-[4/5] max-h-48'}`}>
                         <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover" />
@@ -464,7 +489,7 @@ export default function SeccionAdminBanners() {
                               {uploading ? 'Subiendo...' : isDragging ? 'Suelta la imagen aquí' : 'Haz clic o arrastra una imagen'}
                             </p>
                             <p className="text-xs text-slate-400 mt-1">
-                              {formData.device_type === 'desktop' ? 'Recomendado: 1920x600px' : 'Recomendado: 800x1000px'}
+                              {formData.device_type === 'desktop' ? 'Recomendado: 1800x600px' : 'Recomendado: 1080x1350px'}
                             </p>
                           </div>
                           <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} disabled={uploading} />

@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Mail, Phone, Send, Loader2 } from "lucide-react";
 import Swal from "sweetalert2";
 
-export default function ContactPage() {
+export default function ContactPage({ ongName }: { ongName?: string }) {
+  const ongParam = ongName || "";
+
   const [formData, setFormData] = useState({
     nombre: "",
     email: "",
@@ -12,6 +14,27 @@ export default function ContactPage() {
     asunto: "",
     mensaje: "",
   });
+
+  // Llegada desde una ONG sin pago online: avisamos y dejamos el formulario prellenado
+  useEffect(() => {
+    if (!ongParam) return;
+
+    setFormData((prev) => ({
+      ...prev,
+      asunto: prev.asunto || "donacion",
+      mensaje:
+        prev.mensaje ||
+        `Hola, quiero donar a ${ongParam} y necesito que me contacten para coordinar la donación.`,
+    }));
+
+    Swal.fire({
+      icon: "info",
+      title: "Donar a esta ONG",
+      html: `Para donar a <b>${ongParam.replace(/</g, "&lt;")}</b> contactanos dejándonos tus datos y te ayudamos a completar tu donación.`,
+      confirmButtonText: "Entendido",
+      confirmButtonColor: "#2c8184",
+    });
+  }, [ongParam]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -124,7 +147,7 @@ export default function ContactPage() {
                       rel="noopener noreferrer"
                       className="text-green-600 hover:text-green-700 transition-colors"
                     >
-                      +54 11 2570-7053
+                      +54 9 11 2570-7053
                     </a>
                     <p className="text-sm text-gray-600 mt-1">
                       Disponible 24 horas

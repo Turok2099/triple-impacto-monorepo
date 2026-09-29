@@ -1049,22 +1049,22 @@ export class AdminService {
     }
   }
 
-  async createOrganizacion(adminId: string, payload: any) {
-    if (
-      (payload.monto_fijo_1 !== undefined &&
-        payload.monto_fijo_1 !== null &&
-        payload.monto_fijo_1 < 10000) ||
-      (payload.monto_fijo_2 !== undefined &&
-        payload.monto_fijo_2 !== null &&
-        payload.monto_fijo_2 < 10000) ||
-      (payload.monto_fijo_3 !== undefined &&
-        payload.monto_fijo_3 !== null &&
-        payload.monto_fijo_3 < 10000)
-    ) {
+  /**
+   * El único mínimo válido es el de cada ONG (monto_minimo): los montos fijos
+   * sugeridos no pueden quedar por debajo de él.
+   */
+  private assertMontosFijos(payload: any, montoMinimo: number | null | undefined) {
+    const minimo = Number(montoMinimo) || 0;
+    const fijos = [payload.monto_fijo_1, payload.monto_fijo_2, payload.monto_fijo_3];
+    if (fijos.some((m) => m !== undefined && m !== null && m < minimo)) {
       throw new BadRequestException(
-        'Los montos fijos sugeridos no pueden ser menores a $10.000',
+        `Los montos fijos sugeridos no pueden ser menores al monto mínimo de la ONG ($${minimo.toLocaleString('es-AR')})`,
       );
     }
+  }
+
+  async createOrganizacion(adminId: string, payload: any) {
+    this.assertMontosFijos(payload, payload.monto_minimo);
 
     const client = this.supabaseService.getClient();
 
@@ -1147,33 +1147,20 @@ export class AdminService {
   }
 
   async updateOrganizacion(adminId: string, id: string, payload: any) {
-    if (
-      (payload.monto_fijo_1 !== undefined &&
-        payload.monto_fijo_1 !== null &&
-        payload.monto_fijo_1 < 10000) ||
-      (payload.monto_fijo_2 !== undefined &&
-        payload.monto_fijo_2 !== null &&
-        payload.monto_fijo_2 < 10000) ||
-      (payload.monto_fijo_3 !== undefined &&
-        payload.monto_fijo_3 !== null &&
-        payload.monto_fijo_3 < 10000)
-    ) {
-      throw new BadRequestException(
-        'Los montos fijos sugeridos no pueden ser menores a $10.000',
-      );
-    }
 
     const client = this.supabaseService.getClient();
 
     const { data: existing, error: existingError } = await client
       .from('organizaciones')
-      .select('nombre, slug, fiserv_activo, fiserv_store_id, fiserv_shared_secret')
+      .select('nombre, slug, monto_minimo, fiserv_activo, fiserv_store_id, fiserv_shared_secret')
       .eq('id', id)
       .maybeSingle();
 
     if (existingError || !existing) {
       throw new BadRequestException('Organización no encontrada.');
     }
+
+    this.assertMontosFijos(payload, payload.monto_minimo ?? existing.monto_minimo);
 
     let slug = this.normalizeSlug(payload.slug);
     if (slug) {

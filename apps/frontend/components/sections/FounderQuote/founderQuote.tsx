@@ -41,7 +41,7 @@ export default function FounderQuote() {
               {/* Iconos de redes sociales */}
               <div className="w-full flex justify-center pt-6 pb-6">
                 <a
-                  href="https://www.instagram.com/ayni.loquedasvuelve?igsh=emZzOGIzd25ldjZz"
+                  href="https://www.instagram.com/clubtripleimpactook?utm_source=qr&stkn=emZzOGIzd25ldjZz"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mx-5 hover:scale-110 transition-transform"
@@ -71,7 +71,7 @@ export default function FounderQuote() {
                   </svg>
                 </a>
                 <a
-                  href="https://www.linkedin.com/company/comunidad-club-triple-impacto/posts/?feedView=all"
+                  href="https://www.linkedin.com/company/comunidad-club-triple-impacto/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mx-5 hover:scale-110 transition-transform"

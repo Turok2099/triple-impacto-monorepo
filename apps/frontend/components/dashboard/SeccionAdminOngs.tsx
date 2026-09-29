@@ -39,11 +39,20 @@ export default function SeccionAdminOngs() {
   const [submitting, setSubmitting] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [showSecrets, setShowSecrets] = useState(false);
+  // Visibilidad independiente por campo: cada ojo solo afecta a su propio input
+  type SecretField = "fiserv" | "bondaCupones" | "bondaNominas";
+  const [visibleSecrets, setVisibleSecrets] = useState<
+    Record<SecretField, boolean>
+  >({ fiserv: false, bondaCupones: false, bondaNominas: false });
+  const resetSecrets = () =>
+    setVisibleSecrets({ fiserv: false, bondaCupones: false, bondaNominas: false });
+  const toggleSecret = (field: SecretField) =>
+    setVisibleSecrets((prev) => ({ ...prev, [field]: !prev[field] }));
   // Enmascarado por CSS (no type="password") para que Chrome no ofrezca guardar contraseña
-  const secretMaskStyle = (
-    showSecrets ? undefined : { WebkitTextSecurity: "disc" }
-  ) as React.CSSProperties | undefined;
+  const secretMaskStyle = (field: SecretField) =>
+    (visibleSecrets[field] ? undefined : { WebkitTextSecurity: "disc" }) as
+      | React.CSSProperties
+      | undefined;
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
 
   const handleCopyLink = async (url: string, key: string) => {
@@ -179,7 +188,7 @@ export default function SeccionAdminOngs() {
     setEditingOng(null);
     setSelectedFile(null);
     setPreviewUrl(null);
-    setShowSecrets(false);
+    resetSecrets();
     setFormData({
       nombre: "",
       descripcion: "",
@@ -213,7 +222,7 @@ export default function SeccionAdminOngs() {
         ? ong.bonda_microsites[0]
         : null;
 
-    setShowSecrets(false);
+    resetSecrets();
     setFormData({
       nombre: ong.nombre,
       descripcion: ong.descripcion || "",
@@ -251,6 +260,18 @@ export default function SeccionAdminOngs() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // El único mínimo es el de la ONG: las opciones sugeridas no pueden quedar por debajo
+    const fijos = [formData.monto_fijo_1, formData.monto_fijo_2, formData.monto_fijo_3];
+    if (fijos.some((m) => m < formData.monto_minimo)) {
+      Swal.fire(
+        "Revisá los montos",
+        `Las opciones sugeridas no pueden ser menores al monto mínimo de la ONG ($${formData.monto_minimo.toLocaleString("es-AR")}).`,
+        "warning",
+      );
+      return;
+    }
+
     setSubmitting(true);
     try {
       const token = localStorage.getItem("auth_token") || "";
@@ -727,7 +748,7 @@ export default function SeccionAdminOngs() {
                       </label>
                       <input
                         type="number"
-                        min="0"
+                        min="1"
                         value={formData.monto_minimo}
                         onChange={(e) =>
                           setFormData({
@@ -744,7 +765,7 @@ export default function SeccionAdminOngs() {
                       </label>
                       <input
                         type="number"
-                        min="10000"
+                        min={formData.monto_minimo}
                         value={formData.monto_fijo_1}
                         onChange={(e) =>
                           setFormData({
@@ -761,7 +782,7 @@ export default function SeccionAdminOngs() {
                       </label>
                       <input
                         type="number"
-                        min="10000"
+                        min={formData.monto_minimo}
                         value={formData.monto_fijo_2}
                         onChange={(e) =>
                           setFormData({
@@ -778,7 +799,7 @@ export default function SeccionAdminOngs() {
                       </label>
                       <input
                         type="number"
-                        min="10000"
+                        min={formData.monto_minimo}
                         value={formData.monto_fijo_3}
                         onChange={(e) =>
                           setFormData({
@@ -835,7 +856,7 @@ export default function SeccionAdminOngs() {
                             data-lpignore="true"
                             data-1p-ignore
                             type="text"
-                            style={secretMaskStyle}
+                            style={secretMaskStyle("fiserv")}
                             value={formData.fiserv_shared_secret}
                             onChange={(e) =>
                               setFormData({
@@ -847,10 +868,10 @@ export default function SeccionAdminOngs() {
                           />
                           <button
                             type="button"
-                            onClick={() => setShowSecrets(!showSecrets)}
+                            onClick={() => toggleSecret("fiserv")}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 focus:outline-none"
                           >
-                            {showSecrets ? (
+                            {visibleSecrets.fiserv ? (
                               <EyeOff className="w-4 h-4" />
                             ) : (
                               <Eye className="w-4 h-4" />
@@ -945,7 +966,7 @@ export default function SeccionAdminOngs() {
                           data-lpignore="true"
                           data-1p-ignore
                           type="text"
-                          style={secretMaskStyle}
+                          style={secretMaskStyle("bondaCupones")}
                           placeholder="Token API Cupones"
                           value={formData.bonda_api_token}
                           onChange={(e) =>
@@ -958,10 +979,10 @@ export default function SeccionAdminOngs() {
                         />
                         <button
                           type="button"
-                          onClick={() => setShowSecrets(!showSecrets)}
+                          onClick={() => toggleSecret("bondaCupones")}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 focus:outline-none"
                         >
-                          {showSecrets ? (
+                          {visibleSecrets.bondaCupones ? (
                             <EyeOff className="w-4 h-4" />
                           ) : (
                             <Eye className="w-4 h-4" />
@@ -983,7 +1004,7 @@ export default function SeccionAdminOngs() {
                           data-lpignore="true"
                           data-1p-ignore
                           type="text"
-                          style={secretMaskStyle}
+                          style={secretMaskStyle("bondaNominas")}
                           placeholder="Token API Nóminas"
                           value={formData.bonda_api_token_nominas}
                           onChange={(e) =>
@@ -996,10 +1017,10 @@ export default function SeccionAdminOngs() {
                         />
                         <button
                           type="button"
-                          onClick={() => setShowSecrets(!showSecrets)}
+                          onClick={() => toggleSecret("bondaNominas")}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 focus:outline-none"
                         >
-                          {showSecrets ? (
+                          {visibleSecrets.bondaNominas ? (
                             <EyeOff className="w-4 h-4" />
                           ) : (
                             <Eye className="w-4 h-4" />

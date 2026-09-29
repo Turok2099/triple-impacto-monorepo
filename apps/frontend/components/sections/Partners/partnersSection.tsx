@@ -65,6 +65,12 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
 
   const closeModal = () => setSelectedOrg(null);
 
+  // ONGs sin Fiserv no pueden recibir pago online: se derivan al formulario de contacto
+  const donarHref = (org: Organizacion) =>
+    org.has_fiserv_config === false
+      ? `/contact?ong=${encodeURIComponent(org.nombre)}`
+      : "/donar";
+
   // Carrusel móvil
   const carouselRef = useRef<HTMLDivElement>(null);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
@@ -225,7 +231,7 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                     )}
                   </div>
                   <Link
-                    href="/donar"
+                    href={donarHref(org)}
                     onClick={(e) => e.stopPropagation()}
                     className="w-full bg-[#2c8184] text-white py-3.5 font-bold text-sm tracking-wide text-center"
                   >
@@ -275,7 +281,7 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
                   )}
                 </div>
                 <Link
-                  href="/donar"
+                  href={donarHref(org)}
                   onClick={(e) => e.stopPropagation()}
                   className="w-full bg-[#2c8184] text-white py-4 font-bold text-sm tracking-wide hover:bg-[#2c8184] transition-colors mt-auto text-center"
                 >
@@ -390,7 +396,7 @@ export default function PartnersSection({ hideHeader = false, hideCTA = false, c
 
               <div className="mt-10">
                 <Link
-                  href="/donar"
+                  href={donarHref(selectedOrg)}
                   onClick={closeModal}
                   className="w-full flex justify-center items-center gap-2 bg-[#2c8184] text-white font-bold py-4 px-6 rounded-xl hover:bg-[#2c8184] transition-colors shadow-lg shadow-teal-500/20 text-lg active:scale-[0.98]"
                 >

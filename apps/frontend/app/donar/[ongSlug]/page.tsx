@@ -18,6 +18,7 @@ export default function DonarExclusivePage() {
   const [loadingOrg, setLoadingOrg] = useState(true);
   const [organizacion, setOrganizacion] = useState<Organizacion | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [redirecting, setRedirecting] = useState(false);
 
   const logoUrl = organizacion
     ? organizacion.logo_url || getOrganizationLogoUrl(organizacion.nombre, organizacion.slug || ongSlug)
@@ -60,9 +61,11 @@ export default function DonarExclusivePage() {
         return;
       }
 
-      // Validar si tiene Fiserv configurado
+      // Sin Fiserv no hay pago online: derivamos al formulario de contacto
       if (!data.has_fiserv_config) {
-        throw new Error("Esta organización no tiene habilitado el canal de donación segura.");
+        setRedirecting(true);
+        router.replace(`/contact?ong=${encodeURIComponent(data.nombre || "")}`);
+        return;
       }
 
       setOrganizacion(data);
@@ -73,7 +76,7 @@ export default function DonarExclusivePage() {
     }
   };
 
-  if (authLoading || checkingAuth || loadingOrg) {
+  if (authLoading || checkingAuth || loadingOrg || redirecting) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <Loader2 className="w-10 h-10 animate-spin text-[#2c8184]" />

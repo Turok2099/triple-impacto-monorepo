@@ -57,6 +57,7 @@ const jsonLd = {
       logo: `${SITE_URL}/icon.svg`,
       sameAs: [
         "https://www.linkedin.com/company/comunidad-club-triple-impacto/",
+        "https://www.instagram.com/clubtripleimpactook",
       ],
     },
     {

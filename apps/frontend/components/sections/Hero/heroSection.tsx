@@ -16,7 +16,7 @@ const desktopUrl = cloudinaryLoader({ src: "v1768268779/Fondo_hero_yzustd.png", 
   const mobileUrl = cloudinaryLoader({ src: "v1790353886/club_triple_impacto_rioow5.png", width: 768 });
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
+    <section className="relative min-h-[85svh] md:min-h-screen flex items-end md:items-center overflow-hidden pt-24 pb-28 md:py-0">
       {/* Imagen de fondo responsiva con Art Direction */}
       <picture className="absolute inset-0">
         <source media="(min-width: 768px)" srcSet={desktopUrl} />
@@ -30,26 +30,25 @@ const desktopUrl = cloudinaryLoader({ src: "v1768268779/Fondo_hero_yzustd.png", 
         />
       </picture>
 
-      {/* Overlay oscuro para mejor legibilidad del texto */}
-      <div className="absolute inset-0 bg-black/50" />
+      {/* Overlay: degradado en móvil (más oscuro abajo, donde va el texto); uniforme en desktop */}
+      <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/55 to-black/15 md:bg-none md:bg-black/50" />
 
       <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl">
           {/* Contenido Alineado a la Izquierda */}
           <div className="text-left">
             {/* Título principal */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+            <h1 className="text-[2rem] leading-[1.15] sm:text-5xl sm:leading-tight lg:text-6xl font-bold text-white mb-4 sm:mb-6">
               Doná y recibí{" "}
               <span className="text-white">
-                <br />
-                descuentos <br />
+                <br className="hidden sm:block" />
+                descuentos <br className="hidden sm:block" />
                 exclusivos
-                <br />
               </span>
             </h1>
 
             {/* Subtítulo */}
-            <p className="text-xl text-white mb-8 leading-relaxed">
+            <p className="text-base sm:text-xl text-white/95 mb-6 sm:mb-8 leading-relaxed max-w-md sm:max-w-none">
               Tu donación apoya proyectos sociales y ambientales y te da acceso
               a cupones de descuento ahorrando más de lo que donás.
             </p>
@@ -58,11 +57,11 @@ const desktopUrl = cloudinaryLoader({ src: "v1768268779/Fondo_hero_yzustd.png", 
             <div className="flex flex-col sm:flex-row gap-4">
               <a
                 href="/donar"
-                className="group px-8 py-4 bg-linear-to-r from-teal-600 to-teal-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 flex items-center justify-center gap-2"
+                className="group w-full sm:w-auto px-5 sm:px-8 py-4 bg-linear-to-r from-teal-500 to-teal-600 sm:from-teal-600 sm:to-teal-700 text-white text-[15px] sm:text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 flex items-center justify-center gap-2"
               >
                 <span>Quiero donar y obtener descuentos</span>
                 <svg
-                  className="w-5 h-5 group-hover:translate-x-1 transition-transform"
+                  className="w-5 h-5 shrink-0 group-hover:translate-x-1 transition-transform"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -79,7 +78,7 @@ const desktopUrl = cloudinaryLoader({ src: "v1768268779/Fondo_hero_yzustd.png", 
             </div>
 
             {/* Trust indicators */}
-            <div className="mt-8 flex flex-wrap items-center gap-6 text-sm text-white">
+            <div className="mt-6 sm:mt-8 grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-6 text-sm text-white">
               <div className="flex items-center gap-2">
                 <svg
                   className="w-5 h-5 text-teal-400"

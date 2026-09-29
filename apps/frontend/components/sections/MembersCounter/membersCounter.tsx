@@ -27,7 +27,7 @@ export default function MembersCounter() {
           }
         });
       },
-      { threshold: 0.3 }
+      { threshold: 0.3 },
     );
 
     if (sectionRef.current) {
@@ -64,13 +64,12 @@ export default function MembersCounter() {
   }, [isVisible]);
 
   return (
-    <section ref={sectionRef} className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-white">
+    <section
+      ref={sectionRef}
+      className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-white"
+    >
       <div className="max-w-4xl mx-auto text-center">
         {/* Pill superior */}
-        <div className="inline-flex items-center gap-2 bg-teal-50 text-teal-500 px-4 py-2 rounded-full text-sm font-bold mb-6">
-          <Sparkles className="w-4 h-4" strokeWidth={2.5} />
-          Comunidad Club Triple Impacto
-        </div>
 
         {/* Titular con número animado */}
         <h2 className="text-3xl sm:text-5xl font-bold text-gray-900 leading-tight mb-4">
@@ -81,9 +80,9 @@ export default function MembersCounter() {
           socios
         </h2>
         <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto mb-10">
-          Personas que donan mes a mes en Club Triple Impacto y hacen crecer
-          el impacto colectivo. Cada nueva persona suma más beneficios y más
-          ayuda para las ONGs.
+          Personas que donan mes a mes en Club Triple Impacto y hacen crecer el
+          impacto colectivo. Cada nueva persona suma más beneficios y más ayuda
+          para las ONGs.
         </p>
 
         {/* Cluster de avatares + badge de conteo */}

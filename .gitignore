@@ -213,3 +213,6 @@ apps/backend/*.xls
 
 # Antigravity Agents
 .agents/
+
+# MCP local (Claude Code)
+.mcp.json

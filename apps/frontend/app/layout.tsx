@@ -58,6 +58,7 @@ const jsonLd = {
       sameAs: [
         "https://www.linkedin.com/company/comunidad-club-triple-impacto/",
         "https://www.instagram.com/clubtripleimpactook",
+        "https://www.tiktok.com/@clubtripleimpacto",
       ],
     },
     {
